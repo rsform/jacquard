@@ -5,44 +5,32 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct AcceptConvo<'a> {
     #[serde(borrow)]
-    pub convo_id: jacquard_common::CowStr<'a>,
+    pub convo_id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct AcceptConvoOutput<'a> {
     ///Rev when the convo was accepted. If not present, the convo was already accepted.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub rev: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub rev: Option<CowStr<'a>>,
 }
 
-/// Response type for
-///chat.bsky.convo.acceptConvo
+/// Response type for chat.bsky.convo.acceptConvo
 pub struct AcceptConvoResponse;
 impl jacquard_common::xrpc::XrpcResp for AcceptConvoResponse {
     const NSID: &'static str = "chat.bsky.convo.acceptConvo";
@@ -59,8 +47,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for AcceptConvo<'a> {
     type Response = AcceptConvoResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.convo.acceptConvo
+/// Endpoint type for chat.bsky.convo.acceptConvo
 pub struct AcceptConvoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AcceptConvoRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.acceptConvo";

@@ -5,39 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::moderation::SubjectView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSubjects<'a> {
     #[serde(borrow)]
-    pub subjects: Vec<jacquard_common::CowStr<'a>>,
+    pub subjects: Vec<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSubjectsOutput<'a> {
     #[serde(borrow)]
-    pub subjects: Vec<crate::tools_ozone::moderation::SubjectView<'a>>,
+    pub subjects: Vec<SubjectView<'a>>,
 }
 
-/// Response type for
-///tools.ozone.moderation.getSubjects
+/// Response type for tools.ozone.moderation.getSubjects
 pub struct GetSubjectsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSubjectsResponse {
     const NSID: &'static str = "tools.ozone.moderation.getSubjects";
@@ -52,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSubjects<'a> {
     type Response = GetSubjectsResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.moderation.getSubjects
+/// Endpoint type for tools.ozone.moderation.getSubjects
 pub struct GetSubjectsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSubjectsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.getSubjects";
@@ -96,9 +86,9 @@ pub mod get_subjects_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetSubjectsBuilder<'a, S: get_subjects_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<CowStr<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetSubjects<'a> {
@@ -112,9 +102,9 @@ impl<'a> GetSubjectsBuilder<'a, get_subjects_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSubjectsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -127,13 +117,13 @@ where
     /// Set the `subjects` field (required)
     pub fn subjects(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> GetSubjectsBuilder<'a, get_subjects_state::SetSubjects<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetSubjectsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

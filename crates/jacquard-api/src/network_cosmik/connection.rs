@@ -5,83 +5,82 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A connection linking a source to a target, with optional type and note.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Connection<'a> {
     ///Optional type of connection
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub connection_type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub connection_type: Option<CowStr<'a>>,
     ///Timestamp when this connection was created.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<Datetime>,
     ///Optional note about the connection
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub note: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub note: Option<CowStr<'a>>,
     ///Source entity (URL string or AT URI)
     #[serde(borrow)]
-    pub source: jacquard_common::CowStr<'a>,
+    pub source: CowStr<'a>,
     ///Target entity (URL string or AT URI)
     #[serde(borrow)]
-    pub target: jacquard_common::CowStr<'a>,
+    pub target: CowStr<'a>,
     ///Timestamp when this connection was last updated.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ConnectionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Connection<'a>,
 }
 
 impl<'a> Connection<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ConnectionRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ConnectionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ConnectionRecord;
-impl jacquard_common::xrpc::XrpcResp for ConnectionRecord {
+impl XrpcResp for ConnectionRecord {
     const NSID: &'static str = "network.cosmik.connection";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ConnectionGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ConnectionGetRecordOutput<'_>> for Connection<'_> {
@@ -91,36 +90,32 @@ impl From<ConnectionGetRecordOutput<'_>> for Connection<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Connection<'_> {
+impl Collection for Connection<'_> {
     const NSID: &'static str = "network.cosmik.connection";
     type Record = ConnectionRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ConnectionRecord {
+impl Collection for ConnectionRecord {
     const NSID: &'static str = "network.cosmik.connection";
     type Record = ConnectionRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Connection<'a> {
+impl<'a> LexiconSchema for Connection<'a> {
     fn nsid() -> &'static str {
         "network.cosmik.connection"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_network_cosmik_connection()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.note {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "note",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("note"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -140,52 +135,52 @@ pub mod connection_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Source;
         type Target;
+        type Source;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Source = Unset;
         type Target = Unset;
-    }
-    ///State transition - sets the `source` field to Set
-    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSource<S> {}
-    impl<S: State> State for SetSource<S> {
-        type Source = Set<members::source>;
-        type Target = S::Target;
+        type Source = Unset;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTarget<S> {}
     impl<S: State> State for SetTarget<S> {
-        type Source = S::Source;
         type Target = Set<members::target>;
+        type Source = S::Source;
+    }
+    ///State transition - sets the `source` field to Set
+    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSource<S> {}
+    impl<S: State> State for SetSource<S> {
+        type Target = S::Target;
+        type Source = Set<members::source>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `source` field
-        pub struct source(());
         ///Marker type for the `target` field
         pub struct target(());
+        ///Marker type for the `source` field
+        pub struct source(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ConnectionBuilder<'a, S: connection_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Connection<'a> {
@@ -199,27 +194,21 @@ impl<'a> ConnectionBuilder<'a, connection_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConnectionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     /// Set the `connectionType` field (optional)
-    pub fn connection_type(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn connection_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `connectionType` field to an Option value (optional)
-    pub fn maybe_connection_type(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_connection_type(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -227,18 +216,12 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
 
 impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
-    pub fn created_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
-    pub fn maybe_created_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -246,15 +229,12 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
 
 impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
-    pub fn maybe_note(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -268,13 +248,13 @@ where
     /// Set the `source` field (required)
     pub fn source(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ConnectionBuilder<'a, connection_state::SetSource<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         ConnectionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -287,31 +267,25 @@ where
     /// Set the `target` field (required)
     pub fn target(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ConnectionBuilder<'a, connection_state::SetTarget<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         ConnectionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
-    pub fn updated_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
-    pub fn maybe_updated_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -320,8 +294,8 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
 impl<'a, S> ConnectionBuilder<'a, S>
 where
     S: connection_state::State,
-    S::Source: connection_state::IsSet,
     S::Target: connection_state::IsSet,
+    S::Source: connection_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Connection<'a> {
@@ -338,7 +312,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -355,173 +329,104 @@ where
     }
 }
 
-fn lexicon_doc_network_cosmik_connection() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("network.cosmik.connection"),
-        revision: None,
-        description: None,
+fn lexicon_doc_network_cosmik_connection() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("network.cosmik.connection"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A connection linking a source to a target, with optional type and note.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("source"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("target")
+                                SmolStr::new_static("source"), SmolStr::new_static("target")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "connectionType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("connectionType"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Optional type of connection",
-                                        ),
+                                        CowStr::new_static("Optional type of connection"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp when this connection was created.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "note",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("note"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Optional note about the connection",
-                                        ),
+                                        CowStr::new_static("Optional note about the connection"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(1000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "source",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("source"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Source entity (URL string or AT URI)",
-                                        ),
+                                        CowStr::new_static("Source entity (URL string or AT URI)"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "target",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("target"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Target entity (URL string or AT URI)",
-                                        ),
+                                        CowStr::new_static("Target entity (URL string or AT URI)"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "updatedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("updatedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp when this connection was last updated.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

@@ -5,88 +5,81 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::app_offprint::block::image;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct AspectRatio<'a> {
     pub height: i64,
     pub width: i64,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Image<'a> {
     ///Horizontal alignment
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alignment: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub alignment: Option<CowStr<'a>>,
     ///Alt text for accessibility
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alt: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub alt: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: core::option::Option<
-        crate::app_offprint::block::image::AspectRatio<'a>,
-    >,
+    pub aspect_ratio: Option<image::AspectRatio<'a>>,
     ///The image blob
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub blob: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub blob: Option<BlobRef<'a>>,
     ///Image caption
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub caption: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub caption: Option<CowStr<'a>>,
     ///Facets for caption formatting
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub caption_facets: core::option::Option<
-        Vec<jacquard_common::types::value::Data<'a>>,
-    >,
+    pub caption_facets: Option<Vec<Data<'a>>>,
     ///CSS width value (e.g., "50%", "300px")
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub width: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub width: Option<CowStr<'a>>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
+impl<'a> LexiconSchema for AspectRatio<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.image"
     }
     fn def_name() -> &'static str {
         "aspectRatio"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_image()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.height;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "height",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("height"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -95,10 +88,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
         {
             let value = &self.width;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "width",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("width"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -108,31 +99,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Image<'a> {
+impl<'a> LexiconSchema for Image<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.image"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_image()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.alt {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "alt",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("alt"),
                         max: 300usize,
                         actual: count,
                     });
@@ -143,10 +126,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Image<'a> {
             {
                 let size = value.blob().size;
                 if size > 10000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
+                    return Err(ConstraintError::BlobTooLarge {
+                        path: ValidationPath::from_field("blob"),
                         max: 10000000usize,
                         actual: size,
                     });
@@ -171,10 +152,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Image<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("blob"),
                         accepted: vec!["image/*".to_string()],
                         actual: mime.to_string(),
                     });
@@ -231,9 +210,9 @@ pub mod aspect_ratio_state {
 
 /// Builder for constructing an instance of this type
 pub struct AspectRatioBuilder<'a, S: aspect_ratio_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>, ::core::option::Option<i64>),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> AspectRatio<'a> {
@@ -247,9 +226,9 @@ impl<'a> AspectRatioBuilder<'a, aspect_ratio_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AspectRatioBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -264,11 +243,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetHeight<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         AspectRatioBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -283,11 +262,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetWidth<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         AspectRatioBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -309,10 +288,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> AspectRatio<'a> {
         AspectRatio {
             height: self.__unsafe_private_named.0.unwrap(),
@@ -322,195 +298,118 @@ where
     }
 }
 
-fn lexicon_doc_app_offprint_block_image() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.offprint.block.image"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_offprint_block_image() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.offprint.block.image"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("aspectRatio"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("aspectRatio"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("width"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("height")
-                        ],
+                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "height",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("height"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "width",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("width"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("main"),
+                LexUserType::Object(LexObject {
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alignment",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("alignment"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Horizontal alignment",
-                                    ),
+                                    CowStr::new_static("Horizontal alignment"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("alt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Alt text for accessibility",
-                                    ),
+                                    CowStr::new_static("Alt text for accessibility"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
                                 max_graphemes: Some(300usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "aspectRatio",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#aspectRatio"),
+                            SmolStr::new_static("aspectRatio"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#aspectRatio"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "blob",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                description: None,
-                                accept: None,
-                                max_size: None,
+                            SmolStr::new_static("blob"),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("caption"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Image caption")),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "caption",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("captionFacets"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static("Image caption"),
+                                    CowStr::new_static("Facets for caption formatting"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "captionFacets",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Facets for caption formatting",
-                                    ),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "app.offprint.richtext.facet",
-                                    ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("app.offprint.richtext.facet"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "width",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("width"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "CSS width value (e.g., \"50%\", \"300px\")",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

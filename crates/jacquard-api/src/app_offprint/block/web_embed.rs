@@ -5,82 +5,82 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::string::UriValue;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct WebEmbed<'a> {
     ///Horizontal alignment
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alignment: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub alignment: Option<CowStr<'a>>,
     ///Page description/excerpt
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<CowStr<'a>>,
     ///Native embed height in pixels
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub embed_height: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub embed_height: Option<i64>,
     ///oEmbed URL for iframe embedding
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub embed_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub embed_url: Option<UriValue<'a>>,
     ///Native embed width in pixels
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub embed_width: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub embed_width: Option<i64>,
     ///The URL of the embedded page
     #[serde(borrow)]
-    pub href: jacquard_common::types::string::UriValue<'a>,
+    pub href: UriValue<'a>,
     ///Screenshot of the embedded content (1280×720px)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub preview: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub preview: Option<BlobRef<'a>>,
     ///Name of the website
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub site_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub site_name: Option<CowStr<'a>>,
     ///Page title
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: Option<CowStr<'a>>,
     ///CSS width value (e.g., "100%", "75%". "50%" minimum)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub width: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub width: Option<CowStr<'a>>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
+impl<'a> LexiconSchema for WebEmbed<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.webEmbed"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_webEmbed()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.description {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("description"),
                         max: 1000usize,
                         actual: count,
                     });
@@ -89,10 +89,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
         }
         if let Some(ref value) = self.embed_height {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "embed_height",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("embed_height"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -100,10 +98,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
         }
         if let Some(ref value) = self.embed_width {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "embed_width",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("embed_width"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -113,10 +109,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
             {
                 let size = value.blob().size;
                 if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "preview",
-                        ),
+                    return Err(ConstraintError::BlobTooLarge {
+                        path: ValidationPath::from_field("preview"),
                         max: 1000000usize,
                         actual: size,
                     });
@@ -141,10 +135,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "preview",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("preview"),
                         accepted: vec!["image/*".to_string()],
                         actual: mime.to_string(),
                     });
@@ -153,16 +145,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
         }
         if let Some(ref value) = self.site_name {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "site_name",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("site_name"),
                         max: 100usize,
                         actual: count,
                     });
@@ -171,16 +157,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
         }
         if let Some(ref value) = self.title {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("title"),
                         max: 300usize,
                         actual: count,
                     });
@@ -225,20 +205,20 @@ pub mod web_embed_state {
 
 /// Builder for constructing an instance of this type
 pub struct WebEmbedBuilder<'a, S: web_embed_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<UriValue<'a>>,
+        Option<i64>,
+        Option<UriValue<'a>>,
+        Option<BlobRef<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> WebEmbed<'a> {
@@ -252,7 +232,7 @@ impl<'a> WebEmbedBuilder<'a, web_embed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         WebEmbedBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -265,25 +245,19 @@ impl<'a> WebEmbedBuilder<'a, web_embed_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `alignment` field (optional)
-    pub fn alignment(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn alignment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `alignment` field to an Option value (optional)
-    pub fn maybe_alignment(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_alignment(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -291,18 +265,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -323,18 +291,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `embedUrl` field (optional)
-    pub fn embed_url(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn embed_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `embedUrl` field to an Option value (optional)
-    pub fn maybe_embed_url(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_embed_url(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -361,31 +323,25 @@ where
     /// Set the `href` field (required)
     pub fn href(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> WebEmbedBuilder<'a, web_embed_state::SetHref<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         WebEmbedBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `preview` field (optional)
-    pub fn preview(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
-    ) -> Self {
+    pub fn preview(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `preview` field to an Option value (optional)
-    pub fn maybe_preview(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_preview(mut self, value: Option<BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -393,18 +349,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `siteName` field (optional)
-    pub fn site_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn site_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `siteName` field to an Option value (optional)
-    pub fn maybe_site_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_site_name(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -412,15 +362,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -428,15 +375,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `width` field (optional)
-    pub fn width(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn width(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `width` field to an Option value (optional)
-    pub fn maybe_width(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_width(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -466,7 +410,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -487,217 +431,116 @@ where
     }
 }
 
-fn lexicon_doc_app_offprint_block_webEmbed() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.offprint.block.webEmbed"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_offprint_block_webEmbed() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.offprint.block.webEmbed"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("href")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("main"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("href")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alignment",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("alignment"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Horizontal alignment",
-                                    ),
+                                    CowStr::new_static("Horizontal alignment"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "description",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("description"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Page description/excerpt",
-                                    ),
+                                    CowStr::new_static("Page description/excerpt"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
                                 max_graphemes: Some(1000usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "embedHeight",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("embedHeight"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "embedUrl",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("embedUrl"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "oEmbed URL for iframe embedding",
-                                    ),
+                                    CowStr::new_static("oEmbed URL for iframe embedding"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "embedWidth",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("embedWidth"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "href",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("href"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The URL of the embedded page",
-                                    ),
+                                    CowStr::new_static("The URL of the embedded page"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "preview",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                description: None,
-                                accept: None,
-                                max_size: None,
-                            }),
+                            SmolStr::new_static("preview"),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "siteName",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("siteName"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static("Name of the website"),
+                                    CowStr::new_static("Name of the website"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
                                 max_graphemes: Some(100usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "title",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Page title"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
+                            SmolStr::new_static("title"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Page title")),
                                 max_graphemes: Some(300usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "width",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("width"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "CSS width value (e.g., \"100%\", \"75%\". \"50%\" minimum)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

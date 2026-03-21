@@ -5,96 +5,90 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::pub_quizzy::team_score;
 /// A team's scored answers for a quiz
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct TeamScore<'a> {
     ///Scored answers for this team
     #[serde(borrow)]
-    pub answers: Vec<crate::pub_quizzy::team_score::ScoredAnswer<'a>>,
+    pub answers: Vec<team_score::ScoredAnswer<'a>>,
     ///Reference to the quizBegin record
     #[serde(borrow)]
-    pub quiz_begin: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    pub quiz_begin: StrongRef<'a>,
     ///Reference to the team
     #[serde(borrow)]
-    pub team: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    pub team: StrongRef<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct TeamScoreGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: TeamScore<'a>,
 }
 
 /// An answer with scores for each expected answer
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ScoredAnswer<'a> {
     ///Reference to the answer record
     #[serde(borrow)]
-    pub answer: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    pub answer: StrongRef<'a>,
     ///Optional commentary from the quiz master
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub commentary: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub commentary: Option<CowStr<'a>>,
     ///Points awarded for each expected answer in the question
     pub scores: Vec<i64>,
 }
 
 impl<'a> TeamScore<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, TeamScoreRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, TeamScoreRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TeamScoreRecord;
-impl jacquard_common::xrpc::XrpcResp for TeamScoreRecord {
+impl XrpcResp for TeamScoreRecord {
     const NSID: &'static str = "pub.quizzy.teamScore";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = TeamScoreGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<TeamScoreGetRecordOutput<'_>> for TeamScore<'_> {
@@ -104,37 +98,33 @@ impl From<TeamScoreGetRecordOutput<'_>> for TeamScore<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for TeamScore<'_> {
+impl Collection for TeamScore<'_> {
     const NSID: &'static str = "pub.quizzy.teamScore";
     type Record = TeamScoreRecord;
 }
 
-impl jacquard_common::types::collection::Collection for TeamScoreRecord {
+impl Collection for TeamScoreRecord {
     const NSID: &'static str = "pub.quizzy.teamScore";
     type Record = TeamScoreRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for TeamScore<'a> {
+impl<'a> LexiconSchema for TeamScore<'a> {
     fn nsid() -> &'static str {
         "pub.quizzy.teamScore"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_pub_quizzy_teamScore()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.answers;
             #[allow(unused_comparisons)]
             if value.len() > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "answers",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("answers"),
                     max: 500usize,
                     actual: value.len(),
                 });
@@ -144,26 +134,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TeamScore<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ScoredAnswer<'a> {
+impl<'a> LexiconSchema for ScoredAnswer<'a> {
     fn nsid() -> &'static str {
         "pub.quizzy.teamScore"
     }
     fn def_name() -> &'static str {
         "scoredAnswer"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_pub_quizzy_teamScore()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.commentary {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "commentary",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("commentary"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -171,16 +157,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScoredAnswer<'a> {
         }
         if let Some(ref value) = self.commentary {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "commentary",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("commentary"),
                         max: 500usize,
                         actual: count,
                     });
@@ -191,10 +171,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScoredAnswer<'a> {
             let value = &self.scores;
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "scores",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("scores"),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -204,10 +182,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScoredAnswer<'a> {
             let value = &self.scores;
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "scores",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("scores"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -277,13 +253,13 @@ pub mod team_score_state {
 
 /// Builder for constructing an instance of this type
 pub struct TeamScoreBuilder<'a, S: team_score_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::pub_quizzy::team_score::ScoredAnswer<'a>>>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        Option<Vec<team_score::ScoredAnswer<'a>>>,
+        Option<StrongRef<'a>>,
+        Option<StrongRef<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> TeamScore<'a> {
@@ -297,9 +273,9 @@ impl<'a> TeamScoreBuilder<'a, team_score_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TeamScoreBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -312,13 +288,13 @@ where
     /// Set the `answers` field (required)
     pub fn answers(
         mut self,
-        value: impl Into<Vec<crate::pub_quizzy::team_score::ScoredAnswer<'a>>>,
+        value: impl Into<Vec<team_score::ScoredAnswer<'a>>>,
     ) -> TeamScoreBuilder<'a, team_score_state::SetAnswers<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         TeamScoreBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -331,13 +307,13 @@ where
     /// Set the `quizBegin` field (required)
     pub fn quiz_begin(
         mut self,
-        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        value: impl Into<StrongRef<'a>>,
     ) -> TeamScoreBuilder<'a, team_score_state::SetQuizBegin<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         TeamScoreBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -350,13 +326,13 @@ where
     /// Set the `team` field (required)
     pub fn team(
         mut self,
-        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        value: impl Into<StrongRef<'a>>,
     ) -> TeamScoreBuilder<'a, team_score_state::SetTeam<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         TeamScoreBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -380,7 +356,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -394,161 +370,128 @@ where
     }
 }
 
-fn lexicon_doc_pub_quizzy_teamScore() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("pub.quizzy.teamScore"),
-        revision: None,
-        description: None,
+fn lexicon_doc_pub_quizzy_teamScore() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("pub.quizzy.teamScore"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A team's scored answers for a quiz",
-                        ),
+                        CowStr::new_static("A team's scored answers for a quiz"),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("quizBegin"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("team"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("answers")
+                                SmolStr::new_static("quizBegin"),
+                                SmolStr::new_static("team"), SmolStr::new_static("answers")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "answers",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("answers"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Scored answers for this team",
-                                        ),
+                                        CowStr::new_static("Scored answers for this team"),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "#scoredAnswer",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#scoredAnswer"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(500usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "quizBegin",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "com.atproto.repo.strongRef",
-                                    ),
+                                SmolStr::new_static("quizBegin"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "team",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "com.atproto.repo.strongRef",
-                                    ),
+                                SmolStr::new_static("team"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("scoredAnswer"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("scoredAnswer"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "An answer with scores for each expected answer",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("answer"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("scores")
+                            SmolStr::new_static("answer"), SmolStr::new_static("scores")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "answer",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "com.atproto.repo.strongRef",
-                                ),
+                            SmolStr::new_static("answer"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "commentary",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("commentary"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Optional commentary from the quiz master",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(5000usize),
-                                min_graphemes: None,
                                 max_graphemes: Some(500usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "scores",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("scores"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Points awarded for each expected answer in the question",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                items: LexArrayItem::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                                 min_length: Some(1usize),
                                 max_length: Some(10usize),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -562,49 +505,49 @@ pub mod scored_answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Scores;
         type Answer;
+        type Scores;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Scores = Unset;
         type Answer = Unset;
-    }
-    ///State transition - sets the `scores` field to Set
-    pub struct SetScores<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScores<S> {}
-    impl<S: State> State for SetScores<S> {
-        type Scores = Set<members::scores>;
-        type Answer = S::Answer;
+        type Scores = Unset;
     }
     ///State transition - sets the `answer` field to Set
     pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAnswer<S> {}
     impl<S: State> State for SetAnswer<S> {
-        type Scores = S::Scores;
         type Answer = Set<members::answer>;
+        type Scores = S::Scores;
+    }
+    ///State transition - sets the `scores` field to Set
+    pub struct SetScores<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScores<S> {}
+    impl<S: State> State for SetScores<S> {
+        type Answer = S::Answer;
+        type Scores = Set<members::scores>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scores` field
-        pub struct scores(());
         ///Marker type for the `answer` field
         pub struct answer(());
+        ///Marker type for the `scores` field
+        pub struct scores(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ScoredAnswerBuilder<'a, S: scored_answer_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<i64>>,
+        Option<StrongRef<'a>>,
+        Option<CowStr<'a>>,
+        Option<Vec<i64>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ScoredAnswer<'a> {
@@ -618,9 +561,9 @@ impl<'a> ScoredAnswerBuilder<'a, scored_answer_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ScoredAnswerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -633,31 +576,25 @@ where
     /// Set the `answer` field (required)
     pub fn answer(
         mut self,
-        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        value: impl Into<StrongRef<'a>>,
     ) -> ScoredAnswerBuilder<'a, scored_answer_state::SetAnswer<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ScoredAnswerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: scored_answer_state::State> ScoredAnswerBuilder<'a, S> {
     /// Set the `commentary` field (optional)
-    pub fn commentary(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn commentary(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `commentary` field to an Option value (optional)
-    pub fn maybe_commentary(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_commentary(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -673,11 +610,11 @@ where
         mut self,
         value: impl Into<Vec<i64>>,
     ) -> ScoredAnswerBuilder<'a, scored_answer_state::SetScores<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         ScoredAnswerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -685,8 +622,8 @@ where
 impl<'a, S> ScoredAnswerBuilder<'a, S>
 where
     S: scored_answer_state::State,
-    S::Scores: scored_answer_state::IsSet,
     S::Answer: scored_answer_state::IsSet,
+    S::Scores: scored_answer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScoredAnswer<'a> {
@@ -700,7 +637,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

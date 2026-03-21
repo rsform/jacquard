@@ -5,41 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::graph::TagView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTrendingTags {
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTrendingTagsOutput<'a> {
     #[serde(borrow)]
-    pub tags: Vec<crate::sh_weaver::graph::TagView<'a>>,
+    pub tags: Vec<TagView<'a>>,
 }
 
-/// Response type for
-///sh.weaver.graph.getTrendingTags
+/// Response type for sh.weaver.graph.getTrendingTags
 pub struct GetTrendingTagsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTrendingTagsResponse {
     const NSID: &'static str = "sh.weaver.graph.getTrendingTags";
@@ -54,8 +44,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetTrendingTags {
     type Response = GetTrendingTagsResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.graph.getTrendingTags
+/// Endpoint type for sh.weaver.graph.getTrendingTags
 pub struct GetTrendingTagsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTrendingTagsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.graph.getTrendingTags";
@@ -64,7 +53,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetTrendingTagsRequest {
     type Response = GetTrendingTagsResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
@@ -89,8 +78,8 @@ pub mod get_trending_tags_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetTrendingTagsBuilder<S: get_trending_tags_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>,),
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>,),
 }
 
 impl GetTrendingTags {
@@ -104,7 +93,7 @@ impl GetTrendingTagsBuilder<get_trending_tags_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetTrendingTagsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
         }
     }

@@ -5,141 +5,101 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::UriValue;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::org_custorium::temp::jsonfg::coord_ref_sys;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct MultiRefSys<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub ref_sys: core::option::Option<
-        Vec<crate::org_custorium::temp::jsonfg::coord_ref_sys::SingleRefSys<'a>>,
-    >,
+    pub ref_sys: Option<Vec<coord_ref_sys::SingleRefSys<'a>>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RefSysByRef<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub epoch: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub epoch: Option<i64>,
     #[serde(borrow)]
-    pub href: jacquard_common::types::string::UriValue<'a>,
+    pub href: UriValue<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RefSysCustom<'a> {
     ///Value should not be reference
     #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
+    pub r#type: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RefSysSimpleRef<'a> {
     ///The value is either a URI or a CURIE.
     #[serde(borrow)]
-    pub uri: jacquard_common::CowStr<'a>,
+    pub uri: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SingleRefSys<'a> {
     #[serde(borrow)]
     pub ref_sys: SingleRefSysRefSys<'a>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SingleRefSysRefSys<'a> {
     #[serde(rename = "org.custorium.temp.jsonfg.coordRefSys#refSysSimpleRef")]
-    RefSysSimpleRef(
-        Box<crate::org_custorium::temp::jsonfg::coord_ref_sys::RefSysSimpleRef<'a>>,
-    ),
+    RefSysSimpleRef(Box<coord_ref_sys::RefSysSimpleRef<'a>>),
     #[serde(rename = "org.custorium.temp.jsonfg.coordRefSys#refSysByRef")]
-    RefSysByRef(Box<crate::org_custorium::temp::jsonfg::coord_ref_sys::RefSysByRef<'a>>),
+    RefSysByRef(Box<coord_ref_sys::RefSysByRef<'a>>),
     #[serde(rename = "org.custorium.temp.jsonfg.coordRefSys#refSysCustom")]
-    RefSysCustom(
-        Box<crate::org_custorium::temp::jsonfg::coord_ref_sys::RefSysCustom<'a>>,
-    ),
+    RefSysCustom(Box<coord_ref_sys::RefSysCustom<'a>>),
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for MultiRefSys<'a> {
+impl<'a> LexiconSchema for MultiRefSys<'a> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
     fn def_name() -> &'static str {
         "multiRefSys"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_custorium_temp_jsonfg_coordRefSys()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.ref_sys {
             #[allow(unused_comparisons)]
             if value.len() < 2usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ref_sys",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("ref_sys"),
                     min: 2usize,
                     actual: value.len(),
                 });
@@ -149,275 +109,191 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for MultiRefSys<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for RefSysByRef<'a> {
+impl<'a> LexiconSchema for RefSysByRef<'a> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
     fn def_name() -> &'static str {
         "refSysByRef"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_custorium_temp_jsonfg_coordRefSys()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for RefSysCustom<'a> {
+impl<'a> LexiconSchema for RefSysCustom<'a> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
     fn def_name() -> &'static str {
         "refSysCustom"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_custorium_temp_jsonfg_coordRefSys()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for RefSysSimpleRef<'a> {
+impl<'a> LexiconSchema for RefSysSimpleRef<'a> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
     fn def_name() -> &'static str {
         "refSysSimpleRef"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_custorium_temp_jsonfg_coordRefSys()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for SingleRefSys<'a> {
+impl<'a> LexiconSchema for SingleRefSys<'a> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
     fn def_name() -> &'static str {
         "singleRefSys"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_custorium_temp_jsonfg_coordRefSys()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "org.custorium.temp.jsonfg.coordRefSys",
-        ),
-        revision: None,
-        description: None,
+fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("org.custorium.temp.jsonfg.coordRefSys"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("multiRefSys"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("multiRefSys"),
+                LexUserType::Object(LexObject {
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "refSys",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#singleRefSys",
-                                    ),
+                            SmolStr::new_static("refSys"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#singleRefSys"),
+                                    ..Default::default()
                                 }),
                                 min_length: Some(2usize),
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("refSysByRef"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("href")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("refSysByRef"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("href")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "epoch",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("epoch"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "href",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("href"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("refSysCustom"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("type")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("refSysCustom"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("type")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Value should not be reference",
-                                    ),
+                                    CowStr::new_static("Value should not be reference"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "refSysSimpleRef",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("refSysSimpleRef"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The value is either a URI or a CURIE.",
-                                    ),
+                                    CowStr::new_static("The value is either a URI or a CURIE."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("singleRefSys"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("refSys")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("singleRefSys"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("refSys")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "refSys",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("refSys"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("#refSysSimpleRef"),
-                                    ::jacquard_common::CowStr::new_static("#refSysByRef"),
-                                    ::jacquard_common::CowStr::new_static("#refSysCustom")
+                                    CowStr::new_static("#refSysSimpleRef"),
+                                    CowStr::new_static("#refSysByRef"),
+                                    CowStr::new_static("#refSysCustom")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -455,12 +331,9 @@ pub mod ref_sys_by_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct RefSysByRefBuilder<'a, S: ref_sys_by_ref_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<UriValue<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> RefSysByRef<'a> {
@@ -474,9 +347,9 @@ impl<'a> RefSysByRefBuilder<'a, ref_sys_by_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RefSysByRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -502,13 +375,13 @@ where
     /// Set the `href` field (required)
     pub fn href(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> RefSysByRefBuilder<'a, ref_sys_by_ref_state::SetHref<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         RefSysByRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -529,7 +402,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -576,9 +449,9 @@ pub mod single_ref_sys_state {
 
 /// Builder for constructing an instance of this type
 pub struct SingleRefSysBuilder<'a, S: single_ref_sys_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<SingleRefSysRefSys<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<SingleRefSysRefSys<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SingleRefSys<'a> {
@@ -592,9 +465,9 @@ impl<'a> SingleRefSysBuilder<'a, single_ref_sys_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SingleRefSysBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -609,11 +482,11 @@ where
         mut self,
         value: impl Into<SingleRefSysRefSys<'a>>,
     ) -> SingleRefSysBuilder<'a, single_ref_sys_state::SetRefSys<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SingleRefSysBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -633,7 +506,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

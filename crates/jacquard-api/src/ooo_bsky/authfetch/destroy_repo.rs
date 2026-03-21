@@ -5,20 +5,14 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use core::marker::PhantomData;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct DestroyRepo;
-/// Response type for
-///ooo.bsky.authfetch.destroyRepo
+/// Response type for ooo.bsky.authfetch.destroyRepo
 pub struct DestroyRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for DestroyRepoResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.destroyRepo";
@@ -35,8 +29,7 @@ impl jacquard_common::xrpc::XrpcRequest for DestroyRepo {
     type Response = DestroyRepoResponse;
 }
 
-/// Endpoint type for
-///ooo.bsky.authfetch.destroyRepo
+/// Endpoint type for ooo.bsky.authfetch.destroyRepo
 pub struct DestroyRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DestroyRepoRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.destroyRepo";

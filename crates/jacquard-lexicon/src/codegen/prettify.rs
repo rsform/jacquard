@@ -140,8 +140,28 @@ pub enum ExternalImport {
     LexiconSchema,
     LexiconDoc,
     ConstraintError,
+    ValidationPath,
+    UnicodeSegmentation,
+    // core/alloc types
+    PhantomData,
+    BTreeMap,
     // external crate types
     Bytes,
+    // jacquard_common::xrpc types
+    XrpcResp,
+    XrpcRequest,
+    XrpcEndpoint,
+    XrpcMethod,
+    XrpcSubscription,
+    SubscriptionResp,
+    SubscriptionEndpoint,
+    MessageEncoding,
+    GenericError,
+    EncodeError,
+    DecodeError,
+    // jacquard_common::types::uri types
+    RecordUri,
+    UriError,
 }
 
 impl ExternalImport {
@@ -156,6 +176,23 @@ impl ExternalImport {
             Self::LexiconSchema => "LexiconSchema",
             Self::LexiconDoc => "LexiconDoc",
             Self::ConstraintError => "ConstraintError",
+            Self::ValidationPath => "ValidationPath",
+            Self::UnicodeSegmentation => "UnicodeSegmentation",
+            Self::PhantomData => "PhantomData",
+            Self::BTreeMap => "BTreeMap",
+            Self::XrpcResp => "XrpcResp",
+            Self::XrpcRequest => "XrpcRequest",
+            Self::XrpcEndpoint => "XrpcEndpoint",
+            Self::XrpcMethod => "XrpcMethod",
+            Self::XrpcSubscription => "XrpcSubscription",
+            Self::SubscriptionResp => "SubscriptionResp",
+            Self::SubscriptionEndpoint => "SubscriptionEndpoint",
+            Self::MessageEncoding => "MessageEncoding",
+            Self::GenericError => "GenericError",
+            Self::EncodeError => "EncodeError",
+            Self::DecodeError => "DecodeError",
+            Self::RecordUri => "RecordUri",
+            Self::UriError => "UriError",
         }
     }
 
@@ -166,7 +203,22 @@ impl ExternalImport {
             Self::Bytes => "jacquard_common::deps::bytes",
             Self::LexiconSchema => "jacquard_lexicon::schema",
             Self::LexiconDoc => "jacquard_lexicon::lexicon",
-            Self::ConstraintError => "jacquard_lexicon::validation",
+            Self::ConstraintError | Self::ValidationPath => "jacquard_lexicon::validation",
+            Self::UnicodeSegmentation => "jacquard_common::deps::codegen::unicode_segmentation",
+            Self::PhantomData => "core::marker",
+            Self::BTreeMap => "alloc::collections",
+            Self::XrpcResp
+            | Self::XrpcRequest
+            | Self::XrpcEndpoint
+            | Self::XrpcMethod
+            | Self::XrpcSubscription
+            | Self::SubscriptionResp
+            | Self::SubscriptionEndpoint
+            | Self::MessageEncoding
+            | Self::GenericError
+            | Self::EncodeError => "jacquard_common::xrpc",
+            Self::DecodeError => "jacquard_common::error",
+            Self::RecordUri | Self::UriError => "jacquard_common::types::uri",
         }
     }
 }
@@ -187,18 +239,30 @@ impl ImportSet {
     }
 }
 
+/// How a cross-namespace lexicon ref should be emitted.
+#[derive(Debug, Clone)]
+pub enum LexiconRefResolution {
+    /// Just the type name: `Facet`. Emits `use crate::path::Facet;`.
+    Short(syn::Ident),
+    /// Parent module + type name: `facet::Facet`. Emits `use crate::path::facet;`.
+    ParentQualified {
+        parent: syn::Ident,
+        type_name: syn::Ident,
+    },
+    // Fully-qualified refs are simply absent from the map.
+}
+
 /// Decision table built between collection and emission passes.
 /// Maps each type to either a short Ident or fully-qualified form.
 pub struct ResolvedImports {
     mode: CodegenMode,
     /// CommonTypes that resolved to short names (no collision).
     short: BTreeMap<CommonType, syn::Ident>,
-    /// CommonTypes that must stay fully-qualified (collision or Macro mode).
-    qualified: BTreeSet<CommonType>,
     /// ExternalImports that resolved to short names.
     external_short: BTreeMap<ExternalImport, syn::Ident>,
-    /// Cross-namespace lexicon refs to include in use block.
-    lexicon_uses: BTreeSet<String>,
+    /// Cross-namespace lexicon ref resolution: full crate path → how to emit it.
+    /// Short (`Facet`), parent-qualified (`facet::Facet`), or absent (fully-qualified).
+    lexicon_short: BTreeMap<String, LexiconRefResolution>,
     /// Local type names defined in this file, used for collision detection
     /// with standard library types like `Option`.
     local_type_names: HashSet<String>,
@@ -206,10 +270,17 @@ pub struct ResolvedImports {
 
 impl ResolvedImports {
     /// Build decision table from collected imports, local names, and mode.
+    ///
+    /// `lexicon_paths` maps each cross-namespace lexicon ref's full crate path
+    /// (e.g. `"crate::app_bsky::richtext::facet::Facet"`) to its short type name
+    /// (e.g. `"Facet"`). Pass an empty map when the caller doesn't have access
+    /// to the CodeGenerator (tests, default_resolved_imports).
     pub fn resolve(
         imports: &ImportSet,
         local_type_names: &HashSet<String>,
+        submodule_names: &HashSet<String>,
         mode: CodegenMode,
+        lexicon_paths: &BTreeMap<String, String>,
     ) -> Self {
         match mode {
             CodegenMode::Macro => {
@@ -217,9 +288,8 @@ impl ResolvedImports {
                 Self {
                     mode,
                     short: BTreeMap::new(),
-                    qualified: imports.common.iter().cloned().collect(),
                     external_short: BTreeMap::new(),
-                    lexicon_uses: BTreeSet::new(),
+                    lexicon_short: BTreeMap::new(),
                     local_type_names: local_type_names.clone(),
                 }
             }
@@ -247,14 +317,97 @@ impl ResolvedImports {
                     external_short.insert(ei.clone(), ident);
                 }
 
+                // Resolve cross-namespace lexicon refs with three-tier disambiguation:
+                // 1. Short name (`Facet`) if unique
+                // 2. Parent-qualified (`facet::Facet`) if short name collides but parent is unique
+                // 3. Fully-qualified if both collide
+                //
+                // Count how many refs share each short name.
+                let mut name_counts: BTreeMap<&str, usize> = BTreeMap::new();
+                for (_full_path, type_name) in lexicon_paths.iter() {
+                    *name_counts.entry(type_name.as_str()).or_default() += 1;
+                }
+                // Also count CommonType short names that are already imported.
+                for ct in short.keys() {
+                    *name_counts.entry(ct.short_name()).or_default() += 1;
+                }
+
+                // For colliding names, extract parent module and check if that disambiguates.
+                // full_path looks like "crate::app_bsky::embed::images::View".
+                // Parent module is "images", parent-qualified form is "images::View".
+                fn extract_parent(full_path: &str) -> Option<&str> {
+                    let parts: Vec<&str> = full_path.rsplitn(3, "::").collect();
+                    // parts[0] = type_name, parts[1] = parent_module, parts[2] = rest.
+                    if parts.len() >= 2 {
+                        Some(parts[1])
+                    } else {
+                        None
+                    }
+                }
+
+                // Count parent-qualified forms for colliding names.
+                let mut parent_qualified_counts: BTreeMap<String, usize> = BTreeMap::new();
+                for (full_path, type_name) in lexicon_paths.iter() {
+                    let count = name_counts.get(type_name.as_str()).copied().unwrap_or(0);
+                    if count > 1 || local_type_names.contains(type_name) {
+                        if let Some(parent) = extract_parent(full_path) {
+                            let pq = format!("{}::{}", parent, type_name);
+                            *parent_qualified_counts.entry(pq).or_default() += 1;
+                        }
+                    }
+                }
+
+                let mut lexicon_short = BTreeMap::new();
+                for (full_path, type_name) in lexicon_paths {
+                    let name_count = name_counts.get(type_name.as_str()).copied().unwrap_or(0);
+                    let collides_local = local_type_names.contains(type_name);
+
+                    if name_count <= 1 && !collides_local {
+                        // Tier 1: unique short name.
+                        let ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
+                        lexicon_short.insert(full_path.clone(), LexiconRefResolution::Short(ident));
+                    } else if let Some(parent) = extract_parent(full_path) {
+                        let pq = format!("{}::{}", parent, type_name);
+                        let pq_count = parent_qualified_counts.get(&pq).copied().unwrap_or(0);
+                        let parent_collides =
+                            local_type_names.contains(parent) || submodule_names.contains(parent);
+                        if pq_count <= 1 && !parent_collides {
+                            // Tier 2: parent-qualified.
+                            let parent_ident =
+                                syn::Ident::new(parent, proc_macro2::Span::call_site());
+                            let type_ident =
+                                syn::Ident::new(type_name, proc_macro2::Span::call_site());
+                            lexicon_short.insert(
+                                full_path.clone(),
+                                LexiconRefResolution::ParentQualified {
+                                    parent: parent_ident,
+                                    type_name: type_ident,
+                                },
+                            );
+                        }
+                        // Tier 3: absent from map → fully-qualified.
+                    }
+                }
+
                 Self {
                     mode,
                     short,
-                    qualified,
                     external_short,
-                    lexicon_uses: imports.lexicon_refs.clone(),
+                    lexicon_short,
                     local_type_names: local_type_names.clone(),
                 }
+            }
+        }
+    }
+
+    /// Returns tokens for a cross-namespace lexicon ref if it has a short or
+    /// parent-qualified resolution. Returns `None` if the ref should stay
+    /// fully-qualified. Used by `ref_to_rust_type()`.
+    pub fn lexicon_ref_tokens(&self, full_path: &str) -> Option<TokenStream> {
+        match self.lexicon_short.get(full_path)? {
+            LexiconRefResolution::Short(ident) => Some(quote! { #ident }),
+            LexiconRefResolution::ParentQualified { parent, type_name } => {
+                Some(quote! { #parent::#type_name })
             }
         }
     }
@@ -297,6 +450,29 @@ impl ResolvedImports {
         }
     }
 
+    /// Returns tokens for a CommonType with a specific lifetime name.
+    /// Used in GAT positions where the lifetime is `'de` instead of `'a`.
+    pub fn type_tokens_with_lifetime(&self, ct: &CommonType, lifetime: &str) -> TokenStream {
+        let lt = syn::Lifetime::new(&format!("'{lifetime}"), proc_macro2::Span::call_site());
+        let needs_lifetime = ct.fully_qualified().1;
+
+        if let Some(ident) = self.short.get(ct) {
+            if needs_lifetime {
+                quote! { #ident<#lt> }
+            } else {
+                quote! { #ident }
+            }
+        } else {
+            let (path_str, _) = ct.fully_qualified();
+            let path: syn::Path = syn::parse_str(path_str).expect("valid path");
+            if needs_lifetime {
+                quote! { #path<#lt> }
+            } else {
+                quote! { #path }
+            }
+        }
+    }
+
     /// Returns tokens for a CommonType path WITHOUT any lifetime parameter.
     /// Used when the caller needs to supply a different lifetime (e.g., `'static`)
     /// or when the path is used as a constructor rather than a type annotation.
@@ -329,6 +505,48 @@ impl ResolvedImports {
             CodegenMode::Pretty if !self.local_type_names.contains("Option") => "Option::is_none",
             _ => "core::option::Option::is_none",
         }
+    }
+
+    /// Returns the `Option` type wrapper tokens. In Pretty mode, emits bare
+    /// `Option` (it is in the prelude). In Macro mode, emits
+    /// `core::option::Option`. Use this when wrapping a field type.
+    pub fn option_type(&self, inner: TokenStream) -> TokenStream {
+        match self.mode {
+            CodegenMode::Pretty if !self.local_type_names.contains("Option") => {
+                quote! { Option<#inner> }
+            }
+            _ => {
+                quote! { core::option::Option<#inner> }
+            }
+        }
+    }
+
+    /// Returns the `Option::Some(...)` constructor path. In Pretty mode,
+    /// emits `Option::Some`; in Macro mode, emits `::core::option::Option::Some`.
+    pub fn option_some(&self) -> TokenStream {
+        match self.mode {
+            CodegenMode::Pretty if !self.local_type_names.contains("Option") => {
+                quote! { Option::Some }
+            }
+            _ => {
+                quote! { ::core::option::Option::Some }
+            }
+        }
+    }
+
+    /// Returns `PhantomData` path. In Pretty mode, bare `PhantomData`
+    /// (imported via use block). In Macro mode, `::core::marker::PhantomData`.
+    pub fn phantom_data(&self) -> TokenStream {
+        match self.mode {
+            CodegenMode::Pretty => quote! { PhantomData },
+            CodegenMode::Macro => quote! { ::core::marker::PhantomData },
+        }
+    }
+
+    /// Path to `BTreeMap`. Short in Pretty mode (imported at file scope),
+    /// fully qualified in Macro mode.
+    pub fn btree_map_path(&self) -> TokenStream {
+        self.external_path(&ExternalImport::BTreeMap)
     }
 
     /// Standard derive attribute for most types.
@@ -384,6 +602,27 @@ impl ResolvedImports {
                 ExternalImport::LexiconSchema => "jacquard_lexicon::schema::LexiconSchema",
                 ExternalImport::LexiconDoc => "jacquard_lexicon::lexicon::LexiconDoc",
                 ExternalImport::ConstraintError => "jacquard_lexicon::validation::ConstraintError",
+                ExternalImport::ValidationPath => "jacquard_lexicon::validation::ValidationPath",
+                ExternalImport::XrpcResp => "jacquard_common::xrpc::XrpcResp",
+                ExternalImport::XrpcRequest => "jacquard_common::xrpc::XrpcRequest",
+                ExternalImport::XrpcEndpoint => "jacquard_common::xrpc::XrpcEndpoint",
+                ExternalImport::XrpcMethod => "jacquard_common::xrpc::XrpcMethod",
+                ExternalImport::XrpcSubscription => "jacquard_common::xrpc::XrpcSubscription",
+                ExternalImport::SubscriptionResp => "jacquard_common::xrpc::SubscriptionResp",
+                ExternalImport::SubscriptionEndpoint => {
+                    "jacquard_common::xrpc::SubscriptionEndpoint"
+                }
+                ExternalImport::MessageEncoding => "jacquard_common::xrpc::MessageEncoding",
+                ExternalImport::GenericError => "jacquard_common::xrpc::GenericError",
+                ExternalImport::EncodeError => "jacquard_common::xrpc::EncodeError",
+                ExternalImport::DecodeError => "jacquard_common::error::DecodeError",
+                ExternalImport::RecordUri => "jacquard_common::types::uri::RecordUri",
+                ExternalImport::UriError => "jacquard_common::types::uri::UriError",
+                ExternalImport::UnicodeSegmentation => {
+                    "jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation"
+                }
+                ExternalImport::PhantomData => "::core::marker::PhantomData",
+                ExternalImport::BTreeMap => "alloc::collections::BTreeMap",
             };
             let path: syn::Path = syn::parse_str(path_str).expect("valid path");
             quote! { #path }
@@ -415,13 +654,52 @@ impl ResolvedImports {
             grouped.entry(path).or_default().push(ident);
         }
 
-        // Generate use statements.
+        // Generate use statements for grouped common/external imports.
+        // Validation imports and unicode_segmentation imports get #[allow(unused_imports)] since not all files
+        // with LexiconSchema impls have constraints that reference these types.
         let mut tokens = TokenStream::new();
         for (path_str, idents) in grouped {
             let path: syn::Path = syn::parse_str(path_str).expect("invalid use_path");
-            tokens.extend(quote! {
-                use #path::{#(#idents),*};
-            });
+            if path_str == "jacquard_lexicon::validation" {
+                tokens.extend(quote! {
+                    #[allow(unused_imports)]
+                    use #path::{#(#idents),*};
+                });
+            } else if path_str == "jacquard_common::deps::codegen::unicode_segmentation"
+                || path_str == "core::marker"
+                || path_str == "alloc::collections"
+            {
+                tokens.extend(quote! {
+                    #[allow(unused_imports)]
+                    use #path::{#(#idents),*};
+                });
+            } else {
+                tokens.extend(quote! {
+                    use #path::{#(#idents),*};
+                });
+            }
+        }
+
+        // Generate use statements for cross-namespace lexicon refs.
+        // Collect parent module paths to deduplicate.
+        let mut parent_modules: BTreeSet<String> = BTreeSet::new();
+        for (full_path, resolution) in &self.lexicon_short {
+            match resolution {
+                LexiconRefResolution::Short(_) => {
+                    let path: syn::Path =
+                        syn::parse_str(full_path).expect("invalid lexicon use path");
+                    tokens.extend(quote! { use #path; });
+                }
+                LexiconRefResolution::ParentQualified { .. } => {
+                    let module_path_str = &full_path[..full_path.rfind("::").expect("has ::")];
+                    parent_modules.insert(module_path_str.to_string());
+                }
+            }
+        }
+        for module_path_str in &parent_modules {
+            let module_path: syn::Path =
+                syn::parse_str(module_path_str).expect("invalid parent module path");
+            tokens.extend(quote! { use #module_path; });
         }
 
         tokens
@@ -489,9 +767,13 @@ impl GeneratedCode {
             ..
         } = self;
         quote! {
+
             #type_defs
+
             #inherent_impls
+
             #trait_impls
+
             #internals
         }
     }
@@ -539,9 +821,13 @@ impl FileOutput {
         let use_block = resolved.to_use_block();
         let tokens = quote! {
             #use_block
+
             #all_type_defs
+
             #all_inherent_impls
+
             #all_trait_impls
+
             #all_internals
         };
 
@@ -605,8 +891,10 @@ mod tests {
     fn test_file_output_combine_empty() {
         let resolved = ResolvedImports::resolve(
             &ImportSet::default(),
-            &std::collections::HashSet::new(),
+            &HashSet::new(),
+            &HashSet::new(),
             CodegenMode::Macro,
+            &BTreeMap::new(),
         );
         let result = FileOutput::combine(vec![], None, &resolved);
         assert_eq!(result.tokens.to_string(), "");
@@ -636,8 +924,10 @@ mod tests {
 
         let resolved = ResolvedImports::resolve(
             &ImportSet::default(),
-            &std::collections::HashSet::new(),
+            &HashSet::new(),
+            &HashSet::new(),
             CodegenMode::Macro,
+            &BTreeMap::new(),
         );
         let result =
             FileOutput::combine(vec![gen1, gen2], Some("test.nsid".to_string()), &resolved);
@@ -891,13 +1181,16 @@ mod tests {
         imports.external.insert(ExternalImport::Deserialize);
 
         let local_names = HashSet::new();
-        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Macro);
+        let resolved = ResolvedImports::resolve(
+            &imports,
+            &local_names,
+            &HashSet::new(),
+            CodegenMode::Macro,
+            &BTreeMap::new(),
+        );
 
         // In Macro mode, nothing goes into short maps
         assert!(resolved.short.is_empty());
-        assert_eq!(resolved.qualified.len(), 2);
-        assert!(resolved.qualified.contains(&CommonType::Did));
-        assert!(resolved.qualified.contains(&CommonType::Handle));
         assert!(resolved.external_short.is_empty());
 
         // Use block should be empty in Macro mode
@@ -916,11 +1209,16 @@ mod tests {
         imports.external.insert(ExternalImport::Deserialize);
 
         let local_names = HashSet::new();
-        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Pretty);
+        let resolved = ResolvedImports::resolve(
+            &imports,
+            &local_names,
+            &HashSet::new(),
+            CodegenMode::Pretty,
+            &BTreeMap::new(),
+        );
 
         // All should be in short maps
         assert_eq!(resolved.short.len(), 3);
-        assert!(resolved.qualified.is_empty());
         assert_eq!(resolved.external_short.len(), 2);
 
         // Use block should contain the types (may have spaces or formatting variations)
@@ -948,14 +1246,18 @@ mod tests {
         let mut local_names = HashSet::new();
         local_names.insert("Did".to_string());
 
-        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Pretty);
+        let resolved = ResolvedImports::resolve(
+            &imports,
+            &local_names,
+            &HashSet::new(),
+            CodegenMode::Pretty,
+            &BTreeMap::new(),
+        );
 
         // Did should be in qualified, others in short
         assert_eq!(resolved.short.len(), 2);
         assert!(resolved.short.contains_key(&CommonType::Handle));
         assert!(resolved.short.contains_key(&CommonType::Data));
-        assert_eq!(resolved.qualified.len(), 1);
-        assert!(resolved.qualified.contains(&CommonType::Did));
 
         // Use block should exclude Did
         let use_block = resolved.to_use_block().to_string();
@@ -976,10 +1278,15 @@ mod tests {
         let mut local_names = HashSet::new();
         local_names.insert("Collection".to_string());
 
-        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Pretty);
+        let resolved = ResolvedImports::resolve(
+            &imports,
+            &local_names,
+            &HashSet::new(),
+            CodegenMode::Pretty,
+            &BTreeMap::new(),
+        );
 
         // Collection stays qualified, others short
-        assert!(resolved.qualified.contains(&CommonType::Collection));
         assert!(resolved.short.contains_key(&CommonType::Did));
         assert!(resolved.short.contains_key(&CommonType::RecordError));
 
@@ -996,10 +1303,15 @@ mod tests {
         let imports = ImportSet::default();
         let local_names = HashSet::new();
 
-        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Pretty);
+        let resolved = ResolvedImports::resolve(
+            &imports,
+            &local_names,
+            &HashSet::new(),
+            CodegenMode::Pretty,
+            &BTreeMap::new(),
+        );
 
         assert!(resolved.short.is_empty());
-        assert!(resolved.qualified.is_empty());
         assert!(resolved.external_short.is_empty());
         assert_eq!(resolved.to_use_block().to_string(), "");
     }
@@ -1010,7 +1322,13 @@ mod tests {
         imports.common.insert(CommonType::Did);
 
         let local_names = HashSet::new();
-        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Pretty);
+        let resolved = ResolvedImports::resolve(
+            &imports,
+            &local_names,
+            &HashSet::new(),
+            CodegenMode::Pretty,
+            &BTreeMap::new(),
+        );
 
         // For a short-named type with lifetime, type_tokens should emit ident<'a>.
         let tokens = resolved.type_tokens(&CommonType::Did);
@@ -1020,7 +1338,13 @@ mod tests {
         // For a type without lifetime, type_tokens should emit just the ident.
         let mut imports2 = ImportSet::default();
         imports2.common.insert(CommonType::Datetime);
-        let resolved2 = ResolvedImports::resolve(&imports2, &local_names, CodegenMode::Pretty);
+        let resolved2 = ResolvedImports::resolve(
+            &imports2,
+            &local_names,
+            &HashSet::new(),
+            CodegenMode::Pretty,
+            &BTreeMap::new(),
+        );
         let tokens2 = resolved2.type_tokens(&CommonType::Datetime);
         assert_eq!(tokens2.to_string(), "Datetime");
     }
@@ -1031,7 +1355,13 @@ mod tests {
         imports.common.insert(CommonType::Did);
 
         let local_names = HashSet::new();
-        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Macro);
+        let resolved = ResolvedImports::resolve(
+            &imports,
+            &local_names,
+            &HashSet::new(),
+            CodegenMode::Macro,
+            &BTreeMap::new(),
+        );
 
         // In Macro mode, type_tokens should emit the fully-qualified path with lifetime.
         let tokens = resolved.type_tokens(&CommonType::Did);
@@ -1049,15 +1379,30 @@ mod tests {
     fn test_option_is_none_path_macro_mode() {
         let imports = ImportSet::default();
         let local_names = HashSet::new();
-        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Macro);
-        assert_eq!(resolved.option_is_none_path(), "core::option::Option::is_none");
+        let resolved = ResolvedImports::resolve(
+            &imports,
+            &local_names,
+            &HashSet::new(),
+            CodegenMode::Macro,
+            &BTreeMap::new(),
+        );
+        assert_eq!(
+            resolved.option_is_none_path(),
+            "core::option::Option::is_none"
+        );
     }
 
     #[test]
     fn test_option_is_none_path_pretty_no_collision() {
         let imports = ImportSet::default();
         let local_names = HashSet::new();
-        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Pretty);
+        let resolved = ResolvedImports::resolve(
+            &imports,
+            &local_names,
+            &HashSet::new(),
+            CodegenMode::Pretty,
+            &BTreeMap::new(),
+        );
         assert_eq!(resolved.option_is_none_path(), "Option::is_none");
     }
 
@@ -1067,7 +1412,16 @@ mod tests {
         let imports = ImportSet::default();
         let mut local_names = HashSet::new();
         local_names.insert("Option".to_string());
-        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Pretty);
-        assert_eq!(resolved.option_is_none_path(), "core::option::Option::is_none");
+        let resolved = ResolvedImports::resolve(
+            &imports,
+            &local_names,
+            &HashSet::new(),
+            CodegenMode::Pretty,
+            &BTreeMap::new(),
+        );
+        assert_eq!(
+            resolved.option_is_none_path(),
+            "core::option::Option::is_none"
+        );
     }
 }

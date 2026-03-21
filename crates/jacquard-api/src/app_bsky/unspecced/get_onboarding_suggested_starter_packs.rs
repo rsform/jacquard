@@ -5,41 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::graph::StarterPackView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetOnboardingSuggestedStarterPacks {
     ///Defaults to `10`. Min: 1. Max: 25.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetOnboardingSuggestedStarterPacksOutput<'a> {
     #[serde(borrow)]
-    pub starter_packs: Vec<crate::app_bsky::graph::StarterPackView<'a>>,
+    pub starter_packs: Vec<StarterPackView<'a>>,
 }
 
-/// Response type for
-///app.bsky.unspecced.getOnboardingSuggestedStarterPacks
+/// Response type for app.bsky.unspecced.getOnboardingSuggestedStarterPacks
 pub struct GetOnboardingSuggestedStarterPacksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetOnboardingSuggestedStarterPacksResponse {
     const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedStarterPacks";
@@ -54,8 +44,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetOnboardingSuggestedStarterPacks {
     type Response = GetOnboardingSuggestedStarterPacksResponse;
 }
 
-/// Endpoint type for
-///app.bsky.unspecced.getOnboardingSuggestedStarterPacks
+/// Endpoint type for app.bsky.unspecced.getOnboardingSuggestedStarterPacks
 pub struct GetOnboardingSuggestedStarterPacksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetOnboardingSuggestedStarterPacksRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getOnboardingSuggestedStarterPacks";
@@ -64,7 +53,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetOnboardingSuggestedStarterPacksR
     type Response = GetOnboardingSuggestedStarterPacksResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(10i64)
 }
 
@@ -91,8 +80,8 @@ pub mod get_onboarding_suggested_starter_packs_state {
 pub struct GetOnboardingSuggestedStarterPacksBuilder<
     S: get_onboarding_suggested_starter_packs_state::State,
 > {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>,),
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>,),
 }
 
 impl GetOnboardingSuggestedStarterPacks {
@@ -110,7 +99,7 @@ impl GetOnboardingSuggestedStarterPacksBuilder<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetOnboardingSuggestedStarterPacksBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
         }
     }

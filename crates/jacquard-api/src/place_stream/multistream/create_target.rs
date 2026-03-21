@@ -5,57 +5,52 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::multistream::TargetView;
+use crate::place_stream::multistream::target::Target;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateTarget<'a> {
     #[serde(borrow)]
-    pub multistream_target: crate::place_stream::multistream::target::Target<'a>,
+    pub multistream_target: Target<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateTargetOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::place_stream::multistream::TargetView<'a>,
+    pub value: TargetView<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateTargetError<'a> {
     /// The provided target URL is invalid or unreachable.
     #[serde(rename = "InvalidTargetUrl")]
-    InvalidTargetUrl(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidTargetUrl(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for CreateTargetError<'_> {
@@ -73,8 +68,7 @@ impl core::fmt::Display for CreateTargetError<'_> {
     }
 }
 
-/// Response type for
-///place.stream.multistream.createTarget
+/// Response type for place.stream.multistream.createTarget
 pub struct CreateTargetResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateTargetResponse {
     const NSID: &'static str = "place.stream.multistream.createTarget";
@@ -91,8 +85,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateTarget<'a> {
     type Response = CreateTargetResponse;
 }
 
-/// Endpoint type for
-///place.stream.multistream.createTarget
+/// Endpoint type for place.stream.multistream.createTarget
 pub struct CreateTargetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateTargetRequest {
     const PATH: &'static str = "/xrpc/place.stream.multistream.createTarget";
@@ -137,11 +130,9 @@ pub mod create_target_state {
 
 /// Builder for constructing an instance of this type
 pub struct CreateTargetBuilder<'a, S: create_target_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::place_stream::multistream::target::Target<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Target<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CreateTarget<'a> {
@@ -155,9 +146,9 @@ impl<'a> CreateTargetBuilder<'a, create_target_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateTargetBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -170,13 +161,13 @@ where
     /// Set the `multistreamTarget` field (required)
     pub fn multistream_target(
         mut self,
-        value: impl Into<crate::place_stream::multistream::target::Target<'a>>,
+        value: impl Into<Target<'a>>,
     ) -> CreateTargetBuilder<'a, create_target_state::SetMultistreamTarget<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CreateTargetBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -196,7 +187,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

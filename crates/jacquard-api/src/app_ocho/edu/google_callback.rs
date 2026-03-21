@@ -5,25 +5,21 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GoogleCallback<'a> {
     #[serde(borrow)]
-    pub code: jacquard_common::CowStr<'a>,
+    pub code: CowStr<'a>,
     #[serde(borrow)]
-    pub state: jacquard_common::CowStr<'a>,
+    pub state: CowStr<'a>,
 }
 
-/// Response type for
-///app.ocho.edu.googleCallback
+/// Response type for app.ocho.edu.googleCallback
 pub struct GoogleCallbackResponse;
 impl jacquard_common::xrpc::XrpcResp for GoogleCallbackResponse {
     const NSID: &'static str = "app.ocho.edu.googleCallback";
@@ -38,8 +34,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GoogleCallback<'a> {
     type Response = GoogleCallbackResponse;
 }
 
-/// Endpoint type for
-///app.ocho.edu.googleCallback
+/// Endpoint type for app.ocho.edu.googleCallback
 pub struct GoogleCallbackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GoogleCallbackRequest {
     const PATH: &'static str = "/xrpc/app.ocho.edu.googleCallback";
@@ -58,48 +53,45 @@ pub mod google_callback_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Code;
         type State;
+        type Code;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Code = Unset;
         type State = Unset;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type Code = Set<members::code>;
-        type State = S::State;
+        type Code = Unset;
     }
     ///State transition - sets the `state` field to Set
     pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetState<S> {}
     impl<S: State> State for SetState<S> {
-        type Code = S::Code;
         type State = Set<members::state>;
+        type Code = S::Code;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type State = S::State;
+        type Code = Set<members::code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `state` field
         pub struct state(());
+        ///Marker type for the `code` field
+        pub struct code(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GoogleCallbackBuilder<'a, S: google_callback_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GoogleCallback<'a> {
@@ -113,9 +105,9 @@ impl<'a> GoogleCallbackBuilder<'a, google_callback_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GoogleCallbackBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -128,13 +120,13 @@ where
     /// Set the `code` field (required)
     pub fn code(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GoogleCallbackBuilder<'a, google_callback_state::SetCode<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GoogleCallbackBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -147,13 +139,13 @@ where
     /// Set the `state` field (required)
     pub fn state(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GoogleCallbackBuilder<'a, google_callback_state::SetState<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GoogleCallbackBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -161,8 +153,8 @@ where
 impl<'a, S> GoogleCallbackBuilder<'a, S>
 where
     S: google_callback_state::State,
-    S::Code: google_callback_state::IsSet,
     S::State: google_callback_state::IsSet,
+    S::Code: google_callback_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GoogleCallback<'a> {

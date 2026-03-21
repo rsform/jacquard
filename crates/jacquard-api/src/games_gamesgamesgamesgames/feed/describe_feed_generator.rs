@@ -5,116 +5,92 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::{Did, AtUri};
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::feed::describe_feed_generator;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Feed<'a> {
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Links<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub privacy_policy: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub privacy_policy: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub terms_of_service: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub terms_of_service: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DescribeFeedGeneratorOutput<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
     #[serde(borrow)]
-    pub feeds: Vec<
-        crate::games_gamesgamesgamesgames::feed::describe_feed_generator::Feed<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub feeds: Vec<describe_feed_generator::Feed<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub links: core::option::Option<
-        crate::games_gamesgamesgamesgames::feed::describe_feed_generator::Links<'a>,
-    >,
+    pub links: Option<describe_feed_generator::Links<'a>>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Feed<'a> {
+impl<'a> LexiconSchema for Feed<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.feed.describeFeedGenerator"
     }
     fn def_name() -> &'static str {
         "feed"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_feed_describeFeedGenerator()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Links<'a> {
+impl<'a> LexiconSchema for Links<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.feed.describeFeedGenerator"
     }
     fn def_name() -> &'static str {
         "links"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_feed_describeFeedGenerator()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct DescribeFeedGenerator;
-/// Response type for
-///games.gamesgamesgamesgames.feed.describeFeedGenerator
+/// Response type for games.gamesgamesgamesgames.feed.describeFeedGenerator
 pub struct DescribeFeedGeneratorResponse;
 impl jacquard_common::xrpc::XrpcResp for DescribeFeedGeneratorResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.describeFeedGenerator";
@@ -129,8 +105,7 @@ impl jacquard_common::xrpc::XrpcRequest for DescribeFeedGenerator {
     type Response = DescribeFeedGeneratorResponse;
 }
 
-/// Endpoint type for
-///games.gamesgamesgamesgames.feed.describeFeedGenerator
+/// Endpoint type for games.gamesgamesgamesgames.feed.describeFeedGenerator
 pub struct DescribeFeedGeneratorRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DescribeFeedGeneratorRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.describeFeedGenerator";
@@ -173,11 +148,9 @@ pub mod feed_state {
 
 /// Builder for constructing an instance of this type
 pub struct FeedBuilder<'a, S: feed_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Feed<'a> {
@@ -191,9 +164,9 @@ impl<'a> FeedBuilder<'a, feed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FeedBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -206,13 +179,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> FeedBuilder<'a, feed_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         FeedBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -232,7 +205,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -244,111 +217,65 @@ where
     }
 }
 
-fn lexicon_doc_games_gamesgamesgamesgames_feed_describeFeedGenerator() -> jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_games_gamesgamesgamesgames_feed_describeFeedGenerator() -> LexiconDoc<
     'static,
 > {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "games.gamesgamesgamesgames.feed.describeFeedGenerator",
-        ),
-        revision: None,
-        description: None,
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("games.gamesgamesgamesgames.feed.describeFeedGenerator"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("feed"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("feed"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("links"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("links"),
+                LexUserType::Object(LexObject {
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "privacyPolicy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("privacyPolicy"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "termsOfService",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("termsOfService"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
-                    description: None,
+                SmolStr::new_static("main"),
+                LexUserType::XrpcQuery(LexXrpcQuery {
                     parameters: None,
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

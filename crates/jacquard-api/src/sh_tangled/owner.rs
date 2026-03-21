@@ -5,40 +5,41 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct OwnerOutput<'a> {
     #[serde(borrow)]
-    pub owner: jacquard_common::types::string::Did<'a>,
+    pub owner: Did<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum OwnerError<'a> {
     /// Owner is not set for this service
     #[serde(rename = "OwnerNotFound")]
-    OwnerNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    OwnerNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for OwnerError<'_> {
@@ -57,19 +58,10 @@ impl core::fmt::Display for OwnerError<'_> {
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct Owner;
-/// Response type for
-///sh.tangled.owner
+/// Response type for sh.tangled.owner
 pub struct OwnerResponse;
 impl jacquard_common::xrpc::XrpcResp for OwnerResponse {
     const NSID: &'static str = "sh.tangled.owner";
@@ -84,8 +76,7 @@ impl jacquard_common::xrpc::XrpcRequest for Owner {
     type Response = OwnerResponse;
 }
 
-/// Endpoint type for
-///sh.tangled.owner
+/// Endpoint type for sh.tangled.owner
 pub struct OwnerRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for OwnerRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.owner";

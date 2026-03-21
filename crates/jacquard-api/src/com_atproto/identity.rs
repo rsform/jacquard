@@ -15,41 +15,46 @@ pub mod sign_plc_operation;
 pub mod submit_plc_operation;
 pub mod update_handle;
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::{Did, Handle};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct IdentityInfo<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
     ///The complete DID document for the identity.
     #[serde(borrow)]
-    pub did_doc: jacquard_common::types::value::Data<'a>,
+    pub did_doc: Data<'a>,
     ///The validated handle of the account; or 'handle.invalid' if the handle did not bi-directionally match the DID document.
     #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
+    pub handle: Handle<'a>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for IdentityInfo<'a> {
+impl<'a> LexiconSchema for IdentityInfo<'a> {
     fn nsid() -> &'static str {
         "com.atproto.identity.defs"
     }
     fn def_name() -> &'static str {
         "identityInfo"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_com_atproto_identity_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -64,49 +69,49 @@ pub mod identity_info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Handle;
+        type Did;
         type DidDoc;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Handle = Unset;
+        type Did = Unset;
         type DidDoc = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
-        type DidDoc = S::DidDoc;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Did = S::Did;
         type Handle = Set<members::handle>;
+        type Did = S::Did;
+        type DidDoc = S::DidDoc;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type Did = Set<members::did>;
         type DidDoc = S::DidDoc;
     }
     ///State transition - sets the `did_doc` field to Set
     pub struct SetDidDoc<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDidDoc<S> {}
     impl<S: State> State for SetDidDoc<S> {
-        type Did = S::Did;
         type Handle = S::Handle;
+        type Did = S::Did;
         type DidDoc = Set<members::did_doc>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `did_doc` field
         pub struct did_doc(());
     }
@@ -114,13 +119,9 @@ pub mod identity_info_state {
 
 /// Builder for constructing an instance of this type
 pub struct IdentityInfoBuilder<'a, S: identity_info_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>, Option<Data<'a>>, Option<Handle<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> IdentityInfo<'a> {
@@ -134,9 +135,9 @@ impl<'a> IdentityInfoBuilder<'a, identity_info_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IdentityInfoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -149,13 +150,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> IdentityInfoBuilder<'a, identity_info_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         IdentityInfoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -168,13 +169,13 @@ where
     /// Set the `didDoc` field (required)
     pub fn did_doc(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> IdentityInfoBuilder<'a, identity_info_state::SetDidDoc<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         IdentityInfoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -187,13 +188,13 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<jacquard_common::types::string::Handle<'a>>,
+        value: impl Into<Handle<'a>>,
     ) -> IdentityInfoBuilder<'a, identity_info_state::SetHandle<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         IdentityInfoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -201,8 +202,8 @@ where
 impl<'a, S> IdentityInfoBuilder<'a, S>
 where
     S: identity_info_state::State,
-    S::Did: identity_info_state::IsSet,
     S::Handle: identity_info_state::IsSet,
+    S::Did: identity_info_state::IsSet,
     S::DidDoc: identity_info_state::IsSet,
 {
     /// Build the final struct
@@ -217,10 +218,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> IdentityInfo<'a> {
         IdentityInfo {
             did: self.__unsafe_private_named.0.unwrap(),
@@ -231,86 +229,60 @@ where
     }
 }
 
-fn lexicon_doc_com_atproto_identity_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("com.atproto.identity.defs"),
-        revision: None,
-        description: None,
+fn lexicon_doc_com_atproto_identity_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("com.atproto.identity.defs"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("identityInfo"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("identityInfo"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("handle"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("didDoc")
+                            SmolStr::new_static("did"), SmolStr::new_static("handle"),
+                            SmolStr::new_static("didDoc")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "did",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("did"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "didDoc",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
-                                description: None,
+                            SmolStr::new_static("didDoc"),
+                            LexObjectProperty::Unknown(LexUnknown {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "handle",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("handle"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The validated handle of the account; or 'handle.invalid' if the handle did not bi-directionally match the DID document.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Handle,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Handle),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

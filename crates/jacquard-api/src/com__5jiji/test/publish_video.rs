@@ -5,52 +5,45 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PublishVideo {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PublishVideoOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum PublishVideoError<'a> {
     /// The uploaded file was not a video file (or couldn't get converted to a valid video
     #[serde(rename = "NotAVideo")]
-    NotAVideo(core::option::Option<jacquard_common::CowStr<'a>>),
+    NotAVideo(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for PublishVideoError<'_> {
@@ -68,8 +61,7 @@ impl core::fmt::Display for PublishVideoError<'_> {
     }
 }
 
-/// Response type for
-///com.5jiji.test.publishVideo
+/// Response type for com.5jiji.test.publishVideo
 pub struct PublishVideoResponse;
 impl jacquard_common::xrpc::XrpcResp for PublishVideoResponse {
     const NSID: &'static str = "com.5jiji.test.publishVideo";
@@ -101,8 +93,7 @@ impl jacquard_common::xrpc::XrpcRequest for PublishVideo {
     }
 }
 
-/// Endpoint type for
-///com.5jiji.test.publishVideo
+/// Endpoint type for com.5jiji.test.publishVideo
 pub struct PublishVideoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PublishVideoRequest {
     const PATH: &'static str = "/xrpc/com.5jiji.test.publishVideo";

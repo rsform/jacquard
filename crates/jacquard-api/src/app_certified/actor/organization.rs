@@ -5,106 +5,96 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::app_certified::actor::organization;
 /// Extended metadata for an organization actor. Complements the base actor profile with organization-specific fields like legal structure and reference links.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Organization<'a> {
     ///Client-declared timestamp when this record was originally created.
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///When the organization was established. Stored as datetime per ATProto conventions (no date-only format exists). Clients should use midnight UTC (e.g., '2005-01-01T00:00:00.000Z'); consumers should treat only the date portion as canonical.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub founded_date: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub founded_date: Option<Datetime>,
     ///A strong reference to the location where the organization is based. The record referenced must conform with the lexicon app.certified.location.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub location: core::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub location: Option<StrongRef<'a>>,
     ///Legal or operational structures of the organization (e.g. 'nonprofit', 'ngo', 'government', 'social-enterprise', 'cooperative').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub organization_type: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub organization_type: Option<Vec<CowStr<'a>>>,
     ///Additional reference URLs (social media profiles, contact pages, donation links, etc.) with a display label for each URL.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub urls: core::option::Option<
-        Vec<crate::app_certified::actor::organization::UrlItem<'a>>,
-    >,
+    pub urls: Option<Vec<organization::UrlItem<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct OrganizationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Organization<'a>,
 }
 
 /// A labeled URL reference.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UrlItem<'a> {
     ///Optional human-readable label for this URL (e.g. 'Support page', 'Donation page').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub label: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub label: Option<CowStr<'a>>,
     ///The URL.
     #[serde(borrow)]
-    pub url: jacquard_common::types::string::UriValue<'a>,
+    pub url: UriValue<'a>,
 }
 
 impl<'a> Organization<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, OrganizationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, OrganizationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct OrganizationRecord;
-impl jacquard_common::xrpc::XrpcResp for OrganizationRecord {
+impl XrpcResp for OrganizationRecord {
     const NSID: &'static str = "app.certified.actor.organization";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = OrganizationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<OrganizationGetRecordOutput<'_>> for Organization<'_> {
@@ -114,36 +104,32 @@ impl From<OrganizationGetRecordOutput<'_>> for Organization<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Organization<'_> {
+impl Collection for Organization<'_> {
     const NSID: &'static str = "app.certified.actor.organization";
     type Record = OrganizationRecord;
 }
 
-impl jacquard_common::types::collection::Collection for OrganizationRecord {
+impl Collection for OrganizationRecord {
     const NSID: &'static str = "app.certified.actor.organization";
     type Record = OrganizationRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Organization<'a> {
+impl<'a> LexiconSchema for Organization<'a> {
     fn nsid() -> &'static str {
         "app.certified.actor.organization"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_certified_actor_organization()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.organization_type {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "organization_type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("organization_type"),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -153,26 +139,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Organization<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for UrlItem<'a> {
+impl<'a> LexiconSchema for UrlItem<'a> {
     fn nsid() -> &'static str {
         "app.certified.actor.organization"
     }
     fn def_name() -> &'static str {
         "urlItem"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_certified_actor_organization()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.label {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "label",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("label"),
                     max: 640usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -180,16 +162,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for UrlItem<'a> {
         }
         if let Some(ref value) = self.label {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "label",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("label"),
                         max: 64usize,
                         actual: count,
                     });
@@ -200,10 +176,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for UrlItem<'a> {
             let value = &self.url;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "url",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("url"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -212,16 +186,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for UrlItem<'a> {
         {
             let value = &self.url;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "url",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("url"),
                         max: 2048usize,
                         actual: count,
                     });
@@ -266,17 +234,15 @@ pub mod organization_state {
 
 /// Builder for constructing an instance of this type
 pub struct OrganizationBuilder<'a, S: organization_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<
-            Vec<crate::app_certified::actor::organization::UrlItem<'a>>,
-        >,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<StrongRef<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<organization::UrlItem<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Organization<'a> {
@@ -290,9 +256,9 @@ impl<'a> OrganizationBuilder<'a, organization_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         OrganizationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -305,31 +271,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> OrganizationBuilder<'a, organization_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         OrganizationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `foundedDate` field (optional)
-    pub fn founded_date(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn founded_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `foundedDate` field to an Option value (optional)
-    pub fn maybe_founded_date(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_founded_date(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -337,18 +297,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `location` field (optional)
-    pub fn location(
-        mut self,
-        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> Self {
+    pub fn location(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
-    pub fn maybe_location(
-        mut self,
-        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ) -> Self {
+    pub fn maybe_location(mut self, value: Option<StrongRef<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -358,16 +312,13 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `organizationType` field (optional)
     pub fn organization_type(
         mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+        value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `organizationType` field to an Option value (optional)
-    pub fn maybe_organization_type(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_organization_type(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -377,18 +328,13 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `urls` field (optional)
     pub fn urls(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::app_certified::actor::organization::UrlItem<'a>>>,
-        >,
+        value: impl Into<Option<Vec<organization::UrlItem<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `urls` field to an Option value (optional)
-    pub fn maybe_urls(
-        mut self,
-        value: Option<Vec<crate::app_certified::actor::organization::UrlItem<'a>>>,
-    ) -> Self {
+    pub fn maybe_urls(mut self, value: Option<Vec<organization::UrlItem<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -413,7 +359,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -429,205 +375,139 @@ where
     }
 }
 
-fn lexicon_doc_app_certified_actor_organization() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.certified.actor.organization"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_certified_actor_organization() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.certified.actor.organization"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Extended metadata for an organization actor. Complements the base actor profile with organization-specific fields like legal structure and reference links.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
-                            ],
-                        ),
-                        nullable: None,
+                    key: Some(CowStr::new_static("literal:self")),
+                    record: LexRecordRecord::Object(LexObject {
+                        required: Some(vec![SmolStr::new_static("createdAt")]),
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Client-declared timestamp when this record was originally created.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "foundedDate",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("foundedDate"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "When the organization was established. Stored as datetime per ATProto conventions (no date-only format exists). Clients should use midnight UTC (e.g., '2005-01-01T00:00:00.000Z'); consumers should treat only the date portion as canonical.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "location",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "com.atproto.repo.strongRef",
-                                    ),
+                                SmolStr::new_static("location"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "organizationType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("organizationType"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Legal or operational structures of the organization (e.g. 'nonprofit', 'ngo', 'government', 'social-enterprise', 'cooperative').",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
+                                    items: LexArrayItem::String(LexString {
                                         max_length: Some(128usize),
-                                        min_graphemes: None,
                                         max_graphemes: Some(100usize),
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(10usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "urls",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("urls"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Additional reference URLs (social media profiles, contact pages, donation links, etc.) with a display label for each URL.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static("#urlItem"),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#urlItem"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("urlItem"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("A labeled URL reference."),
-                    ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("url")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("urlItem"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("A labeled URL reference.")),
+                    required: Some(vec![SmolStr::new_static("url")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "label",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("label"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Optional human-readable label for this URL (e.g. 'Support page', 'Donation page').",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(640usize),
-                                min_graphemes: None,
                                 max_graphemes: Some(64usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "url",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("The URL."),
-                                ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("url"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("The URL.")),
+                                format: Some(LexStringFormat::Uri),
                                 max_length: Some(10000usize),
-                                min_graphemes: None,
                                 max_graphemes: Some(2048usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -665,12 +545,9 @@ pub mod url_item_state {
 
 /// Builder for constructing an instance of this type
 pub struct UrlItemBuilder<'a, S: url_item_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UrlItem<'a> {
@@ -684,24 +561,21 @@ impl<'a> UrlItemBuilder<'a, url_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UrlItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: url_item_state::State> UrlItemBuilder<'a, S> {
     /// Set the `label` field (optional)
-    pub fn label(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn label(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `label` field to an Option value (optional)
-    pub fn maybe_label(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_label(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -715,13 +589,13 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> UrlItemBuilder<'a, url_item_state::SetUrl<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         UrlItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -742,7 +616,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

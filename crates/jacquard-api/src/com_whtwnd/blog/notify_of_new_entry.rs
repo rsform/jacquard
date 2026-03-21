@@ -5,47 +5,39 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct NotifyOfNewEntry<'a> {
     #[serde(borrow)]
-    pub entry_uri: jacquard_common::types::string::AtUri<'a>,
+    pub entry_uri: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct NotifyOfNewEntryOutput<'a> {}
+
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum NotifyOfNewEntryError<'a> {}
@@ -57,8 +49,7 @@ impl core::fmt::Display for NotifyOfNewEntryError<'_> {
     }
 }
 
-/// Response type for
-///com.whtwnd.blog.notifyOfNewEntry
+/// Response type for com.whtwnd.blog.notifyOfNewEntry
 pub struct NotifyOfNewEntryResponse;
 impl jacquard_common::xrpc::XrpcResp for NotifyOfNewEntryResponse {
     const NSID: &'static str = "com.whtwnd.blog.notifyOfNewEntry";
@@ -75,8 +66,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for NotifyOfNewEntry<'a> {
     type Response = NotifyOfNewEntryResponse;
 }
 
-/// Endpoint type for
-///com.whtwnd.blog.notifyOfNewEntry
+/// Endpoint type for com.whtwnd.blog.notifyOfNewEntry
 pub struct NotifyOfNewEntryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for NotifyOfNewEntryRequest {
     const PATH: &'static str = "/xrpc/com.whtwnd.blog.notifyOfNewEntry";
@@ -121,11 +111,9 @@ pub mod notify_of_new_entry_state {
 
 /// Builder for constructing an instance of this type
 pub struct NotifyOfNewEntryBuilder<'a, S: notify_of_new_entry_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> NotifyOfNewEntry<'a> {
@@ -139,9 +127,9 @@ impl<'a> NotifyOfNewEntryBuilder<'a, notify_of_new_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NotifyOfNewEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -154,13 +142,13 @@ where
     /// Set the `entryUri` field (required)
     pub fn entry_uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> NotifyOfNewEntryBuilder<'a, notify_of_new_entry_state::SetEntryUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         NotifyOfNewEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -180,7 +168,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

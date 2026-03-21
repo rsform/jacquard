@@ -5,41 +5,43 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::{Nsid, RecordKey, Rkey};
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// Generic class to represent the code list and code that is used
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CodeType<'a> {
     #[serde(borrow)]
-    pub code: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub code: RecordKey<Rkey<'a>>,
     ///Identifier of the standard code list that contains the allowed codes.
     #[serde(borrow)]
-    pub list_id: jacquard_common::types::string::Nsid<'a>,
+    pub list_id: Nsid<'a>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CodeType<'a> {
+impl<'a> LexiconSchema for CodeType<'a> {
     fn nsid() -> &'static str {
         "org.farmapps.temp.ecrop.defs"
     }
     fn def_name() -> &'static str {
         "codeType"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_farmapps_temp_ecrop_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -54,52 +56,45 @@ pub mod code_type_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ListId;
         type Code;
+        type ListId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ListId = Unset;
         type Code = Unset;
-    }
-    ///State transition - sets the `list_id` field to Set
-    pub struct SetListId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetListId<S> {}
-    impl<S: State> State for SetListId<S> {
-        type ListId = Set<members::list_id>;
-        type Code = S::Code;
+        type ListId = Unset;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
-        type ListId = S::ListId;
         type Code = Set<members::code>;
+        type ListId = S::ListId;
+    }
+    ///State transition - sets the `list_id` field to Set
+    pub struct SetListId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetListId<S> {}
+    impl<S: State> State for SetListId<S> {
+        type Code = S::Code;
+        type ListId = Set<members::list_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `list_id` field
-        pub struct list_id(());
         ///Marker type for the `code` field
         pub struct code(());
+        ///Marker type for the `list_id` field
+        pub struct list_id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CodeTypeBuilder<'a, S: code_type_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
-        ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<RecordKey<Rkey<'a>>>, Option<Nsid<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CodeType<'a> {
@@ -113,9 +108,9 @@ impl<'a> CodeTypeBuilder<'a, code_type_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CodeTypeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -128,17 +123,13 @@ where
     /// Set the `code` field (required)
     pub fn code(
         mut self,
-        value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
+        value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> CodeTypeBuilder<'a, code_type_state::SetCode<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CodeTypeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -151,13 +142,13 @@ where
     /// Set the `listId` field (required)
     pub fn list_id(
         mut self,
-        value: impl Into<jacquard_common::types::string::Nsid<'a>>,
+        value: impl Into<Nsid<'a>>,
     ) -> CodeTypeBuilder<'a, code_type_state::SetListId<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CodeTypeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -165,8 +156,8 @@ where
 impl<'a, S> CodeTypeBuilder<'a, S>
 where
     S: code_type_state::State,
-    S::ListId: code_type_state::IsSet,
     S::Code: code_type_state::IsSet,
+    S::ListId: code_type_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CodeType<'a> {
@@ -179,7 +170,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -192,81 +183,56 @@ where
     }
 }
 
-fn lexicon_doc_org_farmapps_temp_ecrop_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.farmapps.temp.ecrop.defs"),
-        revision: None,
-        description: None,
+fn lexicon_doc_org_farmapps_temp_ecrop_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("org.farmapps.temp.ecrop.defs"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("codeType"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("codeType"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Generic class to represent the code list and code that is used",
                         ),
                     ),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("listId"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("code")
-                        ],
+                        vec![SmolStr::new_static("listId"), SmolStr::new_static("code")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "code",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::RecordKey,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("code"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::RecordKey),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "listId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("listId"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Identifier of the standard code list that contains the allowed codes.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Nsid,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Nsid),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

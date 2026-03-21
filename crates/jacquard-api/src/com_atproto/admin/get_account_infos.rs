@@ -5,39 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::admin::AccountView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountInfos<'a> {
     #[serde(borrow)]
-    pub dids: Vec<jacquard_common::types::string::Did<'a>>,
+    pub dids: Vec<Did<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountInfosOutput<'a> {
     #[serde(borrow)]
-    pub infos: Vec<crate::com_atproto::admin::AccountView<'a>>,
+    pub infos: Vec<AccountView<'a>>,
 }
 
-/// Response type for
-///com.atproto.admin.getAccountInfos
+/// Response type for com.atproto.admin.getAccountInfos
 pub struct GetAccountInfosResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAccountInfosResponse {
     const NSID: &'static str = "com.atproto.admin.getAccountInfos";
@@ -52,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetAccountInfos<'a> {
     type Response = GetAccountInfosResponse;
 }
 
-/// Endpoint type for
-///com.atproto.admin.getAccountInfos
+/// Endpoint type for com.atproto.admin.getAccountInfos
 pub struct GetAccountInfosRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInfosRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.getAccountInfos";
@@ -96,11 +86,9 @@ pub mod get_account_infos_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetAccountInfosBuilder<'a, S: get_account_infos_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<Did<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetAccountInfos<'a> {
@@ -114,9 +102,9 @@ impl<'a> GetAccountInfosBuilder<'a, get_account_infos_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetAccountInfosBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -129,13 +117,13 @@ where
     /// Set the `dids` field (required)
     pub fn dids(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+        value: impl Into<Vec<Did<'a>>>,
     ) -> GetAccountInfosBuilder<'a, get_account_infos_state::SetDids<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetAccountInfosBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

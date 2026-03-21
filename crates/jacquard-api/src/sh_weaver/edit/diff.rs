@@ -5,80 +5,83 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::deps::bytes::Bytes;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::sh_weaver::edit::DocRef;
 /// An edit record for a notebook.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Diff<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<Datetime>,
     #[serde(borrow)]
-    pub doc: crate::sh_weaver::edit::DocRef<'a>,
+    pub doc: DocRef<'a>,
     ///An inline diff for for small edit batches. Either this or snapshot must be present to be valid
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
-    pub inline_diff: core::option::Option<jacquard_common::deps::bytes::Bytes>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub inline_diff: Option<Bytes>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub prev: core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub prev: Option<StrongRef<'a>>,
     #[serde(borrow)]
-    pub root: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    pub root: StrongRef<'a>,
     ///Diff from previous diff. Either this or inlineDiff must be present to be valid
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub snapshot: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub snapshot: Option<BlobRef<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DiffGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Diff<'a>,
 }
 
 impl<'a> Diff<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DiffRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, DiffRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DiffRecord;
-impl jacquard_common::xrpc::XrpcResp for DiffRecord {
+impl XrpcResp for DiffRecord {
     const NSID: &'static str = "sh.weaver.edit.diff";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = DiffGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<DiffGetRecordOutput<'_>> for Diff<'_> {
@@ -88,37 +91,33 @@ impl From<DiffGetRecordOutput<'_>> for Diff<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Diff<'_> {
+impl Collection for Diff<'_> {
     const NSID: &'static str = "sh.weaver.edit.diff";
     type Record = DiffRecord;
 }
 
-impl jacquard_common::types::collection::Collection for DiffRecord {
+impl Collection for DiffRecord {
     const NSID: &'static str = "sh.weaver.edit.diff";
     type Record = DiffRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Diff<'a> {
+impl<'a> LexiconSchema for Diff<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.diff"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_diff()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.snapshot {
             {
                 let size = value.blob().size;
                 if size > 3000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "snapshot",
-                        ),
+                    return Err(ConstraintError::BlobTooLarge {
+                        path: ValidationPath::from_field("snapshot"),
                         max: 3000000usize,
                         actual: size,
                     });
@@ -143,10 +142,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Diff<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "snapshot",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("snapshot"),
                         accepted: vec!["*/*".to_string()],
                         actual: mime.to_string(),
                     });
@@ -203,16 +200,16 @@ pub mod diff_state {
 
 /// Builder for constructing an instance of this type
 pub struct DiffBuilder<'a, S: diff_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::sh_weaver::edit::DocRef<'a>>,
-        ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        Option<Datetime>,
+        Option<DocRef<'a>>,
+        Option<Bytes>,
+        Option<StrongRef<'a>>,
+        Option<StrongRef<'a>>,
+        Option<BlobRef<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Diff<'a> {
@@ -226,27 +223,21 @@ impl<'a> DiffBuilder<'a, diff_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DiffBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
-    pub fn created_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
-    pub fn maybe_created_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -260,31 +251,25 @@ where
     /// Set the `doc` field (required)
     pub fn doc(
         mut self,
-        value: impl Into<crate::sh_weaver::edit::DocRef<'a>>,
+        value: impl Into<DocRef<'a>>,
     ) -> DiffBuilder<'a, diff_state::SetDoc<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         DiffBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
     /// Set the `inlineDiff` field (optional)
-    pub fn inline_diff(
-        mut self,
-        value: impl Into<Option<jacquard_common::deps::bytes::Bytes>>,
-    ) -> Self {
+    pub fn inline_diff(mut self, value: impl Into<Option<Bytes>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `inlineDiff` field to an Option value (optional)
-    pub fn maybe_inline_diff(
-        mut self,
-        value: Option<jacquard_common::deps::bytes::Bytes>,
-    ) -> Self {
+    pub fn maybe_inline_diff(mut self, value: Option<Bytes>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -292,18 +277,12 @@ impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
 
 impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
     /// Set the `prev` field (optional)
-    pub fn prev(
-        mut self,
-        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> Self {
+    pub fn prev(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `prev` field to an Option value (optional)
-    pub fn maybe_prev(
-        mut self,
-        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ) -> Self {
+    pub fn maybe_prev(mut self, value: Option<StrongRef<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -317,31 +296,25 @@ where
     /// Set the `root` field (required)
     pub fn root(
         mut self,
-        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        value: impl Into<StrongRef<'a>>,
     ) -> DiffBuilder<'a, diff_state::SetRoot<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         DiffBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
     /// Set the `snapshot` field (optional)
-    pub fn snapshot(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
-    ) -> Self {
+    pub fn snapshot(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `snapshot` field to an Option value (optional)
-    pub fn maybe_snapshot(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_snapshot(mut self, value: Option<BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -368,7 +341,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -385,113 +358,78 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_edit_diff() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("sh.weaver.edit.diff"),
-        revision: None,
-        description: None,
+fn lexicon_doc_sh_weaver_edit_diff() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("sh.weaver.edit.diff"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "An edit record for a notebook.",
-                        ),
+                        CowStr::new_static("An edit record for a notebook."),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
-                            vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("root"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("doc")
-                            ],
+                            vec![SmolStr::new_static("root"), SmolStr::new_static("doc")],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "doc",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "sh.weaver.edit.defs#docRef",
-                                    ),
+                                SmolStr::new_static("doc"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("sh.weaver.edit.defs#docRef"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "inlineDiff",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
-                                    description: None,
+                                SmolStr::new_static("inlineDiff"),
+                                LexObjectProperty::Bytes(LexBytes {
                                     max_length: Some(8192usize),
-                                    min_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "prev",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "com.atproto.repo.strongRef",
-                                    ),
+                                SmolStr::new_static("prev"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "root",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "com.atproto.repo.strongRef",
-                                    ),
+                                SmolStr::new_static("root"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "snapshot",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                    description: None,
-                                    accept: None,
-                                    max_size: None,
-                                }),
+                                SmolStr::new_static("snapshot"),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

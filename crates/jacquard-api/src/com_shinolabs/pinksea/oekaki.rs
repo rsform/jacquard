@@ -5,133 +5,113 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::com_shinolabs::pinksea::oekaki;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Image<'a> {
     ///The actual atproto image blob.
     #[serde(borrow)]
-    pub blob: jacquard_common::types::blob::BlobRef<'a>,
+    pub blob: BlobRef<'a>,
     #[serde(borrow)]
-    pub image_link: crate::com_shinolabs::pinksea::oekaki::ImageLink<'a>,
+    pub image_link: oekaki::ImageLink<'a>,
 }
 
 /// A link to the image, it can be either directly to the PDS or to a CDN.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ImageLink<'a> {
     ///Alt text description of the image, for accessibility.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alt: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub alt: Option<CowStr<'a>>,
 }
 
 /// An oekaki post.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Oekaki<'a> {
     ///The timestamp of creation.
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     #[serde(borrow)]
-    pub image: crate::com_shinolabs::pinksea::oekaki::Image<'a>,
+    pub image: oekaki::Image<'a>,
     ///What this oekaki post is a response to.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub in_response_to: core::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub in_response_to: Option<StrongRef<'a>>,
     ///Is this oekaki NSFW?
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub nsfw: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub nsfw: Option<bool>,
     ///An array of tags this image had.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: Option<Vec<CowStr<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct OekakiGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Oekaki<'a>,
 }
 
 impl<'a> Oekaki<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, OekakiRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, OekakiRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Image<'a> {
+impl<'a> LexiconSchema for Image<'a> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.oekaki"
     }
     fn def_name() -> &'static str {
         "image"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_com_shinolabs_pinksea_oekaki()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.blob;
             {
                 let size = value.blob().size;
                 if size > 1048576usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
+                    return Err(ConstraintError::BlobTooLarge {
+                        path: ValidationPath::from_field("blob"),
                         max: 1048576usize,
                         actual: size,
                     });
@@ -157,10 +137,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Image<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("blob"),
                         accepted: vec!["image/png".to_string()],
                         actual: mime.to_string(),
                     });
@@ -171,31 +149,30 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Image<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ImageLink<'a> {
+impl<'a> LexiconSchema for ImageLink<'a> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.oekaki"
     }
     fn def_name() -> &'static str {
         "imageLink"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_com_shinolabs_pinksea_oekaki()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct OekakiRecord;
-impl jacquard_common::xrpc::XrpcResp for OekakiRecord {
+impl XrpcResp for OekakiRecord {
     const NSID: &'static str = "com.shinolabs.pinksea.oekaki";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = OekakiGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<OekakiGetRecordOutput<'_>> for Oekaki<'_> {
@@ -205,36 +182,32 @@ impl From<OekakiGetRecordOutput<'_>> for Oekaki<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Oekaki<'_> {
+impl Collection for Oekaki<'_> {
     const NSID: &'static str = "com.shinolabs.pinksea.oekaki";
     type Record = OekakiRecord;
 }
 
-impl jacquard_common::types::collection::Collection for OekakiRecord {
+impl Collection for OekakiRecord {
     const NSID: &'static str = "com.shinolabs.pinksea.oekaki";
     type Record = OekakiRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Oekaki<'a> {
+impl<'a> LexiconSchema for Oekaki<'a> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.oekaki"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_com_shinolabs_pinksea_oekaki()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.tags {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("tags"),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -290,12 +263,9 @@ pub mod image_state {
 
 /// Builder for constructing an instance of this type
 pub struct ImageBuilder<'a, S: image_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<crate::com_shinolabs::pinksea::oekaki::ImageLink<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<BlobRef<'a>>, Option<oekaki::ImageLink<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Image<'a> {
@@ -309,9 +279,9 @@ impl<'a> ImageBuilder<'a, image_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImageBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -324,13 +294,13 @@ where
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
-        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+        value: impl Into<BlobRef<'a>>,
     ) -> ImageBuilder<'a, image_state::SetBlob<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ImageBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -343,13 +313,13 @@ where
     /// Set the `imageLink` field (required)
     pub fn image_link(
         mut self,
-        value: impl Into<crate::com_shinolabs::pinksea::oekaki::ImageLink<'a>>,
+        value: impl Into<oekaki::ImageLink<'a>>,
     ) -> ImageBuilder<'a, image_state::SetImageLink<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ImageBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -371,7 +341,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -384,196 +354,139 @@ where
     }
 }
 
-fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("com.shinolabs.pinksea.oekaki"),
-        revision: None,
-        description: None,
+fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("com.shinolabs.pinksea.oekaki"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("image"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("image"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("blob"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("imageLink")
+                            SmolStr::new_static("blob"), SmolStr::new_static("imageLink")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "blob",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                description: None,
-                                accept: None,
-                                max_size: None,
-                            }),
+                            SmolStr::new_static("blob"),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "imageLink",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#imageLink"),
+                            SmolStr::new_static("imageLink"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#imageLink"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("imageLink"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("imageLink"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A link to the image, it can be either directly to the PDS or to a CDN.",
                         ),
                     ),
                     required: Some(vec![]),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("alt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Alt text description of the image, for accessibility.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("An oekaki post."),
-                    ),
-                    key: None,
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
+                    description: Some(CowStr::new_static("An oekaki post.")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("image"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("image"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "The timestamp of creation.",
-                                        ),
+                                        CowStr::new_static("The timestamp of creation."),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "image",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#image"),
+                                SmolStr::new_static("image"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#image"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "inResponseTo",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "com.atproto.repo.strongRef",
-                                    ),
+                                SmolStr::new_static("inResponseTo"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "nsfw",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
+                                SmolStr::new_static("nsfw"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "tags",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("tags"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "An array of tags this image had.",
-                                        ),
+                                        CowStr::new_static("An array of tags this image had."),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
+                                    items: LexArrayItem::String(LexString {
                                         max_length: Some(640usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(10usize),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -623,15 +536,15 @@ pub mod oekaki_state {
 
 /// Builder for constructing an instance of this type
 pub struct OekakiBuilder<'a, S: oekaki_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::com_shinolabs::pinksea::oekaki::Image<'a>>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        Option<Datetime>,
+        Option<oekaki::Image<'a>>,
+        Option<StrongRef<'a>>,
+        Option<bool>,
+        Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Oekaki<'a> {
@@ -645,9 +558,9 @@ impl<'a> OekakiBuilder<'a, oekaki_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         OekakiBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -660,13 +573,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> OekakiBuilder<'a, oekaki_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         OekakiBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -679,31 +592,25 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<crate::com_shinolabs::pinksea::oekaki::Image<'a>>,
+        value: impl Into<oekaki::Image<'a>>,
     ) -> OekakiBuilder<'a, oekaki_state::SetImage<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         OekakiBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: oekaki_state::State> OekakiBuilder<'a, S> {
     /// Set the `inResponseTo` field (optional)
-    pub fn in_response_to(
-        mut self,
-        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> Self {
+    pub fn in_response_to(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `inResponseTo` field to an Option value (optional)
-    pub fn maybe_in_response_to(
-        mut self,
-        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ) -> Self {
+    pub fn maybe_in_response_to(mut self, value: Option<StrongRef<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -724,18 +631,12 @@ impl<'a, S: oekaki_state::State> OekakiBuilder<'a, S> {
 
 impl<'a, S: oekaki_state::State> OekakiBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -761,7 +662,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

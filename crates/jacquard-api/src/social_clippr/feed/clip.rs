@@ -5,94 +5,92 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Language, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Record containing a bookmarked item, or 'clip'.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Clip<'a> {
     ///Client-declared timestamp when the bookmark is created
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///A description of the bookmark's content. This should be ripped from the URL metadata and be static for all records using the URL.
     #[serde(borrow)]
-    pub description: jacquard_common::CowStr<'a>,
+    pub description: CowStr<'a>,
     ///Indicates human language of the given URL
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub languages: core::option::Option<Vec<jacquard_common::types::string::Language>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub languages: Option<Vec<Language>>,
     ///User-written notes for the bookmark. Public and personal.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: Option<CowStr<'a>>,
     ///An array of tags. A format of solely alphanumeric characters and dashes should be used.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tags: core::option::Option<
-        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    >,
+    pub tags: Option<Vec<StrongRef<'a>>>,
     ///The title of the bookmark. If left empty, reuse the URL.
     #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
-    ///Whether the bookmark can be used for feed indexing and aggregation Defaults to `false`.
+    pub title: CowStr<'a>,
+    ///Whether the bookmark can be used for feed indexing and aggregation  Defaults to `false`.
     #[serde(default = "_default_clip_unlisted")]
     pub unlisted: bool,
-    ///Whether the bookmark has been read by the user Defaults to `true`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    ///Whether the bookmark has been read by the user  Defaults to `true`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_clip_unread")]
-    pub unread: core::option::Option<bool>,
+    pub unread: Option<bool>,
     ///The URL of the bookmark. Cannot be left empty or be modified after creation.
     #[serde(borrow)]
-    pub url: jacquard_common::types::string::UriValue<'a>,
+    pub url: UriValue<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ClipGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Clip<'a>,
 }
 
 impl<'a> Clip<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ClipRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ClipRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ClipRecord;
-impl jacquard_common::xrpc::XrpcResp for ClipRecord {
+impl XrpcResp for ClipRecord {
     const NSID: &'static str = "social.clippr.feed.clip";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ClipGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ClipGetRecordOutput<'_>> for Clip<'_> {
@@ -102,37 +100,33 @@ impl From<ClipGetRecordOutput<'_>> for Clip<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Clip<'_> {
+impl Collection for Clip<'_> {
     const NSID: &'static str = "social.clippr.feed.clip";
     type Record = ClipRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ClipRecord {
+impl Collection for ClipRecord {
     const NSID: &'static str = "social.clippr.feed.clip";
     type Record = ClipRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
+impl<'a> LexiconSchema for Clip<'a> {
     fn nsid() -> &'static str {
         "social.clippr.feed.clip"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_social_clippr_feed_clip()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.description;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40960usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("description"),
                     max: 40960usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -141,16 +135,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
         {
             let value = &self.description;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 4096usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("description"),
                         max: 4096usize,
                         actual: count,
                     });
@@ -160,10 +148,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
         if let Some(ref value) = self.languages {
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "languages",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("languages"),
                     max: 5usize,
                     actual: value.len(),
                 });
@@ -172,10 +158,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
         if let Some(ref value) = self.notes {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("notes"),
                     max: 100000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -183,16 +167,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
         }
         if let Some(ref value) = self.notes {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 10000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "notes",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("notes"),
                         max: 10000usize,
                         actual: count,
                     });
@@ -203,10 +181,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20480usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("title"),
                     max: 20480usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -215,16 +191,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
         {
             let value = &self.title;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("title"),
                         max: 2048usize,
                         actual: count,
                     });
@@ -235,10 +205,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
             let value = &self.url;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "url",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("url"),
                     max: 20000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -247,16 +215,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
         {
             let value = &self.url;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 2000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "url",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("url"),
                         max: 2000usize,
                         actual: count,
                     });
@@ -271,7 +233,7 @@ fn _default_clip_unlisted() -> bool {
     false
 }
 
-fn _default_clip_unread() -> core::option::Option<bool> {
+fn _default_clip_unread() -> Option<bool> {
     Some(true)
 }
 
@@ -285,103 +247,103 @@ pub mod clip_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Unlisted;
         type Url;
-        type CreatedAt;
+        type Title;
         type Description;
+        type CreatedAt;
+        type Unlisted;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Unlisted = Unset;
         type Url = Unset;
-        type CreatedAt = Unset;
+        type Title = Unset;
         type Description = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Unlisted = S::Unlisted;
-        type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `unlisted` field to Set
-    pub struct SetUnlisted<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnlisted<S> {}
-    impl<S: State> State for SetUnlisted<S> {
-        type Title = S::Title;
-        type Unlisted = Set<members::unlisted>;
-        type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
+        type CreatedAt = Unset;
+        type Unlisted = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type Title = S::Title;
-        type Unlisted = S::Unlisted;
         type Url = Set<members::url>;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Title = S::Title;
-        type Unlisted = S::Unlisted;
-        type Url = S::Url;
-        type CreatedAt = Set<members::created_at>;
         type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Unlisted = S::Unlisted;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Url = S::Url;
+        type Title = Set<members::title>;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Unlisted = S::Unlisted;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type Title = S::Title;
-        type Unlisted = S::Unlisted;
         type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
         type Description = Set<members::description>;
+        type CreatedAt = S::CreatedAt;
+        type Unlisted = S::Unlisted;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Url = S::Url;
+        type Title = S::Title;
+        type Description = S::Description;
+        type CreatedAt = Set<members::created_at>;
+        type Unlisted = S::Unlisted;
+    }
+    ///State transition - sets the `unlisted` field to Set
+    pub struct SetUnlisted<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnlisted<S> {}
+    impl<S: State> State for SetUnlisted<S> {
+        type Url = S::Url;
+        type Title = S::Title;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Unlisted = Set<members::unlisted>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `unlisted` field
-        pub struct unlisted(());
         ///Marker type for the `url` field
         pub struct url(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `unlisted` field
+        pub struct unlisted(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ClipBuilder<'a, S: clip_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::types::string::Language>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<Vec<Language>>,
+        Option<CowStr<'a>>,
+        Option<Vec<StrongRef<'a>>>,
+        Option<CowStr<'a>>,
+        Option<bool>,
+        Option<bool>,
+        Option<UriValue<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Clip<'a> {
@@ -395,7 +357,7 @@ impl<'a> ClipBuilder<'a, clip_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ClipBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -407,7 +369,7 @@ impl<'a> ClipBuilder<'a, clip_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -420,13 +382,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ClipBuilder<'a, clip_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ClipBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -439,31 +401,25 @@ where
     /// Set the `description` field (required)
     pub fn description(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ClipBuilder<'a, clip_state::SetDescription<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ClipBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     /// Set the `languages` field (optional)
-    pub fn languages(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::string::Language>>>,
-    ) -> Self {
+    pub fn languages(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `languages` field to an Option value (optional)
-    pub fn maybe_languages(
-        mut self,
-        value: Option<Vec<jacquard_common::types::string::Language>>,
-    ) -> Self {
+    pub fn maybe_languages(mut self, value: Option<Vec<Language>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -471,15 +427,12 @@ impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
 
 impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
-    pub fn maybe_notes(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -487,20 +440,12 @@ impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
 
 impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<
-            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        >,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -514,13 +459,13 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ClipBuilder<'a, clip_state::SetTitle<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         ClipBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -535,11 +480,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ClipBuilder<'a, clip_state::SetUnlisted<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         ClipBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -565,13 +510,13 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> ClipBuilder<'a, clip_state::SetUrl<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         ClipBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -579,11 +524,11 @@ where
 impl<'a, S> ClipBuilder<'a, S>
 where
     S: clip_state::State,
-    S::Title: clip_state::IsSet,
-    S::Unlisted: clip_state::IsSet,
     S::Url: clip_state::IsSet,
-    S::CreatedAt: clip_state::IsSet,
+    S::Title: clip_state::IsSet,
     S::Description: clip_state::IsSet,
+    S::CreatedAt: clip_state::IsSet,
+    S::Unlisted: clip_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Clip<'a> {
@@ -603,7 +548,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -623,223 +568,154 @@ where
     }
 }
 
-fn lexicon_doc_social_clippr_feed_clip() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("social.clippr.feed.clip"),
-        revision: None,
-        description: None,
+fn lexicon_doc_social_clippr_feed_clip() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("social.clippr.feed.clip"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Record containing a bookmarked item, or 'clip'.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("url"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("description"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("unlisted"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("url"), SmolStr::new_static("title"),
+                                SmolStr::new_static("description"),
+                                SmolStr::new_static("unlisted"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Client-declared timestamp when the bookmark is created",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "description",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("description"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "A description of the bookmark's content. This should be ripped from the URL metadata and be static for all records using the URL.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(40960usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(4096usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "languages",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("languages"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Indicates human language of the given URL",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Language,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    items: LexArrayItem::String(LexString {
+                                        format: Some(LexStringFormat::Language),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(5usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "notes",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("notes"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "User-written notes for the bookmark. Public and personal.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(100000usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(10000usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "tags",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("tags"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "An array of tags. A format of solely alphanumeric characters and dashes should be used.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "com.atproto.repo.strongRef",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "title",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("title"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The title of the bookmark. If left empty, reuse the URL.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(20480usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(2048usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "unlisted",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
+                                SmolStr::new_static("unlisted"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "unread",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
+                                SmolStr::new_static("unread"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "url",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("url"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The URL of the bookmark. Cannot be left empty or be modified after creation.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
+                                    format: Some(LexStringFormat::Uri),
                                     max_length: Some(20000usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(2000usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

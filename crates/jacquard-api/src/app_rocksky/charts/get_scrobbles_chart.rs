@@ -5,53 +5,45 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::charts::ChartsView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetScrobblesChart<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub albumuri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub albumuri: Option<AtUri<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub artisturi: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub artisturi: Option<AtUri<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did: core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub did: Option<AtIdentifier<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub genre: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub genre: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub songuri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub songuri: Option<AtUri<'a>>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetScrobblesChartOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::charts::ChartsView<'a>,
+    pub value: ChartsView<'a>,
 }
 
-/// Response type for
-///app.rocksky.charts.getScrobblesChart
+/// Response type for app.rocksky.charts.getScrobblesChart
 pub struct GetScrobblesChartResponse;
 impl jacquard_common::xrpc::XrpcResp for GetScrobblesChartResponse {
     const NSID: &'static str = "app.rocksky.charts.getScrobblesChart";
@@ -66,8 +58,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetScrobblesChart<'a> {
     type Response = GetScrobblesChartResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.charts.getScrobblesChart
+/// Endpoint type for app.rocksky.charts.getScrobblesChart
 pub struct GetScrobblesChartRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetScrobblesChartRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.charts.getScrobblesChart";
@@ -97,15 +88,15 @@ pub mod get_scrobbles_chart_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetScrobblesChartBuilder<'a, S: get_scrobbles_chart_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        Option<AtUri<'a>>,
+        Option<AtUri<'a>>,
+        Option<AtIdentifier<'a>>,
+        Option<CowStr<'a>>,
+        Option<AtUri<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetScrobblesChart<'a> {
@@ -119,27 +110,21 @@ impl<'a> GetScrobblesChartBuilder<'a, get_scrobbles_chart_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetScrobblesChartBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `albumuri` field (optional)
-    pub fn albumuri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn albumuri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `albumuri` field to an Option value (optional)
-    pub fn maybe_albumuri(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_albumuri(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -147,18 +132,12 @@ impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
 
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `artisturi` field (optional)
-    pub fn artisturi(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn artisturi(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `artisturi` field to an Option value (optional)
-    pub fn maybe_artisturi(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_artisturi(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -166,18 +145,12 @@ impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
 
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `did` field (optional)
-    pub fn did(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::ident::AtIdentifier<'a>>>,
-    ) -> Self {
+    pub fn did(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
-    pub fn maybe_did(
-        mut self,
-        value: Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ) -> Self {
+    pub fn maybe_did(mut self, value: Option<AtIdentifier<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -185,15 +158,12 @@ impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
 
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `genre` field (optional)
-    pub fn genre(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn genre(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_genre(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -201,18 +171,12 @@ impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
 
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `songuri` field (optional)
-    pub fn songuri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn songuri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `songuri` field to an Option value (optional)
-    pub fn maybe_songuri(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_songuri(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }

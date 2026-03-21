@@ -5,51 +5,44 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::moderation::get_actor_metadata;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorMetadata<'a> {
     #[serde(borrow)]
-    pub actor: jacquard_common::types::string::Did<'a>,
+    pub actor: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorMetadataOutput<'a> {
     #[serde(borrow)]
-    pub all: crate::chat_bsky::moderation::get_actor_metadata::Metadata<'a>,
+    pub all: get_actor_metadata::Metadata<'a>,
     #[serde(borrow)]
-    pub day: crate::chat_bsky::moderation::get_actor_metadata::Metadata<'a>,
+    pub day: get_actor_metadata::Metadata<'a>,
     #[serde(borrow)]
-    pub month: crate::chat_bsky::moderation::get_actor_metadata::Metadata<'a>,
+    pub month: get_actor_metadata::Metadata<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Metadata<'a> {
     pub convos: i64,
@@ -58,8 +51,7 @@ pub struct Metadata<'a> {
     pub messages_sent: i64,
 }
 
-/// Response type for
-///chat.bsky.moderation.getActorMetadata
+/// Response type for chat.bsky.moderation.getActorMetadata
 pub struct GetActorMetadataResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorMetadataResponse {
     const NSID: &'static str = "chat.bsky.moderation.getActorMetadata";
@@ -74,8 +66,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorMetadata<'a> {
     type Response = GetActorMetadataResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.moderation.getActorMetadata
+/// Endpoint type for chat.bsky.moderation.getActorMetadata
 pub struct GetActorMetadataRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorMetadataRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.moderation.getActorMetadata";
@@ -84,19 +75,17 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetActorMetadataRequest {
     type Response = GetActorMetadataResponse;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
+impl<'a> LexiconSchema for Metadata<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.moderation.getActorMetadata"
     }
     fn def_name() -> &'static str {
         "metadata"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_chat_bsky_moderation_getActorMetadata()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -135,11 +124,9 @@ pub mod get_actor_metadata_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetActorMetadataBuilder<'a, S: get_actor_metadata_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetActorMetadata<'a> {
@@ -153,9 +140,9 @@ impl<'a> GetActorMetadataBuilder<'a, get_actor_metadata_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetActorMetadataBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -168,13 +155,13 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetActorMetadataBuilder<'a, get_actor_metadata_state::SetActor<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetActorMetadataBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -202,65 +189,65 @@ pub mod metadata_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Convos;
-        type MessagesSent;
         type MessagesReceived;
+        type MessagesSent;
+        type Convos;
         type ConvosStarted;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Convos = Unset;
-        type MessagesSent = Unset;
         type MessagesReceived = Unset;
+        type MessagesSent = Unset;
+        type Convos = Unset;
         type ConvosStarted = Unset;
     }
-    ///State transition - sets the `convos` field to Set
-    pub struct SetConvos<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetConvos<S> {}
-    impl<S: State> State for SetConvos<S> {
-        type Convos = Set<members::convos>;
+    ///State transition - sets the `messages_received` field to Set
+    pub struct SetMessagesReceived<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessagesReceived<S> {}
+    impl<S: State> State for SetMessagesReceived<S> {
+        type MessagesReceived = Set<members::messages_received>;
         type MessagesSent = S::MessagesSent;
-        type MessagesReceived = S::MessagesReceived;
+        type Convos = S::Convos;
         type ConvosStarted = S::ConvosStarted;
     }
     ///State transition - sets the `messages_sent` field to Set
     pub struct SetMessagesSent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessagesSent<S> {}
     impl<S: State> State for SetMessagesSent<S> {
-        type Convos = S::Convos;
-        type MessagesSent = Set<members::messages_sent>;
         type MessagesReceived = S::MessagesReceived;
+        type MessagesSent = Set<members::messages_sent>;
+        type Convos = S::Convos;
         type ConvosStarted = S::ConvosStarted;
     }
-    ///State transition - sets the `messages_received` field to Set
-    pub struct SetMessagesReceived<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessagesReceived<S> {}
-    impl<S: State> State for SetMessagesReceived<S> {
-        type Convos = S::Convos;
+    ///State transition - sets the `convos` field to Set
+    pub struct SetConvos<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvos<S> {}
+    impl<S: State> State for SetConvos<S> {
+        type MessagesReceived = S::MessagesReceived;
         type MessagesSent = S::MessagesSent;
-        type MessagesReceived = Set<members::messages_received>;
+        type Convos = Set<members::convos>;
         type ConvosStarted = S::ConvosStarted;
     }
     ///State transition - sets the `convos_started` field to Set
     pub struct SetConvosStarted<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetConvosStarted<S> {}
     impl<S: State> State for SetConvosStarted<S> {
-        type Convos = S::Convos;
-        type MessagesSent = S::MessagesSent;
         type MessagesReceived = S::MessagesReceived;
+        type MessagesSent = S::MessagesSent;
+        type Convos = S::Convos;
         type ConvosStarted = Set<members::convos_started>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `convos` field
-        pub struct convos(());
-        ///Marker type for the `messages_sent` field
-        pub struct messages_sent(());
         ///Marker type for the `messages_received` field
         pub struct messages_received(());
+        ///Marker type for the `messages_sent` field
+        pub struct messages_sent(());
+        ///Marker type for the `convos` field
+        pub struct convos(());
         ///Marker type for the `convos_started` field
         pub struct convos_started(());
     }
@@ -268,14 +255,9 @@ pub mod metadata_state {
 
 /// Builder for constructing an instance of this type
 pub struct MetadataBuilder<'a, S: metadata_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<i64>, Option<i64>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Metadata<'a> {
@@ -289,9 +271,9 @@ impl<'a> MetadataBuilder<'a, metadata_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MetadataBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -306,11 +288,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> MetadataBuilder<'a, metadata_state::SetConvos<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         MetadataBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -325,11 +307,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> MetadataBuilder<'a, metadata_state::SetConvosStarted<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         MetadataBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -344,11 +326,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> MetadataBuilder<'a, metadata_state::SetMessagesReceived<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         MetadataBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -363,11 +345,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> MetadataBuilder<'a, metadata_state::SetMessagesSent<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         MetadataBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -375,9 +357,9 @@ where
 impl<'a, S> MetadataBuilder<'a, S>
 where
     S: metadata_state::State,
-    S::Convos: metadata_state::IsSet,
-    S::MessagesSent: metadata_state::IsSet,
     S::MessagesReceived: metadata_state::IsSet,
+    S::MessagesSent: metadata_state::IsSet,
+    S::Convos: metadata_state::IsSet,
     S::ConvosStarted: metadata_state::IsSet,
 {
     /// Build the final struct
@@ -393,7 +375,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -408,133 +390,85 @@ where
     }
 }
 
-fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "chat.bsky.moderation.getActorMetadata",
-        ),
-        revision: None,
-        description: None,
+fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("chat.bsky.moderation.getActorMetadata"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
-                    description: None,
+                SmolStr::new_static("main"),
+                LexUserType::XrpcQuery(LexXrpcQuery {
                     parameters: Some(
-                        ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
-                            description: None,
-                            required: Some(
-                                vec![
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("actor")
-                                ],
-                            ),
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("actor")]),
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::alloc::collections::BTreeMap::new();
+                                let mut map = BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                        "actor",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    SmolStr::new_static("actor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        format: Some(LexStringFormat::Did),
+                                        ..Default::default()
                                     }),
                                 );
                                 map
                             },
+                            ..Default::default()
                         }),
                     ),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("metadata"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("metadata"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("messagesSent"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("messagesReceived"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("convos"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("convosStarted")
+                            SmolStr::new_static("messagesSent"),
+                            SmolStr::new_static("messagesReceived"),
+                            SmolStr::new_static("convos"),
+                            SmolStr::new_static("convosStarted")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "convos",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("convos"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "convosStarted",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("convosStarted"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "messagesReceived",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("messagesReceived"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "messagesSent",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("messagesSent"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

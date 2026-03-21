@@ -5,24 +5,21 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RevokeAccountCredentials<'a> {
     #[serde(borrow)]
-    pub account: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub account: AtIdentifier<'a>,
 }
 
-/// Response type for
-///com.atproto.temp.revokeAccountCredentials
+/// Response type for com.atproto.temp.revokeAccountCredentials
 pub struct RevokeAccountCredentialsResponse;
 impl jacquard_common::xrpc::XrpcResp for RevokeAccountCredentialsResponse {
     const NSID: &'static str = "com.atproto.temp.revokeAccountCredentials";
@@ -39,8 +36,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RevokeAccountCredentials<'a> {
     type Response = RevokeAccountCredentialsResponse;
 }
 
-/// Endpoint type for
-///com.atproto.temp.revokeAccountCredentials
+/// Endpoint type for com.atproto.temp.revokeAccountCredentials
 pub struct RevokeAccountCredentialsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RevokeAccountCredentialsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.temp.revokeAccountCredentials";
@@ -88,11 +84,9 @@ pub struct RevokeAccountCredentialsBuilder<
     'a,
     S: revoke_account_credentials_state::State,
 > {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> RevokeAccountCredentials<'a> {
@@ -109,9 +103,9 @@ impl<'a> RevokeAccountCredentialsBuilder<'a, revoke_account_credentials_state::E
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RevokeAccountCredentialsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -124,16 +118,16 @@ where
     /// Set the `account` field (required)
     pub fn account(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> RevokeAccountCredentialsBuilder<
         'a,
         revoke_account_credentials_state::SetAccount<S>,
     > {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         RevokeAccountCredentialsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -153,7 +147,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

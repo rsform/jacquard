@@ -5,4481 +5,2597 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::social_flockfeeds::lexical::r#type::article;
+use crate::social_flockfeeds::lexical::r#type::brand;
+use crate::social_flockfeeds::lexical::r#type::event;
+use crate::social_flockfeeds::lexical::r#type::image_object;
+use crate::social_flockfeeds::lexical::r#type::offer;
+use crate::social_flockfeeds::lexical::r#type::organization;
+use crate::social_flockfeeds::lexical::r#type::person;
+use crate::social_flockfeeds::lexical::r#type::product;
 /// A particular physical business or branch of an organization. Examples of LocalBusiness include a restaurant, a particular branch of a restaurant chain, a branch of a bank, a medical practice, a club, a bowling alley, etc.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Embedded<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accepted_payment_method: core::option::Option<EmbeddedAcceptedPaymentMethod<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accepted_payment_method: Option<EmbeddedAcceptedPaymentMethod<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub actionable_feedback_policy: core::option::Option<
-        EmbeddedActionableFeedbackPolicy<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub actionable_feedback_policy: Option<EmbeddedActionableFeedbackPolicy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub additional_property: core::option::Option<EmbeddedAdditionalProperty<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub additional_property: Option<EmbeddedAdditionalProperty<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub additional_type: core::option::Option<EmbeddedAdditionalType<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub additional_type: Option<EmbeddedAdditionalType<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub address: core::option::Option<EmbeddedAddress<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub address: Option<EmbeddedAddress<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub agent_interaction_statistic: core::option::Option<
-        EmbeddedAgentInteractionStatistic<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub agent_interaction_statistic: Option<EmbeddedAgentInteractionStatistic<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub aggregate_rating: core::option::Option<EmbeddedAggregateRating<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub aggregate_rating: Option<EmbeddedAggregateRating<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alternate_name: core::option::Option<EmbeddedAlternateName<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub alternate_name: Option<EmbeddedAlternateName<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alumni: core::option::Option<EmbeddedAlumni<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub alumni: Option<EmbeddedAlumni<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub amenity_feature: core::option::Option<EmbeddedAmenityFeature<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub amenity_feature: Option<EmbeddedAmenityFeature<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub area_served: core::option::Option<EmbeddedAreaServed<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub area_served: Option<EmbeddedAreaServed<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub award: core::option::Option<EmbeddedAward<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub award: Option<EmbeddedAward<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub awards: core::option::Option<EmbeddedAwards<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub awards: Option<EmbeddedAwards<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub branch_code: core::option::Option<EmbeddedBranchCode<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub branch_code: Option<EmbeddedBranchCode<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub branch_of: core::option::Option<EmbeddedBranchOf<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub branch_of: Option<EmbeddedBranchOf<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub brand: core::option::Option<EmbeddedBrand<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub brand: Option<EmbeddedBrand<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub company_registration: core::option::Option<EmbeddedCompanyRegistration<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub company_registration: Option<EmbeddedCompanyRegistration<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub contact_point: core::option::Option<EmbeddedContactPoint<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub contact_point: Option<EmbeddedContactPoint<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub contact_points: core::option::Option<EmbeddedContactPoints<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub contact_points: Option<EmbeddedContactPoints<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub contained_in: core::option::Option<EmbeddedContainedIn<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub contained_in: Option<EmbeddedContainedIn<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub contained_in_place: core::option::Option<EmbeddedContainedInPlace<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub contained_in_place: Option<EmbeddedContainedInPlace<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub contains_place: core::option::Option<EmbeddedContainsPlace<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub contains_place: Option<EmbeddedContainsPlace<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub corrections_policy: core::option::Option<EmbeddedCorrectionsPolicy<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub corrections_policy: Option<EmbeddedCorrectionsPolicy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub currencies_accepted: core::option::Option<EmbeddedCurrenciesAccepted<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub currencies_accepted: Option<EmbeddedCurrenciesAccepted<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub department: core::option::Option<EmbeddedDepartment<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub department: Option<EmbeddedDepartment<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description: core::option::Option<EmbeddedDescription<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub description: Option<EmbeddedDescription<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub disambiguating_description: core::option::Option<
-        EmbeddedDisambiguatingDescription<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub dissolution_date: core::option::Option<EmbeddedDissolutionDate<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub dissolution_date: Option<EmbeddedDissolutionDate<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub diversity_policy: core::option::Option<EmbeddedDiversityPolicy<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub diversity_policy: Option<EmbeddedDiversityPolicy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub diversity_staffing_report: core::option::Option<
-        EmbeddedDiversityStaffingReport<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub diversity_staffing_report: Option<EmbeddedDiversityStaffingReport<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub duns: core::option::Option<EmbeddedDuns<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duns: Option<EmbeddedDuns<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub email: core::option::Option<EmbeddedEmail<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub email: Option<EmbeddedEmail<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub employee: core::option::Option<EmbeddedEmployee<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub employee: Option<EmbeddedEmployee<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub employees: core::option::Option<EmbeddedEmployees<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub employees: Option<EmbeddedEmployees<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub ethics_policy: core::option::Option<EmbeddedEthicsPolicy<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub ethics_policy: Option<EmbeddedEthicsPolicy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub event: core::option::Option<EmbeddedEvent<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub event: Option<EmbeddedEvent<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub events: core::option::Option<EmbeddedEvents<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub events: Option<EmbeddedEvents<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub fax_number: core::option::Option<EmbeddedFaxNumber<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub fax_number: Option<EmbeddedFaxNumber<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub founder: core::option::Option<EmbeddedFounder<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub founder: Option<EmbeddedFounder<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub founders: core::option::Option<EmbeddedFounders<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub founders: Option<EmbeddedFounders<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub founding_date: core::option::Option<EmbeddedFoundingDate<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub founding_date: Option<EmbeddedFoundingDate<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub founding_location: core::option::Option<EmbeddedFoundingLocation<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub founding_location: Option<EmbeddedFoundingLocation<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub funder: core::option::Option<EmbeddedFunder<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub funder: Option<EmbeddedFunder<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub funding: core::option::Option<EmbeddedFunding<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub funding: Option<EmbeddedFunding<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo: core::option::Option<EmbeddedGeo<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo: Option<EmbeddedGeo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_contains: core::option::Option<EmbeddedGeoContains<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_contains: Option<EmbeddedGeoContains<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_covered_by: core::option::Option<EmbeddedGeoCoveredBy<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_covered_by: Option<EmbeddedGeoCoveredBy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_covers: core::option::Option<EmbeddedGeoCovers<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_covers: Option<EmbeddedGeoCovers<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_crosses: core::option::Option<EmbeddedGeoCrosses<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_crosses: Option<EmbeddedGeoCrosses<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_disjoint: core::option::Option<EmbeddedGeoDisjoint<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_disjoint: Option<EmbeddedGeoDisjoint<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_equals: core::option::Option<EmbeddedGeoEquals<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_equals: Option<EmbeddedGeoEquals<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_intersects: core::option::Option<EmbeddedGeoIntersects<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_intersects: Option<EmbeddedGeoIntersects<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_overlaps: core::option::Option<EmbeddedGeoOverlaps<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_overlaps: Option<EmbeddedGeoOverlaps<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_touches: core::option::Option<EmbeddedGeoTouches<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_touches: Option<EmbeddedGeoTouches<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_within: core::option::Option<EmbeddedGeoWithin<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_within: Option<EmbeddedGeoWithin<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub global_location_number: core::option::Option<EmbeddedGlobalLocationNumber<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub global_location_number: Option<EmbeddedGlobalLocationNumber<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_certification: core::option::Option<EmbeddedHasCertification<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_certification: Option<EmbeddedHasCertification<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_credential: core::option::Option<EmbeddedHasCredential<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_credential: Option<EmbeddedHasCredential<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_drive_through_service: core::option::Option<
-        EmbeddedHasDriveThroughService<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_drive_through_service: Option<EmbeddedHasDriveThroughService<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_gs1_digital_link: core::option::Option<EmbeddedHasGs1DigitalLink<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_gs1_digital_link: Option<EmbeddedHasGs1DigitalLink<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_map: core::option::Option<EmbeddedHasMap<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_map: Option<EmbeddedHasMap<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_member_program: core::option::Option<EmbeddedHasMemberProgram<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_member_program: Option<EmbeddedHasMemberProgram<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_merchant_return_policy: core::option::Option<
-        EmbeddedHasMerchantReturnPolicy<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_merchant_return_policy: Option<EmbeddedHasMerchantReturnPolicy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_offer_catalog: core::option::Option<EmbeddedHasOfferCatalog<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_offer_catalog: Option<EmbeddedHasOfferCatalog<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_pos: core::option::Option<EmbeddedHasPos<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_pos: Option<EmbeddedHasPos<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_product_return_policy: core::option::Option<
-        EmbeddedHasProductReturnPolicy<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_product_return_policy: Option<EmbeddedHasProductReturnPolicy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_shipping_service: core::option::Option<EmbeddedHasShippingService<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_shipping_service: Option<EmbeddedHasShippingService<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub identifier: core::option::Option<EmbeddedIdentifier<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub identifier: Option<EmbeddedIdentifier<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub image: core::option::Option<EmbeddedImage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub image: Option<EmbeddedImage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub interaction_statistic: core::option::Option<EmbeddedInteractionStatistic<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub interaction_statistic: Option<EmbeddedInteractionStatistic<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub is_accessible_for_free: core::option::Option<EmbeddedIsAccessibleForFree<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_accessible_for_free: Option<EmbeddedIsAccessibleForFree<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub isic_v4: core::option::Option<EmbeddedIsicV4<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub isic_v4: Option<EmbeddedIsicV4<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub iso6523_code: core::option::Option<EmbeddedIso6523Code<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub iso6523_code: Option<EmbeddedIso6523Code<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub keywords: core::option::Option<EmbeddedKeywords<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub keywords: Option<EmbeddedKeywords<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub knows_about: core::option::Option<EmbeddedKnowsAbout<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub knows_about: Option<EmbeddedKnowsAbout<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub knows_language: core::option::Option<EmbeddedKnowsLanguage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub knows_language: Option<EmbeddedKnowsLanguage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub latitude: core::option::Option<EmbeddedLatitude<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub latitude: Option<EmbeddedLatitude<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub legal_address: core::option::Option<EmbeddedLegalAddress<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub legal_address: Option<EmbeddedLegalAddress<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub legal_name: core::option::Option<EmbeddedLegalName<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub legal_name: Option<EmbeddedLegalName<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub legal_representative: core::option::Option<EmbeddedLegalRepresentative<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub legal_representative: Option<EmbeddedLegalRepresentative<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub lei_code: core::option::Option<EmbeddedLeiCode<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub lei_code: Option<EmbeddedLeiCode<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub location: core::option::Option<EmbeddedLocation<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub location: Option<EmbeddedLocation<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub logo: core::option::Option<EmbeddedLogo<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub logo: Option<EmbeddedLogo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub longitude: core::option::Option<EmbeddedLongitude<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub longitude: Option<EmbeddedLongitude<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub main_entity_of_page: core::option::Option<EmbeddedMainEntityOfPage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub makes_offer: core::option::Option<EmbeddedMakesOffer<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub makes_offer: Option<EmbeddedMakesOffer<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub map: core::option::Option<EmbeddedMap<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub map: Option<EmbeddedMap<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub maps: core::option::Option<EmbeddedMaps<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub maps: Option<EmbeddedMaps<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub maximum_attendee_capacity: core::option::Option<
-        EmbeddedMaximumAttendeeCapacity<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub maximum_attendee_capacity: Option<EmbeddedMaximumAttendeeCapacity<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub member: core::option::Option<EmbeddedMember<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub member: Option<EmbeddedMember<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub member_of: core::option::Option<EmbeddedMemberOf<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub member_of: Option<EmbeddedMemberOf<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub members: core::option::Option<EmbeddedMembers<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub members: Option<EmbeddedMembers<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub naics: core::option::Option<EmbeddedNaics<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub naics: Option<EmbeddedNaics<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub name: core::option::Option<EmbeddedName<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub name: Option<EmbeddedName<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub nonprofit_status: core::option::Option<EmbeddedNonprofitStatus<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub nonprofit_status: Option<EmbeddedNonprofitStatus<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub number_of_employees: core::option::Option<EmbeddedNumberOfEmployees<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub number_of_employees: Option<EmbeddedNumberOfEmployees<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub opening_hours: core::option::Option<EmbeddedOpeningHours<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub opening_hours: Option<EmbeddedOpeningHours<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub opening_hours_specification: core::option::Option<
-        EmbeddedOpeningHoursSpecification<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub opening_hours_specification: Option<EmbeddedOpeningHoursSpecification<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub ownership_funding_info: core::option::Option<EmbeddedOwnershipFundingInfo<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub ownership_funding_info: Option<EmbeddedOwnershipFundingInfo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub owns: core::option::Option<EmbeddedOwns<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub owns: Option<EmbeddedOwns<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub parent_organization: core::option::Option<EmbeddedParentOrganization<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub parent_organization: Option<EmbeddedParentOrganization<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub payment_accepted: core::option::Option<EmbeddedPaymentAccepted<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub payment_accepted: Option<EmbeddedPaymentAccepted<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub photo: core::option::Option<EmbeddedPhoto<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub photo: Option<EmbeddedPhoto<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub photos: core::option::Option<EmbeddedPhotos<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub photos: Option<EmbeddedPhotos<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub potential_action: core::option::Option<EmbeddedPotentialAction<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub potential_action: Option<EmbeddedPotentialAction<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub price_range: core::option::Option<EmbeddedPriceRange<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub price_range: Option<EmbeddedPriceRange<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub public_access: core::option::Option<EmbeddedPublicAccess<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub public_access: Option<EmbeddedPublicAccess<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub publishing_principles: core::option::Option<EmbeddedPublishingPrinciples<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub publishing_principles: Option<EmbeddedPublishingPrinciples<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub review: core::option::Option<EmbeddedReview<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub review: Option<EmbeddedReview<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub reviews: core::option::Option<EmbeddedReviews<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reviews: Option<EmbeddedReviews<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub same_as: core::option::Option<EmbeddedSameAs<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub same_as: Option<EmbeddedSameAs<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub seeks: core::option::Option<EmbeddedSeeks<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub seeks: Option<EmbeddedSeeks<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub service_area: core::option::Option<EmbeddedServiceArea<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub service_area: Option<EmbeddedServiceArea<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub skills: core::option::Option<EmbeddedSkills<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub skills: Option<EmbeddedSkills<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub slogan: core::option::Option<EmbeddedSlogan<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub slogan: Option<EmbeddedSlogan<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub smoking_allowed: core::option::Option<EmbeddedSmokingAllowed<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub smoking_allowed: Option<EmbeddedSmokingAllowed<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub special_opening_hours_specification: core::option::Option<
+    pub special_opening_hours_specification: Option<
         EmbeddedSpecialOpeningHoursSpecification<'a>,
     >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sponsor: core::option::Option<EmbeddedSponsor<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sponsor: Option<EmbeddedSponsor<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sub_organization: core::option::Option<EmbeddedSubOrganization<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sub_organization: Option<EmbeddedSubOrganization<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subject_of: core::option::Option<EmbeddedSubjectOf<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub subject_of: Option<EmbeddedSubjectOf<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tax_id: core::option::Option<EmbeddedTaxId<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub tax_id: Option<EmbeddedTaxId<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub telephone: core::option::Option<EmbeddedTelephone<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub telephone: Option<EmbeddedTelephone<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tour_booking_page: core::option::Option<EmbeddedTourBookingPage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub tour_booking_page: Option<EmbeddedTourBookingPage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub unnamed_sources_policy: core::option::Option<EmbeddedUnnamedSourcesPolicy<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub unnamed_sources_policy: Option<EmbeddedUnnamedSourcesPolicy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub url: core::option::Option<EmbeddedUrl<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub url: Option<EmbeddedUrl<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub vat_id: core::option::Option<EmbeddedVatId<'a>>,
+    pub vat_id: Option<EmbeddedVatId<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAcceptedPaymentMethod<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedActionableFeedbackPolicy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAdditionalProperty<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAdditionalType<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAddress<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAgentInteractionStatistic<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAggregateRating<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAlternateName<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAlumni<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAmenityFeature<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAreaServed<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAward<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAwards<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedBranchCode<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedBranchOf<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedBrand<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Brand#embedded")]
-    BrandEmbedded(Box<crate::social_flockfeeds::lexical::r#type::brand::Embedded<'a>>),
+    BrandEmbedded(Box<brand::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCompanyRegistration<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContactPoint<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContactPoints<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContainedIn<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContainedInPlace<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContainsPlace<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCorrectionsPolicy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCurrenciesAccepted<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDepartment<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDescription<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDisambiguatingDescription<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDissolutionDate<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDiversityPolicy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDiversityStaffingReport<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Article#embedded")]
-    ArticleEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::article::Embedded<'a>>,
-    ),
+    ArticleEmbedded(Box<article::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDuns<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEmail<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEmployee<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEmployees<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEthicsPolicy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEvent<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<crate::social_flockfeeds::lexical::r#type::event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEvents<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<crate::social_flockfeeds::lexical::r#type::event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFaxNumber<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFounder<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFounders<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFoundingDate<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFoundingLocation<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFunder<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFunding<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeo<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoContains<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoCoveredBy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoCovers<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoCrosses<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoDisjoint<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoEquals<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoIntersects<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoOverlaps<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoTouches<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGeoWithin<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGlobalLocationNumber<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasCertification<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasCredential<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasDriveThroughService<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasGs1DigitalLink<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasMap<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasMemberProgram<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasMerchantReturnPolicy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasOfferCatalog<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasPos<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasProductReturnPolicy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasShippingService<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIdentifier<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedImage<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedInteractionStatistic<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIsAccessibleForFree<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIsicV4<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIso6523Code<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedKeywords<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedKnowsAbout<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedKnowsLanguage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLatitude<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLegalAddress<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLegalName<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLegalRepresentative<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLeiCode<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLocation<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLogo<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLongitude<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMainEntityOfPage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMakesOffer<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<crate::social_flockfeeds::lexical::r#type::offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMap<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMaps<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMaximumAttendeeCapacity<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMember<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMemberOf<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMembers<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedNaics<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedName<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedNonprofitStatus<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedNumberOfEmployees<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedOpeningHours<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedOpeningHoursSpecification<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedOwnershipFundingInfo<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedOwns<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::product::Embedded<'a>>,
-    ),
+    ProductEmbedded(Box<product::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedParentOrganization<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPaymentAccepted<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPhoto<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPhotos<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPotentialAction<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPriceRange<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPublicAccess<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPublishingPrinciples<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedReview<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedReviews<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSameAs<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSeeks<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedServiceArea<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSkills<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSlogan<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSmokingAllowed<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSpecialOpeningHoursSpecification<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSponsor<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSubOrganization<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSubjectOf<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<crate::social_flockfeeds::lexical::r#type::event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTaxId<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTelephone<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTourBookingPage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedUnnamedSourcesPolicy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedUrl<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedVatId<'a> {}
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct LocalBusiness<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accepted_payment_method: core::option::Option<
-        LocalBusinessAcceptedPaymentMethod<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accepted_payment_method: Option<LocalBusinessAcceptedPaymentMethod<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub actionable_feedback_policy: core::option::Option<
-        LocalBusinessActionableFeedbackPolicy<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub actionable_feedback_policy: Option<LocalBusinessActionableFeedbackPolicy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub additional_property: core::option::Option<LocalBusinessAdditionalProperty<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub additional_property: Option<LocalBusinessAdditionalProperty<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub additional_type: core::option::Option<LocalBusinessAdditionalType<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub additional_type: Option<LocalBusinessAdditionalType<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub address: core::option::Option<LocalBusinessAddress<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub address: Option<LocalBusinessAddress<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub agent_interaction_statistic: core::option::Option<
-        LocalBusinessAgentInteractionStatistic<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub agent_interaction_statistic: Option<LocalBusinessAgentInteractionStatistic<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub aggregate_rating: core::option::Option<LocalBusinessAggregateRating<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub aggregate_rating: Option<LocalBusinessAggregateRating<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alternate_name: core::option::Option<LocalBusinessAlternateName<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub alternate_name: Option<LocalBusinessAlternateName<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alumni: core::option::Option<LocalBusinessAlumni<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub alumni: Option<LocalBusinessAlumni<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub amenity_feature: core::option::Option<LocalBusinessAmenityFeature<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub amenity_feature: Option<LocalBusinessAmenityFeature<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub area_served: core::option::Option<LocalBusinessAreaServed<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub area_served: Option<LocalBusinessAreaServed<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub award: core::option::Option<LocalBusinessAward<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub award: Option<LocalBusinessAward<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub awards: core::option::Option<LocalBusinessAwards<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub awards: Option<LocalBusinessAwards<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub branch_code: core::option::Option<LocalBusinessBranchCode<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub branch_code: Option<LocalBusinessBranchCode<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub branch_of: core::option::Option<LocalBusinessBranchOf<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub branch_of: Option<LocalBusinessBranchOf<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub brand: core::option::Option<LocalBusinessBrand<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub brand: Option<LocalBusinessBrand<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub company_registration: core::option::Option<LocalBusinessCompanyRegistration<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub company_registration: Option<LocalBusinessCompanyRegistration<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub contact_point: core::option::Option<LocalBusinessContactPoint<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub contact_point: Option<LocalBusinessContactPoint<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub contact_points: core::option::Option<LocalBusinessContactPoints<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub contact_points: Option<LocalBusinessContactPoints<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub contained_in: core::option::Option<LocalBusinessContainedIn<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub contained_in: Option<LocalBusinessContainedIn<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub contained_in_place: core::option::Option<LocalBusinessContainedInPlace<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub contained_in_place: Option<LocalBusinessContainedInPlace<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub contains_place: core::option::Option<LocalBusinessContainsPlace<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub contains_place: Option<LocalBusinessContainsPlace<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub corrections_policy: core::option::Option<LocalBusinessCorrectionsPolicy<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub corrections_policy: Option<LocalBusinessCorrectionsPolicy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub currencies_accepted: core::option::Option<LocalBusinessCurrenciesAccepted<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub currencies_accepted: Option<LocalBusinessCurrenciesAccepted<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub department: core::option::Option<LocalBusinessDepartment<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub department: Option<LocalBusinessDepartment<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description: core::option::Option<LocalBusinessDescription<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub description: Option<LocalBusinessDescription<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub disambiguating_description: core::option::Option<
-        LocalBusinessDisambiguatingDescription<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub disambiguating_description: Option<LocalBusinessDisambiguatingDescription<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub dissolution_date: core::option::Option<LocalBusinessDissolutionDate<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub dissolution_date: Option<LocalBusinessDissolutionDate<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub diversity_policy: core::option::Option<LocalBusinessDiversityPolicy<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub diversity_policy: Option<LocalBusinessDiversityPolicy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub diversity_staffing_report: core::option::Option<
-        LocalBusinessDiversityStaffingReport<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub diversity_staffing_report: Option<LocalBusinessDiversityStaffingReport<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub duns: core::option::Option<LocalBusinessDuns<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duns: Option<LocalBusinessDuns<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub email: core::option::Option<LocalBusinessEmail<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub email: Option<LocalBusinessEmail<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub employee: core::option::Option<LocalBusinessEmployee<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub employee: Option<LocalBusinessEmployee<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub employees: core::option::Option<LocalBusinessEmployees<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub employees: Option<LocalBusinessEmployees<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub ethics_policy: core::option::Option<LocalBusinessEthicsPolicy<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub ethics_policy: Option<LocalBusinessEthicsPolicy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub event: core::option::Option<LocalBusinessEvent<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub event: Option<LocalBusinessEvent<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub events: core::option::Option<LocalBusinessEvents<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub events: Option<LocalBusinessEvents<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub fax_number: core::option::Option<LocalBusinessFaxNumber<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub fax_number: Option<LocalBusinessFaxNumber<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub founder: core::option::Option<LocalBusinessFounder<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub founder: Option<LocalBusinessFounder<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub founders: core::option::Option<LocalBusinessFounders<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub founders: Option<LocalBusinessFounders<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub founding_date: core::option::Option<LocalBusinessFoundingDate<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub founding_date: Option<LocalBusinessFoundingDate<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub founding_location: core::option::Option<LocalBusinessFoundingLocation<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub founding_location: Option<LocalBusinessFoundingLocation<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub funder: core::option::Option<LocalBusinessFunder<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub funder: Option<LocalBusinessFunder<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub funding: core::option::Option<LocalBusinessFunding<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub funding: Option<LocalBusinessFunding<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo: core::option::Option<LocalBusinessGeo<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo: Option<LocalBusinessGeo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_contains: core::option::Option<LocalBusinessGeoContains<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_contains: Option<LocalBusinessGeoContains<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_covered_by: core::option::Option<LocalBusinessGeoCoveredBy<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_covered_by: Option<LocalBusinessGeoCoveredBy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_covers: core::option::Option<LocalBusinessGeoCovers<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_covers: Option<LocalBusinessGeoCovers<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_crosses: core::option::Option<LocalBusinessGeoCrosses<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_crosses: Option<LocalBusinessGeoCrosses<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_disjoint: core::option::Option<LocalBusinessGeoDisjoint<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_disjoint: Option<LocalBusinessGeoDisjoint<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_equals: core::option::Option<LocalBusinessGeoEquals<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_equals: Option<LocalBusinessGeoEquals<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_intersects: core::option::Option<LocalBusinessGeoIntersects<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_intersects: Option<LocalBusinessGeoIntersects<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_overlaps: core::option::Option<LocalBusinessGeoOverlaps<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_overlaps: Option<LocalBusinessGeoOverlaps<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_touches: core::option::Option<LocalBusinessGeoTouches<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_touches: Option<LocalBusinessGeoTouches<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geo_within: core::option::Option<LocalBusinessGeoWithin<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub geo_within: Option<LocalBusinessGeoWithin<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub global_location_number: core::option::Option<
-        LocalBusinessGlobalLocationNumber<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub global_location_number: Option<LocalBusinessGlobalLocationNumber<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_certification: core::option::Option<LocalBusinessHasCertification<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_certification: Option<LocalBusinessHasCertification<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_credential: core::option::Option<LocalBusinessHasCredential<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_credential: Option<LocalBusinessHasCredential<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_drive_through_service: core::option::Option<
-        LocalBusinessHasDriveThroughService<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_drive_through_service: Option<LocalBusinessHasDriveThroughService<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_gs1_digital_link: core::option::Option<LocalBusinessHasGs1DigitalLink<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_gs1_digital_link: Option<LocalBusinessHasGs1DigitalLink<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_map: core::option::Option<LocalBusinessHasMap<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_map: Option<LocalBusinessHasMap<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_member_program: core::option::Option<LocalBusinessHasMemberProgram<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_member_program: Option<LocalBusinessHasMemberProgram<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_merchant_return_policy: core::option::Option<
-        LocalBusinessHasMerchantReturnPolicy<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_merchant_return_policy: Option<LocalBusinessHasMerchantReturnPolicy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_offer_catalog: core::option::Option<LocalBusinessHasOfferCatalog<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_offer_catalog: Option<LocalBusinessHasOfferCatalog<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_pos: core::option::Option<LocalBusinessHasPos<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_pos: Option<LocalBusinessHasPos<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_product_return_policy: core::option::Option<
-        LocalBusinessHasProductReturnPolicy<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_product_return_policy: Option<LocalBusinessHasProductReturnPolicy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_shipping_service: core::option::Option<LocalBusinessHasShippingService<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_shipping_service: Option<LocalBusinessHasShippingService<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub identifier: core::option::Option<LocalBusinessIdentifier<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub identifier: Option<LocalBusinessIdentifier<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub image: core::option::Option<LocalBusinessImage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub image: Option<LocalBusinessImage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub interaction_statistic: core::option::Option<
-        LocalBusinessInteractionStatistic<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub interaction_statistic: Option<LocalBusinessInteractionStatistic<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub is_accessible_for_free: core::option::Option<
-        LocalBusinessIsAccessibleForFree<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_accessible_for_free: Option<LocalBusinessIsAccessibleForFree<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub isic_v4: core::option::Option<LocalBusinessIsicV4<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub isic_v4: Option<LocalBusinessIsicV4<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub iso6523_code: core::option::Option<LocalBusinessIso6523Code<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub iso6523_code: Option<LocalBusinessIso6523Code<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub keywords: core::option::Option<LocalBusinessKeywords<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub keywords: Option<LocalBusinessKeywords<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub knows_about: core::option::Option<LocalBusinessKnowsAbout<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub knows_about: Option<LocalBusinessKnowsAbout<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub knows_language: core::option::Option<LocalBusinessKnowsLanguage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub knows_language: Option<LocalBusinessKnowsLanguage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub latitude: core::option::Option<LocalBusinessLatitude<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub latitude: Option<LocalBusinessLatitude<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub legal_address: core::option::Option<LocalBusinessLegalAddress<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub legal_address: Option<LocalBusinessLegalAddress<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub legal_name: core::option::Option<LocalBusinessLegalName<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub legal_name: Option<LocalBusinessLegalName<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub legal_representative: core::option::Option<LocalBusinessLegalRepresentative<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub legal_representative: Option<LocalBusinessLegalRepresentative<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub lei_code: core::option::Option<LocalBusinessLeiCode<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub lei_code: Option<LocalBusinessLeiCode<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub location: core::option::Option<LocalBusinessLocation<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub location: Option<LocalBusinessLocation<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub logo: core::option::Option<LocalBusinessLogo<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub logo: Option<LocalBusinessLogo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub longitude: core::option::Option<LocalBusinessLongitude<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub longitude: Option<LocalBusinessLongitude<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub main_entity_of_page: core::option::Option<LocalBusinessMainEntityOfPage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub main_entity_of_page: Option<LocalBusinessMainEntityOfPage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub makes_offer: core::option::Option<LocalBusinessMakesOffer<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub makes_offer: Option<LocalBusinessMakesOffer<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub map: core::option::Option<LocalBusinessMap<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub map: Option<LocalBusinessMap<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub maps: core::option::Option<LocalBusinessMaps<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub maps: Option<LocalBusinessMaps<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub maximum_attendee_capacity: core::option::Option<
-        LocalBusinessMaximumAttendeeCapacity<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub maximum_attendee_capacity: Option<LocalBusinessMaximumAttendeeCapacity<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub member: core::option::Option<LocalBusinessMember<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub member: Option<LocalBusinessMember<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub member_of: core::option::Option<LocalBusinessMemberOf<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub member_of: Option<LocalBusinessMemberOf<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub members: core::option::Option<LocalBusinessMembers<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub members: Option<LocalBusinessMembers<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub naics: core::option::Option<LocalBusinessNaics<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub naics: Option<LocalBusinessNaics<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub name: core::option::Option<LocalBusinessName<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub name: Option<LocalBusinessName<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub nonprofit_status: core::option::Option<LocalBusinessNonprofitStatus<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub nonprofit_status: Option<LocalBusinessNonprofitStatus<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub number_of_employees: core::option::Option<LocalBusinessNumberOfEmployees<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub number_of_employees: Option<LocalBusinessNumberOfEmployees<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub opening_hours: core::option::Option<LocalBusinessOpeningHours<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub opening_hours: Option<LocalBusinessOpeningHours<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub opening_hours_specification: core::option::Option<
-        LocalBusinessOpeningHoursSpecification<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub opening_hours_specification: Option<LocalBusinessOpeningHoursSpecification<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub ownership_funding_info: core::option::Option<
-        LocalBusinessOwnershipFundingInfo<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub ownership_funding_info: Option<LocalBusinessOwnershipFundingInfo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub owns: core::option::Option<LocalBusinessOwns<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub owns: Option<LocalBusinessOwns<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub parent_organization: core::option::Option<LocalBusinessParentOrganization<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub parent_organization: Option<LocalBusinessParentOrganization<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub payment_accepted: core::option::Option<LocalBusinessPaymentAccepted<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub payment_accepted: Option<LocalBusinessPaymentAccepted<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub photo: core::option::Option<LocalBusinessPhoto<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub photo: Option<LocalBusinessPhoto<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub photos: core::option::Option<LocalBusinessPhotos<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub photos: Option<LocalBusinessPhotos<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub potential_action: core::option::Option<LocalBusinessPotentialAction<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub potential_action: Option<LocalBusinessPotentialAction<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub price_range: core::option::Option<LocalBusinessPriceRange<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub price_range: Option<LocalBusinessPriceRange<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub public_access: core::option::Option<LocalBusinessPublicAccess<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub public_access: Option<LocalBusinessPublicAccess<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub publishing_principles: core::option::Option<
-        LocalBusinessPublishingPrinciples<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub publishing_principles: Option<LocalBusinessPublishingPrinciples<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub review: core::option::Option<LocalBusinessReview<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub review: Option<LocalBusinessReview<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub reviews: core::option::Option<LocalBusinessReviews<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reviews: Option<LocalBusinessReviews<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub same_as: core::option::Option<LocalBusinessSameAs<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub same_as: Option<LocalBusinessSameAs<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub seeks: core::option::Option<LocalBusinessSeeks<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub seeks: Option<LocalBusinessSeeks<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub service_area: core::option::Option<LocalBusinessServiceArea<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub service_area: Option<LocalBusinessServiceArea<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub skills: core::option::Option<LocalBusinessSkills<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub skills: Option<LocalBusinessSkills<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub slogan: core::option::Option<LocalBusinessSlogan<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub slogan: Option<LocalBusinessSlogan<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub smoking_allowed: core::option::Option<LocalBusinessSmokingAllowed<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub smoking_allowed: Option<LocalBusinessSmokingAllowed<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub special_opening_hours_specification: core::option::Option<
+    pub special_opening_hours_specification: Option<
         LocalBusinessSpecialOpeningHoursSpecification<'a>,
     >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sponsor: core::option::Option<LocalBusinessSponsor<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sponsor: Option<LocalBusinessSponsor<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sub_organization: core::option::Option<LocalBusinessSubOrganization<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sub_organization: Option<LocalBusinessSubOrganization<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subject_of: core::option::Option<LocalBusinessSubjectOf<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub subject_of: Option<LocalBusinessSubjectOf<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tax_id: core::option::Option<LocalBusinessTaxId<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub tax_id: Option<LocalBusinessTaxId<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub telephone: core::option::Option<LocalBusinessTelephone<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub telephone: Option<LocalBusinessTelephone<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tour_booking_page: core::option::Option<LocalBusinessTourBookingPage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub tour_booking_page: Option<LocalBusinessTourBookingPage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub unnamed_sources_policy: core::option::Option<
-        LocalBusinessUnnamedSourcesPolicy<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub unnamed_sources_policy: Option<LocalBusinessUnnamedSourcesPolicy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub url: core::option::Option<LocalBusinessUrl<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub url: Option<LocalBusinessUrl<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub vat_id: core::option::Option<LocalBusinessVatId<'a>>,
+    pub vat_id: Option<LocalBusinessVatId<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAcceptedPaymentMethod<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessActionableFeedbackPolicy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAdditionalProperty<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAdditionalType<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAddress<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAgentInteractionStatistic<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAggregateRating<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAlternateName<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAlumni<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAmenityFeature<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAreaServed<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAward<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessAwards<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessBranchCode<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessBranchOf<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessBrand<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Brand#embedded")]
-    BrandEmbedded(Box<crate::social_flockfeeds::lexical::r#type::brand::Embedded<'a>>),
+    BrandEmbedded(Box<brand::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessCompanyRegistration<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessContactPoint<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessContactPoints<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessContainedIn<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessContainedInPlace<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessContainsPlace<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessCorrectionsPolicy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessCurrenciesAccepted<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessDepartment<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessDescription<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessDisambiguatingDescription<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessDissolutionDate<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessDiversityPolicy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessDiversityStaffingReport<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Article#embedded")]
-    ArticleEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::article::Embedded<'a>>,
-    ),
+    ArticleEmbedded(Box<article::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessDuns<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessEmail<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessEmployee<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessEmployees<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessEthicsPolicy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessEvent<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<crate::social_flockfeeds::lexical::r#type::event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessEvents<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<crate::social_flockfeeds::lexical::r#type::event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessFaxNumber<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessFounder<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessFounders<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessFoundingDate<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessFoundingLocation<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessFunder<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessFunding<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeo<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoContains<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoCoveredBy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoCovers<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoCrosses<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoDisjoint<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoEquals<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoIntersects<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoOverlaps<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoTouches<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGeoWithin<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessGlobalLocationNumber<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasCertification<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasCredential<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasDriveThroughService<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasGs1DigitalLink<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasMap<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasMemberProgram<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasMerchantReturnPolicy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasOfferCatalog<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasPos<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasProductReturnPolicy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessHasShippingService<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessIdentifier<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessImage<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessInteractionStatistic<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessIsAccessibleForFree<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessIsicV4<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessIso6523Code<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessKeywords<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessKnowsAbout<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessKnowsLanguage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessLatitude<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessLegalAddress<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessLegalName<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessLegalRepresentative<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessLeiCode<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessLocation<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessLogo<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessLongitude<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessMainEntityOfPage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessMakesOffer<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<crate::social_flockfeeds::lexical::r#type::offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessMap<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessMaps<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessMaximumAttendeeCapacity<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessMember<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessMemberOf<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessMembers<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessNaics<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessName<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessNonprofitStatus<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessNumberOfEmployees<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessOpeningHours<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessOpeningHoursSpecification<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessOwnershipFundingInfo<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessOwns<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::product::Embedded<'a>>,
-    ),
+    ProductEmbedded(Box<product::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessParentOrganization<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessPaymentAccepted<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessPhoto<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessPhotos<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessPotentialAction<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessPriceRange<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessPublicAccess<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessPublishingPrinciples<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessReview<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessReviews<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessSameAs<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessSeeks<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessServiceArea<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessSkills<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessSlogan<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessSmokingAllowed<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessSpecialOpeningHoursSpecification<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessSponsor<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessSubOrganization<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessSubjectOf<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<crate::social_flockfeeds::lexical::r#type::event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessTaxId<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessTelephone<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessTourBookingPage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessUnnamedSourcesPolicy<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessUrl<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LocalBusinessVatId<'a> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct LocalBusinessGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: LocalBusiness<'a>,
 }
 
 impl<'a> LocalBusiness<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LocalBusinessRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, LocalBusinessRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Embedded<'a> {
+impl<'a> LexiconSchema for Embedded<'a> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.LocalBusiness"
     }
     fn def_name() -> &'static str {
         "embedded"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_social_flockfeeds_lexical_type_LocalBusiness()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LocalBusinessRecord;
-impl jacquard_common::xrpc::XrpcResp for LocalBusinessRecord {
+impl XrpcResp for LocalBusinessRecord {
     const NSID: &'static str = "social.flockfeeds.lexical.type.LocalBusiness";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = LocalBusinessGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<LocalBusinessGetRecordOutput<'_>> for LocalBusiness<'_> {
@@ -4489,3469 +2605,2708 @@ impl From<LocalBusinessGetRecordOutput<'_>> for LocalBusiness<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for LocalBusiness<'_> {
+impl Collection for LocalBusiness<'_> {
     const NSID: &'static str = "social.flockfeeds.lexical.type.LocalBusiness";
     type Record = LocalBusinessRecord;
 }
 
-impl jacquard_common::types::collection::Collection for LocalBusinessRecord {
+impl Collection for LocalBusinessRecord {
     const NSID: &'static str = "social.flockfeeds.lexical.type.LocalBusiness";
     type Record = LocalBusinessRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for LocalBusiness<'a> {
+impl<'a> LexiconSchema for LocalBusiness<'a> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.LocalBusiness"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_social_flockfeeds_lexical_type_LocalBusiness()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_social_flockfeeds_lexical_type_LocalBusiness() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "social.flockfeeds.lexical.type.LocalBusiness",
-        ),
-        revision: None,
-        description: None,
+fn lexicon_doc_social_flockfeeds_lexical_type_LocalBusiness() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("social.flockfeeds.lexical.type.LocalBusiness"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("embedded"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("embedded"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A particular physical business or branch of an organization. Examples of LocalBusiness include a restaurant, a particular branch of a restaurant chain, a branch of a bank, a medical practice, a club, a bowling alley, etc.",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "acceptedPaymentMethod",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("acceptedPaymentMethod"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.LoanOrCredit#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PaymentMethod#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#acceptedPaymentMethodScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#acceptedPaymentMethodList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.LoanOrCredit#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.PaymentMethod#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#acceptedPaymentMethodScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#acceptedPaymentMethodList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "actionableFeedbackPolicy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("actionableFeedbackPolicy"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#actionableFeedbackPolicyScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#actionableFeedbackPolicyList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#actionableFeedbackPolicyScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#actionableFeedbackPolicyList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "additionalProperty",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("additionalProperty"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PropertyValue#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#additionalPropertyList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.PropertyValue#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#additionalPropertyList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "additionalType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("additionalType"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#additionalTypeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#additionalTypeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#additionalTypeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#additionalTypeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "address",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("address"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PostalAddress#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#addressScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#addressList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.PostalAddress#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#addressScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#addressList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "agentInteractionStatistic",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("agentInteractionStatistic"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.InteractionCounter#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#agentInteractionStatisticList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.InteractionCounter#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#agentInteractionStatisticList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "aggregateRating",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("aggregateRating"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.AggregateRating#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#aggregateRatingList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.AggregateRating#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#aggregateRatingList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alternateName",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("alternateName"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#alternateNameScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#alternateNameList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#alternateNameScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#alternateNameList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alumni",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("alumni"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#alumniList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#alumniList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "amenityFeature",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("amenityFeature"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.LocationFeatureSpecification#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#amenityFeatureList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.LocationFeatureSpecification#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#amenityFeatureList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "areaServed",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("areaServed"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.AdministrativeArea#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeoShape#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#areaServedScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#areaServedList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.AdministrativeArea#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.GeoShape#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#areaServedScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#areaServedList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "award",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("award"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "awards",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("awards"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardsScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardsScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "branchCode",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("branchCode"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#branchCodeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#branchCodeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#branchCodeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#branchCodeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "branchOf",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("branchOf"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#branchOfList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#branchOfList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "brand",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("brand"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Brand#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#brandList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Brand#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#brandList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "companyRegistration",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("companyRegistration"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Certification#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#companyRegistrationList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Certification#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#companyRegistrationList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "contactPoint",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("contactPoint"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ContactPoint#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#contactPointList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.ContactPoint#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#contactPointList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "contactPoints",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("contactPoints"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ContactPoint#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#contactPointsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.ContactPoint#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#contactPointsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "containedIn",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("containedIn"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#containedInList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#containedInList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "containedInPlace",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("containedInPlace"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#containedInPlaceList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#containedInPlaceList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "containsPlace",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("containsPlace"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#containsPlaceList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#containsPlaceList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "correctionsPolicy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("correctionsPolicy"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#correctionsPolicyScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#correctionsPolicyList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#correctionsPolicyScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#correctionsPolicyList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "currenciesAccepted",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("currenciesAccepted"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#currenciesAcceptedScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#currenciesAcceptedList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#currenciesAcceptedScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#currenciesAcceptedList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "department",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("department"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#departmentList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#departmentList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "description",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("description"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.TextObject#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#descriptionScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#descriptionList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.TextObject#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#descriptionScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#descriptionList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "disambiguatingDescription",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("disambiguatingDescription"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#disambiguatingDescriptionScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#disambiguatingDescriptionList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#disambiguatingDescriptionScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#disambiguatingDescriptionList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "dissolutionDate",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("dissolutionDate"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dissolutionDateScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dissolutionDateList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dissolutionDateScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dissolutionDateList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "diversityPolicy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("diversityPolicy"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityPolicyScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityPolicyList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityPolicyScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityPolicyList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "diversityStaffingReport",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("diversityStaffingReport"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Article#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityStaffingReportScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityStaffingReportList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Article#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityStaffingReportScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityStaffingReportList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "duns",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("duns"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dunsScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dunsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dunsScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dunsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "email",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("email"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#emailScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#emailList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#emailScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#emailList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "employee",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("employee"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#employeeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#employeeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "employees",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("employees"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#employeesList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#employeesList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "ethicsPolicy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("ethicsPolicy"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ethicsPolicyScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ethicsPolicyList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ethicsPolicyScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ethicsPolicyList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "event",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("event"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#eventList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#eventList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "events",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("events"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#eventsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#eventsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "faxNumber",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("faxNumber"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#faxNumberScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#faxNumberList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#faxNumberScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#faxNumberList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "founder",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("founder"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#founderList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#founderList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "founders",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("founders"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundersList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundersList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "foundingDate",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("foundingDate"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundingDateScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundingDateList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundingDateScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundingDateList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "foundingLocation",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("foundingLocation"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundingLocationList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundingLocationList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "funder",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("funder"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#funderList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#funderList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "funding",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("funding"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Grant#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#fundingList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Grant#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#fundingList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "geo",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("geo"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeoCoordinates#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeoShape#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.GeoCoordinates#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.GeoShape#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "geoContains",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("geoContains"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoContainsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoContainsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "geoCoveredBy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("geoCoveredBy"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoCoveredByList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoCoveredByList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "geoCovers",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("geoCovers"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoCoversList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoCoversList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "geoCrosses",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("geoCrosses"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoCrossesList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoCrossesList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "geoDisjoint",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("geoDisjoint"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoDisjointList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoDisjointList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "geoEquals",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("geoEquals"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoEqualsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoEqualsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "geoIntersects",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("geoIntersects"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoIntersectsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoIntersectsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "geoOverlaps",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("geoOverlaps"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoOverlapsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoOverlapsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "geoTouches",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("geoTouches"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoTouchesList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoTouchesList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "geoWithin",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("geoWithin"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoWithinList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoWithinList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "globalLocationNumber",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("globalLocationNumber"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#globalLocationNumberScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#globalLocationNumberList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#globalLocationNumberScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#globalLocationNumberList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasCertification",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("hasCertification"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Certification#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasCertificationList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Certification#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasCertificationList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasCredential",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("hasCredential"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.EducationalOccupationalCredential#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasCredentialList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.EducationalOccupationalCredential#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasCredentialList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasDriveThroughService",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("hasDriveThroughService"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasDriveThroughServiceScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasDriveThroughServiceList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasDriveThroughServiceScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasDriveThroughServiceList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasGS1DigitalLink",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("hasGS1DigitalLink"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasGS1DigitalLinkScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasGS1DigitalLinkList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasGS1DigitalLinkScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasGS1DigitalLinkList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasMap",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("hasMap"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Map#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMapScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMapList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Map#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMapScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMapList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasMemberProgram",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("hasMemberProgram"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MemberProgram#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMemberProgramList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.MemberProgram#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMemberProgramList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasMerchantReturnPolicy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("hasMerchantReturnPolicy"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MerchantReturnPolicy#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMerchantReturnPolicyList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.MerchantReturnPolicy#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMerchantReturnPolicyList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasOfferCatalog",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("hasOfferCatalog"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.OfferCatalog#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasOfferCatalogList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.OfferCatalog#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasOfferCatalogList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasPOS",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("hasPOS"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasPOSList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasPOSList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasProductReturnPolicy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("hasProductReturnPolicy"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ProductReturnPolicy#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasProductReturnPolicyList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.ProductReturnPolicy#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasProductReturnPolicyList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasShippingService",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("hasShippingService"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ShippingService#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasShippingServiceList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.ShippingService#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasShippingServiceList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "identifier",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("identifier"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PropertyValue#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#identifierScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#identifierList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.PropertyValue#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#identifierScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#identifierList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "image",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("image"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#imageScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#imageList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#imageScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#imageList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "interactionStatistic",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("interactionStatistic"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.InteractionCounter#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#interactionStatisticList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.InteractionCounter#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#interactionStatisticList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "isAccessibleForFree",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("isAccessibleForFree"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isAccessibleForFreeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isAccessibleForFreeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isAccessibleForFreeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isAccessibleForFreeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "isicV4",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("isicV4"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isicV4Scalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isicV4List")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isicV4Scalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isicV4List")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "iso6523Code",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("iso6523Code"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#iso6523CodeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#iso6523CodeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#iso6523CodeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#iso6523CodeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "keywords",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("keywords"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#keywordsScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#keywordsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#keywordsScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#keywordsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "knowsAbout",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("knowsAbout"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsAboutScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsAboutList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsAboutScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsAboutList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "knowsLanguage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("knowsLanguage"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Language#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsLanguageScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsLanguageList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Language#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsLanguageScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsLanguageList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "latitude",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("latitude"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#latitudeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#latitudeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#latitudeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#latitudeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "legalAddress",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("legalAddress"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PostalAddress#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalAddressList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.PostalAddress#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalAddressList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "legalName",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("legalName"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalNameScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalNameList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalNameScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalNameList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "legalRepresentative",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("legalRepresentative"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalRepresentativeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalRepresentativeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "leiCode",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("leiCode"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#leiCodeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#leiCodeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#leiCodeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#leiCodeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "location",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("location"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PostalAddress#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.VirtualLocation#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#locationScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#locationList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.PostalAddress#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.VirtualLocation#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#locationScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#locationList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "logo",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("logo"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#logoScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#logoList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#logoScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#logoList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "longitude",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("longitude"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#longitudeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#longitudeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#longitudeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#longitudeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mainEntityOfPage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("mainEntityOfPage"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mainEntityOfPageScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mainEntityOfPageList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mainEntityOfPageScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mainEntityOfPageList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "makesOffer",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("makesOffer"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Offer#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#makesOfferList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Offer#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#makesOfferList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "map",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("map"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maps",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("maps"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapsScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapsScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maximumAttendeeCapacity",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("maximumAttendeeCapacity"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#maximumAttendeeCapacityScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#maximumAttendeeCapacityList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#maximumAttendeeCapacityScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#maximumAttendeeCapacityList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "member",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("member"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#memberList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#memberList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "memberOf",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("memberOf"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MemberProgramTier#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ProgramMembership#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#memberOfList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.MemberProgramTier#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.ProgramMembership#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#memberOfList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "members",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("members"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#membersList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#membersList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "naics",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("naics"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#naicsScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#naicsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#naicsScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#naicsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nameScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nameList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nameScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nameList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "nonprofitStatus",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("nonprofitStatus"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.NonprofitType#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nonprofitStatusScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nonprofitStatusList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.NonprofitType#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nonprofitStatusScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nonprofitStatusList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "numberOfEmployees",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("numberOfEmployees"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#numberOfEmployeesList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#numberOfEmployeesList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "openingHours",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("openingHours"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#openingHoursScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#openingHoursList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#openingHoursScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#openingHoursList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "openingHoursSpecification",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("openingHoursSpecification"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.OpeningHoursSpecification#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#openingHoursSpecificationList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.OpeningHoursSpecification#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#openingHoursSpecificationList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "ownershipFundingInfo",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("ownershipFundingInfo"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.AboutPage#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ownershipFundingInfoScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ownershipFundingInfoList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.AboutPage#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ownershipFundingInfoScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ownershipFundingInfoList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "owns",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("owns"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.OwnershipInfo#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ownsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.OwnershipInfo#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ownsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "parentOrganization",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("parentOrganization"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#parentOrganizationList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#parentOrganizationList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "paymentAccepted",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("paymentAccepted"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#paymentAcceptedScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#paymentAcceptedList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#paymentAcceptedScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#paymentAcceptedList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "photo",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("photo"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Photograph#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#photoList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Photograph#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#photoList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "photos",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("photos"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Photograph#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#photosList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Photograph#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#photosList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "potentialAction",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("potentialAction"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Action#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#potentialActionList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Action#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#potentialActionList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "priceRange",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("priceRange"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#priceRangeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#priceRangeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#priceRangeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#priceRangeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "publicAccess",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("publicAccess"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publicAccessScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publicAccessList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publicAccessScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publicAccessList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "publishingPrinciples",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("publishingPrinciples"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publishingPrinciplesScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publishingPrinciplesList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publishingPrinciplesScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publishingPrinciplesList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "review",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("review"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#reviewList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#reviewList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "reviews",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("reviews"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#reviewsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#reviewsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sameAs",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("sameAs"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sameAsScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sameAsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sameAsScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sameAsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "seeks",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("seeks"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Demand#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#seeksList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Demand#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#seeksList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "serviceArea",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("serviceArea"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.AdministrativeArea#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeoShape#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#serviceAreaList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.AdministrativeArea#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.GeoShape#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#serviceAreaList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "skills",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("skills"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#skillsScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#skillsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#skillsScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#skillsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "slogan",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("slogan"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sloganScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sloganList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sloganScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sloganList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "smokingAllowed",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("smokingAllowed"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#smokingAllowedScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#smokingAllowedList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#smokingAllowedScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#smokingAllowedList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "specialOpeningHoursSpecification",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("specialOpeningHoursSpecification"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.OpeningHoursSpecification#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#specialOpeningHoursSpecificationList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.OpeningHoursSpecification#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#specialOpeningHoursSpecificationList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sponsor",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("sponsor"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sponsorList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sponsorList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "subOrganization",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("subOrganization"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#subOrganizationList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#subOrganizationList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "subjectOf",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("subjectOf"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#subjectOfList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#subjectOfList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "taxID",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("taxID"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#taxIDScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#taxIDList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#taxIDScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#taxIDList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "telephone",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("telephone"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#telephoneScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#telephoneList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#telephoneScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#telephoneList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "tourBookingPage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("tourBookingPage"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#tourBookingPageScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#tourBookingPageList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#tourBookingPageScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#tourBookingPageList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "unnamedSourcesPolicy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("unnamedSourcesPolicy"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#unnamedSourcesPolicyScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#unnamedSourcesPolicyList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#unnamedSourcesPolicyScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#unnamedSourcesPolicyList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "url",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("url"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#urlScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#urlList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#urlScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#urlList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "vatID",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("vatID"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#vatIDScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#vatIDList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#vatIDScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#vatIDList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         description: Some(
-                            ::jacquard_common::CowStr::new_static(
+                            CowStr::new_static(
                                 "A particular physical business or branch of an organization. Examples of LocalBusiness include a restaurant, a particular branch of a restaurant chain, a branch of a bank, a medical practice, a club, a bowling alley, etc.",
                             ),
                         ),
-                        required: None,
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "acceptedPaymentMethod",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("acceptedPaymentMethod"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.LoanOrCredit#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PaymentMethod#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#acceptedPaymentMethodScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#acceptedPaymentMethodList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.LoanOrCredit#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.PaymentMethod#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#acceptedPaymentMethodScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#acceptedPaymentMethodList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "actionableFeedbackPolicy",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("actionableFeedbackPolicy"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#actionableFeedbackPolicyScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#actionableFeedbackPolicyList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#actionableFeedbackPolicyScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#actionableFeedbackPolicyList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "additionalProperty",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("additionalProperty"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PropertyValue#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#additionalPropertyList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.PropertyValue#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#additionalPropertyList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "additionalType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("additionalType"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#additionalTypeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#additionalTypeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#additionalTypeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#additionalTypeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "address",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("address"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PostalAddress#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#addressScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#addressList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.PostalAddress#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#addressScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#addressList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "agentInteractionStatistic",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("agentInteractionStatistic"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.InteractionCounter#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#agentInteractionStatisticList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.InteractionCounter#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#agentInteractionStatisticList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "aggregateRating",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("aggregateRating"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.AggregateRating#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#aggregateRatingList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.AggregateRating#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#aggregateRatingList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "alternateName",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("alternateName"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#alternateNameScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#alternateNameList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#alternateNameScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#alternateNameList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "alumni",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("alumni"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#alumniList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#alumniList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "amenityFeature",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("amenityFeature"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.LocationFeatureSpecification#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#amenityFeatureList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.LocationFeatureSpecification#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#amenityFeatureList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "areaServed",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("areaServed"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.AdministrativeArea#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeoShape#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#areaServedScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#areaServedList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.AdministrativeArea#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.GeoShape#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#areaServedScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#areaServedList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "award",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("award"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "awards",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("awards"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardsScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardsScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#awardsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "branchCode",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("branchCode"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#branchCodeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#branchCodeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#branchCodeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#branchCodeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "branchOf",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("branchOf"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#branchOfList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#branchOfList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "brand",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("brand"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Brand#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#brandList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Brand#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#brandList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "companyRegistration",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("companyRegistration"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Certification#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#companyRegistrationList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Certification#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#companyRegistrationList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "contactPoint",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("contactPoint"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ContactPoint#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#contactPointList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.ContactPoint#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#contactPointList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "contactPoints",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("contactPoints"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ContactPoint#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#contactPointsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.ContactPoint#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#contactPointsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "containedIn",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("containedIn"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#containedInList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#containedInList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "containedInPlace",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("containedInPlace"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#containedInPlaceList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#containedInPlaceList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "containsPlace",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("containsPlace"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#containsPlaceList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#containsPlaceList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "correctionsPolicy",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("correctionsPolicy"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#correctionsPolicyScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#correctionsPolicyList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#correctionsPolicyScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#correctionsPolicyList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "currenciesAccepted",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("currenciesAccepted"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#currenciesAcceptedScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#currenciesAcceptedList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#currenciesAcceptedScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#currenciesAcceptedList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "department",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("department"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#departmentList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#departmentList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "description",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("description"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.TextObject#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#descriptionScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#descriptionList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.TextObject#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#descriptionScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#descriptionList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "disambiguatingDescription",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("disambiguatingDescription"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#disambiguatingDescriptionScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#disambiguatingDescriptionList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#disambiguatingDescriptionScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#disambiguatingDescriptionList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "dissolutionDate",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("dissolutionDate"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dissolutionDateScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dissolutionDateList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dissolutionDateScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dissolutionDateList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "diversityPolicy",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("diversityPolicy"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityPolicyScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityPolicyList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityPolicyScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityPolicyList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "diversityStaffingReport",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("diversityStaffingReport"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Article#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityStaffingReportScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityStaffingReportList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Article#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityStaffingReportScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#diversityStaffingReportList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "duns",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("duns"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dunsScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dunsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dunsScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#dunsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "email",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("email"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#emailScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#emailList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#emailScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#emailList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "employee",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("employee"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#employeeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#employeeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "employees",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("employees"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#employeesList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#employeesList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "ethicsPolicy",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("ethicsPolicy"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ethicsPolicyScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ethicsPolicyList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ethicsPolicyScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ethicsPolicyList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "event",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("event"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#eventList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#eventList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "events",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("events"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#eventsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#eventsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "faxNumber",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("faxNumber"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#faxNumberScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#faxNumberList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#faxNumberScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#faxNumberList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "founder",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("founder"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#founderList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#founderList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "founders",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("founders"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundersList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundersList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "foundingDate",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("foundingDate"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundingDateScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundingDateList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundingDateScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundingDateList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "foundingLocation",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("foundingLocation"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundingLocationList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#foundingLocationList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "funder",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("funder"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#funderList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#funderList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "funding",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("funding"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Grant#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#fundingList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Grant#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#fundingList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "geo",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("geo"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeoCoordinates#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeoShape#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.GeoCoordinates#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.GeoShape#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "geoContains",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("geoContains"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoContainsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoContainsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "geoCoveredBy",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("geoCoveredBy"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoCoveredByList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoCoveredByList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "geoCovers",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("geoCovers"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoCoversList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoCoversList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "geoCrosses",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("geoCrosses"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoCrossesList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoCrossesList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "geoDisjoint",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("geoDisjoint"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoDisjointList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoDisjointList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "geoEquals",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("geoEquals"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoEqualsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoEqualsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "geoIntersects",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("geoIntersects"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoIntersectsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoIntersectsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "geoOverlaps",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("geoOverlaps"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoOverlapsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoOverlapsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "geoTouches",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("geoTouches"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoTouchesList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoTouchesList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "geoWithin",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("geoWithin"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoWithinList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.GeospatialGeometry#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#geoWithinList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "globalLocationNumber",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("globalLocationNumber"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#globalLocationNumberScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#globalLocationNumberList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#globalLocationNumberScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#globalLocationNumberList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "hasCertification",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("hasCertification"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Certification#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasCertificationList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Certification#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasCertificationList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "hasCredential",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("hasCredential"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.EducationalOccupationalCredential#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasCredentialList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.EducationalOccupationalCredential#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasCredentialList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "hasDriveThroughService",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("hasDriveThroughService"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasDriveThroughServiceScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasDriveThroughServiceList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasDriveThroughServiceScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasDriveThroughServiceList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "hasGS1DigitalLink",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("hasGS1DigitalLink"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasGS1DigitalLinkScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasGS1DigitalLinkList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasGS1DigitalLinkScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasGS1DigitalLinkList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "hasMap",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("hasMap"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Map#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMapScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMapList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Map#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMapScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMapList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "hasMemberProgram",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("hasMemberProgram"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MemberProgram#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMemberProgramList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.MemberProgram#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMemberProgramList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "hasMerchantReturnPolicy",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("hasMerchantReturnPolicy"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MerchantReturnPolicy#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMerchantReturnPolicyList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.MerchantReturnPolicy#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasMerchantReturnPolicyList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "hasOfferCatalog",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("hasOfferCatalog"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.OfferCatalog#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasOfferCatalogList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.OfferCatalog#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasOfferCatalogList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "hasPOS",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("hasPOS"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasPOSList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasPOSList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "hasProductReturnPolicy",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("hasProductReturnPolicy"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ProductReturnPolicy#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasProductReturnPolicyList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.ProductReturnPolicy#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasProductReturnPolicyList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "hasShippingService",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("hasShippingService"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ShippingService#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasShippingServiceList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.ShippingService#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#hasShippingServiceList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "identifier",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("identifier"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PropertyValue#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#identifierScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#identifierList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.PropertyValue#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#identifierScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#identifierList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "image",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("image"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#imageScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#imageList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#imageScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#imageList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "interactionStatistic",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("interactionStatistic"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.InteractionCounter#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#interactionStatisticList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.InteractionCounter#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#interactionStatisticList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "isAccessibleForFree",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("isAccessibleForFree"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isAccessibleForFreeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isAccessibleForFreeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isAccessibleForFreeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isAccessibleForFreeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "isicV4",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("isicV4"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isicV4Scalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isicV4List")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isicV4Scalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#isicV4List")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "iso6523Code",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("iso6523Code"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#iso6523CodeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#iso6523CodeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#iso6523CodeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#iso6523CodeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "keywords",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("keywords"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#keywordsScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#keywordsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#keywordsScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#keywordsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "knowsAbout",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("knowsAbout"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsAboutScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsAboutList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsAboutScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsAboutList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "knowsLanguage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("knowsLanguage"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Language#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsLanguageScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsLanguageList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Language#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsLanguageScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#knowsLanguageList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "latitude",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("latitude"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#latitudeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#latitudeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#latitudeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#latitudeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "legalAddress",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("legalAddress"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PostalAddress#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalAddressList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.PostalAddress#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalAddressList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "legalName",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("legalName"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalNameScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalNameList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalNameScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalNameList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "legalRepresentative",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("legalRepresentative"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalRepresentativeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#legalRepresentativeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "leiCode",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("leiCode"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#leiCodeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#leiCodeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#leiCodeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#leiCodeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "location",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("location"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PostalAddress#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.VirtualLocation#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#locationScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#locationList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.PostalAddress#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.VirtualLocation#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#locationScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#locationList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "logo",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("logo"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#logoScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#logoList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#logoScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#logoList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "longitude",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("longitude"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#longitudeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#longitudeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#longitudeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#longitudeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "mainEntityOfPage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("mainEntityOfPage"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mainEntityOfPageScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mainEntityOfPageList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mainEntityOfPageScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mainEntityOfPageList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "makesOffer",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("makesOffer"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Offer#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#makesOfferList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Offer#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#makesOfferList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "map",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("map"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "maps",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("maps"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapsScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapsScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#mapsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "maximumAttendeeCapacity",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("maximumAttendeeCapacity"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#maximumAttendeeCapacityScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#maximumAttendeeCapacityList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#maximumAttendeeCapacityScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#maximumAttendeeCapacityList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "member",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("member"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#memberList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#memberList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "memberOf",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("memberOf"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MemberProgramTier#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ProgramMembership#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#memberOfList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.MemberProgramTier#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.ProgramMembership#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#memberOfList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "members",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("members"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#membersList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#membersList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "naics",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("naics"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#naicsScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#naicsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#naicsScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#naicsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("name"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nameScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nameList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nameScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nameList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "nonprofitStatus",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("nonprofitStatus"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.NonprofitType#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nonprofitStatusScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nonprofitStatusList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.NonprofitType#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nonprofitStatusScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#nonprofitStatusList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "numberOfEmployees",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("numberOfEmployees"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#numberOfEmployeesList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#numberOfEmployeesList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "openingHours",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("openingHours"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#openingHoursScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#openingHoursList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#openingHoursScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#openingHoursList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "openingHoursSpecification",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("openingHoursSpecification"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.OpeningHoursSpecification#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#openingHoursSpecificationList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.OpeningHoursSpecification#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#openingHoursSpecificationList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "ownershipFundingInfo",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("ownershipFundingInfo"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.AboutPage#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ownershipFundingInfoScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ownershipFundingInfoList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.AboutPage#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ownershipFundingInfoScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ownershipFundingInfoList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "owns",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("owns"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.OwnershipInfo#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ownsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.OwnershipInfo#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#ownsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "parentOrganization",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("parentOrganization"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#parentOrganizationList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#parentOrganizationList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "paymentAccepted",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("paymentAccepted"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#paymentAcceptedScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#paymentAcceptedList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#paymentAcceptedScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#paymentAcceptedList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "photo",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("photo"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Photograph#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#photoList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Photograph#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#photoList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "photos",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("photos"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Photograph#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#photosList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Photograph#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#photosList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "potentialAction",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("potentialAction"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Action#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#potentialActionList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Action#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#potentialActionList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "priceRange",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("priceRange"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#priceRangeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#priceRangeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#priceRangeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#priceRangeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "publicAccess",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("publicAccess"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publicAccessScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publicAccessList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publicAccessScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publicAccessList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "publishingPrinciples",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("publishingPrinciples"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publishingPrinciplesScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publishingPrinciplesList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publishingPrinciplesScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#publishingPrinciplesList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "review",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("review"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#reviewList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#reviewList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "reviews",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("reviews"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#reviewsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#reviewsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sameAs",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("sameAs"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sameAsScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sameAsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sameAsScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sameAsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "seeks",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("seeks"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Demand#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#seeksList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Demand#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#seeksList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "serviceArea",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("serviceArea"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.AdministrativeArea#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.GeoShape#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#serviceAreaList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.AdministrativeArea#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.GeoShape#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#serviceAreaList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "skills",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("skills"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#skillsScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#skillsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#skillsScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#skillsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "slogan",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("slogan"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sloganScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sloganList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sloganScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sloganList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "smokingAllowed",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("smokingAllowed"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#smokingAllowedScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#smokingAllowedList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#smokingAllowedScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#smokingAllowedList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "specialOpeningHoursSpecification",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("specialOpeningHoursSpecification"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.OpeningHoursSpecification#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#specialOpeningHoursSpecificationList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.OpeningHoursSpecification#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#specialOpeningHoursSpecificationList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sponsor",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("sponsor"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sponsorList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#sponsorList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "subOrganization",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("subOrganization"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#subOrganizationList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#subOrganizationList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "subjectOf",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("subjectOf"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#subjectOfList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#subjectOfList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "taxID",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("taxID"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#taxIDScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#taxIDList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#taxIDScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#taxIDList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "telephone",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("telephone"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#telephoneScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#telephoneList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#telephoneScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#telephoneList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "tourBookingPage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("tourBookingPage"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#tourBookingPageScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#tourBookingPageList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#tourBookingPageScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#tourBookingPageList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "unnamedSourcesPolicy",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("unnamedSourcesPolicy"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#unnamedSourcesPolicyScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#unnamedSourcesPolicyList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#unnamedSourcesPolicyScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#unnamedSourcesPolicyList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "url",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("url"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#urlScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#urlList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#urlScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#urlList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "vatID",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("vatID"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#vatIDScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#vatIDList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#vatIDScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.localBusiness#vatIDList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -7976,136 +5331,136 @@ pub mod local_business_state {
 
 /// Builder for constructing an instance of this type
 pub struct LocalBusinessBuilder<'a, S: local_business_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<LocalBusinessAcceptedPaymentMethod<'a>>,
-        ::core::option::Option<LocalBusinessActionableFeedbackPolicy<'a>>,
-        ::core::option::Option<LocalBusinessAdditionalProperty<'a>>,
-        ::core::option::Option<LocalBusinessAdditionalType<'a>>,
-        ::core::option::Option<LocalBusinessAddress<'a>>,
-        ::core::option::Option<LocalBusinessAgentInteractionStatistic<'a>>,
-        ::core::option::Option<LocalBusinessAggregateRating<'a>>,
-        ::core::option::Option<LocalBusinessAlternateName<'a>>,
-        ::core::option::Option<LocalBusinessAlumni<'a>>,
-        ::core::option::Option<LocalBusinessAmenityFeature<'a>>,
-        ::core::option::Option<LocalBusinessAreaServed<'a>>,
-        ::core::option::Option<LocalBusinessAward<'a>>,
-        ::core::option::Option<LocalBusinessAwards<'a>>,
-        ::core::option::Option<LocalBusinessBranchCode<'a>>,
-        ::core::option::Option<LocalBusinessBranchOf<'a>>,
-        ::core::option::Option<LocalBusinessBrand<'a>>,
-        ::core::option::Option<LocalBusinessCompanyRegistration<'a>>,
-        ::core::option::Option<LocalBusinessContactPoint<'a>>,
-        ::core::option::Option<LocalBusinessContactPoints<'a>>,
-        ::core::option::Option<LocalBusinessContainedIn<'a>>,
-        ::core::option::Option<LocalBusinessContainedInPlace<'a>>,
-        ::core::option::Option<LocalBusinessContainsPlace<'a>>,
-        ::core::option::Option<LocalBusinessCorrectionsPolicy<'a>>,
-        ::core::option::Option<LocalBusinessCurrenciesAccepted<'a>>,
-        ::core::option::Option<LocalBusinessDepartment<'a>>,
-        ::core::option::Option<LocalBusinessDescription<'a>>,
-        ::core::option::Option<LocalBusinessDisambiguatingDescription<'a>>,
-        ::core::option::Option<LocalBusinessDissolutionDate<'a>>,
-        ::core::option::Option<LocalBusinessDiversityPolicy<'a>>,
-        ::core::option::Option<LocalBusinessDiversityStaffingReport<'a>>,
-        ::core::option::Option<LocalBusinessDuns<'a>>,
-        ::core::option::Option<LocalBusinessEmail<'a>>,
-        ::core::option::Option<LocalBusinessEmployee<'a>>,
-        ::core::option::Option<LocalBusinessEmployees<'a>>,
-        ::core::option::Option<LocalBusinessEthicsPolicy<'a>>,
-        ::core::option::Option<LocalBusinessEvent<'a>>,
-        ::core::option::Option<LocalBusinessEvents<'a>>,
-        ::core::option::Option<LocalBusinessFaxNumber<'a>>,
-        ::core::option::Option<LocalBusinessFounder<'a>>,
-        ::core::option::Option<LocalBusinessFounders<'a>>,
-        ::core::option::Option<LocalBusinessFoundingDate<'a>>,
-        ::core::option::Option<LocalBusinessFoundingLocation<'a>>,
-        ::core::option::Option<LocalBusinessFunder<'a>>,
-        ::core::option::Option<LocalBusinessFunding<'a>>,
-        ::core::option::Option<LocalBusinessGeo<'a>>,
-        ::core::option::Option<LocalBusinessGeoContains<'a>>,
-        ::core::option::Option<LocalBusinessGeoCoveredBy<'a>>,
-        ::core::option::Option<LocalBusinessGeoCovers<'a>>,
-        ::core::option::Option<LocalBusinessGeoCrosses<'a>>,
-        ::core::option::Option<LocalBusinessGeoDisjoint<'a>>,
-        ::core::option::Option<LocalBusinessGeoEquals<'a>>,
-        ::core::option::Option<LocalBusinessGeoIntersects<'a>>,
-        ::core::option::Option<LocalBusinessGeoOverlaps<'a>>,
-        ::core::option::Option<LocalBusinessGeoTouches<'a>>,
-        ::core::option::Option<LocalBusinessGeoWithin<'a>>,
-        ::core::option::Option<LocalBusinessGlobalLocationNumber<'a>>,
-        ::core::option::Option<LocalBusinessHasCertification<'a>>,
-        ::core::option::Option<LocalBusinessHasCredential<'a>>,
-        ::core::option::Option<LocalBusinessHasDriveThroughService<'a>>,
-        ::core::option::Option<LocalBusinessHasGs1DigitalLink<'a>>,
-        ::core::option::Option<LocalBusinessHasMap<'a>>,
-        ::core::option::Option<LocalBusinessHasMemberProgram<'a>>,
-        ::core::option::Option<LocalBusinessHasMerchantReturnPolicy<'a>>,
-        ::core::option::Option<LocalBusinessHasOfferCatalog<'a>>,
-        ::core::option::Option<LocalBusinessHasPos<'a>>,
-        ::core::option::Option<LocalBusinessHasProductReturnPolicy<'a>>,
-        ::core::option::Option<LocalBusinessHasShippingService<'a>>,
-        ::core::option::Option<LocalBusinessIdentifier<'a>>,
-        ::core::option::Option<LocalBusinessImage<'a>>,
-        ::core::option::Option<LocalBusinessInteractionStatistic<'a>>,
-        ::core::option::Option<LocalBusinessIsAccessibleForFree<'a>>,
-        ::core::option::Option<LocalBusinessIsicV4<'a>>,
-        ::core::option::Option<LocalBusinessIso6523Code<'a>>,
-        ::core::option::Option<LocalBusinessKeywords<'a>>,
-        ::core::option::Option<LocalBusinessKnowsAbout<'a>>,
-        ::core::option::Option<LocalBusinessKnowsLanguage<'a>>,
-        ::core::option::Option<LocalBusinessLatitude<'a>>,
-        ::core::option::Option<LocalBusinessLegalAddress<'a>>,
-        ::core::option::Option<LocalBusinessLegalName<'a>>,
-        ::core::option::Option<LocalBusinessLegalRepresentative<'a>>,
-        ::core::option::Option<LocalBusinessLeiCode<'a>>,
-        ::core::option::Option<LocalBusinessLocation<'a>>,
-        ::core::option::Option<LocalBusinessLogo<'a>>,
-        ::core::option::Option<LocalBusinessLongitude<'a>>,
-        ::core::option::Option<LocalBusinessMainEntityOfPage<'a>>,
-        ::core::option::Option<LocalBusinessMakesOffer<'a>>,
-        ::core::option::Option<LocalBusinessMap<'a>>,
-        ::core::option::Option<LocalBusinessMaps<'a>>,
-        ::core::option::Option<LocalBusinessMaximumAttendeeCapacity<'a>>,
-        ::core::option::Option<LocalBusinessMember<'a>>,
-        ::core::option::Option<LocalBusinessMemberOf<'a>>,
-        ::core::option::Option<LocalBusinessMembers<'a>>,
-        ::core::option::Option<LocalBusinessNaics<'a>>,
-        ::core::option::Option<LocalBusinessName<'a>>,
-        ::core::option::Option<LocalBusinessNonprofitStatus<'a>>,
-        ::core::option::Option<LocalBusinessNumberOfEmployees<'a>>,
-        ::core::option::Option<LocalBusinessOpeningHours<'a>>,
-        ::core::option::Option<LocalBusinessOpeningHoursSpecification<'a>>,
-        ::core::option::Option<LocalBusinessOwnershipFundingInfo<'a>>,
-        ::core::option::Option<LocalBusinessOwns<'a>>,
-        ::core::option::Option<LocalBusinessParentOrganization<'a>>,
-        ::core::option::Option<LocalBusinessPaymentAccepted<'a>>,
-        ::core::option::Option<LocalBusinessPhoto<'a>>,
-        ::core::option::Option<LocalBusinessPhotos<'a>>,
-        ::core::option::Option<LocalBusinessPotentialAction<'a>>,
-        ::core::option::Option<LocalBusinessPriceRange<'a>>,
-        ::core::option::Option<LocalBusinessPublicAccess<'a>>,
-        ::core::option::Option<LocalBusinessPublishingPrinciples<'a>>,
-        ::core::option::Option<LocalBusinessReview<'a>>,
-        ::core::option::Option<LocalBusinessReviews<'a>>,
-        ::core::option::Option<LocalBusinessSameAs<'a>>,
-        ::core::option::Option<LocalBusinessSeeks<'a>>,
-        ::core::option::Option<LocalBusinessServiceArea<'a>>,
-        ::core::option::Option<LocalBusinessSkills<'a>>,
-        ::core::option::Option<LocalBusinessSlogan<'a>>,
-        ::core::option::Option<LocalBusinessSmokingAllowed<'a>>,
-        ::core::option::Option<LocalBusinessSpecialOpeningHoursSpecification<'a>>,
-        ::core::option::Option<LocalBusinessSponsor<'a>>,
-        ::core::option::Option<LocalBusinessSubOrganization<'a>>,
-        ::core::option::Option<LocalBusinessSubjectOf<'a>>,
-        ::core::option::Option<LocalBusinessTaxId<'a>>,
-        ::core::option::Option<LocalBusinessTelephone<'a>>,
-        ::core::option::Option<LocalBusinessTourBookingPage<'a>>,
-        ::core::option::Option<LocalBusinessUnnamedSourcesPolicy<'a>>,
-        ::core::option::Option<LocalBusinessUrl<'a>>,
-        ::core::option::Option<LocalBusinessVatId<'a>>,
+        Option<LocalBusinessAcceptedPaymentMethod<'a>>,
+        Option<LocalBusinessActionableFeedbackPolicy<'a>>,
+        Option<LocalBusinessAdditionalProperty<'a>>,
+        Option<LocalBusinessAdditionalType<'a>>,
+        Option<LocalBusinessAddress<'a>>,
+        Option<LocalBusinessAgentInteractionStatistic<'a>>,
+        Option<LocalBusinessAggregateRating<'a>>,
+        Option<LocalBusinessAlternateName<'a>>,
+        Option<LocalBusinessAlumni<'a>>,
+        Option<LocalBusinessAmenityFeature<'a>>,
+        Option<LocalBusinessAreaServed<'a>>,
+        Option<LocalBusinessAward<'a>>,
+        Option<LocalBusinessAwards<'a>>,
+        Option<LocalBusinessBranchCode<'a>>,
+        Option<LocalBusinessBranchOf<'a>>,
+        Option<LocalBusinessBrand<'a>>,
+        Option<LocalBusinessCompanyRegistration<'a>>,
+        Option<LocalBusinessContactPoint<'a>>,
+        Option<LocalBusinessContactPoints<'a>>,
+        Option<LocalBusinessContainedIn<'a>>,
+        Option<LocalBusinessContainedInPlace<'a>>,
+        Option<LocalBusinessContainsPlace<'a>>,
+        Option<LocalBusinessCorrectionsPolicy<'a>>,
+        Option<LocalBusinessCurrenciesAccepted<'a>>,
+        Option<LocalBusinessDepartment<'a>>,
+        Option<LocalBusinessDescription<'a>>,
+        Option<LocalBusinessDisambiguatingDescription<'a>>,
+        Option<LocalBusinessDissolutionDate<'a>>,
+        Option<LocalBusinessDiversityPolicy<'a>>,
+        Option<LocalBusinessDiversityStaffingReport<'a>>,
+        Option<LocalBusinessDuns<'a>>,
+        Option<LocalBusinessEmail<'a>>,
+        Option<LocalBusinessEmployee<'a>>,
+        Option<LocalBusinessEmployees<'a>>,
+        Option<LocalBusinessEthicsPolicy<'a>>,
+        Option<LocalBusinessEvent<'a>>,
+        Option<LocalBusinessEvents<'a>>,
+        Option<LocalBusinessFaxNumber<'a>>,
+        Option<LocalBusinessFounder<'a>>,
+        Option<LocalBusinessFounders<'a>>,
+        Option<LocalBusinessFoundingDate<'a>>,
+        Option<LocalBusinessFoundingLocation<'a>>,
+        Option<LocalBusinessFunder<'a>>,
+        Option<LocalBusinessFunding<'a>>,
+        Option<LocalBusinessGeo<'a>>,
+        Option<LocalBusinessGeoContains<'a>>,
+        Option<LocalBusinessGeoCoveredBy<'a>>,
+        Option<LocalBusinessGeoCovers<'a>>,
+        Option<LocalBusinessGeoCrosses<'a>>,
+        Option<LocalBusinessGeoDisjoint<'a>>,
+        Option<LocalBusinessGeoEquals<'a>>,
+        Option<LocalBusinessGeoIntersects<'a>>,
+        Option<LocalBusinessGeoOverlaps<'a>>,
+        Option<LocalBusinessGeoTouches<'a>>,
+        Option<LocalBusinessGeoWithin<'a>>,
+        Option<LocalBusinessGlobalLocationNumber<'a>>,
+        Option<LocalBusinessHasCertification<'a>>,
+        Option<LocalBusinessHasCredential<'a>>,
+        Option<LocalBusinessHasDriveThroughService<'a>>,
+        Option<LocalBusinessHasGs1DigitalLink<'a>>,
+        Option<LocalBusinessHasMap<'a>>,
+        Option<LocalBusinessHasMemberProgram<'a>>,
+        Option<LocalBusinessHasMerchantReturnPolicy<'a>>,
+        Option<LocalBusinessHasOfferCatalog<'a>>,
+        Option<LocalBusinessHasPos<'a>>,
+        Option<LocalBusinessHasProductReturnPolicy<'a>>,
+        Option<LocalBusinessHasShippingService<'a>>,
+        Option<LocalBusinessIdentifier<'a>>,
+        Option<LocalBusinessImage<'a>>,
+        Option<LocalBusinessInteractionStatistic<'a>>,
+        Option<LocalBusinessIsAccessibleForFree<'a>>,
+        Option<LocalBusinessIsicV4<'a>>,
+        Option<LocalBusinessIso6523Code<'a>>,
+        Option<LocalBusinessKeywords<'a>>,
+        Option<LocalBusinessKnowsAbout<'a>>,
+        Option<LocalBusinessKnowsLanguage<'a>>,
+        Option<LocalBusinessLatitude<'a>>,
+        Option<LocalBusinessLegalAddress<'a>>,
+        Option<LocalBusinessLegalName<'a>>,
+        Option<LocalBusinessLegalRepresentative<'a>>,
+        Option<LocalBusinessLeiCode<'a>>,
+        Option<LocalBusinessLocation<'a>>,
+        Option<LocalBusinessLogo<'a>>,
+        Option<LocalBusinessLongitude<'a>>,
+        Option<LocalBusinessMainEntityOfPage<'a>>,
+        Option<LocalBusinessMakesOffer<'a>>,
+        Option<LocalBusinessMap<'a>>,
+        Option<LocalBusinessMaps<'a>>,
+        Option<LocalBusinessMaximumAttendeeCapacity<'a>>,
+        Option<LocalBusinessMember<'a>>,
+        Option<LocalBusinessMemberOf<'a>>,
+        Option<LocalBusinessMembers<'a>>,
+        Option<LocalBusinessNaics<'a>>,
+        Option<LocalBusinessName<'a>>,
+        Option<LocalBusinessNonprofitStatus<'a>>,
+        Option<LocalBusinessNumberOfEmployees<'a>>,
+        Option<LocalBusinessOpeningHours<'a>>,
+        Option<LocalBusinessOpeningHoursSpecification<'a>>,
+        Option<LocalBusinessOwnershipFundingInfo<'a>>,
+        Option<LocalBusinessOwns<'a>>,
+        Option<LocalBusinessParentOrganization<'a>>,
+        Option<LocalBusinessPaymentAccepted<'a>>,
+        Option<LocalBusinessPhoto<'a>>,
+        Option<LocalBusinessPhotos<'a>>,
+        Option<LocalBusinessPotentialAction<'a>>,
+        Option<LocalBusinessPriceRange<'a>>,
+        Option<LocalBusinessPublicAccess<'a>>,
+        Option<LocalBusinessPublishingPrinciples<'a>>,
+        Option<LocalBusinessReview<'a>>,
+        Option<LocalBusinessReviews<'a>>,
+        Option<LocalBusinessSameAs<'a>>,
+        Option<LocalBusinessSeeks<'a>>,
+        Option<LocalBusinessServiceArea<'a>>,
+        Option<LocalBusinessSkills<'a>>,
+        Option<LocalBusinessSlogan<'a>>,
+        Option<LocalBusinessSmokingAllowed<'a>>,
+        Option<LocalBusinessSpecialOpeningHoursSpecification<'a>>,
+        Option<LocalBusinessSponsor<'a>>,
+        Option<LocalBusinessSubOrganization<'a>>,
+        Option<LocalBusinessSubjectOf<'a>>,
+        Option<LocalBusinessTaxId<'a>>,
+        Option<LocalBusinessTelephone<'a>>,
+        Option<LocalBusinessTourBookingPage<'a>>,
+        Option<LocalBusinessUnnamedSourcesPolicy<'a>>,
+        Option<LocalBusinessUrl<'a>>,
+        Option<LocalBusinessVatId<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> LocalBusiness<'a> {
@@ -8119,7 +5474,7 @@ impl<'a> LocalBusinessBuilder<'a, local_business_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LocalBusinessBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -8248,7 +5603,7 @@ impl<'a> LocalBusinessBuilder<'a, local_business_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -10549,10 +7904,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> LocalBusiness<'a> {
         LocalBusiness {
             accepted_payment_method: self.__unsafe_private_named.0,

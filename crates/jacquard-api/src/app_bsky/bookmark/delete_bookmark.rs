@@ -5,40 +5,41 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteBookmark<'a> {
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteBookmarkError<'a> {
     /// The URI to be bookmarked is for an unsupported collection.
     #[serde(rename = "UnsupportedCollection")]
-    UnsupportedCollection(core::option::Option<jacquard_common::CowStr<'a>>),
+    UnsupportedCollection(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteBookmarkError<'_> {
@@ -56,8 +57,7 @@ impl core::fmt::Display for DeleteBookmarkError<'_> {
     }
 }
 
-/// Response type for
-///app.bsky.bookmark.deleteBookmark
+/// Response type for app.bsky.bookmark.deleteBookmark
 pub struct DeleteBookmarkResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteBookmarkResponse {
     const NSID: &'static str = "app.bsky.bookmark.deleteBookmark";
@@ -74,8 +74,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBookmark<'a> {
     type Response = DeleteBookmarkResponse;
 }
 
-/// Endpoint type for
-///app.bsky.bookmark.deleteBookmark
+/// Endpoint type for app.bsky.bookmark.deleteBookmark
 pub struct DeleteBookmarkRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteBookmarkRequest {
     const PATH: &'static str = "/xrpc/app.bsky.bookmark.deleteBookmark";
@@ -120,11 +119,9 @@ pub mod delete_bookmark_state {
 
 /// Builder for constructing an instance of this type
 pub struct DeleteBookmarkBuilder<'a, S: delete_bookmark_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> DeleteBookmark<'a> {
@@ -138,9 +135,9 @@ impl<'a> DeleteBookmarkBuilder<'a, delete_bookmark_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeleteBookmarkBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -153,13 +150,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> DeleteBookmarkBuilder<'a, delete_bookmark_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         DeleteBookmarkBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -179,7 +176,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

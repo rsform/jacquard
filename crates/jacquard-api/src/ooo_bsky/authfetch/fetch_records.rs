@@ -5,64 +5,58 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::ooo_bsky::authfetch::strategy::Strategy;
+use crate::ooo_bsky::authfetch::fetch_records;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct FetchRecords<'a> {
     #[serde(borrow)]
-    pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
+    pub uris: Vec<AtUri<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct FetchRecordsOutput<'a> {
     ///The results of the queries. Missing results indicate an error. For privacy, the error is not returned.
     #[serde(borrow)]
-    pub results: Vec<crate::ooo_bsky::authfetch::fetch_records::FetchRecordsResult<'a>>,
+    pub results: Vec<fetch_records::FetchRecordsResult<'a>>,
 }
 
 /// Successful result, with the record value.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct FetchRecordsResult<'a> {
     ///The stored private record value.
     #[serde(borrow)]
-    pub record: jacquard_common::types::value::Data<'a>,
+    pub record: Data<'a>,
     ///The strategy used to authenticate fetch requests for this record.
     #[serde(borrow)]
-    pub strategy: crate::ooo_bsky::authfetch::strategy::Strategy<'a>,
+    pub strategy: Strategy<'a>,
     ///The AT URI of the record.
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-/// Response type for
-///ooo.bsky.authfetch.fetchRecords
+/// Response type for ooo.bsky.authfetch.fetchRecords
 pub struct FetchRecordsResponse;
 impl jacquard_common::xrpc::XrpcResp for FetchRecordsResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.fetchRecords";
@@ -77,8 +71,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for FetchRecords<'a> {
     type Response = FetchRecordsResponse;
 }
 
-/// Endpoint type for
-///ooo.bsky.authfetch.fetchRecords
+/// Endpoint type for ooo.bsky.authfetch.fetchRecords
 pub struct FetchRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for FetchRecordsRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.fetchRecords";
@@ -87,19 +80,17 @@ impl jacquard_common::xrpc::XrpcEndpoint for FetchRecordsRequest {
     type Response = FetchRecordsResponse;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for FetchRecordsResult<'a> {
+impl<'a> LexiconSchema for FetchRecordsResult<'a> {
     fn nsid() -> &'static str {
         "ooo.bsky.authfetch.fetchRecords"
     }
     fn def_name() -> &'static str {
         "result"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_ooo_bsky_authfetch_fetchRecords()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -138,11 +129,9 @@ pub mod fetch_records_state {
 
 /// Builder for constructing an instance of this type
 pub struct FetchRecordsBuilder<'a, S: fetch_records_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<AtUri<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> FetchRecords<'a> {
@@ -156,9 +145,9 @@ impl<'a> FetchRecordsBuilder<'a, fetch_records_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FetchRecordsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -171,13 +160,13 @@ where
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<'a>>>,
     ) -> FetchRecordsBuilder<'a, fetch_records_state::SetUris<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         FetchRecordsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -205,63 +194,59 @@ pub mod fetch_records_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Uri;
         type Record;
         type Strategy;
-        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Uri = Unset;
         type Record = Unset;
         type Strategy = Unset;
-        type Uri = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Strategy = S::Strategy;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `strategy` field to Set
-    pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStrategy<S> {}
-    impl<S: State> State for SetStrategy<S> {
-        type Record = S::Record;
-        type Strategy = Set<members::strategy>;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
         type Record = S::Record;
         type Strategy = S::Strategy;
-        type Uri = Set<members::uri>;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Uri = S::Uri;
+        type Record = Set<members::record>;
+        type Strategy = S::Strategy;
+    }
+    ///State transition - sets the `strategy` field to Set
+    pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStrategy<S> {}
+    impl<S: State> State for SetStrategy<S> {
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type Strategy = Set<members::strategy>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `record` field
         pub struct record(());
         ///Marker type for the `strategy` field
         pub struct strategy(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FetchRecordsResultBuilder<'a, S: fetch_records_result_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<crate::ooo_bsky::authfetch::strategy::Strategy<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Data<'a>>, Option<Strategy<'a>>, Option<AtUri<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> FetchRecordsResult<'a> {
@@ -275,9 +260,9 @@ impl<'a> FetchRecordsResultBuilder<'a, fetch_records_result_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FetchRecordsResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -290,13 +275,13 @@ where
     /// Set the `record` field (required)
     pub fn record(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> FetchRecordsResultBuilder<'a, fetch_records_result_state::SetRecord<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         FetchRecordsResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -309,13 +294,13 @@ where
     /// Set the `strategy` field (required)
     pub fn strategy(
         mut self,
-        value: impl Into<crate::ooo_bsky::authfetch::strategy::Strategy<'a>>,
+        value: impl Into<Strategy<'a>>,
     ) -> FetchRecordsResultBuilder<'a, fetch_records_result_state::SetStrategy<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         FetchRecordsResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -328,13 +313,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> FetchRecordsResultBuilder<'a, fetch_records_result_state::SetUri<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         FetchRecordsResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -342,9 +327,9 @@ where
 impl<'a, S> FetchRecordsResultBuilder<'a, S>
 where
     S: fetch_records_result_state::State,
+    S::Uri: fetch_records_result_state::IsSet,
     S::Record: fetch_records_result_state::IsSet,
     S::Strategy: fetch_records_result_state::IsSet,
-    S::Uri: fetch_records_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FetchRecordsResult<'a> {
@@ -358,10 +343,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> FetchRecordsResult<'a> {
         FetchRecordsResult {
             record: self.__unsafe_private_named.0.unwrap(),
@@ -372,129 +354,90 @@ where
     }
 }
 
-fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("ooo.bsky.authfetch.fetchRecords"),
-        revision: None,
-        description: None,
+fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("ooo.bsky.authfetch.fetchRecords"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
-                    description: None,
+                SmolStr::new_static("main"),
+                LexUserType::XrpcQuery(LexXrpcQuery {
                     parameters: Some(
-                        ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
-                            description: None,
-                            required: Some(
-                                vec![
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("uris")
-                                ],
-                            ),
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("uris")]),
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::alloc::collections::BTreeMap::new();
+                                let mut map = BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                        "uris",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Array(::jacquard_lexicon::lexicon::LexPrimitiveArray {
-                                        description: None,
-                                        items: ::jacquard_lexicon::lexicon::LexPrimitiveArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
-                                            format: Some(
-                                                ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                            ),
-                                            default: None,
-                                            min_length: None,
-                                            max_length: None,
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                    SmolStr::new_static("uris"),
+                                    LexXrpcParametersProperty::Array(LexPrimitiveArray {
+                                        items: LexPrimitiveArrayItem::String(LexString {
+                                            format: Some(LexStringFormat::AtUri),
+                                            ..Default::default()
                                         }),
                                         min_length: Some(1usize),
                                         max_length: Some(50usize),
+                                        ..Default::default()
                                     }),
                                 );
                                 map
                             },
+                            ..Default::default()
                         }),
                     ),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("result"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("result"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Successful result, with the record value.",
-                        ),
+                        CowStr::new_static("Successful result, with the record value."),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("strategy"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("record")
+                            SmolStr::new_static("uri"), SmolStr::new_static("strategy"),
+                            SmolStr::new_static("record")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "record",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
-                                description: None,
+                            SmolStr::new_static("record"),
+                            LexObjectProperty::Unknown(LexUnknown {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "strategy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "ooo.bsky.authfetch.strategy",
-                                ),
+                            SmolStr::new_static("strategy"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("ooo.bsky.authfetch.strategy"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The AT URI of the record.",
-                                    ),
+                                    CowStr::new_static("The AT URI of the record."),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

@@ -5,73 +5,79 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::space_remanso::note;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Image<'a> {
     ///Alt text for the image.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alt: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub alt: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub image: jacquard_common::types::blob::BlobRef<'a>,
+    pub image: BlobRef<'a>,
 }
 
 /// A markdown blog post with LaTeX, GitHub notes, Mermaid, YouTube and Bluesky extensions.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Note<'a> {
     ///Markdown content. Local image paths are replaced with blob CIDs at publish time.
     #[serde(borrow)]
-    pub content: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    pub content: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<Datetime>,
     ///Whether the note can be discovered by others in public listings. Defaults to true.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub discoverable: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub discoverable: Option<bool>,
     ///Font family name available from Coollabs.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub font_family: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub font_family: Option<CowStr<'a>>,
     ///Font size in points. Recommended range: 9–21, but clients may allow larger sizes for accessibility.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub font_size: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub font_size: Option<i64>,
     ///Blob references for images embedded in the markdown content.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub images: core::option::Option<Vec<crate::space_remanso::note::Image<'a>>>,
+    pub images: Option<Vec<note::Image<'a>>>,
     ///Most used language in the note. In ISO 639-3 code.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub language: core::option::Option<NoteLanguage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub published_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    pub language: Option<NoteLanguage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub published_at: Option<Datetime>,
     ///Display theme for the note.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub theme: core::option::Option<NoteTheme<'a>>,
+    pub theme: Option<NoteTheme<'a>>,
     #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
+    pub title: CowStr<'a>,
 }
 
 /// Most used language in the note. In ISO 639-3 code.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum NoteLanguage<'a> {
     Afr,
@@ -124,7 +130,7 @@ pub enum NoteLanguage<'a> {
     Tur,
     Ukr,
     Vie,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> NoteLanguage<'a> {
@@ -238,7 +244,7 @@ impl<'a> From<&'a str> for NoteLanguage<'a> {
             "tur" => Self::Tur,
             "ukr" => Self::Ukr,
             "vie" => Self::Vie,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -296,7 +302,7 @@ impl<'a> From<String> for NoteLanguage<'a> {
             "tur" => Self::Tur,
             "ukr" => Self::Ukr,
             "vie" => Self::Vie,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -401,11 +407,12 @@ impl jacquard_common::IntoStatic for NoteLanguage<'_> {
 }
 
 /// Display theme for the note.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum NoteTheme<'a> {
     Light,
     Dark,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> NoteTheme<'a> {
@@ -423,7 +430,7 @@ impl<'a> From<&'a str> for NoteTheme<'a> {
         match s {
             "light" => Self::Light,
             "dark" => Self::Dark,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -433,7 +440,7 @@ impl<'a> From<String> for NoteTheme<'a> {
         match s.as_str() {
             "light" => Self::Light,
             "dark" => Self::Dark,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -490,59 +497,43 @@ impl jacquard_common::IntoStatic for NoteTheme<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct NoteGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Note<'a>,
 }
 
 impl<'a> Note<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, NoteRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, NoteRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Image<'a> {
+impl<'a> LexiconSchema for Image<'a> {
     fn nsid() -> &'static str {
         "space.remanso.note"
     }
     fn def_name() -> &'static str {
         "image"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_space_remanso_note()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "alt",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("alt"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -553,10 +544,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Image<'a> {
             {
                 let size = value.blob().size;
                 if size > 2000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "image",
-                        ),
+                    return Err(ConstraintError::BlobTooLarge {
+                        path: ValidationPath::from_field("image"),
                         max: 2000000usize,
                         actual: size,
                     });
@@ -582,10 +571,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Image<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "image",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("image"),
                         accepted: vec!["image/*".to_string()],
                         actual: mime.to_string(),
                     });
@@ -597,13 +584,14 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Image<'a> {
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct NoteRecord;
-impl jacquard_common::xrpc::XrpcResp for NoteRecord {
+impl XrpcResp for NoteRecord {
     const NSID: &'static str = "space.remanso.note";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = NoteGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<NoteGetRecordOutput<'_>> for Note<'_> {
@@ -613,37 +601,33 @@ impl From<NoteGetRecordOutput<'_>> for Note<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Note<'_> {
+impl Collection for Note<'_> {
     const NSID: &'static str = "space.remanso.note";
     type Record = NoteRecord;
 }
 
-impl jacquard_common::types::collection::Collection for NoteRecord {
+impl Collection for NoteRecord {
     const NSID: &'static str = "space.remanso.note";
     type Record = NoteRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Note<'a> {
+impl<'a> LexiconSchema for Note<'a> {
     fn nsid() -> &'static str {
         "space.remanso.note"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_space_remanso_note()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.content;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("content"),
                     max: 30000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -652,10 +636,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Note<'a> {
         if let Some(ref value) = self.font_family {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "font_family",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("font_family"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -664,10 +646,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Note<'a> {
         if let Some(ref value) = self.images {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "images",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("images"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -676,10 +656,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Note<'a> {
         if let Some(ref value) = self.language {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "language",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("language"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -689,10 +667,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Note<'a> {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("title"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -736,12 +712,9 @@ pub mod image_state {
 
 /// Builder for constructing an instance of this type
 pub struct ImageBuilder<'a, S: image_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<BlobRef<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Image<'a> {
@@ -755,21 +728,21 @@ impl<'a> ImageBuilder<'a, image_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImageBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `alt` field (optional)
-    pub fn alt(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
-    pub fn maybe_alt(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -783,13 +756,13 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+        value: impl Into<BlobRef<'a>>,
     ) -> ImageBuilder<'a, image_state::SetImage<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ImageBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -810,7 +783,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -823,270 +796,164 @@ where
     }
 }
 
-fn lexicon_doc_space_remanso_note() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("space.remanso.note"),
-        revision: None,
-        description: None,
+fn lexicon_doc_space_remanso_note() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("space.remanso.note"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("image"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("image")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("image"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("image")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("alt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Alt text for the image.",
-                                    ),
+                                    CowStr::new_static("Alt text for the image."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(2000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "image",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                description: None,
-                                accept: None,
-                                max_size: None,
-                            }),
+                            SmolStr::new_static("image"),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A markdown blog post with LaTeX, GitHub notes, Mermaid, YouTube and Bluesky extensions.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("content")
+                                SmolStr::new_static("title"), SmolStr::new_static("content")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "content",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("content"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Markdown content. Local image paths are replaced with blob CIDs at publish time.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(30000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "discoverable",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
+                                SmolStr::new_static("discoverable"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "fontFamily",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("fontFamily"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Font family name available from Coollabs.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(200usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "fontSize",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("fontSize"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "images",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("images"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Blob references for images embedded in the markdown content.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static("#image"),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#image"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(20usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "language",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("language"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Most used language in the note. In ISO 639-3 code.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(10usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "publishedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("publishedAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "theme",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("theme"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Display theme for the note.",
-                                        ),
+                                        CowStr::new_static("Display theme for the note."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "title",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("title"),
+                                LexObjectProperty::String(LexString {
                                     max_length: Some(1000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1136,20 +1003,20 @@ pub mod note_state {
 
 /// Builder for constructing an instance of this type
 pub struct NoteBuilder<'a, S: note_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<Vec<crate::space_remanso::note::Image<'a>>>,
-        ::core::option::Option<NoteLanguage<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<NoteTheme<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<bool>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<Vec<note::Image<'a>>>,
+        Option<NoteLanguage<'a>>,
+        Option<Datetime>,
+        Option<NoteTheme<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Note<'a> {
@@ -1163,7 +1030,7 @@ impl<'a> NoteBuilder<'a, note_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NoteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -1176,7 +1043,7 @@ impl<'a> NoteBuilder<'a, note_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1189,31 +1056,25 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> NoteBuilder<'a, note_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         NoteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
-    pub fn created_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
-    pub fn maybe_created_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -1234,18 +1095,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `fontFamily` field (optional)
-    pub fn font_family(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn font_family(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `fontFamily` field to an Option value (optional)
-    pub fn maybe_font_family(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_font_family(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -1266,18 +1121,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `images` field (optional)
-    pub fn images(
-        mut self,
-        value: impl Into<Option<Vec<crate::space_remanso::note::Image<'a>>>>,
-    ) -> Self {
+    pub fn images(mut self, value: impl Into<Option<Vec<note::Image<'a>>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `images` field to an Option value (optional)
-    pub fn maybe_images(
-        mut self,
-        value: Option<Vec<crate::space_remanso::note::Image<'a>>>,
-    ) -> Self {
+    pub fn maybe_images(mut self, value: Option<Vec<note::Image<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -1298,18 +1147,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `publishedAt` field (optional)
-    pub fn published_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `publishedAt` field to an Option value (optional)
-    pub fn maybe_published_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_published_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -1336,13 +1179,13 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> NoteBuilder<'a, note_state::SetTitle<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         NoteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1372,7 +1215,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

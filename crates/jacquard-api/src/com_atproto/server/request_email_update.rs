@@ -5,35 +5,23 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RequestEmailUpdateOutput<'a> {
     pub token_required: bool,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct RequestEmailUpdate;
-/// Response type for
-///com.atproto.server.requestEmailUpdate
+/// Response type for com.atproto.server.requestEmailUpdate
 pub struct RequestEmailUpdateResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestEmailUpdateResponse {
     const NSID: &'static str = "com.atproto.server.requestEmailUpdate";
@@ -50,8 +38,7 @@ impl jacquard_common::xrpc::XrpcRequest for RequestEmailUpdate {
     type Response = RequestEmailUpdateResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.requestEmailUpdate
+/// Endpoint type for com.atproto.server.requestEmailUpdate
 pub struct RequestEmailUpdateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestEmailUpdateRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.requestEmailUpdate";

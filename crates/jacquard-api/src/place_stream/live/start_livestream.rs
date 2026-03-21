@@ -5,50 +5,41 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::{Did, Cid, UriValue};
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::livestream::Livestream;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct StartLivestream<'a> {
     ///Whether to create a Bluesky post announcing the livestream.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub create_bluesky_post: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub create_bluesky_post: Option<bool>,
     #[serde(borrow)]
-    pub livestream: crate::place_stream::livestream::Livestream<'a>,
+    pub livestream: Livestream<'a>,
     ///The DID of the streamer.
     #[serde(borrow)]
-    pub streamer: jacquard_common::types::string::Did<'a>,
+    pub streamer: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct StartLivestreamOutput<'a> {
     ///The CID of the livestream record.
     #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub cid: Cid<'a>,
     ///The URI of the livestream record.
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::UriValue<'a>,
+    pub uri: UriValue<'a>,
 }
 
-/// Response type for
-///place.stream.live.startLivestream
+/// Response type for place.stream.live.startLivestream
 pub struct StartLivestreamResponse;
 impl jacquard_common::xrpc::XrpcResp for StartLivestreamResponse {
     const NSID: &'static str = "place.stream.live.startLivestream";
@@ -65,8 +56,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for StartLivestream<'a> {
     type Response = StartLivestreamResponse;
 }
 
-/// Endpoint type for
-///place.stream.live.startLivestream
+/// Endpoint type for place.stream.live.startLivestream
 pub struct StartLivestreamRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StartLivestreamRequest {
     const PATH: &'static str = "/xrpc/place.stream.live.startLivestream";
@@ -123,13 +113,9 @@ pub mod start_livestream_state {
 
 /// Builder for constructing an instance of this type
 pub struct StartLivestreamBuilder<'a, S: start_livestream_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<bool>,
-        ::core::option::Option<crate::place_stream::livestream::Livestream<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<bool>, Option<Livestream<'a>>, Option<Did<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> StartLivestream<'a> {
@@ -143,9 +129,9 @@ impl<'a> StartLivestreamBuilder<'a, start_livestream_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StartLivestreamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -171,13 +157,13 @@ where
     /// Set the `livestream` field (required)
     pub fn livestream(
         mut self,
-        value: impl Into<crate::place_stream::livestream::Livestream<'a>>,
+        value: impl Into<Livestream<'a>>,
     ) -> StartLivestreamBuilder<'a, start_livestream_state::SetLivestream<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         StartLivestreamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -190,13 +176,13 @@ where
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> StartLivestreamBuilder<'a, start_livestream_state::SetStreamer<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         StartLivestreamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -219,7 +205,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

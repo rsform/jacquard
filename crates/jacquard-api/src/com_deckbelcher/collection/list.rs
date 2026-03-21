@@ -5,173 +5,149 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::com_deckbelcher::CardRef;
+use crate::com_deckbelcher::richtext::Document;
+use crate::com_deckbelcher::collection::list;
 /// A card saved to the list.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CardItem<'a> {
     ///Timestamp when this item was added to the list.
-    pub added_at: jacquard_common::types::string::Datetime,
+    pub added_at: Datetime,
     ///Reference to the card (scryfall printing + oracle card).
     #[serde(borrow)]
-    pub r#ref: crate::com_deckbelcher::CardRef<'a>,
+    pub r#ref: CardRef<'a>,
 }
 
 /// A deck saved to the list.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DeckItem<'a> {
     ///Timestamp when this item was added to the list.
-    pub added_at: jacquard_common::types::string::Datetime,
+    pub added_at: Datetime,
     ///Reference to the deck record.
     #[serde(borrow)]
-    pub r#ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    pub r#ref: StrongRef<'a>,
 }
 
 /// A curated list of cards and/or decks.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct List<'a> {
     ///Timestamp when the list was created.
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///Description of the list.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description: core::option::Option<
-        crate::com_deckbelcher::richtext::Document<'a>,
-    >,
+    pub description: Option<Document<'a>>,
     ///Items in the list.
     #[serde(borrow)]
     pub items: Vec<ListItemsItem<'a>>,
     ///Name of the list.
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///Timestamp when the list was last updated.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<Datetime>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ListItemsItem<'a> {
     #[serde(rename = "com.deckbelcher.collection.list#cardItem")]
-    CardItem(Box<crate::com_deckbelcher::collection::list::CardItem<'a>>),
+    CardItem(Box<list::CardItem<'a>>),
     #[serde(rename = "com.deckbelcher.collection.list#deckItem")]
-    DeckItem(Box<crate::com_deckbelcher::collection::list::DeckItem<'a>>),
+    DeckItem(Box<list::DeckItem<'a>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: List<'a>,
 }
 
 impl<'a> List<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ListRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ListRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CardItem<'a> {
+impl<'a> LexiconSchema for CardItem<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.collection.list"
     }
     fn def_name() -> &'static str {
         "cardItem"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_collection_list()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DeckItem<'a> {
+impl<'a> LexiconSchema for DeckItem<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.collection.list"
     }
     fn def_name() -> &'static str {
         "deckItem"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_collection_list()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ListRecord;
-impl jacquard_common::xrpc::XrpcResp for ListRecord {
+impl XrpcResp for ListRecord {
     const NSID: &'static str = "com.deckbelcher.collection.list";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ListGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ListGetRecordOutput<'_>> for List<'_> {
@@ -181,37 +157,33 @@ impl From<ListGetRecordOutput<'_>> for List<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for List<'_> {
+impl Collection for List<'_> {
     const NSID: &'static str = "com.deckbelcher.collection.list";
     type Record = ListRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ListRecord {
+impl Collection for ListRecord {
     const NSID: &'static str = "com.deckbelcher.collection.list";
     type Record = ListRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for List<'a> {
+impl<'a> LexiconSchema for List<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.collection.list"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_collection_list()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1280usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 1280usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -220,16 +192,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for List<'a> {
         {
             let value = &self.name;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("name"),
                         max: 128usize,
                         actual: count,
                     });
@@ -250,48 +216,45 @@ pub mod card_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AddedAt;
         type Ref;
+        type AddedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AddedAt = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type AddedAt = Set<members::added_at>;
-        type Ref = S::Ref;
+        type AddedAt = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type AddedAt = S::AddedAt;
         type Ref = Set<members::r#ref>;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type Ref = S::Ref;
+        type AddedAt = Set<members::added_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CardItemBuilder<'a, S: card_item_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::com_deckbelcher::CardRef<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Datetime>, Option<CardRef<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CardItem<'a> {
@@ -305,9 +268,9 @@ impl<'a> CardItemBuilder<'a, card_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CardItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -320,13 +283,13 @@ where
     /// Set the `addedAt` field (required)
     pub fn added_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> CardItemBuilder<'a, card_item_state::SetAddedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CardItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -339,13 +302,13 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<crate::com_deckbelcher::CardRef<'a>>,
+        value: impl Into<CardRef<'a>>,
     ) -> CardItemBuilder<'a, card_item_state::SetRef<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CardItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -353,8 +316,8 @@ where
 impl<'a, S> CardItemBuilder<'a, S>
 where
     S: card_item_state::State,
-    S::AddedAt: card_item_state::IsSet,
     S::Ref: card_item_state::IsSet,
+    S::AddedAt: card_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CardItem<'a> {
@@ -367,7 +330,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -380,253 +343,165 @@ where
     }
 }
 
-fn lexicon_doc_com_deckbelcher_collection_list() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("com.deckbelcher.collection.list"),
-        revision: None,
-        description: None,
+fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("com.deckbelcher.collection.list"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("cardItem"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A card saved to the list.",
-                        ),
-                    ),
+                SmolStr::new_static("cardItem"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("A card saved to the list.")),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("ref"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("addedAt")
-                        ],
+                        vec![SmolStr::new_static("ref"), SmolStr::new_static("addedAt")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "addedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("addedAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Timestamp when this item was added to the list.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "ref",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "com.deckbelcher.defs#cardRef",
-                                ),
+                            SmolStr::new_static("ref"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("com.deckbelcher.defs#cardRef"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("deckItem"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A deck saved to the list.",
-                        ),
-                    ),
+                SmolStr::new_static("deckItem"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("A deck saved to the list.")),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("ref"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("addedAt")
-                        ],
+                        vec![SmolStr::new_static("ref"), SmolStr::new_static("addedAt")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "addedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("addedAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Timestamp when this item was added to the list.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "ref",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "com.atproto.repo.strongRef",
-                                ),
+                            SmolStr::new_static("ref"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A curated list of cards and/or decks.",
-                        ),
+                        CowStr::new_static("A curated list of cards and/or decks."),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("items"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("name"), SmolStr::new_static("items"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Timestamp when the list was created.",
-                                        ),
+                                        CowStr::new_static("Timestamp when the list was created."),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "description",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("description"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "com.deckbelcher.richtext#document",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "items",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static("Items in the list."),
-                                    ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                        description: None,
+                                SmolStr::new_static("items"),
+                                LexObjectProperty::Array(LexArray {
+                                    description: Some(CowStr::new_static("Items in the list.")),
+                                    items: LexArrayItem::Union(LexRefUnion {
                                         refs: vec![
-                                            ::jacquard_common::CowStr::new_static("#cardItem"),
-                                            ::jacquard_common::CowStr::new_static("#deckItem")
+                                            CowStr::new_static("#cardItem"),
+                                            CowStr::new_static("#deckItem")
                                         ],
-                                        closed: None,
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static("Name of the list."),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("name"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(CowStr::new_static("Name of the list.")),
                                     max_length: Some(1280usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(128usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "updatedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("updatedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp when the list was last updated.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -640,48 +515,45 @@ pub mod deck_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AddedAt;
         type Ref;
+        type AddedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AddedAt = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type AddedAt = Set<members::added_at>;
-        type Ref = S::Ref;
+        type AddedAt = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type AddedAt = S::AddedAt;
         type Ref = Set<members::r#ref>;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type Ref = S::Ref;
+        type AddedAt = Set<members::added_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DeckItemBuilder<'a, S: deck_item_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Datetime>, Option<StrongRef<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> DeckItem<'a> {
@@ -695,9 +567,9 @@ impl<'a> DeckItemBuilder<'a, deck_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeckItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -710,13 +582,13 @@ where
     /// Set the `addedAt` field (required)
     pub fn added_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> DeckItemBuilder<'a, deck_item_state::SetAddedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         DeckItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -729,13 +601,13 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        value: impl Into<StrongRef<'a>>,
     ) -> DeckItemBuilder<'a, deck_item_state::SetRef<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         DeckItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -743,8 +615,8 @@ where
 impl<'a, S> DeckItemBuilder<'a, S>
 where
     S: deck_item_state::State,
-    S::AddedAt: deck_item_state::IsSet,
     S::Ref: deck_item_state::IsSet,
+    S::AddedAt: deck_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeckItem<'a> {
@@ -757,7 +629,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -780,65 +652,65 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
         type Items;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
         type Items = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Items = S::Items;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
         type Items = S::Items;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `items` field to Set
     pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetItems<S> {}
     impl<S: State> State for SetItems<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
         type Items = Set<members::items>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Items = S::Items;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `items` field
         pub struct items(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ListBuilder<'a, S: list_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::com_deckbelcher::richtext::Document<'a>>,
-        ::core::option::Option<Vec<ListItemsItem<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<Datetime>,
+        Option<Document<'a>>,
+        Option<Vec<ListItemsItem<'a>>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> List<'a> {
@@ -852,9 +724,9 @@ impl<'a> ListBuilder<'a, list_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -867,31 +739,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ListBuilder<'a, list_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<crate::com_deckbelcher::richtext::Document<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<Document<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<crate::com_deckbelcher::richtext::Document<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<Document<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -907,11 +773,11 @@ where
         mut self,
         value: impl Into<Vec<ListItemsItem<'a>>>,
     ) -> ListBuilder<'a, list_state::SetItems<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -924,31 +790,25 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ListBuilder<'a, list_state::SetName<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
-    pub fn updated_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
-    pub fn maybe_updated_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -957,9 +817,9 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::CreatedAt: list_state::IsSet,
     S::Name: list_state::IsSet,
     S::Items: list_state::IsSet,
+    S::CreatedAt: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -975,7 +835,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

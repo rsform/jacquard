@@ -5,44 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::DeletedMessageView;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteMessageForSelf<'a> {
     #[serde(borrow)]
-    pub convo_id: jacquard_common::CowStr<'a>,
+    pub convo_id: CowStr<'a>,
     #[serde(borrow)]
-    pub message_id: jacquard_common::CowStr<'a>,
+    pub message_id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteMessageForSelfOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::chat_bsky::convo::DeletedMessageView<'a>,
+    pub value: DeletedMessageView<'a>,
 }
 
-/// Response type for
-///chat.bsky.convo.deleteMessageForSelf
+/// Response type for chat.bsky.convo.deleteMessageForSelf
 pub struct DeleteMessageForSelfResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteMessageForSelfResponse {
     const NSID: &'static str = "chat.bsky.convo.deleteMessageForSelf";
@@ -59,8 +49,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteMessageForSelf<'a> {
     type Response = DeleteMessageForSelfResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.convo.deleteMessageForSelf
+/// Endpoint type for chat.bsky.convo.deleteMessageForSelf
 pub struct DeleteMessageForSelfRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteMessageForSelfRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.deleteMessageForSelf";

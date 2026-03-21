@@ -5,41 +5,40 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RequestCrawl<'a> {
     ///Hostname of the current service (eg, PDS) that is requesting to be crawled.
     #[serde(borrow)]
-    pub hostname: jacquard_common::CowStr<'a>,
+    pub hostname: CowStr<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RequestCrawlError<'a> {
     #[serde(rename = "HostBanned")]
-    HostBanned(core::option::Option<jacquard_common::CowStr<'a>>),
+    HostBanned(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for RequestCrawlError<'_> {
@@ -57,8 +56,7 @@ impl core::fmt::Display for RequestCrawlError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.sync.requestCrawl
+/// Response type for com.atproto.sync.requestCrawl
 pub struct RequestCrawlResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestCrawlResponse {
     const NSID: &'static str = "com.atproto.sync.requestCrawl";
@@ -75,8 +73,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RequestCrawl<'a> {
     type Response = RequestCrawlResponse;
 }
 
-/// Endpoint type for
-///com.atproto.sync.requestCrawl
+/// Endpoint type for com.atproto.sync.requestCrawl
 pub struct RequestCrawlRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestCrawlRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.requestCrawl";

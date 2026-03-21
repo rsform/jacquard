@@ -5,249 +5,198 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::git::ref_update;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CommitCountBreakdown<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub by_email: core::option::Option<
-        Vec<crate::sh_tangled::git::ref_update::IndividualEmailCommitCount<'a>>,
-    >,
+    pub by_email: Option<Vec<ref_update::IndividualEmailCommitCount<'a>>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct IndividualEmailCommitCount<'a> {
     pub count: i64,
     #[serde(borrow)]
-    pub email: jacquard_common::CowStr<'a>,
+    pub email: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct IndividualLanguageSize<'a> {
     #[serde(borrow)]
-    pub lang: jacquard_common::CowStr<'a>,
+    pub lang: CowStr<'a>,
     pub size: i64,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LangBreakdown<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub inputs: core::option::Option<
-        Vec<crate::sh_tangled::git::ref_update::IndividualLanguageSize<'a>>,
-    >,
+    pub inputs: Option<Vec<ref_update::IndividualLanguageSize<'a>>>,
 }
 
 /// An update to a git repository, emitted by knots.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RefUpdate<'a> {
     ///did of the user that pushed this ref
     #[serde(borrow)]
-    pub committer_did: jacquard_common::types::string::Did<'a>,
+    pub committer_did: Did<'a>,
     #[serde(borrow)]
-    pub meta: crate::sh_tangled::git::ref_update::Meta<'a>,
+    pub meta: ref_update::Meta<'a>,
     ///new SHA of this ref
     #[serde(borrow)]
-    pub new_sha: jacquard_common::CowStr<'a>,
+    pub new_sha: CowStr<'a>,
     ///old SHA of this ref
     #[serde(borrow)]
-    pub old_sha: jacquard_common::CowStr<'a>,
+    pub old_sha: CowStr<'a>,
     ///Ref being updated
     #[serde(borrow)]
-    pub r#ref: jacquard_common::CowStr<'a>,
+    pub r#ref: CowStr<'a>,
     ///did of the owner of the repo
     #[serde(borrow)]
-    pub repo_did: jacquard_common::types::string::Did<'a>,
+    pub repo_did: Did<'a>,
     ///name of the repo
     #[serde(borrow)]
-    pub repo_name: jacquard_common::CowStr<'a>,
+    pub repo_name: CowStr<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RefUpdateGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: RefUpdate<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Meta<'a> {
     #[serde(borrow)]
-    pub commit_count: crate::sh_tangled::git::ref_update::CommitCountBreakdown<'a>,
-    ///Defaults to `false`.
+    pub commit_count: ref_update::CommitCountBreakdown<'a>,
+    /// Defaults to `false`.
     #[serde(default = "_default_meta_is_default_ref")]
     pub is_default_ref: bool,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub lang_breakdown: core::option::Option<
-        crate::sh_tangled::git::ref_update::LangBreakdown<'a>,
-    >,
+    pub lang_breakdown: Option<ref_update::LangBreakdown<'a>>,
 }
 
 impl<'a> RefUpdate<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, RefUpdateRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, RefUpdateRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CommitCountBreakdown<'a> {
+impl<'a> LexiconSchema for CommitCountBreakdown<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
     }
     fn def_name() -> &'static str {
         "commitCountBreakdown"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_refUpdate()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for IndividualEmailCommitCount<'a> {
+impl<'a> LexiconSchema for IndividualEmailCommitCount<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
     }
     fn def_name() -> &'static str {
         "individualEmailCommitCount"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_refUpdate()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for IndividualLanguageSize<'a> {
+impl<'a> LexiconSchema for IndividualLanguageSize<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
     }
     fn def_name() -> &'static str {
         "individualLanguageSize"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_refUpdate()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for LangBreakdown<'a> {
+impl<'a> LexiconSchema for LangBreakdown<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
     }
     fn def_name() -> &'static str {
         "langBreakdown"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_refUpdate()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RefUpdateRecord;
-impl jacquard_common::xrpc::XrpcResp for RefUpdateRecord {
+impl XrpcResp for RefUpdateRecord {
     const NSID: &'static str = "sh.tangled.git.refUpdate";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = RefUpdateGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<RefUpdateGetRecordOutput<'_>> for RefUpdate<'_> {
@@ -257,37 +206,33 @@ impl From<RefUpdateGetRecordOutput<'_>> for RefUpdate<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for RefUpdate<'_> {
+impl Collection for RefUpdate<'_> {
     const NSID: &'static str = "sh.tangled.git.refUpdate";
     type Record = RefUpdateRecord;
 }
 
-impl jacquard_common::types::collection::Collection for RefUpdateRecord {
+impl Collection for RefUpdateRecord {
     const NSID: &'static str = "sh.tangled.git.refUpdate";
     type Record = RefUpdateRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
+impl<'a> LexiconSchema for RefUpdate<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_refUpdate()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.new_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "new_sha",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("new_sha"),
                     max: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -297,10 +242,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
             let value = &self.new_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "new_sha",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("new_sha"),
                     min: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -310,10 +253,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
             let value = &self.old_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "old_sha",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("old_sha"),
                     max: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -323,10 +264,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
             let value = &self.old_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "old_sha",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("old_sha"),
                     min: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -336,10 +275,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
             let value = &self.r#ref;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2560usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ref",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("ref"),
                     max: 2560usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -348,16 +285,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
         {
             let value = &self.r#ref;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "ref",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("ref"),
                         max: 256usize,
                         actual: count,
                     });
@@ -368,407 +299,257 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Meta<'a> {
+impl<'a> LexiconSchema for Meta<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
     }
     fn def_name() -> &'static str {
         "meta"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_refUpdate()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_sh_tangled_git_refUpdate() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("sh.tangled.git.refUpdate"),
-        revision: None,
-        description: None,
+fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("sh.tangled.git.refUpdate"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "commitCountBreakdown",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("commitCountBreakdown"),
+                LexUserType::Object(LexObject {
                     required: Some(vec![]),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "byEmail",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#individualEmailCommitCount",
-                                    ),
+                            SmolStr::new_static("byEmail"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#individualEmailCommitCount"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "individualEmailCommitCount",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("individualEmailCommitCount"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("email"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("count")
-                        ],
+                        vec![SmolStr::new_static("email"), SmolStr::new_static("count")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "count",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("count"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "email",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("email"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "individualLanguageSize",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("individualLanguageSize"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("lang"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("size")
-                        ],
+                        vec![SmolStr::new_static("lang"), SmolStr::new_static("size")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "lang",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("lang"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "size",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("size"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("langBreakdown"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("langBreakdown"),
+                LexUserType::Object(LexObject {
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "inputs",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#individualLanguageSize",
-                                    ),
+                            SmolStr::new_static("inputs"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#individualLanguageSize"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "An update to a git repository, emitted by knots.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("ref"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("committerDid"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("repoDid"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("repoName"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("oldSha"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("newSha"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("meta")
+                                SmolStr::new_static("ref"),
+                                SmolStr::new_static("committerDid"),
+                                SmolStr::new_static("repoDid"),
+                                SmolStr::new_static("repoName"),
+                                SmolStr::new_static("oldSha"),
+                                SmolStr::new_static("newSha"), SmolStr::new_static("meta")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "committerDid",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("committerDid"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "did of the user that pushed this ref",
-                                        ),
+                                        CowStr::new_static("did of the user that pushed this ref"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "meta",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#meta"),
+                                SmolStr::new_static("meta"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#meta"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "newSha",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("newSha"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static("new SHA of this ref"),
+                                        CowStr::new_static("new SHA of this ref"),
                                     ),
-                                    format: None,
-                                    default: None,
                                     min_length: Some(40usize),
                                     max_length: Some(40usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "oldSha",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("oldSha"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static("old SHA of this ref"),
+                                        CowStr::new_static("old SHA of this ref"),
                                     ),
-                                    format: None,
-                                    default: None,
                                     min_length: Some(40usize),
                                     max_length: Some(40usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "ref",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static("Ref being updated"),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("ref"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(CowStr::new_static("Ref being updated")),
                                     max_length: Some(2560usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "repoDid",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("repoDid"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "did of the owner of the repo",
-                                        ),
+                                        CowStr::new_static("did of the owner of the repo"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "repoName",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static("name of the repo"),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("repoName"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(CowStr::new_static("name of the repo")),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("meta"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("meta"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("isDefaultRef"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("commitCount")
+                            SmolStr::new_static("isDefaultRef"),
+                            SmolStr::new_static("commitCount")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "commitCount",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#commitCountBreakdown",
-                                ),
+                            SmolStr::new_static("commitCount"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#commitCountBreakdown"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "isDefaultRef",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("isDefaultRef"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "langBreakdown",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#langBreakdown",
-                                ),
+                            SmolStr::new_static("langBreakdown"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#langBreakdown"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -782,37 +563,37 @@ pub mod individual_email_commit_count_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Count;
         type Email;
+        type Count;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Count = Unset;
         type Email = Unset;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCount<S> {}
-    impl<S: State> State for SetCount<S> {
-        type Count = Set<members::count>;
-        type Email = S::Email;
+        type Count = Unset;
     }
     ///State transition - sets the `email` field to Set
     pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEmail<S> {}
     impl<S: State> State for SetEmail<S> {
-        type Count = S::Count;
         type Email = Set<members::email>;
+        type Count = S::Count;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCount<S> {}
+    impl<S: State> State for SetCount<S> {
+        type Email = S::Email;
+        type Count = Set<members::count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `count` field
-        pub struct count(());
         ///Marker type for the `email` field
         pub struct email(());
+        ///Marker type for the `count` field
+        pub struct count(());
     }
 }
 
@@ -821,12 +602,9 @@ pub struct IndividualEmailCommitCountBuilder<
     'a,
     S: individual_email_commit_count_state::State,
 > {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> IndividualEmailCommitCount<'a> {
@@ -845,9 +623,9 @@ impl<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IndividualEmailCommitCountBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -865,11 +643,11 @@ where
         'a,
         individual_email_commit_count_state::SetCount<S>,
     > {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         IndividualEmailCommitCountBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -882,16 +660,16 @@ where
     /// Set the `email` field (required)
     pub fn email(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> IndividualEmailCommitCountBuilder<
         'a,
         individual_email_commit_count_state::SetEmail<S>,
     > {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         IndividualEmailCommitCountBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -899,8 +677,8 @@ where
 impl<'a, S> IndividualEmailCommitCountBuilder<'a, S>
 where
     S: individual_email_commit_count_state::State,
-    S::Count: individual_email_commit_count_state::IsSet,
     S::Email: individual_email_commit_count_state::IsSet,
+    S::Count: individual_email_commit_count_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IndividualEmailCommitCount<'a> {
@@ -913,7 +691,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -972,12 +750,9 @@ pub mod individual_language_size_state {
 
 /// Builder for constructing an instance of this type
 pub struct IndividualLanguageSizeBuilder<'a, S: individual_language_size_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> IndividualLanguageSize<'a> {
@@ -994,9 +769,9 @@ impl<'a> IndividualLanguageSizeBuilder<'a, individual_language_size_state::Empty
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IndividualLanguageSizeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1009,13 +784,13 @@ where
     /// Set the `lang` field (required)
     pub fn lang(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> IndividualLanguageSizeBuilder<'a, individual_language_size_state::SetLang<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         IndividualLanguageSizeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1030,11 +805,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> IndividualLanguageSizeBuilder<'a, individual_language_size_state::SetSize<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         IndividualLanguageSizeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1056,7 +831,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1079,143 +854,143 @@ pub mod ref_update_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
-        type CommitterDid;
-        type RepoDid;
         type RepoName;
-        type NewSha;
+        type CommitterDid;
         type Meta;
+        type Ref;
+        type RepoDid;
         type OldSha;
+        type NewSha;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
-        type CommitterDid = Unset;
-        type RepoDid = Unset;
         type RepoName = Unset;
-        type NewSha = Unset;
+        type CommitterDid = Unset;
         type Meta = Unset;
+        type Ref = Unset;
+        type RepoDid = Unset;
         type OldSha = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type CommitterDid = S::CommitterDid;
-        type RepoDid = S::RepoDid;
-        type RepoName = S::RepoName;
-        type NewSha = S::NewSha;
-        type Meta = S::Meta;
-        type OldSha = S::OldSha;
-    }
-    ///State transition - sets the `committer_did` field to Set
-    pub struct SetCommitterDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommitterDid<S> {}
-    impl<S: State> State for SetCommitterDid<S> {
-        type Ref = S::Ref;
-        type CommitterDid = Set<members::committer_did>;
-        type RepoDid = S::RepoDid;
-        type RepoName = S::RepoName;
-        type NewSha = S::NewSha;
-        type Meta = S::Meta;
-        type OldSha = S::OldSha;
-    }
-    ///State transition - sets the `repo_did` field to Set
-    pub struct SetRepoDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepoDid<S> {}
-    impl<S: State> State for SetRepoDid<S> {
-        type Ref = S::Ref;
-        type CommitterDid = S::CommitterDid;
-        type RepoDid = Set<members::repo_did>;
-        type RepoName = S::RepoName;
-        type NewSha = S::NewSha;
-        type Meta = S::Meta;
-        type OldSha = S::OldSha;
+        type NewSha = Unset;
     }
     ///State transition - sets the `repo_name` field to Set
     pub struct SetRepoName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepoName<S> {}
     impl<S: State> State for SetRepoName<S> {
-        type Ref = S::Ref;
-        type CommitterDid = S::CommitterDid;
-        type RepoDid = S::RepoDid;
         type RepoName = Set<members::repo_name>;
-        type NewSha = S::NewSha;
-        type Meta = S::Meta;
-        type OldSha = S::OldSha;
-    }
-    ///State transition - sets the `new_sha` field to Set
-    pub struct SetNewSha<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNewSha<S> {}
-    impl<S: State> State for SetNewSha<S> {
-        type Ref = S::Ref;
         type CommitterDid = S::CommitterDid;
-        type RepoDid = S::RepoDid;
-        type RepoName = S::RepoName;
-        type NewSha = Set<members::new_sha>;
         type Meta = S::Meta;
+        type Ref = S::Ref;
+        type RepoDid = S::RepoDid;
         type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
+    }
+    ///State transition - sets the `committer_did` field to Set
+    pub struct SetCommitterDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommitterDid<S> {}
+    impl<S: State> State for SetCommitterDid<S> {
+        type RepoName = S::RepoName;
+        type CommitterDid = Set<members::committer_did>;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type RepoDid = S::RepoDid;
+        type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
     }
     ///State transition - sets the `meta` field to Set
     pub struct SetMeta<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMeta<S> {}
     impl<S: State> State for SetMeta<S> {
-        type Ref = S::Ref;
-        type CommitterDid = S::CommitterDid;
-        type RepoDid = S::RepoDid;
         type RepoName = S::RepoName;
-        type NewSha = S::NewSha;
+        type CommitterDid = S::CommitterDid;
         type Meta = Set<members::meta>;
+        type Ref = S::Ref;
+        type RepoDid = S::RepoDid;
         type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type RepoName = S::RepoName;
+        type CommitterDid = S::CommitterDid;
+        type Meta = S::Meta;
+        type Ref = Set<members::r#ref>;
+        type RepoDid = S::RepoDid;
+        type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
+    }
+    ///State transition - sets the `repo_did` field to Set
+    pub struct SetRepoDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepoDid<S> {}
+    impl<S: State> State for SetRepoDid<S> {
+        type RepoName = S::RepoName;
+        type CommitterDid = S::CommitterDid;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type RepoDid = Set<members::repo_did>;
+        type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
     }
     ///State transition - sets the `old_sha` field to Set
     pub struct SetOldSha<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOldSha<S> {}
     impl<S: State> State for SetOldSha<S> {
-        type Ref = S::Ref;
-        type CommitterDid = S::CommitterDid;
-        type RepoDid = S::RepoDid;
         type RepoName = S::RepoName;
-        type NewSha = S::NewSha;
+        type CommitterDid = S::CommitterDid;
         type Meta = S::Meta;
+        type Ref = S::Ref;
+        type RepoDid = S::RepoDid;
         type OldSha = Set<members::old_sha>;
+        type NewSha = S::NewSha;
+    }
+    ///State transition - sets the `new_sha` field to Set
+    pub struct SetNewSha<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNewSha<S> {}
+    impl<S: State> State for SetNewSha<S> {
+        type RepoName = S::RepoName;
+        type CommitterDid = S::CommitterDid;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type RepoDid = S::RepoDid;
+        type OldSha = S::OldSha;
+        type NewSha = Set<members::new_sha>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
-        ///Marker type for the `committer_did` field
-        pub struct committer_did(());
-        ///Marker type for the `repo_did` field
-        pub struct repo_did(());
         ///Marker type for the `repo_name` field
         pub struct repo_name(());
-        ///Marker type for the `new_sha` field
-        pub struct new_sha(());
+        ///Marker type for the `committer_did` field
+        pub struct committer_did(());
         ///Marker type for the `meta` field
         pub struct meta(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
+        ///Marker type for the `repo_did` field
+        pub struct repo_did(());
         ///Marker type for the `old_sha` field
         pub struct old_sha(());
+        ///Marker type for the `new_sha` field
+        pub struct new_sha(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RefUpdateBuilder<'a, S: ref_update_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<crate::sh_tangled::git::ref_update::Meta<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<Did<'a>>,
+        Option<ref_update::Meta<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Did<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> RefUpdate<'a> {
@@ -1229,9 +1004,9 @@ impl<'a> RefUpdateBuilder<'a, ref_update_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RefUpdateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1244,13 +1019,13 @@ where
     /// Set the `committerDid` field (required)
     pub fn committer_did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetCommitterDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         RefUpdateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1263,13 +1038,13 @@ where
     /// Set the `meta` field (required)
     pub fn meta(
         mut self,
-        value: impl Into<crate::sh_tangled::git::ref_update::Meta<'a>>,
+        value: impl Into<ref_update::Meta<'a>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetMeta<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         RefUpdateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1282,13 +1057,13 @@ where
     /// Set the `newSha` field (required)
     pub fn new_sha(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetNewSha<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         RefUpdateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1301,13 +1076,13 @@ where
     /// Set the `oldSha` field (required)
     pub fn old_sha(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetOldSha<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         RefUpdateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1320,13 +1095,13 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetRef<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         RefUpdateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1339,13 +1114,13 @@ where
     /// Set the `repoDid` field (required)
     pub fn repo_did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetRepoDid<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         RefUpdateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1358,13 +1133,13 @@ where
     /// Set the `repoName` field (required)
     pub fn repo_name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetRepoName<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         RefUpdateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1372,13 +1147,13 @@ where
 impl<'a, S> RefUpdateBuilder<'a, S>
 where
     S: ref_update_state::State,
-    S::Ref: ref_update_state::IsSet,
-    S::CommitterDid: ref_update_state::IsSet,
-    S::RepoDid: ref_update_state::IsSet,
     S::RepoName: ref_update_state::IsSet,
-    S::NewSha: ref_update_state::IsSet,
+    S::CommitterDid: ref_update_state::IsSet,
     S::Meta: ref_update_state::IsSet,
+    S::Ref: ref_update_state::IsSet,
+    S::RepoDid: ref_update_state::IsSet,
     S::OldSha: ref_update_state::IsSet,
+    S::NewSha: ref_update_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RefUpdate<'a> {
@@ -1396,7 +1171,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1428,51 +1203,49 @@ pub mod meta_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IsDefaultRef;
         type CommitCount;
+        type IsDefaultRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IsDefaultRef = Unset;
         type CommitCount = Unset;
-    }
-    ///State transition - sets the `is_default_ref` field to Set
-    pub struct SetIsDefaultRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsDefaultRef<S> {}
-    impl<S: State> State for SetIsDefaultRef<S> {
-        type IsDefaultRef = Set<members::is_default_ref>;
-        type CommitCount = S::CommitCount;
+        type IsDefaultRef = Unset;
     }
     ///State transition - sets the `commit_count` field to Set
     pub struct SetCommitCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommitCount<S> {}
     impl<S: State> State for SetCommitCount<S> {
-        type IsDefaultRef = S::IsDefaultRef;
         type CommitCount = Set<members::commit_count>;
+        type IsDefaultRef = S::IsDefaultRef;
+    }
+    ///State transition - sets the `is_default_ref` field to Set
+    pub struct SetIsDefaultRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsDefaultRef<S> {}
+    impl<S: State> State for SetIsDefaultRef<S> {
+        type CommitCount = S::CommitCount;
+        type IsDefaultRef = Set<members::is_default_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `is_default_ref` field
-        pub struct is_default_ref(());
         ///Marker type for the `commit_count` field
         pub struct commit_count(());
+        ///Marker type for the `is_default_ref` field
+        pub struct is_default_ref(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MetaBuilder<'a, S: meta_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            crate::sh_tangled::git::ref_update::CommitCountBreakdown<'a>,
-        >,
-        ::core::option::Option<bool>,
-        ::core::option::Option<crate::sh_tangled::git::ref_update::LangBreakdown<'a>>,
+        Option<ref_update::CommitCountBreakdown<'a>>,
+        Option<bool>,
+        Option<ref_update::LangBreakdown<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Meta<'a> {
@@ -1486,9 +1259,9 @@ impl<'a> MetaBuilder<'a, meta_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MetaBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1501,13 +1274,13 @@ where
     /// Set the `commitCount` field (required)
     pub fn commit_count(
         mut self,
-        value: impl Into<crate::sh_tangled::git::ref_update::CommitCountBreakdown<'a>>,
+        value: impl Into<ref_update::CommitCountBreakdown<'a>>,
     ) -> MetaBuilder<'a, meta_state::SetCommitCount<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         MetaBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1522,11 +1295,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> MetaBuilder<'a, meta_state::SetIsDefaultRef<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         MetaBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1535,7 +1308,7 @@ impl<'a, S: meta_state::State> MetaBuilder<'a, S> {
     /// Set the `langBreakdown` field (optional)
     pub fn lang_breakdown(
         mut self,
-        value: impl Into<Option<crate::sh_tangled::git::ref_update::LangBreakdown<'a>>>,
+        value: impl Into<Option<ref_update::LangBreakdown<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -1543,7 +1316,7 @@ impl<'a, S: meta_state::State> MetaBuilder<'a, S> {
     /// Set the `langBreakdown` field to an Option value (optional)
     pub fn maybe_lang_breakdown(
         mut self,
-        value: Option<crate::sh_tangled::git::ref_update::LangBreakdown<'a>>,
+        value: Option<ref_update::LangBreakdown<'a>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
@@ -1553,8 +1326,8 @@ impl<'a, S: meta_state::State> MetaBuilder<'a, S> {
 impl<'a, S> MetaBuilder<'a, S>
 where
     S: meta_state::State,
-    S::IsDefaultRef: meta_state::IsSet,
     S::CommitCount: meta_state::IsSet,
+    S::IsDefaultRef: meta_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Meta<'a> {
@@ -1568,7 +1341,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

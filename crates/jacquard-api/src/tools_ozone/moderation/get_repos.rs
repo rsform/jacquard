@@ -5,58 +5,43 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::moderation::RepoViewDetail;
+use crate::tools_ozone::moderation::RepoViewNotFound;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRepos<'a> {
     #[serde(borrow)]
-    pub dids: Vec<jacquard_common::types::string::Did<'a>>,
+    pub dids: Vec<Did<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetReposOutput<'a> {
     #[serde(borrow)]
     pub repos: Vec<GetReposOutputReposItem<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetReposOutputReposItem<'a> {
     #[serde(rename = "tools.ozone.moderation.defs#repoViewDetail")]
-    RepoViewDetail(Box<crate::tools_ozone::moderation::RepoViewDetail<'a>>),
+    RepoViewDetail(Box<RepoViewDetail<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#repoViewNotFound")]
-    RepoViewNotFound(Box<crate::tools_ozone::moderation::RepoViewNotFound<'a>>),
+    RepoViewNotFound(Box<RepoViewNotFound<'a>>),
 }
 
-/// Response type for
-///tools.ozone.moderation.getRepos
+/// Response type for tools.ozone.moderation.getRepos
 pub struct GetReposResponse;
 impl jacquard_common::xrpc::XrpcResp for GetReposResponse {
     const NSID: &'static str = "tools.ozone.moderation.getRepos";
@@ -71,8 +56,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepos<'a> {
     type Response = GetReposResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.moderation.getRepos
+/// Endpoint type for tools.ozone.moderation.getRepos
 pub struct GetReposRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetReposRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.getRepos";
@@ -115,11 +99,9 @@ pub mod get_repos_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetReposBuilder<'a, S: get_repos_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<Did<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetRepos<'a> {
@@ -133,9 +115,9 @@ impl<'a> GetReposBuilder<'a, get_repos_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetReposBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -148,13 +130,13 @@ where
     /// Set the `dids` field (required)
     pub fn dids(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+        value: impl Into<Vec<Did<'a>>>,
     ) -> GetReposBuilder<'a, get_repos_state::SetDids<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetReposBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

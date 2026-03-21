@@ -5,20 +5,14 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use core::marker::PhantomData;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct ActivateAccount;
-/// Response type for
-///com.atproto.server.activateAccount
+/// Response type for com.atproto.server.activateAccount
 pub struct ActivateAccountResponse;
 impl jacquard_common::xrpc::XrpcResp for ActivateAccountResponse {
     const NSID: &'static str = "com.atproto.server.activateAccount";
@@ -35,8 +29,7 @@ impl jacquard_common::xrpc::XrpcRequest for ActivateAccount {
     type Response = ActivateAccountResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.activateAccount
+/// Endpoint type for com.atproto.server.activateAccount
 pub struct ActivateAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ActivateAccountRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.activateAccount";

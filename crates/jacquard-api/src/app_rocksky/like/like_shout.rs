@@ -5,44 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::shout::ShoutView;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LikeShout<'a> {
     ///The unique identifier of the shout to like
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: Option<AtUri<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct LikeShoutOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::shout::ShoutView<'a>,
+    pub value: ShoutView<'a>,
 }
 
-/// Response type for
-///app.rocksky.like.likeShout
+/// Response type for app.rocksky.like.likeShout
 pub struct LikeShoutResponse;
 impl jacquard_common::xrpc::XrpcResp for LikeShoutResponse {
     const NSID: &'static str = "app.rocksky.like.likeShout";
@@ -59,8 +49,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for LikeShout<'a> {
     type Response = LikeShoutResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.like.likeShout
+/// Endpoint type for app.rocksky.like.likeShout
 pub struct LikeShoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LikeShoutRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.like.likeShout";

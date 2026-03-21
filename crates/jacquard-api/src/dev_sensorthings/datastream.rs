@@ -5,118 +5,111 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::dev_sensorthings::datastream;
 /// Groups Observations of one ObservedProperty by one Sensor on one Thing. Carries all context needed to interpret observation results.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Datastream<'a> {
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: Datetime,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///O&M observation type URI, e.g. http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement
     #[serde(borrow)]
-    pub observation_type: jacquard_common::types::string::UriValue<'a>,
+    pub observation_type: UriValue<'a>,
     ///Representative location for the datastream
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub observed_area: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub observed_area: Option<Data<'a>>,
     ///AT-URI of the dev.sensorthings.observedProperty record
     #[serde(borrow)]
-    pub observed_property: jacquard_common::types::string::AtUri<'a>,
+    pub observed_property: AtUri<'a>,
     ///10^n divisor for numeric results. E.g. 2 means observation integers are in centi-units (÷100). Default 0. Only meaningful for numericResult and arrayResult types.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub result_scale_factor: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub result_scale_factor: Option<i64>,
     ///AT-URI of the dev.sensorthings.sensor record
     #[serde(borrow)]
-    pub sensor: jacquard_common::types::string::AtUri<'a>,
+    pub sensor: AtUri<'a>,
     ///AT-URI of the dev.sensorthings.thing record
     #[serde(borrow)]
-    pub thing: jacquard_common::types::string::AtUri<'a>,
+    pub thing: AtUri<'a>,
     #[serde(borrow)]
-    pub unit_of_measurement: crate::dev_sensorthings::datastream::UnitOfMeasurement<'a>,
+    pub unit_of_measurement: datastream::UnitOfMeasurement<'a>,
     ///Vertical datum reference for water level or elevation measurements. Either a URI (e.g. http://www.opengis.net/def/crs/EPSG/0/5731 for Malin Head) or a human-readable identifier (e.g. 'Chart Datum', 'local-gauge-zero'). Absent for non-vertical measurements.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub vertical_datum: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub vertical_datum: Option<CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DatastreamGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Datastream<'a>,
 }
 
 /// UCUM-compatible unit description.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UnitOfMeasurement<'a> {
     ///URI from QUDT, UCUM, or similar unit ontology
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub definition: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub definition: Option<UriValue<'a>>,
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     #[serde(borrow)]
-    pub symbol: jacquard_common::CowStr<'a>,
+    pub symbol: CowStr<'a>,
 }
 
 impl<'a> Datastream<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DatastreamRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, DatastreamRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DatastreamRecord;
-impl jacquard_common::xrpc::XrpcResp for DatastreamRecord {
+impl XrpcResp for DatastreamRecord {
     const NSID: &'static str = "dev.sensorthings.datastream";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = DatastreamGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<DatastreamGetRecordOutput<'_>> for Datastream<'_> {
@@ -126,36 +119,32 @@ impl From<DatastreamGetRecordOutput<'_>> for Datastream<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Datastream<'_> {
+impl Collection for Datastream<'_> {
     const NSID: &'static str = "dev.sensorthings.datastream";
     type Record = DatastreamRecord;
 }
 
-impl jacquard_common::types::collection::Collection for DatastreamRecord {
+impl Collection for DatastreamRecord {
     const NSID: &'static str = "dev.sensorthings.datastream";
     type Record = DatastreamRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Datastream<'a> {
+impl<'a> LexiconSchema for Datastream<'a> {
     fn nsid() -> &'static str {
         "dev.sensorthings.datastream"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_dev_sensorthings_datastream()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("description"),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -165,10 +154,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Datastream<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -177,10 +164,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Datastream<'a> {
         if let Some(ref value) = self.vertical_datum {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "vertical_datum",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("vertical_datum"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -190,27 +175,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Datastream<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for UnitOfMeasurement<'a> {
+impl<'a> LexiconSchema for UnitOfMeasurement<'a> {
     fn nsid() -> &'static str {
         "dev.sensorthings.datastream"
     }
     fn def_name() -> &'static str {
         "unitOfMeasurement"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_dev_sensorthings_datastream()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -220,10 +201,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for UnitOfMeasurement<'a> {
             let value = &self.symbol;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "symbol",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("symbol"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -243,149 +222,147 @@ pub mod datastream_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Thing;
         type Sensor;
+        type CreatedAt;
+        type UnitOfMeasurement;
+        type Thing;
         type ObservedProperty;
         type Name;
-        type UnitOfMeasurement;
         type ObservationType;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Thing = Unset;
         type Sensor = Unset;
+        type CreatedAt = Unset;
+        type UnitOfMeasurement = Unset;
+        type Thing = Unset;
         type ObservedProperty = Unset;
         type Name = Unset;
-        type UnitOfMeasurement = Unset;
         type ObservationType = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `thing` field to Set
-    pub struct SetThing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThing<S> {}
-    impl<S: State> State for SetThing<S> {
-        type Thing = Set<members::thing>;
-        type Sensor = S::Sensor;
-        type ObservedProperty = S::ObservedProperty;
-        type Name = S::Name;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-        type ObservationType = S::ObservationType;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `sensor` field to Set
     pub struct SetSensor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSensor<S> {}
     impl<S: State> State for SetSensor<S> {
-        type Thing = S::Thing;
         type Sensor = Set<members::sensor>;
+        type CreatedAt = S::CreatedAt;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type Thing = S::Thing;
         type ObservedProperty = S::ObservedProperty;
         type Name = S::Name;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
         type ObservationType = S::ObservationType;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `observed_property` field to Set
-    pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
-    impl<S: State> State for SetObservedProperty<S> {
-        type Thing = S::Thing;
-        type Sensor = S::Sensor;
-        type ObservedProperty = Set<members::observed_property>;
-        type Name = S::Name;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-        type ObservationType = S::ObservationType;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Thing = S::Thing;
-        type Sensor = S::Sensor;
-        type ObservedProperty = S::ObservedProperty;
-        type Name = Set<members::name>;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-        type ObservationType = S::ObservationType;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `unit_of_measurement` field to Set
-    pub struct SetUnitOfMeasurement<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnitOfMeasurement<S> {}
-    impl<S: State> State for SetUnitOfMeasurement<S> {
-        type Thing = S::Thing;
-        type Sensor = S::Sensor;
-        type ObservedProperty = S::ObservedProperty;
-        type Name = S::Name;
-        type UnitOfMeasurement = Set<members::unit_of_measurement>;
-        type ObservationType = S::ObservationType;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `observation_type` field to Set
-    pub struct SetObservationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObservationType<S> {}
-    impl<S: State> State for SetObservationType<S> {
-        type Thing = S::Thing;
-        type Sensor = S::Sensor;
-        type ObservedProperty = S::ObservedProperty;
-        type Name = S::Name;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-        type ObservationType = Set<members::observation_type>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Thing = S::Thing;
         type Sensor = S::Sensor;
+        type CreatedAt = Set<members::created_at>;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type Thing = S::Thing;
         type ObservedProperty = S::ObservedProperty;
         type Name = S::Name;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
         type ObservationType = S::ObservationType;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `unit_of_measurement` field to Set
+    pub struct SetUnitOfMeasurement<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnitOfMeasurement<S> {}
+    impl<S: State> State for SetUnitOfMeasurement<S> {
+        type Sensor = S::Sensor;
+        type CreatedAt = S::CreatedAt;
+        type UnitOfMeasurement = Set<members::unit_of_measurement>;
+        type Thing = S::Thing;
+        type ObservedProperty = S::ObservedProperty;
+        type Name = S::Name;
+        type ObservationType = S::ObservationType;
+    }
+    ///State transition - sets the `thing` field to Set
+    pub struct SetThing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThing<S> {}
+    impl<S: State> State for SetThing<S> {
+        type Sensor = S::Sensor;
+        type CreatedAt = S::CreatedAt;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type Thing = Set<members::thing>;
+        type ObservedProperty = S::ObservedProperty;
+        type Name = S::Name;
+        type ObservationType = S::ObservationType;
+    }
+    ///State transition - sets the `observed_property` field to Set
+    pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
+    impl<S: State> State for SetObservedProperty<S> {
+        type Sensor = S::Sensor;
+        type CreatedAt = S::CreatedAt;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type Thing = S::Thing;
+        type ObservedProperty = Set<members::observed_property>;
+        type Name = S::Name;
+        type ObservationType = S::ObservationType;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Sensor = S::Sensor;
+        type CreatedAt = S::CreatedAt;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type Thing = S::Thing;
+        type ObservedProperty = S::ObservedProperty;
+        type Name = Set<members::name>;
+        type ObservationType = S::ObservationType;
+    }
+    ///State transition - sets the `observation_type` field to Set
+    pub struct SetObservationType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObservationType<S> {}
+    impl<S: State> State for SetObservationType<S> {
+        type Sensor = S::Sensor;
+        type CreatedAt = S::CreatedAt;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type Thing = S::Thing;
+        type ObservedProperty = S::ObservedProperty;
+        type Name = S::Name;
+        type ObservationType = Set<members::observation_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `thing` field
-        pub struct thing(());
         ///Marker type for the `sensor` field
         pub struct sensor(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `unit_of_measurement` field
+        pub struct unit_of_measurement(());
+        ///Marker type for the `thing` field
+        pub struct thing(());
         ///Marker type for the `observed_property` field
         pub struct observed_property(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `unit_of_measurement` field
-        pub struct unit_of_measurement(());
         ///Marker type for the `observation_type` field
         pub struct observation_type(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DatastreamBuilder<'a, S: datastream_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<
-            crate::dev_sensorthings::datastream::UnitOfMeasurement<'a>,
-        >,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<UriValue<'a>>,
+        Option<Data<'a>>,
+        Option<AtUri<'a>>,
+        Option<i64>,
+        Option<AtUri<'a>>,
+        Option<AtUri<'a>>,
+        Option<datastream::UnitOfMeasurement<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Datastream<'a> {
@@ -399,7 +376,7 @@ impl<'a> DatastreamBuilder<'a, datastream_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DatastreamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -413,7 +390,7 @@ impl<'a> DatastreamBuilder<'a, datastream_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -426,31 +403,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> DatastreamBuilder<'a, datastream_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         DatastreamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: datastream_state::State> DatastreamBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -464,13 +435,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> DatastreamBuilder<'a, datastream_state::SetName<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         DatastreamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -483,31 +454,25 @@ where
     /// Set the `observationType` field (required)
     pub fn observation_type(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> DatastreamBuilder<'a, datastream_state::SetObservationType<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         DatastreamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: datastream_state::State> DatastreamBuilder<'a, S> {
     /// Set the `observedArea` field (optional)
-    pub fn observed_area(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn observed_area(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `observedArea` field to an Option value (optional)
-    pub fn maybe_observed_area(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_observed_area(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -521,13 +486,13 @@ where
     /// Set the `observedProperty` field (required)
     pub fn observed_property(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> DatastreamBuilder<'a, datastream_state::SetObservedProperty<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         DatastreamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -553,13 +518,13 @@ where
     /// Set the `sensor` field (required)
     pub fn sensor(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> DatastreamBuilder<'a, datastream_state::SetSensor<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         DatastreamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -572,13 +537,13 @@ where
     /// Set the `thing` field (required)
     pub fn thing(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> DatastreamBuilder<'a, datastream_state::SetThing<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         DatastreamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -591,31 +556,25 @@ where
     /// Set the `unitOfMeasurement` field (required)
     pub fn unit_of_measurement(
         mut self,
-        value: impl Into<crate::dev_sensorthings::datastream::UnitOfMeasurement<'a>>,
+        value: impl Into<datastream::UnitOfMeasurement<'a>>,
     ) -> DatastreamBuilder<'a, datastream_state::SetUnitOfMeasurement<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         DatastreamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: datastream_state::State> DatastreamBuilder<'a, S> {
     /// Set the `verticalDatum` field (optional)
-    pub fn vertical_datum(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn vertical_datum(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `verticalDatum` field to an Option value (optional)
-    pub fn maybe_vertical_datum(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_vertical_datum(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -624,13 +583,13 @@ impl<'a, S: datastream_state::State> DatastreamBuilder<'a, S> {
 impl<'a, S> DatastreamBuilder<'a, S>
 where
     S: datastream_state::State,
-    S::Thing: datastream_state::IsSet,
     S::Sensor: datastream_state::IsSet,
+    S::CreatedAt: datastream_state::IsSet,
+    S::UnitOfMeasurement: datastream_state::IsSet,
+    S::Thing: datastream_state::IsSet,
     S::ObservedProperty: datastream_state::IsSet,
     S::Name: datastream_state::IsSet,
-    S::UnitOfMeasurement: datastream_state::IsSet,
     S::ObservationType: datastream_state::IsSet,
-    S::CreatedAt: datastream_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Datastream<'a> {
@@ -652,10 +611,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Datastream<'a> {
         Datastream {
             created_at: self.__unsafe_private_named.0.unwrap(),
@@ -674,330 +630,194 @@ where
     }
 }
 
-fn lexicon_doc_dev_sensorthings_datastream() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("dev.sensorthings.datastream"),
-        revision: None,
-        description: None,
+fn lexicon_doc_dev_sensorthings_datastream() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("dev.sensorthings.datastream"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Groups Observations of one ObservedProperty by one Sensor on one Thing. Carries all context needed to interpret observation results.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("thing"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("sensor"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("observedProperty"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("unitOfMeasurement"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("observationType"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("name"), SmolStr::new_static("thing"),
+                                SmolStr::new_static("sensor"),
+                                SmolStr::new_static("observedProperty"),
+                                SmolStr::new_static("unitOfMeasurement"),
+                                SmolStr::new_static("observationType"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "description",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("description"),
+                                LexObjectProperty::String(LexString {
                                     max_length: Some(2048usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("name"),
+                                LexObjectProperty::String(LexString {
                                     max_length: Some(256usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "observationType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("observationType"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "O&M observation type URI, e.g. http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Uri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "observedArea",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("observedArea"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "dev.sensorthings.thing#geoPoint",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "observedProperty",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("observedProperty"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "AT-URI of the dev.sensorthings.observedProperty record",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "resultScaleFactor",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("resultScaleFactor"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sensor",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("sensor"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "AT-URI of the dev.sensorthings.sensor record",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "thing",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("thing"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "AT-URI of the dev.sensorthings.thing record",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "unitOfMeasurement",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#unitOfMeasurement",
-                                    ),
+                                SmolStr::new_static("unitOfMeasurement"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#unitOfMeasurement"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "verticalDatum",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("verticalDatum"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Vertical datum reference for water level or elevation measurements. Either a URI (e.g. http://www.opengis.net/def/crs/EPSG/0/5731 for Malin Head) or a human-readable identifier (e.g. 'Chart Datum', 'local-gauge-zero'). Absent for non-vertical measurements.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(256usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "unitOfMeasurement",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("unitOfMeasurement"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "UCUM-compatible unit description.",
-                        ),
+                        CowStr::new_static("UCUM-compatible unit description."),
                     ),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("symbol")
-                        ],
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("symbol")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "definition",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("definition"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "URI from QUDT, UCUM, or similar unit ontology",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(128usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "symbol",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("symbol"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(32usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

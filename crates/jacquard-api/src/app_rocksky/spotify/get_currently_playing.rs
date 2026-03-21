@@ -5,41 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::player::CurrentlyPlayingViewDetailed;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetCurrentlyPlaying<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub actor: core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    pub actor: Option<AtIdentifier<'a>>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetCurrentlyPlayingOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::player::CurrentlyPlayingViewDetailed<'a>,
+    pub value: CurrentlyPlayingViewDetailed<'a>,
 }
 
-/// Response type for
-///app.rocksky.spotify.getCurrentlyPlaying
+/// Response type for app.rocksky.spotify.getCurrentlyPlaying
 pub struct GetCurrentlyPlayingResponse;
 impl jacquard_common::xrpc::XrpcResp for GetCurrentlyPlayingResponse {
     const NSID: &'static str = "app.rocksky.spotify.getCurrentlyPlaying";
@@ -54,8 +44,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetCurrentlyPlaying<'a> {
     type Response = GetCurrentlyPlayingResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.spotify.getCurrentlyPlaying
+/// Endpoint type for app.rocksky.spotify.getCurrentlyPlaying
 pub struct GetCurrentlyPlayingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetCurrentlyPlayingRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.spotify.getCurrentlyPlaying";
@@ -85,11 +74,9 @@ pub mod get_currently_playing_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetCurrentlyPlayingBuilder<'a, S: get_currently_playing_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetCurrentlyPlaying<'a> {
@@ -103,27 +90,21 @@ impl<'a> GetCurrentlyPlayingBuilder<'a, get_currently_playing_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetCurrentlyPlayingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S> {
     /// Set the `actor` field (optional)
-    pub fn actor(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::ident::AtIdentifier<'a>>>,
-    ) -> Self {
+    pub fn actor(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `actor` field to an Option value (optional)
-    pub fn maybe_actor(
-        mut self,
-        value: Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ) -> Self {
+    pub fn maybe_actor(mut self, value: Option<AtIdentifier<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }

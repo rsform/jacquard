@@ -5,60 +5,50 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStripeIntent<'a> {
     pub amount: i64,
     #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
+    pub id: CowStr<'a>,
     #[serde(borrow)]
-    pub iss: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub iss: Did<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub token: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub token: Option<CowStr<'a>>,
 }
 
 /// The intent data
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStripeIntentOutput<'a> {
     ///The customer ID for the payment intent
     #[serde(borrow)]
-    pub customer: jacquard_common::CowStr<'a>,
+    pub customer: CowStr<'a>,
     ///The customer session ID for the payment intent
     #[serde(borrow)]
-    pub customer_session: jacquard_common::CowStr<'a>,
+    pub customer_session: CowStr<'a>,
     ///The ephemeral key for the payment intent
     #[serde(borrow)]
-    pub ephemeral_key: jacquard_common::CowStr<'a>,
+    pub ephemeral_key: CowStr<'a>,
     ///The payment intent ID
     #[serde(borrow)]
-    pub payment_intent: jacquard_common::CowStr<'a>,
+    pub payment_intent: CowStr<'a>,
     ///The publishable key for the payment intent
     #[serde(borrow)]
-    pub publishable_key: jacquard_common::CowStr<'a>,
+    pub publishable_key: CowStr<'a>,
 }
 
-/// Response type for
-///app.ocho.payment.getStripeIntent
+/// Response type for app.ocho.payment.getStripeIntent
 pub struct GetStripeIntentResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStripeIntentResponse {
     const NSID: &'static str = "app.ocho.payment.getStripeIntent";
@@ -73,8 +63,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetStripeIntent<'a> {
     type Response = GetStripeIntentResponse;
 }
 
-/// Endpoint type for
-///app.ocho.payment.getStripeIntent
+/// Endpoint type for app.ocho.payment.getStripeIntent
 pub struct GetStripeIntentRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStripeIntentRequest {
     const PATH: &'static str = "/xrpc/app.ocho.payment.getStripeIntent";
@@ -143,14 +132,14 @@ pub mod get_stripe_intent_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetStripeIntentBuilder<'a, S: get_stripe_intent_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<Did<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetStripeIntent<'a> {
@@ -164,9 +153,9 @@ impl<'a> GetStripeIntentBuilder<'a, get_stripe_intent_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetStripeIntentBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -181,11 +170,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> GetStripeIntentBuilder<'a, get_stripe_intent_state::SetAmount<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetStripeIntentBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -198,13 +187,13 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetStripeIntentBuilder<'a, get_stripe_intent_state::SetId<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetStripeIntentBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -217,28 +206,25 @@ where
     /// Set the `iss` field (required)
     pub fn iss(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetStripeIntentBuilder<'a, get_stripe_intent_state::SetIss<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         GetStripeIntentBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_stripe_intent_state::State> GetStripeIntentBuilder<'a, S> {
     /// Set the `token` field (optional)
-    pub fn token(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn token(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `token` field to an Option value (optional)
-    pub fn maybe_token(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_token(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }

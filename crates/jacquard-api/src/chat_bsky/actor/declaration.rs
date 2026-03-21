@@ -5,29 +5,40 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A declaration of a Bluesky chat account.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Declaration<'a> {
     #[serde(borrow)]
     pub allow_incoming: DeclarationAllowIncoming<'a>,
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DeclarationAllowIncoming<'a> {
     All,
     None,
     Following,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> DeclarationAllowIncoming<'a> {
@@ -47,7 +58,7 @@ impl<'a> From<&'a str> for DeclarationAllowIncoming<'a> {
             "all" => Self::All,
             "none" => Self::None,
             "following" => Self::Following,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -58,7 +69,7 @@ impl<'a> From<String> for DeclarationAllowIncoming<'a> {
             "all" => Self::All,
             "none" => Self::None,
             "following" => Self::Following,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -118,47 +129,36 @@ impl jacquard_common::IntoStatic for DeclarationAllowIncoming<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DeclarationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Declaration<'a>,
 }
 
 impl<'a> Declaration<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DeclarationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, DeclarationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DeclarationRecord;
-impl jacquard_common::xrpc::XrpcResp for DeclarationRecord {
+impl XrpcResp for DeclarationRecord {
     const NSID: &'static str = "chat.bsky.actor.declaration";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = DeclarationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
@@ -168,29 +168,27 @@ impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Declaration<'_> {
+impl Collection for Declaration<'_> {
     const NSID: &'static str = "chat.bsky.actor.declaration";
     type Record = DeclarationRecord;
 }
 
-impl jacquard_common::types::collection::Collection for DeclarationRecord {
+impl Collection for DeclarationRecord {
     const NSID: &'static str = "chat.bsky.actor.declaration";
     type Record = DeclarationRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
+impl<'a> LexiconSchema for Declaration<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.actor.declaration"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_chat_bsky_actor_declaration()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -229,9 +227,9 @@ pub mod declaration_state {
 
 /// Builder for constructing an instance of this type
 pub struct DeclarationBuilder<'a, S: declaration_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<DeclarationAllowIncoming<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<DeclarationAllowIncoming<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Declaration<'a> {
@@ -245,9 +243,9 @@ impl<'a> DeclarationBuilder<'a, declaration_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeclarationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -262,11 +260,11 @@ where
         mut self,
         value: impl Into<DeclarationAllowIncoming<'a>>,
     ) -> DeclarationBuilder<'a, declaration_state::SetAllowIncoming<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         DeclarationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -286,7 +284,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -298,59 +296,43 @@ where
     }
 }
 
-fn lexicon_doc_chat_bsky_actor_declaration() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("chat.bsky.actor.declaration"),
-        revision: None,
-        description: None,
+fn lexicon_doc_chat_bsky_actor_declaration() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("chat.bsky.actor.declaration"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A declaration of a Bluesky chat account.",
-                        ),
+                        CowStr::new_static("A declaration of a Bluesky chat account."),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("allowIncoming")
-                            ],
-                        ),
-                        nullable: None,
+                    key: Some(CowStr::new_static("literal:self")),
+                    record: LexRecordRecord::Object(LexObject {
+                        required: Some(vec![SmolStr::new_static("allowIncoming")]),
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "allowIncoming",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("allowIncoming"),
+                                LexObjectProperty::String(LexString {
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

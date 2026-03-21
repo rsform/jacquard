@@ -26,6 +26,8 @@ thiserror.workspace = true
 [lints.rust]
 # just so that my rust-analyzer shuts up about the module name for 2048.blue's namespace
 non_snake_case = "allow"
+# and because pretty mode still imports a *couple* extra things...
+unused_imports = "allow"
 
 [features]
 default = [ "minimal", "std"]
@@ -37,6 +39,9 @@ lexicon_community = ["community_lexicon", "my_skylights", "com_whtwnd", "social_
 ufos = [ "moe_karashiiro", "dev_regnault", "buzz_bookhive", "uk_ewancroft",  "win_tomo_x", "dev_fudgeu", "dev_ocbwoy3", "net_bnewbold", "club_stellz", "dev_baileytownsend", "net_aftertheinter", "org_devcon","org_robocracy", "garden_lexicon", "social_clippr", "social_grain", "social_pmsky", "app_blebbit", "app_ocho", "uk_skyblur", "us_polhem", "blue_atplane",  "blue__2048", "net_mmatt", "minimal", "app_rocksky"]
 
 streaming = ["jacquard-common/websocket"]
+
+# note to manually add "site_standard" features to  weaver, pckt, leaflet, and offprint.
+# feature resolution currently doesn't find them
 
 # --- generated ---
 # Generated namespace features
@@ -56,7 +61,7 @@ app_juttu = ["com_atproto"]
 app_mathr = []
 app_nblr = []
 app_ocho = []
-app_offprint = ["com_atproto"]
+app_offprint = ["com_atproto", "site_standard"]
 app_openmkt = []
 app_protoimsg = []
 app_rocksky = ["com_atproto"]
@@ -69,7 +74,7 @@ at_pasteb = []
 at_podping = []
 at_unthread = []
 beauty_cybernetic = []
-blog_pckt = ["com_atproto"]
+blog_pckt = ["com_atproto", "site_standard"]
 blue__2048 = []
 blue_atplane = []
 blue_atplay = []
@@ -174,12 +179,12 @@ pink_vase = ["com_atproto"]
 place_atwork = []
 place_stream = ["app_bsky", "com_atproto"]
 place_wisp = []
-pub_leaflet = ["com_atproto"]
+pub_leaflet = ["com_atproto", "site_standard"]
 pub_quizzy = ["com_atproto"]
 science_alt = []
 scot_comhairle = []
 sh_tangled = []
-sh_weaver = ["app_bsky", "com_atproto"]
+sh_weaver = ["app_bsky", "com_atproto", "site_standard"]
 site_standard = ["com_atproto", "pub_leaflet"]
 social_clippr = []
 social_colibri = []

@@ -5,86 +5,77 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::feed::BlockedPost;
+use crate::app_bsky::feed::NotFoundPost;
+use crate::app_bsky::feed::ThreadViewPost;
+use crate::app_bsky::feed::ThreadgateView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThread<'a> {
     ///Defaults to `6`. Min: 0. Max: 1000.
     #[serde(default = "_default_depth")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub depth: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub depth: Option<i64>,
     ///Defaults to `80`. Min: 0. Max: 1000.
     #[serde(default = "_default_parent_height")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub parent_height: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_height: Option<i64>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThreadOutput<'a> {
     #[serde(borrow)]
     pub thread: GetPostThreadOutputThread<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub threadgate: core::option::Option<crate::app_bsky::feed::ThreadgateView<'a>>,
+    pub threadgate: Option<ThreadgateView<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetPostThreadOutputThread<'a> {
     #[serde(rename = "app.bsky.feed.defs#threadViewPost")]
-    ThreadViewPost(Box<crate::app_bsky::feed::ThreadViewPost<'a>>),
+    ThreadViewPost(Box<ThreadViewPost<'a>>),
     #[serde(rename = "app.bsky.feed.defs#notFoundPost")]
-    NotFoundPost(Box<crate::app_bsky::feed::NotFoundPost<'a>>),
+    NotFoundPost(Box<NotFoundPost<'a>>),
     #[serde(rename = "app.bsky.feed.defs#blockedPost")]
-    BlockedPost(Box<crate::app_bsky::feed::BlockedPost<'a>>),
+    BlockedPost(Box<BlockedPost<'a>>),
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetPostThreadError<'a> {
     #[serde(rename = "NotFound")]
-    NotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    NotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetPostThreadError<'_> {
@@ -102,8 +93,7 @@ impl core::fmt::Display for GetPostThreadError<'_> {
     }
 }
 
-/// Response type for
-///app.bsky.feed.getPostThread
+/// Response type for app.bsky.feed.getPostThread
 pub struct GetPostThreadResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPostThreadResponse {
     const NSID: &'static str = "app.bsky.feed.getPostThread";
@@ -118,8 +108,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPostThread<'a> {
     type Response = GetPostThreadResponse;
 }
 
-/// Endpoint type for
-///app.bsky.feed.getPostThread
+/// Endpoint type for app.bsky.feed.getPostThread
 pub struct GetPostThreadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadRequest {
     const PATH: &'static str = "/xrpc/app.bsky.feed.getPostThread";
@@ -128,11 +117,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadRequest {
     type Response = GetPostThreadResponse;
 }
 
-fn _default_depth() -> core::option::Option<i64> {
+fn _default_depth() -> Option<i64> {
     Some(6i64)
 }
 
-fn _default_parent_height() -> core::option::Option<i64> {
+fn _default_parent_height() -> Option<i64> {
     Some(80i64)
 }
 
@@ -170,13 +159,9 @@ pub mod get_post_thread_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetPostThreadBuilder<'a, S: get_post_thread_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<i64>, Option<AtUri<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetPostThread<'a> {
@@ -190,9 +175,9 @@ impl<'a> GetPostThreadBuilder<'a, get_post_thread_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetPostThreadBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -231,13 +216,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetPostThreadBuilder<'a, get_post_thread_state::SetUri<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         GetPostThreadBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

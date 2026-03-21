@@ -9,107 +9,103 @@ pub mod get_actor_feed;
 pub mod get_play;
 pub mod play;
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::Datetime;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::fm_teal::alpha::feed;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Artist<'a> {
     ///The Musicbrainz ID of the artist
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub artist_mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub artist_mb_id: Option<CowStr<'a>>,
     ///The name of the artist
     #[serde(borrow)]
-    pub artist_name: jacquard_common::CowStr<'a>,
+    pub artist_name: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayView<'a> {
     ///Array of artists in order of original appearance.
     #[serde(borrow)]
-    pub artists: Vec<crate::fm_teal::alpha::feed::Artist<'a>>,
+    pub artists: Vec<feed::Artist<'a>>,
     ///The length of the track in seconds
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub duration: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub duration: Option<i64>,
     ///The ISRC code associated with the recording
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub isrc: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub isrc: Option<CowStr<'a>>,
     ///The base domain of the music service. e.g. music.apple.com, tidal.com, spotify.com. Defaults to 'local' if not provided.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub music_service_base_domain: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub music_service_base_domain: Option<CowStr<'a>>,
     ///The URL associated with this track
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub origin_url: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub origin_url: Option<CowStr<'a>>,
     ///The unix timestamp of when the track was played
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub played_time: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub played_time: Option<Datetime>,
     ///The Musicbrainz recording ID of the track
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub recording_mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub recording_mb_id: Option<CowStr<'a>>,
     ///The Musicbrainz release ID
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub release_mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub release_mb_id: Option<CowStr<'a>>,
     ///The name of the release/album
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub release_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub release_name: Option<CowStr<'a>>,
     ///A user-agent style string specifying the user agent. e.g. tealtracker/0.0.1b (Linux; Android 13; SM-A715F). Defaults to 'manual/unknown' if not provided.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub submission_client_agent: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub submission_client_agent: Option<CowStr<'a>>,
     ///The Musicbrainz ID of the track
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub track_mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub track_mb_id: Option<CowStr<'a>>,
     ///The name of the track
     #[serde(borrow)]
-    pub track_name: jacquard_common::CowStr<'a>,
+    pub track_name: CowStr<'a>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
+impl<'a> LexiconSchema for Artist<'a> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.feed.defs"
     }
     fn def_name() -> &'static str {
         "artist"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_fm_teal_alpha_feed_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.artist_name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "artist_name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("artist_name"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -119,10 +115,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
             let value = &self.artist_name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "artist_name",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("artist_name"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -131,16 +125,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
         {
             let value = &self.artist_name;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 2560usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "artist_name",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("artist_name"),
                         max: 2560usize,
                         actual: count,
                     });
@@ -151,26 +139,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for PlayView<'a> {
+impl<'a> LexiconSchema for PlayView<'a> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.feed.defs"
     }
     fn def_name() -> &'static str {
         "playView"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_fm_teal_alpha_feed_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.release_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "release_name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("release_name"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -178,16 +162,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PlayView<'a> {
         }
         if let Some(ref value) = self.release_name {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 2560usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "release_name",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("release_name"),
                         max: 2560usize,
                         actual: count,
                     });
@@ -197,10 +175,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PlayView<'a> {
         if let Some(ref value) = self.submission_client_agent {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "submission_client_agent",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("submission_client_agent"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -208,16 +184,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PlayView<'a> {
         }
         if let Some(ref value) = self.submission_client_agent {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 2560usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "submission_client_agent",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("submission_client_agent"),
                         max: 2560usize,
                         actual: count,
                     });
@@ -228,10 +198,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PlayView<'a> {
             let value = &self.track_name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "track_name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("track_name"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -241,10 +209,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PlayView<'a> {
             let value = &self.track_name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "track_name",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("track_name"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -253,16 +219,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PlayView<'a> {
         {
             let value = &self.track_name;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 2560usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "track_name",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("track_name"),
                         max: 2560usize,
                         actual: count,
                     });
@@ -273,338 +233,198 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PlayView<'a> {
     }
 }
 
-fn lexicon_doc_fm_teal_alpha_feed_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("fm.teal.alpha.feed.defs"),
-        revision: None,
-        description: None,
+fn lexicon_doc_fm_teal_alpha_feed_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("fm.teal.alpha.feed.defs"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("artist"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("artistName")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("artist"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("artistName")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "artistMbId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("artistMbId"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The Musicbrainz ID of the artist",
-                                    ),
+                                    CowStr::new_static("The Musicbrainz ID of the artist"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "artistName",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("artistName"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The name of the artist",
-                                    ),
+                                    CowStr::new_static("The name of the artist"),
                                 ),
-                                format: None,
-                                default: None,
                                 min_length: Some(1usize),
                                 max_length: Some(256usize),
-                                min_graphemes: None,
                                 max_graphemes: Some(2560usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("playView"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("playView"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("trackName"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("artists")
+                            SmolStr::new_static("trackName"),
+                            SmolStr::new_static("artists")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "artists",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("artists"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Array of artists in order of original appearance.",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#artist"),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#artist"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "duration",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("duration"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "isrc",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("isrc"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The ISRC code associated with the recording",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "musicServiceBaseDomain",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("musicServiceBaseDomain"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The base domain of the music service. e.g. music.apple.com, tidal.com, spotify.com. Defaults to 'local' if not provided.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "originUrl",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("originUrl"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The URL associated with this track",
-                                    ),
+                                    CowStr::new_static("The URL associated with this track"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "playedTime",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("playedTime"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The unix timestamp of when the track was played",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "recordingMbId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("recordingMbId"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The Musicbrainz recording ID of the track",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "releaseMbId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("releaseMbId"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The Musicbrainz release ID",
-                                    ),
+                                    CowStr::new_static("The Musicbrainz release ID"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "releaseName",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("releaseName"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The name of the release/album",
-                                    ),
+                                    CowStr::new_static("The name of the release/album"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(256usize),
-                                min_graphemes: None,
                                 max_graphemes: Some(2560usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "submissionClientAgent",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("submissionClientAgent"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "A user-agent style string specifying the user agent. e.g. tealtracker/0.0.1b (Linux; Android 13; SM-A715F). Defaults to 'manual/unknown' if not provided.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(256usize),
-                                min_graphemes: None,
                                 max_graphemes: Some(2560usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "trackMbId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("trackMbId"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The Musicbrainz ID of the track",
-                                    ),
+                                    CowStr::new_static("The Musicbrainz ID of the track"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "trackName",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("trackName"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The name of the track",
-                                    ),
+                                    CowStr::new_static("The name of the track"),
                                 ),
-                                format: None,
-                                default: None,
                                 min_length: Some(1usize),
                                 max_length: Some(256usize),
-                                min_graphemes: None,
                                 max_graphemes: Some(2560usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -654,22 +474,22 @@ pub mod play_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct PlayViewBuilder<'a, S: play_view_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::fm_teal::alpha::feed::Artist<'a>>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<Vec<feed::Artist<'a>>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> PlayView<'a> {
@@ -683,7 +503,7 @@ impl<'a> PlayViewBuilder<'a, play_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PlayViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -698,7 +518,7 @@ impl<'a> PlayViewBuilder<'a, play_view_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -711,13 +531,13 @@ where
     /// Set the `artists` field (required)
     pub fn artists(
         mut self,
-        value: impl Into<Vec<crate::fm_teal::alpha::feed::Artist<'a>>>,
+        value: impl Into<Vec<feed::Artist<'a>>>,
     ) -> PlayViewBuilder<'a, play_view_state::SetArtists<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PlayViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -737,15 +557,12 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
 
 impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     /// Set the `isrc` field (optional)
-    pub fn isrc(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn isrc(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `isrc` field to an Option value (optional)
-    pub fn maybe_isrc(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_isrc(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -755,16 +572,13 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     /// Set the `musicServiceBaseDomain` field (optional)
     pub fn music_service_base_domain(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `musicServiceBaseDomain` field to an Option value (optional)
-    pub fn maybe_music_service_base_domain(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_music_service_base_domain(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -772,18 +586,12 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
 
 impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     /// Set the `originUrl` field (optional)
-    pub fn origin_url(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn origin_url(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `originUrl` field to an Option value (optional)
-    pub fn maybe_origin_url(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_origin_url(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -791,18 +599,12 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
 
 impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     /// Set the `playedTime` field (optional)
-    pub fn played_time(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn played_time(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `playedTime` field to an Option value (optional)
-    pub fn maybe_played_time(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_played_time(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -810,18 +612,12 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
 
 impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     /// Set the `recordingMbId` field (optional)
-    pub fn recording_mb_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn recording_mb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `recordingMbId` field to an Option value (optional)
-    pub fn maybe_recording_mb_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_recording_mb_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -829,18 +625,12 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
 
 impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     /// Set the `releaseMbId` field (optional)
-    pub fn release_mb_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn release_mb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `releaseMbId` field to an Option value (optional)
-    pub fn maybe_release_mb_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_release_mb_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -848,18 +638,12 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
 
 impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     /// Set the `releaseName` field (optional)
-    pub fn release_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn release_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `releaseName` field to an Option value (optional)
-    pub fn maybe_release_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_release_name(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -869,16 +653,13 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     /// Set the `submissionClientAgent` field (optional)
     pub fn submission_client_agent(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `submissionClientAgent` field to an Option value (optional)
-    pub fn maybe_submission_client_agent(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_submission_client_agent(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -886,18 +667,12 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
 
 impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     /// Set the `trackMbId` field (optional)
-    pub fn track_mb_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn track_mb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `trackMbId` field to an Option value (optional)
-    pub fn maybe_track_mb_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_track_mb_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -911,13 +686,13 @@ where
     /// Set the `trackName` field (required)
     pub fn track_name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> PlayViewBuilder<'a, play_view_state::SetTrackName<S>> {
-        self.__unsafe_private_named.11 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.11 = Option::Some(value.into());
         PlayViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -949,7 +724,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

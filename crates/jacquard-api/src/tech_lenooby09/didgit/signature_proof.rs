@@ -5,50 +5,61 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A cryptographic proof that a did-git object was signed by a specific DID. This provides key-rotation-independent verification by anchoring the proof to a PDS or signing event.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SignatureProof<'a> {
     ///The hex SHA-256 object ID being proven.
     #[serde(borrow)]
-    pub object_id: jacquard_common::CowStr<'a>,
+    pub object_id: CowStr<'a>,
     ///The type of object.
     #[serde(borrow)]
     pub object_type: SignatureProofObjectType<'a>,
     ///The PDS endpoint that issued this proof (for service auth proofs).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub pds_endpoint: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub pds_endpoint: Option<CowStr<'a>>,
     ///The base64url-encoded signature or JWT token.
     #[serde(borrow)]
-    pub signature: jacquard_common::CowStr<'a>,
+    pub signature: CowStr<'a>,
     ///The signature algorithm or token type (e.g., 'atproto-service-auth', 'jws', 'raw-ed25519', 'raw-ecdsa-secp256k1').
     #[serde(borrow)]
-    pub signature_type: jacquard_common::CowStr<'a>,
+    pub signature_type: CowStr<'a>,
     ///Unix timestamp (seconds) when the proof was created.
     pub signed_at: i64,
     ///The DID of the signer.
     #[serde(borrow)]
-    pub signer: jacquard_common::CowStr<'a>,
+    pub signer: CowStr<'a>,
 }
 
 /// The type of object.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SignatureProofObjectType<'a> {
     Blob,
     Tree,
     Commit,
     Tag,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> SignatureProofObjectType<'a> {
@@ -70,7 +81,7 @@ impl<'a> From<&'a str> for SignatureProofObjectType<'a> {
             "tree" => Self::Tree,
             "commit" => Self::Commit,
             "tag" => Self::Tag,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -82,7 +93,7 @@ impl<'a> From<String> for SignatureProofObjectType<'a> {
             "tree" => Self::Tree,
             "commit" => Self::Commit,
             "tag" => Self::Tag,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -143,47 +154,36 @@ impl jacquard_common::IntoStatic for SignatureProofObjectType<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SignatureProofGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: SignatureProof<'a>,
 }
 
 impl<'a> SignatureProof<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SignatureProofRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, SignatureProofRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SignatureProofRecord;
-impl jacquard_common::xrpc::XrpcResp for SignatureProofRecord {
+impl XrpcResp for SignatureProofRecord {
     const NSID: &'static str = "tech.lenooby09.didgit.signatureProof";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = SignatureProofGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<SignatureProofGetRecordOutput<'_>> for SignatureProof<'_> {
@@ -193,37 +193,33 @@ impl From<SignatureProofGetRecordOutput<'_>> for SignatureProof<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for SignatureProof<'_> {
+impl Collection for SignatureProof<'_> {
     const NSID: &'static str = "tech.lenooby09.didgit.signatureProof";
     type Record = SignatureProofRecord;
 }
 
-impl jacquard_common::types::collection::Collection for SignatureProofRecord {
+impl Collection for SignatureProofRecord {
     const NSID: &'static str = "tech.lenooby09.didgit.signatureProof";
     type Record = SignatureProofRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for SignatureProof<'a> {
+impl<'a> LexiconSchema for SignatureProof<'a> {
     fn nsid() -> &'static str {
         "tech.lenooby09.didgit.signatureProof"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_tech_lenooby09_didgit_signatureProof()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.object_id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "object_id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("object_id"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -233,10 +229,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for SignatureProof<'a> {
             let value = &self.object_type;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 16usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "object_type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("object_type"),
                     max: 16usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -245,10 +239,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for SignatureProof<'a> {
         if let Some(ref value) = self.pds_endpoint {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "pds_endpoint",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("pds_endpoint"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -258,10 +250,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for SignatureProof<'a> {
             let value = &self.signature;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "signature",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("signature"),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -271,10 +261,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for SignatureProof<'a> {
             let value = &self.signature_type;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "signature_type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("signature_type"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -284,10 +272,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for SignatureProof<'a> {
             let value = &self.signer;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "signer",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("signer"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -309,10 +295,10 @@ pub mod signature_proof_state {
     pub trait State: sealed::Sealed {
         type ObjectId;
         type SignatureType;
-        type Signer;
-        type SignedAt;
-        type ObjectType;
         type Signature;
+        type SignedAt;
+        type Signer;
+        type ObjectType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -320,10 +306,10 @@ pub mod signature_proof_state {
     impl State for Empty {
         type ObjectId = Unset;
         type SignatureType = Unset;
-        type Signer = Unset;
-        type SignedAt = Unset;
-        type ObjectType = Unset;
         type Signature = Unset;
+        type SignedAt = Unset;
+        type Signer = Unset;
+        type ObjectType = Unset;
     }
     ///State transition - sets the `object_id` field to Set
     pub struct SetObjectId<S: State = Empty>(PhantomData<fn() -> S>);
@@ -331,10 +317,10 @@ pub mod signature_proof_state {
     impl<S: State> State for SetObjectId<S> {
         type ObjectId = Set<members::object_id>;
         type SignatureType = S::SignatureType;
-        type Signer = S::Signer;
-        type SignedAt = S::SignedAt;
-        type ObjectType = S::ObjectType;
         type Signature = S::Signature;
+        type SignedAt = S::SignedAt;
+        type Signer = S::Signer;
+        type ObjectType = S::ObjectType;
     }
     ///State transition - sets the `signature_type` field to Set
     pub struct SetSignatureType<S: State = Empty>(PhantomData<fn() -> S>);
@@ -342,43 +328,10 @@ pub mod signature_proof_state {
     impl<S: State> State for SetSignatureType<S> {
         type ObjectId = S::ObjectId;
         type SignatureType = Set<members::signature_type>;
-        type Signer = S::Signer;
+        type Signature = S::Signature;
         type SignedAt = S::SignedAt;
-        type ObjectType = S::ObjectType;
-        type Signature = S::Signature;
-    }
-    ///State transition - sets the `signer` field to Set
-    pub struct SetSigner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSigner<S> {}
-    impl<S: State> State for SetSigner<S> {
-        type ObjectId = S::ObjectId;
-        type SignatureType = S::SignatureType;
-        type Signer = Set<members::signer>;
-        type SignedAt = S::SignedAt;
-        type ObjectType = S::ObjectType;
-        type Signature = S::Signature;
-    }
-    ///State transition - sets the `signed_at` field to Set
-    pub struct SetSignedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignedAt<S> {}
-    impl<S: State> State for SetSignedAt<S> {
-        type ObjectId = S::ObjectId;
-        type SignatureType = S::SignatureType;
         type Signer = S::Signer;
-        type SignedAt = Set<members::signed_at>;
         type ObjectType = S::ObjectType;
-        type Signature = S::Signature;
-    }
-    ///State transition - sets the `object_type` field to Set
-    pub struct SetObjectType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObjectType<S> {}
-    impl<S: State> State for SetObjectType<S> {
-        type ObjectId = S::ObjectId;
-        type SignatureType = S::SignatureType;
-        type Signer = S::Signer;
-        type SignedAt = S::SignedAt;
-        type ObjectType = Set<members::object_type>;
-        type Signature = S::Signature;
     }
     ///State transition - sets the `signature` field to Set
     pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
@@ -386,10 +339,43 @@ pub mod signature_proof_state {
     impl<S: State> State for SetSignature<S> {
         type ObjectId = S::ObjectId;
         type SignatureType = S::SignatureType;
-        type Signer = S::Signer;
-        type SignedAt = S::SignedAt;
-        type ObjectType = S::ObjectType;
         type Signature = Set<members::signature>;
+        type SignedAt = S::SignedAt;
+        type Signer = S::Signer;
+        type ObjectType = S::ObjectType;
+    }
+    ///State transition - sets the `signed_at` field to Set
+    pub struct SetSignedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignedAt<S> {}
+    impl<S: State> State for SetSignedAt<S> {
+        type ObjectId = S::ObjectId;
+        type SignatureType = S::SignatureType;
+        type Signature = S::Signature;
+        type SignedAt = Set<members::signed_at>;
+        type Signer = S::Signer;
+        type ObjectType = S::ObjectType;
+    }
+    ///State transition - sets the `signer` field to Set
+    pub struct SetSigner<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSigner<S> {}
+    impl<S: State> State for SetSigner<S> {
+        type ObjectId = S::ObjectId;
+        type SignatureType = S::SignatureType;
+        type Signature = S::Signature;
+        type SignedAt = S::SignedAt;
+        type Signer = Set<members::signer>;
+        type ObjectType = S::ObjectType;
+    }
+    ///State transition - sets the `object_type` field to Set
+    pub struct SetObjectType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObjectType<S> {}
+    impl<S: State> State for SetObjectType<S> {
+        type ObjectId = S::ObjectId;
+        type SignatureType = S::SignatureType;
+        type Signature = S::Signature;
+        type SignedAt = S::SignedAt;
+        type Signer = S::Signer;
+        type ObjectType = Set<members::object_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -398,30 +384,30 @@ pub mod signature_proof_state {
         pub struct object_id(());
         ///Marker type for the `signature_type` field
         pub struct signature_type(());
-        ///Marker type for the `signer` field
-        pub struct signer(());
-        ///Marker type for the `signed_at` field
-        pub struct signed_at(());
-        ///Marker type for the `object_type` field
-        pub struct object_type(());
         ///Marker type for the `signature` field
         pub struct signature(());
+        ///Marker type for the `signed_at` field
+        pub struct signed_at(());
+        ///Marker type for the `signer` field
+        pub struct signer(());
+        ///Marker type for the `object_type` field
+        pub struct object_type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SignatureProofBuilder<'a, S: signature_proof_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<SignatureProofObjectType<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<SignatureProofObjectType<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SignatureProof<'a> {
@@ -435,9 +421,9 @@ impl<'a> SignatureProofBuilder<'a, signature_proof_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SignatureProofBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -450,13 +436,13 @@ where
     /// Set the `objectId` field (required)
     pub fn object_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SignatureProofBuilder<'a, signature_proof_state::SetObjectId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SignatureProofBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -471,29 +457,23 @@ where
         mut self,
         value: impl Into<SignatureProofObjectType<'a>>,
     ) -> SignatureProofBuilder<'a, signature_proof_state::SetObjectType<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         SignatureProofBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: signature_proof_state::State> SignatureProofBuilder<'a, S> {
     /// Set the `pdsEndpoint` field (optional)
-    pub fn pds_endpoint(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn pds_endpoint(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `pdsEndpoint` field to an Option value (optional)
-    pub fn maybe_pds_endpoint(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_pds_endpoint(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -507,13 +487,13 @@ where
     /// Set the `signature` field (required)
     pub fn signature(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SignatureProofBuilder<'a, signature_proof_state::SetSignature<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         SignatureProofBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -526,13 +506,13 @@ where
     /// Set the `signatureType` field (required)
     pub fn signature_type(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SignatureProofBuilder<'a, signature_proof_state::SetSignatureType<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         SignatureProofBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -547,11 +527,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SignatureProofBuilder<'a, signature_proof_state::SetSignedAt<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         SignatureProofBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -564,13 +544,13 @@ where
     /// Set the `signer` field (required)
     pub fn signer(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SignatureProofBuilder<'a, signature_proof_state::SetSigner<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         SignatureProofBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -580,10 +560,10 @@ where
     S: signature_proof_state::State,
     S::ObjectId: signature_proof_state::IsSet,
     S::SignatureType: signature_proof_state::IsSet,
-    S::Signer: signature_proof_state::IsSet,
-    S::SignedAt: signature_proof_state::IsSet,
-    S::ObjectType: signature_proof_state::IsSet,
     S::Signature: signature_proof_state::IsSet,
+    S::SignedAt: signature_proof_state::IsSet,
+    S::Signer: signature_proof_state::IsSet,
+    S::ObjectType: signature_proof_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SignatureProof<'a> {
@@ -601,7 +581,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -619,186 +599,122 @@ where
     }
 }
 
-fn lexicon_doc_tech_lenooby09_didgit_signatureProof() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "tech.lenooby09.didgit.signatureProof",
-        ),
-        revision: None,
-        description: None,
+fn lexicon_doc_tech_lenooby09_didgit_signatureProof() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("tech.lenooby09.didgit.signatureProof"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A cryptographic proof that a did-git object was signed by a specific DID. This provides key-rotation-independent verification by anchoring the proof to a PDS or signing event.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("objectId"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("objectType"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("signatureType"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("signature"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("signedAt"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("signer")
+                                SmolStr::new_static("objectId"),
+                                SmolStr::new_static("objectType"),
+                                SmolStr::new_static("signatureType"),
+                                SmolStr::new_static("signature"),
+                                SmolStr::new_static("signedAt"),
+                                SmolStr::new_static("signer")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "objectId",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("objectId"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The hex SHA-256 object ID being proven.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(64usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "objectType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("objectType"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static("The type of object."),
+                                        CowStr::new_static("The type of object."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(16usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "pdsEndpoint",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("pdsEndpoint"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The PDS endpoint that issued this proof (for service auth proofs).",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(256usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "signature",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("signature"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The base64url-encoded signature or JWT token.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(2048usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "signatureType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("signatureType"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The signature algorithm or token type (e.g., 'atproto-service-auth', 'jws', 'raw-ed25519', 'raw-ecdsa-secp256k1').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(64usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "signedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("signedAt"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "signer",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("signer"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "The DID of the signer.",
-                                        ),
+                                        CowStr::new_static("The DID of the signer."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(128usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

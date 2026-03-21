@@ -5,39 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::com_whtwnd::blog::BlogEntry;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAuthorPosts<'a> {
     #[serde(borrow)]
-    pub author: jacquard_common::types::string::Did<'a>,
+    pub author: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAuthorPostsOutput<'a> {
     #[serde(borrow)]
-    pub post: Vec<crate::com_whtwnd::blog::BlogEntry<'a>>,
+    pub post: Vec<BlogEntry<'a>>,
 }
 
-/// Response type for
-///com.whtwnd.blog.getAuthorPosts
+/// Response type for com.whtwnd.blog.getAuthorPosts
 pub struct GetAuthorPostsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAuthorPostsResponse {
     const NSID: &'static str = "com.whtwnd.blog.getAuthorPosts";
@@ -52,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetAuthorPosts<'a> {
     type Response = GetAuthorPostsResponse;
 }
 
-/// Endpoint type for
-///com.whtwnd.blog.getAuthorPosts
+/// Endpoint type for com.whtwnd.blog.getAuthorPosts
 pub struct GetAuthorPostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorPostsRequest {
     const PATH: &'static str = "/xrpc/com.whtwnd.blog.getAuthorPosts";
@@ -96,11 +86,9 @@ pub mod get_author_posts_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetAuthorPostsBuilder<'a, S: get_author_posts_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetAuthorPosts<'a> {
@@ -114,9 +102,9 @@ impl<'a> GetAuthorPostsBuilder<'a, get_author_posts_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetAuthorPostsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -129,13 +117,13 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetAuthorPostsBuilder<'a, get_author_posts_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetAuthorPostsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

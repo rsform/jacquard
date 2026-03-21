@@ -5,59 +5,53 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::git::temp::Branch;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetHead<'a> {
     #[serde(borrow)]
-    pub repo: jacquard_common::types::string::AtUri<'a>,
+    pub repo: AtUri<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetHeadOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::sh_tangled::git::temp::Branch<'a>,
+    pub value: Branch<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetHeadError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(Option<CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRequest(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetHeadError<'_> {
@@ -82,8 +76,7 @@ impl core::fmt::Display for GetHeadError<'_> {
     }
 }
 
-/// Response type for
-///sh.tangled.git.temp.getHead
+/// Response type for sh.tangled.git.temp.getHead
 pub struct GetHeadResponse;
 impl jacquard_common::xrpc::XrpcResp for GetHeadResponse {
     const NSID: &'static str = "sh.tangled.git.temp.getHead";
@@ -98,8 +91,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetHead<'a> {
     type Response = GetHeadResponse;
 }
 
-/// Endpoint type for
-///sh.tangled.git.temp.getHead
+/// Endpoint type for sh.tangled.git.temp.getHead
 pub struct GetHeadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetHeadRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.getHead";
@@ -142,11 +134,9 @@ pub mod get_head_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetHeadBuilder<'a, S: get_head_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetHead<'a> {
@@ -160,9 +150,9 @@ impl<'a> GetHeadBuilder<'a, get_head_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetHeadBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -175,13 +165,13 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetHeadBuilder<'a, get_head_state::SetRepo<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetHeadBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

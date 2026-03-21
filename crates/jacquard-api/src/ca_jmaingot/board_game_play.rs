@@ -5,70 +5,69 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A single board game play
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct BoardGamePlay<'a> {
     ///corresponds to https://boardgamegeek.com/boardgame/<bggId> for the game
     #[serde(borrow)]
-    pub bgg_id: jacquard_common::CowStr<'a>,
+    pub bgg_id: CowStr<'a>,
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///ISO 8601 date string
-    pub played_at: jacquard_common::types::string::Datetime,
+    pub played_at: Datetime,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct BoardGamePlayGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: BoardGamePlay<'a>,
 }
 
 impl<'a> BoardGamePlay<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, BoardGamePlayRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, BoardGamePlayRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct BoardGamePlayRecord;
-impl jacquard_common::xrpc::XrpcResp for BoardGamePlayRecord {
+impl XrpcResp for BoardGamePlayRecord {
     const NSID: &'static str = "ca.jmaingot.boardGamePlay";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = BoardGamePlayGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<BoardGamePlayGetRecordOutput<'_>> for BoardGamePlay<'_> {
@@ -78,29 +77,27 @@ impl From<BoardGamePlayGetRecordOutput<'_>> for BoardGamePlay<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for BoardGamePlay<'_> {
+impl Collection for BoardGamePlay<'_> {
     const NSID: &'static str = "ca.jmaingot.boardGamePlay";
     type Record = BoardGamePlayRecord;
 }
 
-impl jacquard_common::types::collection::Collection for BoardGamePlayRecord {
+impl Collection for BoardGamePlayRecord {
     const NSID: &'static str = "ca.jmaingot.boardGamePlay";
     type Record = BoardGamePlayRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for BoardGamePlay<'a> {
+impl<'a> LexiconSchema for BoardGamePlay<'a> {
     fn nsid() -> &'static str {
         "ca.jmaingot.boardGamePlay"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_ca_jmaingot_boardGamePlay()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -116,62 +113,58 @@ pub mod board_game_play_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type PlayedAt;
         type BggId;
+        type PlayedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type PlayedAt = Unset;
         type BggId = Unset;
+        type PlayedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type BggId = S::BggId;
         type PlayedAt = S::PlayedAt;
-        type BggId = S::BggId;
-    }
-    ///State transition - sets the `played_at` field to Set
-    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
-    impl<S: State> State for SetPlayedAt<S> {
-        type Name = S::Name;
-        type PlayedAt = Set<members::played_at>;
-        type BggId = S::BggId;
     }
     ///State transition - sets the `bgg_id` field to Set
     pub struct SetBggId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBggId<S> {}
     impl<S: State> State for SetBggId<S> {
         type Name = S::Name;
-        type PlayedAt = S::PlayedAt;
         type BggId = Set<members::bgg_id>;
+        type PlayedAt = S::PlayedAt;
+    }
+    ///State transition - sets the `played_at` field to Set
+    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
+    impl<S: State> State for SetPlayedAt<S> {
+        type Name = S::Name;
+        type BggId = S::BggId;
+        type PlayedAt = Set<members::played_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `played_at` field
-        pub struct played_at(());
         ///Marker type for the `bgg_id` field
         pub struct bgg_id(());
+        ///Marker type for the `played_at` field
+        pub struct played_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BoardGamePlayBuilder<'a, S: board_game_play_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> BoardGamePlay<'a> {
@@ -185,9 +178,9 @@ impl<'a> BoardGamePlayBuilder<'a, board_game_play_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BoardGamePlayBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -200,13 +193,13 @@ where
     /// Set the `bggId` field (required)
     pub fn bgg_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> BoardGamePlayBuilder<'a, board_game_play_state::SetBggId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         BoardGamePlayBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -219,13 +212,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> BoardGamePlayBuilder<'a, board_game_play_state::SetName<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         BoardGamePlayBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -238,13 +231,13 @@ where
     /// Set the `playedAt` field (required)
     pub fn played_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> BoardGamePlayBuilder<'a, board_game_play_state::SetPlayedAt<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         BoardGamePlayBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -253,8 +246,8 @@ impl<'a, S> BoardGamePlayBuilder<'a, S>
 where
     S: board_game_play_state::State,
     S::Name: board_game_play_state::IsSet,
-    S::PlayedAt: board_game_play_state::IsSet,
     S::BggId: board_game_play_state::IsSet,
+    S::PlayedAt: board_game_play_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BoardGamePlay<'a> {
@@ -268,7 +261,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -282,103 +275,67 @@ where
     }
 }
 
-fn lexicon_doc_ca_jmaingot_boardGamePlay() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("ca.jmaingot.boardGamePlay"),
-        revision: None,
-        description: None,
+fn lexicon_doc_ca_jmaingot_boardGamePlay() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("ca.jmaingot.boardGamePlay"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("A single board game play"),
-                    ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
+                    description: Some(CowStr::new_static("A single board game play")),
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("bggId"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("playedAt")
+                                SmolStr::new_static("name"), SmolStr::new_static("bggId"),
+                                SmolStr::new_static("playedAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "bggId",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("bggId"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "corresponds to https://boardgamegeek.com/boardgame/<bggId> for the game",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("name"),
+                                LexObjectProperty::String(LexString {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "playedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("playedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "ISO 8601 date string",
-                                        ),
+                                        CowStr::new_static("ISO 8601 date string"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

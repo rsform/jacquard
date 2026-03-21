@@ -5,72 +5,63 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::admin::AccountView;
+use crate::tools_ozone::signature::SigDetail;
+use crate::tools_ozone::signature::find_related_accounts;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct FindRelatedAccounts<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct FindRelatedAccountsOutput<'a> {
     #[serde(borrow)]
-    pub accounts: Vec<
-        crate::tools_ozone::signature::find_related_accounts::RelatedAccount<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accounts: Vec<find_related_accounts::RelatedAccount<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RelatedAccount<'a> {
     #[serde(borrow)]
-    pub account: crate::com_atproto::admin::AccountView<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub account: AccountView<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub similarities: core::option::Option<
-        Vec<crate::tools_ozone::signature::SigDetail<'a>>,
-    >,
+    pub similarities: Option<Vec<SigDetail<'a>>>,
 }
 
-/// Response type for
-///tools.ozone.signature.findRelatedAccounts
+/// Response type for tools.ozone.signature.findRelatedAccounts
 pub struct FindRelatedAccountsResponse;
 impl jacquard_common::xrpc::XrpcResp for FindRelatedAccountsResponse {
     const NSID: &'static str = "tools.ozone.signature.findRelatedAccounts";
@@ -85,8 +76,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for FindRelatedAccounts<'a> {
     type Response = FindRelatedAccountsResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.signature.findRelatedAccounts
+/// Endpoint type for tools.ozone.signature.findRelatedAccounts
 pub struct FindRelatedAccountsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for FindRelatedAccountsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.signature.findRelatedAccounts";
@@ -95,24 +85,22 @@ impl jacquard_common::xrpc::XrpcEndpoint for FindRelatedAccountsRequest {
     type Response = FindRelatedAccountsResponse;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for RelatedAccount<'a> {
+impl<'a> LexiconSchema for RelatedAccount<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.signature.findRelatedAccounts"
     }
     fn def_name() -> &'static str {
         "relatedAccount"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_tools_ozone_signature_findRelatedAccounts()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
@@ -150,13 +138,9 @@ pub mod find_related_accounts_state {
 
 /// Builder for constructing an instance of this type
 pub struct FindRelatedAccountsBuilder<'a, S: find_related_accounts_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<Did<'a>>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> FindRelatedAccounts<'a> {
@@ -170,24 +154,21 @@ impl<'a> FindRelatedAccountsBuilder<'a, find_related_accounts_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FindRelatedAccountsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: find_related_accounts_state::State> FindRelatedAccountsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -201,13 +182,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> FindRelatedAccountsBuilder<'a, find_related_accounts_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         FindRelatedAccountsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -274,12 +255,9 @@ pub mod related_account_state {
 
 /// Builder for constructing an instance of this type
 pub struct RelatedAccountBuilder<'a, S: related_account_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::com_atproto::admin::AccountView<'a>>,
-        ::core::option::Option<Vec<crate::tools_ozone::signature::SigDetail<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AccountView<'a>>, Option<Vec<SigDetail<'a>>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> RelatedAccount<'a> {
@@ -293,9 +271,9 @@ impl<'a> RelatedAccountBuilder<'a, related_account_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RelatedAccountBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -308,31 +286,25 @@ where
     /// Set the `account` field (required)
     pub fn account(
         mut self,
-        value: impl Into<crate::com_atproto::admin::AccountView<'a>>,
+        value: impl Into<AccountView<'a>>,
     ) -> RelatedAccountBuilder<'a, related_account_state::SetAccount<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         RelatedAccountBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: related_account_state::State> RelatedAccountBuilder<'a, S> {
     /// Set the `similarities` field (optional)
-    pub fn similarities(
-        mut self,
-        value: impl Into<Option<Vec<crate::tools_ozone::signature::SigDetail<'a>>>>,
-    ) -> Self {
+    pub fn similarities(mut self, value: impl Into<Option<Vec<SigDetail<'a>>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `similarities` field to an Option value (optional)
-    pub fn maybe_similarities(
-        mut self,
-        value: Option<Vec<crate::tools_ozone::signature::SigDetail<'a>>>,
-    ) -> Self {
+    pub fn maybe_similarities(mut self, value: Option<Vec<SigDetail<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -354,7 +326,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -367,135 +339,87 @@ where
     }
 }
 
-fn lexicon_doc_tools_ozone_signature_findRelatedAccounts() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "tools.ozone.signature.findRelatedAccounts",
-        ),
-        revision: None,
-        description: None,
+fn lexicon_doc_tools_ozone_signature_findRelatedAccounts() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("tools.ozone.signature.findRelatedAccounts"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
-                    description: None,
+                SmolStr::new_static("main"),
+                LexUserType::XrpcQuery(LexXrpcQuery {
                     parameters: Some(
-                        ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
-                            description: None,
-                            required: Some(
-                                vec![
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("did")
-                                ],
-                            ),
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("did")]),
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::alloc::collections::BTreeMap::new();
+                                let mut map = BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                        "cursor",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        ..Default::default()
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                        "did",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    SmolStr::new_static("did"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        format: Some(LexStringFormat::Did),
+                                        ..Default::default()
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                        "limit",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
                                     }),
                                 );
                                 map
                             },
+                            ..Default::default()
                         }),
                     ),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("relatedAccount"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("account")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("relatedAccount"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("account")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "account",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("account"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "com.atproto.admin.defs#accountView",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "similarities",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("similarities"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "tools.ozone.signature.defs#sigDetail",
                                     ),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

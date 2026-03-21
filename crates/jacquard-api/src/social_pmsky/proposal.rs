@@ -5,99 +5,99 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::deps::bytes::Bytes;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Proposal<'a> {
     ///The persistent, anonymous identifier for the user creating the proposal.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub aid: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub aid: Option<CowStr<'a>>,
     ///Optionally, CID specifying the specific version of 'uri' resource this proposal applies to.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     ///Timestamp when this proposal was created.
-    pub cts: jacquard_common::types::string::Datetime,
+    pub cts: Datetime,
     ///For 'label' proposals where 'val' is 'needs-context', the full text of any proposed annotation (e.g. community note) to be shown below the post.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub note: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub note: Option<CowStr<'a>>,
     ///An optional array of predefined reasons justifying the moderation action.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub reasons: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub reasons: Option<Vec<CowStr<'a>>>,
     ///Signature of dag-cbor encoded proposal.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
-    pub sig: core::option::Option<jacquard_common::deps::bytes::Bytes>,
+    pub sig: Option<Bytes>,
     ///DID of the actor who created this proposal.
     #[serde(borrow)]
-    pub src: jacquard_common::types::string::Did<'a>,
+    pub src: Did<'a>,
     ///The type of moderation action being proposed. Currently expected values are 'allowed_user' or 'label'
     #[serde(borrow)]
-    pub typ: jacquard_common::CowStr<'a>,
+    pub typ: CowStr<'a>,
     ///AT URI of the record, repository (account), or other resource that this proposal applies to.
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::UriValue<'a>,
+    pub uri: UriValue<'a>,
     ///For 'label' proposals, the short string name of the value of the proposed label.
     #[serde(borrow)]
-    pub val: jacquard_common::CowStr<'a>,
+    pub val: CowStr<'a>,
     ///The AT Protocol version of the proposal object.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub ver: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ver: Option<i64>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ProposalGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Proposal<'a>,
 }
 
 impl<'a> Proposal<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ProposalRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ProposalRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ProposalRecord;
-impl jacquard_common::xrpc::XrpcResp for ProposalRecord {
+impl XrpcResp for ProposalRecord {
     const NSID: &'static str = "social.pmsky.proposal";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ProposalGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ProposalGetRecordOutput<'_>> for Proposal<'_> {
@@ -107,37 +107,33 @@ impl From<ProposalGetRecordOutput<'_>> for Proposal<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Proposal<'_> {
+impl Collection for Proposal<'_> {
     const NSID: &'static str = "social.pmsky.proposal";
     type Record = ProposalRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ProposalRecord {
+impl Collection for ProposalRecord {
     const NSID: &'static str = "social.pmsky.proposal";
     type Record = ProposalRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Proposal<'a> {
+impl<'a> LexiconSchema for Proposal<'a> {
     fn nsid() -> &'static str {
         "social.pmsky.proposal"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_social_pmsky_proposal()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.val;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "val",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("val"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -157,9 +153,9 @@ pub mod proposal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cts;
-        type Typ;
         type Uri;
+        type Typ;
+        type Cts;
         type Src;
         type Val;
     }
@@ -167,19 +163,19 @@ pub mod proposal_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cts = Unset;
-        type Typ = Unset;
         type Uri = Unset;
+        type Typ = Unset;
+        type Cts = Unset;
         type Src = Unset;
         type Val = Unset;
     }
-    ///State transition - sets the `cts` field to Set
-    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCts<S> {}
-    impl<S: State> State for SetCts<S> {
-        type Cts = Set<members::cts>;
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
         type Typ = S::Typ;
-        type Uri = S::Uri;
+        type Cts = S::Cts;
         type Src = S::Src;
         type Val = S::Val;
     }
@@ -187,19 +183,19 @@ pub mod proposal_state {
     pub struct SetTyp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTyp<S> {}
     impl<S: State> State for SetTyp<S> {
-        type Cts = S::Cts;
-        type Typ = Set<members::typ>;
         type Uri = S::Uri;
+        type Typ = Set<members::typ>;
+        type Cts = S::Cts;
         type Src = S::Src;
         type Val = S::Val;
     }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cts = S::Cts;
+    ///State transition - sets the `cts` field to Set
+    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCts<S> {}
+    impl<S: State> State for SetCts<S> {
+        type Uri = S::Uri;
         type Typ = S::Typ;
-        type Uri = Set<members::uri>;
+        type Cts = Set<members::cts>;
         type Src = S::Src;
         type Val = S::Val;
     }
@@ -207,9 +203,9 @@ pub mod proposal_state {
     pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSrc<S> {}
     impl<S: State> State for SetSrc<S> {
-        type Cts = S::Cts;
-        type Typ = S::Typ;
         type Uri = S::Uri;
+        type Typ = S::Typ;
+        type Cts = S::Cts;
         type Src = Set<members::src>;
         type Val = S::Val;
     }
@@ -217,21 +213,21 @@ pub mod proposal_state {
     pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVal<S> {}
     impl<S: State> State for SetVal<S> {
-        type Cts = S::Cts;
-        type Typ = S::Typ;
         type Uri = S::Uri;
+        type Typ = S::Typ;
+        type Cts = S::Cts;
         type Src = S::Src;
         type Val = Set<members::val>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cts` field
-        pub struct cts(());
-        ///Marker type for the `typ` field
-        pub struct typ(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `typ` field
+        pub struct typ(());
+        ///Marker type for the `cts` field
+        pub struct cts(());
         ///Marker type for the `src` field
         pub struct src(());
         ///Marker type for the `val` field
@@ -241,21 +237,21 @@ pub mod proposal_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProposalBuilder<'a, S: proposal_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
+        Option<CowStr<'a>>,
+        Option<Cid<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Bytes>,
+        Option<Did<'a>>,
+        Option<CowStr<'a>>,
+        Option<UriValue<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Proposal<'a> {
@@ -269,7 +265,7 @@ impl<'a> ProposalBuilder<'a, proposal_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProposalBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -283,19 +279,19 @@ impl<'a> ProposalBuilder<'a, proposal_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
     /// Set the `aid` field (optional)
-    pub fn aid(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn aid(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `aid` field to an Option value (optional)
-    pub fn maybe_aid(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_aid(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -303,18 +299,12 @@ impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
 
 impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
     /// Set the `cid` field (optional)
-    pub fn cid(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
-    ) -> Self {
+    pub fn cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
-    pub fn maybe_cid(
-        mut self,
-        value: Option<jacquard_common::types::string::Cid<'a>>,
-    ) -> Self {
+    pub fn maybe_cid(mut self, value: Option<Cid<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -328,28 +318,25 @@ where
     /// Set the `cts` field (required)
     pub fn cts(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ProposalBuilder<'a, proposal_state::SetCts<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         ProposalBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
-    pub fn maybe_note(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -357,18 +344,12 @@ impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
 
 impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
     /// Set the `reasons` field (optional)
-    pub fn reasons(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn reasons(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `reasons` field to an Option value (optional)
-    pub fn maybe_reasons(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_reasons(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -376,18 +357,12 @@ impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
 
 impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
     /// Set the `sig` field (optional)
-    pub fn sig(
-        mut self,
-        value: impl Into<Option<jacquard_common::deps::bytes::Bytes>>,
-    ) -> Self {
+    pub fn sig(mut self, value: impl Into<Option<Bytes>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `sig` field to an Option value (optional)
-    pub fn maybe_sig(
-        mut self,
-        value: Option<jacquard_common::deps::bytes::Bytes>,
-    ) -> Self {
+    pub fn maybe_sig(mut self, value: Option<Bytes>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -401,13 +376,13 @@ where
     /// Set the `src` field (required)
     pub fn src(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> ProposalBuilder<'a, proposal_state::SetSrc<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         ProposalBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -420,13 +395,13 @@ where
     /// Set the `typ` field (required)
     pub fn typ(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ProposalBuilder<'a, proposal_state::SetTyp<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         ProposalBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -439,13 +414,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> ProposalBuilder<'a, proposal_state::SetUri<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         ProposalBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -458,13 +433,13 @@ where
     /// Set the `val` field (required)
     pub fn val(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ProposalBuilder<'a, proposal_state::SetVal<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         ProposalBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -485,9 +460,9 @@ impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
 impl<'a, S> ProposalBuilder<'a, S>
 where
     S: proposal_state::State,
-    S::Cts: proposal_state::IsSet,
-    S::Typ: proposal_state::IsSet,
     S::Uri: proposal_state::IsSet,
+    S::Typ: proposal_state::IsSet,
+    S::Cts: proposal_state::IsSet,
     S::Src: proposal_state::IsSet,
     S::Val: proposal_state::IsSet,
 {
@@ -511,7 +486,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -533,271 +508,162 @@ where
     }
 }
 
-fn lexicon_doc_social_pmsky_proposal() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("social.pmsky.proposal"),
-        revision: None,
-        description: None,
+fn lexicon_doc_social_pmsky_proposal() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("social.pmsky.proposal"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         description: Some(
-                            ::jacquard_common::CowStr::new_static(
+                            CowStr::new_static(
                                 "A proposed moderation action (e.g. adding a label or annotation to a post). Refers to some other resource via URI (e.g. an atproto post). Superset of 'com.atproto.proposal.defs#label.",
                             ),
                         ),
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("typ"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("src"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("val"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("cts")
+                                SmolStr::new_static("typ"), SmolStr::new_static("src"),
+                                SmolStr::new_static("uri"), SmolStr::new_static("val"),
+                                SmolStr::new_static("cts")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "aid",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("aid"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The persistent, anonymous identifier for the user creating the proposal.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "cid",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("cid"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Optionally, CID specifying the specific version of 'uri' resource this proposal applies to.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Cid),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "cts",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("cts"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp when this proposal was created.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "note",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("note"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "For 'label' proposals where 'val' is 'needs-context', the full text of any proposed annotation (e.g. community note) to be shown below the post.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "reasons",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("reasons"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "An optional array of predefined reasons justifying the moderation action.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    items: LexArrayItem::String(LexString {
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sig",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
-                                    description: None,
-                                    max_length: None,
-                                    min_length: None,
-                                }),
+                                SmolStr::new_static("sig"),
+                                LexObjectProperty::Bytes(LexBytes { ..Default::default() }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "src",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("src"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "DID of the actor who created this proposal.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "typ",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("typ"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The type of moderation action being proposed. Currently expected values are 'allowed_user' or 'label'",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "uri",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("uri"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "AT URI of the record, repository (account), or other resource that this proposal applies to.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Uri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "val",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("val"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "For 'label' proposals, the short string name of the value of the proposed label.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(128usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "ver",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("ver"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

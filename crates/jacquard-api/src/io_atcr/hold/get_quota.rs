@@ -5,66 +5,60 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetQuota<'a> {
     #[serde(borrow)]
-    pub user_did: jacquard_common::types::string::Did<'a>,
+    pub user_did: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetQuotaOutput<'a> {
     ///Storage limit in bytes (absent if unlimited)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
     ///Quota tier name (e.g., 'deckhand', 'bosun', 'quartermaster')
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tier: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub tier: Option<CowStr<'a>>,
     ///Total size in bytes of unique blobs
     pub total_size: i64,
     ///Number of unique blob digests
     pub unique_blobs: i64,
     ///DID of the user
     #[serde(borrow)]
-    pub user_did: jacquard_common::types::string::Did<'a>,
+    pub user_did: Did<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetQuotaError<'a> {
     #[serde(rename = "InvalidUserDid")]
-    InvalidUserDid(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidUserDid(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetQuotaError<'_> {
@@ -82,8 +76,7 @@ impl core::fmt::Display for GetQuotaError<'_> {
     }
 }
 
-/// Response type for
-///io.atcr.hold.getQuota
+/// Response type for io.atcr.hold.getQuota
 pub struct GetQuotaResponse;
 impl jacquard_common::xrpc::XrpcResp for GetQuotaResponse {
     const NSID: &'static str = "io.atcr.hold.getQuota";
@@ -98,8 +91,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetQuota<'a> {
     type Response = GetQuotaResponse;
 }
 
-/// Endpoint type for
-///io.atcr.hold.getQuota
+/// Endpoint type for io.atcr.hold.getQuota
 pub struct GetQuotaRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetQuotaRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.getQuota";
@@ -142,11 +134,9 @@ pub mod get_quota_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetQuotaBuilder<'a, S: get_quota_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetQuota<'a> {
@@ -160,9 +150,9 @@ impl<'a> GetQuotaBuilder<'a, get_quota_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetQuotaBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -175,13 +165,13 @@ where
     /// Set the `userDid` field (required)
     pub fn user_did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetQuotaBuilder<'a, get_quota_state::SetUserDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetQuotaBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

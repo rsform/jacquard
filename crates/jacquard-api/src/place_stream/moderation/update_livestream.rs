@@ -5,77 +5,71 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateLivestream<'a> {
     ///The AT-URI of the livestream record to update.
     #[serde(borrow)]
-    pub livestream_uri: jacquard_common::types::string::AtUri<'a>,
+    pub livestream_uri: AtUri<'a>,
     ///The DID of the streamer.
     #[serde(borrow)]
-    pub streamer: jacquard_common::types::string::Did<'a>,
+    pub streamer: Did<'a>,
     ///New title for the livestream.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateLivestreamOutput<'a> {
     ///The CID of the updated livestream record.
     #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub cid: Cid<'a>,
     ///The AT-URI of the updated livestream record.
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UpdateLivestreamError<'a> {
     /// The request lacks valid authentication credentials.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(core::option::Option<jacquard_common::CowStr<'a>>),
+    Unauthorized(Option<CowStr<'a>>),
     /// The caller does not have permission to update livestream metadata for this streamer.
     #[serde(rename = "Forbidden")]
-    Forbidden(core::option::Option<jacquard_common::CowStr<'a>>),
+    Forbidden(Option<CowStr<'a>>),
     /// The streamer's OAuth session could not be found or is invalid.
     #[serde(rename = "SessionNotFound")]
-    SessionNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    SessionNotFound(Option<CowStr<'a>>),
     /// The specified livestream record does not exist.
     #[serde(rename = "RecordNotFound")]
-    RecordNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    RecordNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for UpdateLivestreamError<'_> {
@@ -114,8 +108,7 @@ impl core::fmt::Display for UpdateLivestreamError<'_> {
     }
 }
 
-/// Response type for
-///place.stream.moderation.updateLivestream
+/// Response type for place.stream.moderation.updateLivestream
 pub struct UpdateLivestreamResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateLivestreamResponse {
     const NSID: &'static str = "place.stream.moderation.updateLivestream";
@@ -132,8 +125,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateLivestream<'a> {
     type Response = UpdateLivestreamResponse;
 }
 
-/// Endpoint type for
-///place.stream.moderation.updateLivestream
+/// Endpoint type for place.stream.moderation.updateLivestream
 pub struct UpdateLivestreamRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateLivestreamRequest {
     const PATH: &'static str = "/xrpc/place.stream.moderation.updateLivestream";
@@ -154,49 +146,45 @@ pub mod update_livestream_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type LivestreamUri;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type LivestreamUri = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Streamer = Set<members::streamer>;
-        type LivestreamUri = S::LivestreamUri;
+        type Streamer = Unset;
     }
     ///State transition - sets the `livestream_uri` field to Set
     pub struct SetLivestreamUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLivestreamUri<S> {}
     impl<S: State> State for SetLivestreamUri<S> {
-        type Streamer = S::Streamer;
         type LivestreamUri = Set<members::livestream_uri>;
+        type Streamer = S::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type LivestreamUri = S::LivestreamUri;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `livestream_uri` field
         pub struct livestream_uri(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct UpdateLivestreamBuilder<'a, S: update_livestream_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>, Option<Did<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateLivestream<'a> {
@@ -210,9 +198,9 @@ impl<'a> UpdateLivestreamBuilder<'a, update_livestream_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateLivestreamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -225,13 +213,13 @@ where
     /// Set the `livestreamUri` field (required)
     pub fn livestream_uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> UpdateLivestreamBuilder<'a, update_livestream_state::SetLivestreamUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         UpdateLivestreamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -244,28 +232,25 @@ where
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> UpdateLivestreamBuilder<'a, update_livestream_state::SetStreamer<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         UpdateLivestreamBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: update_livestream_state::State> UpdateLivestreamBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -274,8 +259,8 @@ impl<'a, S: update_livestream_state::State> UpdateLivestreamBuilder<'a, S> {
 impl<'a, S> UpdateLivestreamBuilder<'a, S>
 where
     S: update_livestream_state::State,
-    S::Streamer: update_livestream_state::IsSet,
     S::LivestreamUri: update_livestream_state::IsSet,
+    S::Streamer: update_livestream_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateLivestream<'a> {
@@ -289,7 +274,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

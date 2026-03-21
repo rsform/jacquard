@@ -49,8 +49,17 @@ impl<'c> CodeGenerator<'c> {
                         imports.merge(self.collect_ref_type(&ref_str));
                     } else {
                         // Multi-variant: union type is generated via generate_union.
+                        // Still collect all refs so their types get imported in Pretty mode.
                         if union.closed != Some(true) {
                             imports.external.insert(ExternalImport::OpenUnion);
+                        }
+                        for ref_str in &union.refs {
+                            let full_ref = if ref_str.starts_with('#') {
+                                format!("{}{}", nsid, ref_str)
+                            } else {
+                                ref_str.to_string()
+                            };
+                            imports.merge(self.collect_ref_type(&full_ref));
                         }
                     }
                 } else {
@@ -87,8 +96,19 @@ impl<'c> CodeGenerator<'c> {
                     imports.merge(self.collect_ref_type(&ref_str));
                 }
                 // Multi-variant unions are generated via generate_union.
-                if union.refs.len() > 1 && union.closed != Some(true) {
-                    imports.external.insert(ExternalImport::OpenUnion);
+                // Still collect all refs so their types get imported in Pretty mode.
+                if union.refs.len() > 1 {
+                    if union.closed != Some(true) {
+                        imports.external.insert(ExternalImport::OpenUnion);
+                    }
+                    for ref_str in &union.refs {
+                        let full_ref = if ref_str.starts_with('#') {
+                            format!("{}{}", nsid, ref_str)
+                        } else {
+                            ref_str.to_string()
+                        };
+                        imports.merge(self.collect_ref_type(&full_ref));
+                    }
                 }
             }
         }
@@ -157,11 +177,7 @@ impl<'c> CodeGenerator<'c> {
     }
 
     /// Collect types from an array item (mirrors array_item_to_rust_type).
-    pub(super) fn collect_array_item_types(
-        &self,
-        nsid: &str,
-        item: &LexArrayItem,
-    ) -> ImportSet {
+    pub(super) fn collect_array_item_types(&self, nsid: &str, item: &LexArrayItem) -> ImportSet {
         let mut imports = ImportSet::default();
         match item {
             LexArrayItem::Boolean(_) | LexArrayItem::Integer(_) => {}
@@ -219,11 +235,20 @@ impl<'c> CodeGenerator<'c> {
     ) -> ImportSet {
         let mut imports = ImportSet::default();
 
-        // All records use serde derives, IntoStatic, and the lexicon attribute macro.
+        // All records use serde derives, IntoStatic, lexicon attr, and PhantomData (builders).
         imports.external.insert(ExternalImport::Serialize);
         imports.external.insert(ExternalImport::Deserialize);
         imports.external.insert(ExternalImport::IntoStatic);
         imports.external.insert(ExternalImport::LexiconAttr);
+        imports.external.insert(ExternalImport::PhantomData);
+        imports.external.insert(ExternalImport::BTreeMap);
+
+        // Records generate LexiconSchema trait impls with validation.
+        imports.external.insert(ExternalImport::LexiconSchema);
+        imports.external.insert(ExternalImport::LexiconDoc);
+        imports.external.insert(ExternalImport::ConstraintError);
+        imports.external.insert(ExternalImport::ValidationPath);
+        imports.external.insert(ExternalImport::UnicodeSegmentation);
 
         // Records always use CowStr and AtUri for the uri() method.
         imports.common.insert(CommonType::CowStr);
@@ -235,6 +260,13 @@ impl<'c> CodeGenerator<'c> {
 
         // Records generate a GetRecordOutput wrapper that uses Cid.
         imports.common.insert(CommonType::Cid);
+
+        // Records use XrpcResp for the marker struct impl.
+        imports.external.insert(ExternalImport::XrpcResp);
+
+        // Records use RecordUri and UriError for the uri() method.
+        imports.external.insert(ExternalImport::RecordUri);
+        imports.external.insert(ExternalImport::UriError);
 
         // Walk all properties in the record.
         match &record.record {
@@ -254,13 +286,39 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         obj: &crate::lexicon::LexObject<'static>,
     ) -> ImportSet {
+        self.collect_object_with_builder_check(nsid, None, obj)
+    }
+
+    /// Collect all types from an object definition, optionally checking builder heuristics.
+    /// When `type_name` is provided, the builder heuristic is consulted to decide whether
+    /// PhantomData and BTreeMap are needed. When `None`, they are always included
+    /// (conservative fallback for XRPC body schemas where the type name isn't known yet).
+    fn collect_object_with_builder_check(
+        &self,
+        nsid: &str,
+        type_name: Option<&str>,
+        obj: &crate::lexicon::LexObject<'static>,
+    ) -> ImportSet {
         let mut imports = ImportSet::default();
 
-        // All objects use serde derives, IntoStatic, and the lexicon attribute macro.
         imports.external.insert(ExternalImport::Serialize);
         imports.external.insert(ExternalImport::Deserialize);
         imports.external.insert(ExternalImport::IntoStatic);
         imports.external.insert(ExternalImport::LexiconAttr);
+
+        // PhantomData and BTreeMap are only needed when a builder is generated.
+        let needs_builder = match type_name {
+            Some(name) => {
+                let decision = crate::codegen::builder_heuristics::should_generate_builder(name, obj);
+                decision.has_builder
+            }
+            // Conservative: include them when we don't know the type name.
+            None => true,
+        };
+        if needs_builder {
+            imports.external.insert(ExternalImport::PhantomData);
+            imports.external.insert(ExternalImport::BTreeMap);
+        }
 
         // Walk all properties in the object.
         for (_prop_name, prop) in &obj.properties {
@@ -278,11 +336,12 @@ impl<'c> CodeGenerator<'c> {
     ) -> ImportSet {
         let mut imports = ImportSet::default();
 
-        // Queries use serde derives and IntoStatic.
+        // Queries use serde derives, IntoStatic, and PhantomData (builders).
         // LexiconAttr is added by collect_object when body schemas are walked.
         imports.external.insert(ExternalImport::Serialize);
         imports.external.insert(ExternalImport::Deserialize);
         imports.external.insert(ExternalImport::IntoStatic);
+        imports.external.insert(ExternalImport::PhantomData);
 
         // Collect from parameters.
         if let Some(params) = &query.parameters {
@@ -300,7 +359,7 @@ impl<'c> CodeGenerator<'c> {
         }
 
         // Error enums use open_union and CowStr for variant data.
-        if query.errors.is_some() {
+        if query.errors.as_ref().is_some_and(|e| !e.is_empty()) {
             imports.external.insert(ExternalImport::OpenUnion);
             imports.common.insert(CommonType::CowStr);
         }
@@ -316,11 +375,12 @@ impl<'c> CodeGenerator<'c> {
     ) -> ImportSet {
         let mut imports = ImportSet::default();
 
-        // Procedures use serde derives and IntoStatic.
+        // Procedures use serde derives, IntoStatic, and PhantomData (builders).
         // LexiconAttr is added by collect_object when body schemas are walked.
         imports.external.insert(ExternalImport::Serialize);
         imports.external.insert(ExternalImport::Deserialize);
         imports.external.insert(ExternalImport::IntoStatic);
+        imports.external.insert(ExternalImport::PhantomData);
 
         // Collect from parameters.
         if let Some(params) = &proc.parameters {
@@ -343,7 +403,7 @@ impl<'c> CodeGenerator<'c> {
         }
 
         // Error enums use open_union and CowStr for variant data.
-        if proc.errors.is_some() {
+        if proc.errors.as_ref().is_some_and(|e| !e.is_empty()) {
             imports.external.insert(ExternalImport::OpenUnion);
             imports.common.insert(CommonType::CowStr);
         }
@@ -359,11 +419,12 @@ impl<'c> CodeGenerator<'c> {
     ) -> ImportSet {
         let mut imports = ImportSet::default();
 
-        // Subscriptions use serde derives and IntoStatic.
+        // Subscriptions use serde derives, IntoStatic, and PhantomData (builders).
         // LexiconAttr is added by collect_object when message schemas are walked.
         imports.external.insert(ExternalImport::Serialize);
         imports.external.insert(ExternalImport::Deserialize);
         imports.external.insert(ExternalImport::IntoStatic);
+        imports.external.insert(ExternalImport::PhantomData);
 
         // Collect from parameters.
         if let Some(params) = &sub.parameters {
@@ -383,7 +444,7 @@ impl<'c> CodeGenerator<'c> {
         }
 
         // Error enums use open_union and CowStr for variant data.
-        if sub.errors.is_some() {
+        if sub.errors.as_ref().is_some_and(|e| !e.is_empty()) {
             imports.external.insert(ExternalImport::OpenUnion);
             imports.common.insert(CommonType::CowStr);
         }
@@ -524,12 +585,23 @@ impl<'c> CodeGenerator<'c> {
     pub(super) fn collect_def(
         &self,
         nsid: &str,
-        def_name: &str,
+        _def_name: &str,
         def: &LexUserType<'static>,
     ) -> ImportSet {
         match def {
             LexUserType::Record(r) => self.collect_record(nsid, r),
-            LexUserType::Object(o) => self.collect_object(nsid, o),
+            LexUserType::Object(o) => {
+                let type_name = self.def_to_type_name(nsid, _def_name);
+                let mut imports = self.collect_object_with_builder_check(nsid, Some(&type_name), o);
+                // Top-level objects generate LexiconSchema trait impls with validation.
+                // (XRPC body objects go through collect_object too, but don't get schema impls.)
+                imports.external.insert(ExternalImport::LexiconSchema);
+                imports.external.insert(ExternalImport::LexiconDoc);
+                imports.external.insert(ExternalImport::ConstraintError);
+                imports.external.insert(ExternalImport::ValidationPath);
+                imports.external.insert(ExternalImport::UnicodeSegmentation);
+                imports
+            }
             LexUserType::XrpcQuery(q) => self.collect_query(nsid, q),
             LexUserType::XrpcProcedure(p) => self.collect_procedure(nsid, p),
             LexUserType::XrpcSubscription(s) => self.collect_subscription(nsid, s),
@@ -541,15 +613,12 @@ impl<'c> CodeGenerator<'c> {
                 i.external.insert(ExternalImport::IntoStatic);
                 i
             }
-            // String with known_values: generates an enum with serde + IntoStatic.
-            // Always needs CowStr for the catch-all Other variant. Does NOT use
-            // the string format type — known_values enums are always string-based.
+            // String with known_values: generates an enum with custom Serialize,
+            // Deserialize, and IntoStatic impls (NOT derives). Only needs CowStr
+            // for the catch-all Other variant.
             LexUserType::String(s) if s.known_values.is_some() => {
                 let mut i = ImportSet::default();
                 i.common.insert(CommonType::CowStr);
-                i.external.insert(ExternalImport::Serialize);
-                i.external.insert(ExternalImport::Deserialize);
-                i.external.insert(ExternalImport::IntoStatic);
                 i
             }
             // Plain string: type alias, only needs the string type.
@@ -768,9 +837,7 @@ mod tests {
             LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
         let codegen = super::super::CodeGenerator::new(&corpus, "jacquard_api");
 
-        let doc = corpus
-            .get("app.bsky.embed.external")
-            .expect("get external");
+        let doc = corpus.get("app.bsky.embed.external").expect("get external");
         let def = doc.defs.get("external").expect("get external def");
 
         let imports = codegen.collect_def("app.bsky.embed.external", "external", def);
@@ -878,9 +945,6 @@ mod tests {
             has_datetime_in_main,
             "main def should have Datetime from createdAt"
         );
-        assert!(
-            !has_datetime_in_reply,
-            "replyRef should not have Datetime"
-        );
+        assert!(!has_datetime_in_reply, "replyRef should not have Datetime");
     }
 }

@@ -5,66 +5,55 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::string::{AtUri, Datetime};
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::richtext::facet::Facet;
+use crate::games_gamesgamesgamesgames::Website;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateProfile<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub avatar: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub avatar: Option<BlobRef<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<CowStr<'a>>,
     ///Annotations of text (mentions, URLs, hashtags, etc)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: core::option::Option<
-        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub description_facets: Option<Vec<Facet<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub display_name: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub pronouns: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub pronouns: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub websites: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
-    >,
+    pub websites: Option<Vec<Website<'a>>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateProfileOutput<'a> {
     #[serde(borrow)]
-    pub cid: jacquard_common::CowStr<'a>,
+    pub cid: CowStr<'a>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-/// Response type for
-///games.gamesgamesgamesgames.actor.createProfile
+/// Response type for games.gamesgamesgamesgames.actor.createProfile
 pub struct CreateProfileResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateProfileResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.actor.createProfile";
@@ -81,8 +70,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateProfile<'a> {
     type Response = CreateProfileResponse;
 }
 
-/// Endpoint type for
-///games.gamesgamesgamesgames.actor.createProfile
+/// Endpoint type for games.gamesgamesgamesgames.actor.createProfile
 pub struct CreateProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateProfileRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.actor.createProfile";

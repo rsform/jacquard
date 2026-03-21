@@ -5,25 +5,22 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::Handle;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateHandle<'a> {
     ///The new handle.
     #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
+    pub handle: Handle<'a>,
 }
 
-/// Response type for
-///com.atproto.identity.updateHandle
+/// Response type for com.atproto.identity.updateHandle
 pub struct UpdateHandleResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateHandleResponse {
     const NSID: &'static str = "com.atproto.identity.updateHandle";
@@ -40,8 +37,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateHandle<'a> {
     type Response = UpdateHandleResponse;
 }
 
-/// Endpoint type for
-///com.atproto.identity.updateHandle
+/// Endpoint type for com.atproto.identity.updateHandle
 pub struct UpdateHandleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateHandleRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.updateHandle";
@@ -86,11 +82,9 @@ pub mod update_handle_state {
 
 /// Builder for constructing an instance of this type
 pub struct UpdateHandleBuilder<'a, S: update_handle_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Handle<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateHandle<'a> {
@@ -104,9 +98,9 @@ impl<'a> UpdateHandleBuilder<'a, update_handle_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateHandleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -119,13 +113,13 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<jacquard_common::types::string::Handle<'a>>,
+        value: impl Into<Handle<'a>>,
     ) -> UpdateHandleBuilder<'a, update_handle_state::SetHandle<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         UpdateHandleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -145,7 +139,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

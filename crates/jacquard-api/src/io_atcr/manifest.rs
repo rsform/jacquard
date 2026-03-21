@@ -5,109 +5,112 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::io_atcr::manifest;
 /// Reference to a blob stored in S3 or external storage
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct BlobReference<'a> {
     ///Optional OCI annotation metadata. Map of string keys to string values.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub annotations: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub annotations: Option<Data<'a>>,
     ///Content digest (e.g., 'sha256:...')
     #[serde(borrow)]
-    pub digest: jacquard_common::CowStr<'a>,
+    pub digest: CowStr<'a>,
     ///MIME type of the blob
     #[serde(borrow)]
-    pub media_type: jacquard_common::CowStr<'a>,
+    pub media_type: CowStr<'a>,
     ///Size in bytes
     pub size: i64,
     ///Optional direct URLs to blob (for BYOS)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub urls: core::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
+    pub urls: Option<Vec<UriValue<'a>>>,
 }
 
 /// A container image manifest following OCI specification, stored in ATProto
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Manifest<'a> {
     ///Optional OCI annotation metadata. Map of string keys to string values (e.g., org.opencontainers.image.title → 'My App').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub annotations: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub annotations: Option<Data<'a>>,
     ///Reference to image configuration blob
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub config: core::option::Option<crate::io_atcr::manifest::BlobReference<'a>>,
+    pub config: Option<manifest::BlobReference<'a>>,
     ///Record creation timestamp
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///Content digest (e.g., 'sha256:abc123...')
     #[serde(borrow)]
-    pub digest: jacquard_common::CowStr<'a>,
+    pub digest: CowStr<'a>,
     ///DID of the hold service where blobs are stored (e.g., 'did:web:hold01.atcr.io'). Primary reference for hold resolution.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub hold_did: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub hold_did: Option<Did<'a>>,
     ///Hold service endpoint URL where blobs are stored. DEPRECATED: Use holdDid instead. Kept for backward compatibility.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub hold_endpoint: core::option::Option<
-        jacquard_common::types::string::UriValue<'a>,
-    >,
+    pub hold_endpoint: Option<UriValue<'a>>,
     ///Filesystem layers (for image manifests)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub layers: core::option::Option<Vec<crate::io_atcr::manifest::BlobReference<'a>>>,
+    pub layers: Option<Vec<manifest::BlobReference<'a>>>,
     ///The full OCI manifest stored as a blob in ATProto.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub manifest_blob: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub manifest_blob: Option<BlobRef<'a>>,
     ///Referenced manifests (for manifest lists/indexes)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub manifests: core::option::Option<
-        Vec<crate::io_atcr::manifest::ManifestReference<'a>>,
-    >,
+    pub manifests: Option<Vec<manifest::ManifestReference<'a>>>,
     ///OCI media type
     #[serde(borrow)]
     pub media_type: ManifestMediaType<'a>,
     ///Repository name (e.g., 'myapp'). Scoped to user's DID.
     #[serde(borrow)]
-    pub repository: jacquard_common::CowStr<'a>,
+    pub repository: CowStr<'a>,
     ///OCI schema version (typically 2)
     pub schema_version: i64,
     ///Optional reference to another manifest (for attestations, signatures)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subject: core::option::Option<crate::io_atcr::manifest::BlobReference<'a>>,
+    pub subject: Option<manifest::BlobReference<'a>>,
 }
 
 /// OCI media type
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ManifestMediaType<'a> {
     ApplicationVndOciImageManifestV1Json,
     ApplicationVndDockerDistributionManifestV2Json,
     ApplicationVndOciImageIndexV1Json,
     ApplicationVndDockerDistributionManifestListV2Json,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ManifestMediaType<'a> {
@@ -145,7 +148,7 @@ impl<'a> From<&'a str> for ManifestMediaType<'a> {
             "application/vnd.docker.distribution.manifest.list.v2+json" => {
                 Self::ApplicationVndDockerDistributionManifestListV2Json
             }
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -165,7 +168,7 @@ impl<'a> From<String> for ManifestMediaType<'a> {
             "application/vnd.docker.distribution.manifest.list.v2+json" => {
                 Self::ApplicationVndDockerDistributionManifestListV2Json
             }
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -232,125 +235,94 @@ impl jacquard_common::IntoStatic for ManifestMediaType<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ManifestGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Manifest<'a>,
 }
 
 /// Reference to a manifest in a manifest list/index
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ManifestReference<'a> {
     ///Optional OCI annotation metadata. Map of string keys to string values.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub annotations: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub annotations: Option<Data<'a>>,
     ///Content digest (e.g., 'sha256:...')
     #[serde(borrow)]
-    pub digest: jacquard_common::CowStr<'a>,
+    pub digest: CowStr<'a>,
     ///Media type of the referenced manifest
     #[serde(borrow)]
-    pub media_type: jacquard_common::CowStr<'a>,
+    pub media_type: CowStr<'a>,
     ///Platform information for this manifest
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub platform: core::option::Option<crate::io_atcr::manifest::Platform<'a>>,
+    pub platform: Option<manifest::Platform<'a>>,
     ///Size in bytes
     pub size: i64,
 }
 
 /// Platform information describing OS and architecture
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Platform<'a> {
     ///CPU architecture (e.g., 'amd64', 'arm64', 'arm')
     #[serde(borrow)]
-    pub architecture: jacquard_common::CowStr<'a>,
+    pub architecture: CowStr<'a>,
     ///Operating system (e.g., 'linux', 'windows', 'darwin')
     #[serde(borrow)]
-    pub os: jacquard_common::CowStr<'a>,
+    pub os: CowStr<'a>,
     ///Optional OS features
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub os_features: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub os_features: Option<Vec<CowStr<'a>>>,
     ///Optional OS version
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub os_version: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub os_version: Option<CowStr<'a>>,
     ///Optional CPU variant (e.g., 'v7' for ARM)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub variant: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub variant: Option<CowStr<'a>>,
 }
 
 impl<'a> Manifest<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ManifestRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ManifestRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for BlobReference<'a> {
+impl<'a> LexiconSchema for BlobReference<'a> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
     fn def_name() -> &'static str {
         "blobReference"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_io_atcr_manifest()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.digest;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "digest",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("digest"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -360,10 +332,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for BlobReference<'a> {
             let value = &self.media_type;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "media_type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("media_type"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -374,13 +344,14 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for BlobReference<'a> {
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ManifestRecord;
-impl jacquard_common::xrpc::XrpcResp for ManifestRecord {
+impl XrpcResp for ManifestRecord {
     const NSID: &'static str = "io.atcr.manifest";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ManifestGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ManifestGetRecordOutput<'_>> for Manifest<'_> {
@@ -390,37 +361,33 @@ impl From<ManifestGetRecordOutput<'_>> for Manifest<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Manifest<'_> {
+impl Collection for Manifest<'_> {
     const NSID: &'static str = "io.atcr.manifest";
     type Record = ManifestRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ManifestRecord {
+impl Collection for ManifestRecord {
     const NSID: &'static str = "io.atcr.manifest";
     type Record = ManifestRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
+impl<'a> LexiconSchema for Manifest<'a> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_io_atcr_manifest()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.digest;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "digest",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("digest"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -430,10 +397,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
             let value = &self.media_type;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "media_type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("media_type"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -443,10 +408,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
             let value = &self.repository;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "repository",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("repository"),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -456,27 +419,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ManifestReference<'a> {
+impl<'a> LexiconSchema for ManifestReference<'a> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
     fn def_name() -> &'static str {
         "manifestReference"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_io_atcr_manifest()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.digest;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "digest",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("digest"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -486,10 +445,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ManifestReference<'a> {
             let value = &self.media_type;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "media_type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("media_type"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -499,27 +456,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ManifestReference<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Platform<'a> {
+impl<'a> LexiconSchema for Platform<'a> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
     fn def_name() -> &'static str {
         "platform"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_io_atcr_manifest()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.architecture;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "architecture",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("architecture"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -529,10 +482,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Platform<'a> {
             let value = &self.os;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "os",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("os"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -541,10 +492,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Platform<'a> {
         if let Some(ref value) = self.os_version {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "os_version",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("os_version"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -553,10 +502,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Platform<'a> {
         if let Some(ref value) = self.variant {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "variant",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("variant"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -576,65 +523,65 @@ pub mod blob_reference_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MediaType;
-        type Digest;
         type Size;
+        type Digest;
+        type MediaType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MediaType = Unset;
-        type Digest = Unset;
         type Size = Unset;
-    }
-    ///State transition - sets the `media_type` field to Set
-    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMediaType<S> {}
-    impl<S: State> State for SetMediaType<S> {
-        type MediaType = Set<members::media_type>;
-        type Digest = S::Digest;
-        type Size = S::Size;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type MediaType = S::MediaType;
-        type Digest = Set<members::digest>;
-        type Size = S::Size;
+        type Digest = Unset;
+        type MediaType = Unset;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSize<S> {}
     impl<S: State> State for SetSize<S> {
-        type MediaType = S::MediaType;
-        type Digest = S::Digest;
         type Size = Set<members::size>;
+        type Digest = S::Digest;
+        type MediaType = S::MediaType;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type Size = S::Size;
+        type Digest = Set<members::digest>;
+        type MediaType = S::MediaType;
+    }
+    ///State transition - sets the `media_type` field to Set
+    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMediaType<S> {}
+    impl<S: State> State for SetMediaType<S> {
+        type Size = S::Size;
+        type Digest = S::Digest;
+        type MediaType = Set<members::media_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `media_type` field
-        pub struct media_type(());
-        ///Marker type for the `digest` field
-        pub struct digest(());
         ///Marker type for the `size` field
         pub struct size(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
+        ///Marker type for the `media_type` field
+        pub struct media_type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BlobReferenceBuilder<'a, S: blob_reference_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
+        Option<Data<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<Vec<UriValue<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> BlobReference<'a> {
@@ -648,27 +595,21 @@ impl<'a> BlobReferenceBuilder<'a, blob_reference_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlobReferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: blob_reference_state::State> BlobReferenceBuilder<'a, S> {
     /// Set the `annotations` field (optional)
-    pub fn annotations(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn annotations(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `annotations` field to an Option value (optional)
-    pub fn maybe_annotations(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_annotations(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -682,13 +623,13 @@ where
     /// Set the `digest` field (required)
     pub fn digest(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> BlobReferenceBuilder<'a, blob_reference_state::SetDigest<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         BlobReferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -701,13 +642,13 @@ where
     /// Set the `mediaType` field (required)
     pub fn media_type(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> BlobReferenceBuilder<'a, blob_reference_state::SetMediaType<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         BlobReferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -722,29 +663,23 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> BlobReferenceBuilder<'a, blob_reference_state::SetSize<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         BlobReferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: blob_reference_state::State> BlobReferenceBuilder<'a, S> {
     /// Set the `urls` field (optional)
-    pub fn urls(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::string::UriValue<'a>>>>,
-    ) -> Self {
+    pub fn urls(mut self, value: impl Into<Option<Vec<UriValue<'a>>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `urls` field to an Option value (optional)
-    pub fn maybe_urls(
-        mut self,
-        value: Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn maybe_urls(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -753,9 +688,9 @@ impl<'a, S: blob_reference_state::State> BlobReferenceBuilder<'a, S> {
 impl<'a, S> BlobReferenceBuilder<'a, S>
 where
     S: blob_reference_state::State,
-    S::MediaType: blob_reference_state::IsSet,
-    S::Digest: blob_reference_state::IsSet,
     S::Size: blob_reference_state::IsSet,
+    S::Digest: blob_reference_state::IsSet,
+    S::MediaType: blob_reference_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BlobReference<'a> {
@@ -771,10 +706,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> BlobReference<'a> {
         BlobReference {
             annotations: self.__unsafe_private_named.0,
@@ -787,607 +719,385 @@ where
     }
 }
 
-fn lexicon_doc_io_atcr_manifest() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("io.atcr.manifest"),
-        revision: None,
-        description: None,
+fn lexicon_doc_io_atcr_manifest() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("io.atcr.manifest"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("blobReference"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("blobReference"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Reference to a blob stored in S3 or external storage",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mediaType"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("size"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("digest")
+                            SmolStr::new_static("mediaType"),
+                            SmolStr::new_static("size"), SmolStr::new_static("digest")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "annotations",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
-                                description: None,
+                            SmolStr::new_static("annotations"),
+                            LexObjectProperty::Unknown(LexUnknown {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "digest",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("digest"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Content digest (e.g., 'sha256:...')",
-                                    ),
+                                    CowStr::new_static("Content digest (e.g., 'sha256:...')"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(128usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mediaType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("mediaType"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "MIME type of the blob",
-                                    ),
+                                    CowStr::new_static("MIME type of the blob"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(128usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "size",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("size"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "urls",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("urls"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Optional direct URLs to blob (for BYOS)",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                items: LexArrayItem::String(LexString {
+                                    format: Some(LexStringFormat::Uri),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A container image manifest following OCI specification, stored in ATProto",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("repository"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("digest"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("mediaType"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("schemaVersion"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("repository"),
+                                SmolStr::new_static("digest"),
+                                SmolStr::new_static("mediaType"),
+                                SmolStr::new_static("schemaVersion"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "annotations",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
-                                    description: None,
+                                SmolStr::new_static("annotations"),
+                                LexObjectProperty::Unknown(LexUnknown {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "config",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#blobReference",
-                                    ),
+                                SmolStr::new_static("config"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#blobReference"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Record creation timestamp",
-                                        ),
+                                        CowStr::new_static("Record creation timestamp"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "digest",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("digest"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Content digest (e.g., 'sha256:abc123...')",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(128usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "holdDid",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("holdDid"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "DID of the hold service where blobs are stored (e.g., 'did:web:hold01.atcr.io'). Primary reference for hold resolution.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "holdEndpoint",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("holdEndpoint"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Hold service endpoint URL where blobs are stored. DEPRECATED: Use holdDid instead. Kept for backward compatibility.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Uri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "layers",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("layers"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Filesystem layers (for image manifests)",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "#blobReference",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#blobReference"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "manifestBlob",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                    description: None,
-                                    accept: None,
-                                    max_size: None,
-                                }),
+                                SmolStr::new_static("manifestBlob"),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "manifests",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("manifests"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Referenced manifests (for manifest lists/indexes)",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "#manifestReference",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#manifestReference"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "mediaType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static("OCI media type"),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("mediaType"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(CowStr::new_static("OCI media type")),
                                     max_length: Some(128usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "repository",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("repository"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Repository name (e.g., 'myapp'). Scoped to user's DID.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(255usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "schemaVersion",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("schemaVersion"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "subject",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#blobReference",
-                                    ),
+                                SmolStr::new_static("subject"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#blobReference"),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "manifestReference",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("manifestReference"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Reference to a manifest in a manifest list/index",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mediaType"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("size"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("digest")
+                            SmolStr::new_static("mediaType"),
+                            SmolStr::new_static("size"), SmolStr::new_static("digest")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "annotations",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
-                                description: None,
+                            SmolStr::new_static("annotations"),
+                            LexObjectProperty::Unknown(LexUnknown {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "digest",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("digest"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Content digest (e.g., 'sha256:...')",
-                                    ),
+                                    CowStr::new_static("Content digest (e.g., 'sha256:...')"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(128usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mediaType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("mediaType"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Media type of the referenced manifest",
-                                    ),
+                                    CowStr::new_static("Media type of the referenced manifest"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(128usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "platform",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#platform"),
+                            SmolStr::new_static("platform"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#platform"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "size",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("size"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("platform"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("platform"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Platform information describing OS and architecture",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("architecture"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("os")
+                            SmolStr::new_static("architecture"),
+                            SmolStr::new_static("os")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "architecture",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("architecture"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "CPU architecture (e.g., 'amd64', 'arm64', 'arm')",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(32usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("os"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("os"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Operating system (e.g., 'linux', 'windows', 'darwin')",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(32usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "osFeatures",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("osFeatures"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Optional OS features",
-                                    ),
+                                    CowStr::new_static("Optional OS features"),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                items: LexArrayItem::String(LexString {
                                     max_length: Some(64usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "osVersion",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("osVersion"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static("Optional OS version"),
+                                    CowStr::new_static("Optional OS version"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(64usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "variant",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("variant"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Optional CPU variant (e.g., 'v7' for ARM)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(32usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1401,107 +1111,107 @@ pub mod manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Digest;
-        type SchemaVersion;
         type CreatedAt;
-        type Repository;
+        type SchemaVersion;
+        type Digest;
         type MediaType;
+        type Repository;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Digest = Unset;
-        type SchemaVersion = Unset;
         type CreatedAt = Unset;
-        type Repository = Unset;
+        type SchemaVersion = Unset;
+        type Digest = Unset;
         type MediaType = Unset;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Digest = Set<members::digest>;
-        type SchemaVersion = S::SchemaVersion;
-        type CreatedAt = S::CreatedAt;
-        type Repository = S::Repository;
-        type MediaType = S::MediaType;
-    }
-    ///State transition - sets the `schema_version` field to Set
-    pub struct SetSchemaVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSchemaVersion<S> {}
-    impl<S: State> State for SetSchemaVersion<S> {
-        type Digest = S::Digest;
-        type SchemaVersion = Set<members::schema_version>;
-        type CreatedAt = S::CreatedAt;
-        type Repository = S::Repository;
-        type MediaType = S::MediaType;
+        type Repository = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Digest = S::Digest;
-        type SchemaVersion = S::SchemaVersion;
         type CreatedAt = Set<members::created_at>;
-        type Repository = S::Repository;
-        type MediaType = S::MediaType;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type Digest = S::Digest;
         type SchemaVersion = S::SchemaVersion;
-        type CreatedAt = S::CreatedAt;
-        type Repository = Set<members::repository>;
+        type Digest = S::Digest;
         type MediaType = S::MediaType;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `schema_version` field to Set
+    pub struct SetSchemaVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSchemaVersion<S> {}
+    impl<S: State> State for SetSchemaVersion<S> {
+        type CreatedAt = S::CreatedAt;
+        type SchemaVersion = Set<members::schema_version>;
+        type Digest = S::Digest;
+        type MediaType = S::MediaType;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type CreatedAt = S::CreatedAt;
+        type SchemaVersion = S::SchemaVersion;
+        type Digest = Set<members::digest>;
+        type MediaType = S::MediaType;
+        type Repository = S::Repository;
     }
     ///State transition - sets the `media_type` field to Set
     pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMediaType<S> {}
     impl<S: State> State for SetMediaType<S> {
-        type Digest = S::Digest;
-        type SchemaVersion = S::SchemaVersion;
         type CreatedAt = S::CreatedAt;
-        type Repository = S::Repository;
+        type SchemaVersion = S::SchemaVersion;
+        type Digest = S::Digest;
         type MediaType = Set<members::media_type>;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type CreatedAt = S::CreatedAt;
+        type SchemaVersion = S::SchemaVersion;
+        type Digest = S::Digest;
+        type MediaType = S::MediaType;
+        type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `digest` field
-        pub struct digest(());
-        ///Marker type for the `schema_version` field
-        pub struct schema_version(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `repository` field
-        pub struct repository(());
+        ///Marker type for the `schema_version` field
+        pub struct schema_version(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
         ///Marker type for the `media_type` field
         pub struct media_type(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ManifestBuilder<'a, S: manifest_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<crate::io_atcr::manifest::BlobReference<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<Vec<crate::io_atcr::manifest::BlobReference<'a>>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<Vec<crate::io_atcr::manifest::ManifestReference<'a>>>,
-        ::core::option::Option<ManifestMediaType<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<crate::io_atcr::manifest::BlobReference<'a>>,
+        Option<Data<'a>>,
+        Option<manifest::BlobReference<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<Did<'a>>,
+        Option<UriValue<'a>>,
+        Option<Vec<manifest::BlobReference<'a>>>,
+        Option<BlobRef<'a>>,
+        Option<Vec<manifest::ManifestReference<'a>>>,
+        Option<ManifestMediaType<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<manifest::BlobReference<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Manifest<'a> {
@@ -1515,7 +1225,7 @@ impl<'a> ManifestBuilder<'a, manifest_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ManifestBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -1531,25 +1241,19 @@ impl<'a> ManifestBuilder<'a, manifest_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `annotations` field (optional)
-    pub fn annotations(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn annotations(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `annotations` field to an Option value (optional)
-    pub fn maybe_annotations(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_annotations(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -1559,16 +1263,13 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `config` field (optional)
     pub fn config(
         mut self,
-        value: impl Into<Option<crate::io_atcr::manifest::BlobReference<'a>>>,
+        value: impl Into<Option<manifest::BlobReference<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `config` field to an Option value (optional)
-    pub fn maybe_config(
-        mut self,
-        value: Option<crate::io_atcr::manifest::BlobReference<'a>>,
-    ) -> Self {
+    pub fn maybe_config(mut self, value: Option<manifest::BlobReference<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -1582,13 +1283,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ManifestBuilder<'a, manifest_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1601,31 +1302,25 @@ where
     /// Set the `digest` field (required)
     pub fn digest(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ManifestBuilder<'a, manifest_state::SetDigest<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `holdDid` field (optional)
-    pub fn hold_did(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn hold_did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `holdDid` field to an Option value (optional)
-    pub fn maybe_hold_did(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_hold_did(mut self, value: Option<Did<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -1633,18 +1328,12 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
 
 impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `holdEndpoint` field (optional)
-    pub fn hold_endpoint(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn hold_endpoint(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `holdEndpoint` field to an Option value (optional)
-    pub fn maybe_hold_endpoint(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_hold_endpoint(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -1654,7 +1343,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `layers` field (optional)
     pub fn layers(
         mut self,
-        value: impl Into<Option<Vec<crate::io_atcr::manifest::BlobReference<'a>>>>,
+        value: impl Into<Option<Vec<manifest::BlobReference<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
@@ -1662,7 +1351,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `layers` field to an Option value (optional)
     pub fn maybe_layers(
         mut self,
-        value: Option<Vec<crate::io_atcr::manifest::BlobReference<'a>>>,
+        value: Option<Vec<manifest::BlobReference<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.6 = value;
         self
@@ -1671,18 +1360,12 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
 
 impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `manifestBlob` field (optional)
-    pub fn manifest_blob(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
-    ) -> Self {
+    pub fn manifest_blob(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `manifestBlob` field to an Option value (optional)
-    pub fn maybe_manifest_blob(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_manifest_blob(mut self, value: Option<BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -1692,7 +1375,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `manifests` field (optional)
     pub fn manifests(
         mut self,
-        value: impl Into<Option<Vec<crate::io_atcr::manifest::ManifestReference<'a>>>>,
+        value: impl Into<Option<Vec<manifest::ManifestReference<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
@@ -1700,7 +1383,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `manifests` field to an Option value (optional)
     pub fn maybe_manifests(
         mut self,
-        value: Option<Vec<crate::io_atcr::manifest::ManifestReference<'a>>>,
+        value: Option<Vec<manifest::ManifestReference<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.8 = value;
         self
@@ -1717,11 +1400,11 @@ where
         mut self,
         value: impl Into<ManifestMediaType<'a>>,
     ) -> ManifestBuilder<'a, manifest_state::SetMediaType<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1734,13 +1417,13 @@ where
     /// Set the `repository` field (required)
     pub fn repository(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ManifestBuilder<'a, manifest_state::SetRepository<S>> {
-        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.10 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1755,11 +1438,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ManifestBuilder<'a, manifest_state::SetSchemaVersion<S>> {
-        self.__unsafe_private_named.11 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.11 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1768,16 +1451,13 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `subject` field (optional)
     pub fn subject(
         mut self,
-        value: impl Into<Option<crate::io_atcr::manifest::BlobReference<'a>>>,
+        value: impl Into<Option<manifest::BlobReference<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
-    pub fn maybe_subject(
-        mut self,
-        value: Option<crate::io_atcr::manifest::BlobReference<'a>>,
-    ) -> Self {
+    pub fn maybe_subject(mut self, value: Option<manifest::BlobReference<'a>>) -> Self {
         self.__unsafe_private_named.12 = value;
         self
     }
@@ -1786,11 +1466,11 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
 impl<'a, S> ManifestBuilder<'a, S>
 where
     S: manifest_state::State,
-    S::Digest: manifest_state::IsSet,
-    S::SchemaVersion: manifest_state::IsSet,
     S::CreatedAt: manifest_state::IsSet,
-    S::Repository: manifest_state::IsSet,
+    S::SchemaVersion: manifest_state::IsSet,
+    S::Digest: manifest_state::IsSet,
     S::MediaType: manifest_state::IsSet,
+    S::Repository: manifest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Manifest<'a> {
@@ -1814,10 +1494,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Manifest<'a> {
         Manifest {
             annotations: self.__unsafe_private_named.0,
@@ -1848,49 +1525,49 @@ pub mod manifest_reference_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Size;
         type MediaType;
+        type Size;
         type Digest;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Size = Unset;
         type MediaType = Unset;
+        type Size = Unset;
         type Digest = Unset;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Size = Set<members::size>;
-        type MediaType = S::MediaType;
-        type Digest = S::Digest;
     }
     ///State transition - sets the `media_type` field to Set
     pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMediaType<S> {}
     impl<S: State> State for SetMediaType<S> {
-        type Size = S::Size;
         type MediaType = Set<members::media_type>;
+        type Size = S::Size;
+        type Digest = S::Digest;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type MediaType = S::MediaType;
+        type Size = Set<members::size>;
         type Digest = S::Digest;
     }
     ///State transition - sets the `digest` field to Set
     pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDigest<S> {}
     impl<S: State> State for SetDigest<S> {
-        type Size = S::Size;
         type MediaType = S::MediaType;
+        type Size = S::Size;
         type Digest = Set<members::digest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `size` field
-        pub struct size(());
         ///Marker type for the `media_type` field
         pub struct media_type(());
+        ///Marker type for the `size` field
+        pub struct size(());
         ///Marker type for the `digest` field
         pub struct digest(());
     }
@@ -1898,15 +1575,15 @@ pub mod manifest_reference_state {
 
 /// Builder for constructing an instance of this type
 pub struct ManifestReferenceBuilder<'a, S: manifest_reference_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::io_atcr::manifest::Platform<'a>>,
-        ::core::option::Option<i64>,
+        Option<Data<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<manifest::Platform<'a>>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ManifestReference<'a> {
@@ -1920,27 +1597,21 @@ impl<'a> ManifestReferenceBuilder<'a, manifest_reference_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ManifestReferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: manifest_reference_state::State> ManifestReferenceBuilder<'a, S> {
     /// Set the `annotations` field (optional)
-    pub fn annotations(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn annotations(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `annotations` field to an Option value (optional)
-    pub fn maybe_annotations(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_annotations(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -1954,13 +1625,13 @@ where
     /// Set the `digest` field (required)
     pub fn digest(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ManifestReferenceBuilder<'a, manifest_reference_state::SetDigest<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ManifestReferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1973,31 +1644,25 @@ where
     /// Set the `mediaType` field (required)
     pub fn media_type(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ManifestReferenceBuilder<'a, manifest_reference_state::SetMediaType<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         ManifestReferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: manifest_reference_state::State> ManifestReferenceBuilder<'a, S> {
     /// Set the `platform` field (optional)
-    pub fn platform(
-        mut self,
-        value: impl Into<Option<crate::io_atcr::manifest::Platform<'a>>>,
-    ) -> Self {
+    pub fn platform(mut self, value: impl Into<Option<manifest::Platform<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `platform` field to an Option value (optional)
-    pub fn maybe_platform(
-        mut self,
-        value: Option<crate::io_atcr::manifest::Platform<'a>>,
-    ) -> Self {
+    pub fn maybe_platform(mut self, value: Option<manifest::Platform<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -2013,11 +1678,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ManifestReferenceBuilder<'a, manifest_reference_state::SetSize<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         ManifestReferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2025,8 +1690,8 @@ where
 impl<'a, S> ManifestReferenceBuilder<'a, S>
 where
     S: manifest_reference_state::State,
-    S::Size: manifest_reference_state::IsSet,
     S::MediaType: manifest_reference_state::IsSet,
+    S::Size: manifest_reference_state::IsSet,
     S::Digest: manifest_reference_state::IsSet,
 {
     /// Build the final struct
@@ -2043,10 +1708,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ManifestReference<'a> {
         ManifestReference {
             annotations: self.__unsafe_private_named.0,

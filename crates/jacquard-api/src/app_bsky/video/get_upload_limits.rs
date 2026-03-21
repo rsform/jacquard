@@ -5,45 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetUploadLimitsOutput<'a> {
     pub can_upload: bool,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub error: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub error: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub remaining_daily_bytes: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub remaining_daily_videos: core::option::Option<i64>,
+    pub message: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub remaining_daily_bytes: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub remaining_daily_videos: Option<i64>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct GetUploadLimits;
-/// Response type for
-///app.bsky.video.getUploadLimits
+/// Response type for app.bsky.video.getUploadLimits
 pub struct GetUploadLimitsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetUploadLimitsResponse {
     const NSID: &'static str = "app.bsky.video.getUploadLimits";
@@ -58,8 +47,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetUploadLimits {
     type Response = GetUploadLimitsResponse;
 }
 
-/// Endpoint type for
-///app.bsky.video.getUploadLimits
+/// Endpoint type for app.bsky.video.getUploadLimits
 pub struct GetUploadLimitsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetUploadLimitsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.video.getUploadLimits";

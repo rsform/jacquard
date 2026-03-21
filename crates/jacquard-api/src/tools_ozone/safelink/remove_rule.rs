@@ -5,68 +5,64 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::safelink::Event;
+use crate::tools_ozone::safelink::PatternType;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveRule<'a> {
     ///Optional comment about why the rule is being removed
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<CowStr<'a>>,
     ///Optional DID of the user. Only respected when using admin auth.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub created_by: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub created_by: Option<Did<'a>>,
     #[serde(borrow)]
-    pub pattern: crate::tools_ozone::safelink::PatternType<'a>,
+    pub pattern: PatternType<'a>,
     ///The URL or domain to remove the rule for
     #[serde(borrow)]
-    pub url: jacquard_common::CowStr<'a>,
+    pub url: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveRuleOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::tools_ozone::safelink::Event<'a>,
+    pub value: Event<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RemoveRuleError<'a> {
     /// No active rule found for this URL/domain
     #[serde(rename = "RuleNotFound")]
-    RuleNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    RuleNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for RemoveRuleError<'_> {
@@ -84,8 +80,7 @@ impl core::fmt::Display for RemoveRuleError<'_> {
     }
 }
 
-/// Response type for
-///tools.ozone.safelink.removeRule
+/// Response type for tools.ozone.safelink.removeRule
 pub struct RemoveRuleResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveRuleResponse {
     const NSID: &'static str = "tools.ozone.safelink.removeRule";
@@ -102,8 +97,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveRule<'a> {
     type Response = RemoveRuleResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.safelink.removeRule
+/// Endpoint type for tools.ozone.safelink.removeRule
 pub struct RemoveRuleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveRuleRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.safelink.removeRule";
@@ -124,50 +118,50 @@ pub mod remove_rule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Pattern;
         type Url;
+        type Pattern;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Pattern = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `pattern` field to Set
-    pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPattern<S> {}
-    impl<S: State> State for SetPattern<S> {
-        type Pattern = Set<members::pattern>;
-        type Url = S::Url;
+        type Pattern = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type Pattern = S::Pattern;
         type Url = Set<members::url>;
+        type Pattern = S::Pattern;
+    }
+    ///State transition - sets the `pattern` field to Set
+    pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPattern<S> {}
+    impl<S: State> State for SetPattern<S> {
+        type Url = S::Url;
+        type Pattern = Set<members::pattern>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `pattern` field
-        pub struct pattern(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `pattern` field
+        pub struct pattern(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RemoveRuleBuilder<'a, S: remove_rule_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<crate::tools_ozone::safelink::PatternType<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Did<'a>>,
+        Option<PatternType<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> RemoveRule<'a> {
@@ -181,24 +175,21 @@ impl<'a> RemoveRuleBuilder<'a, remove_rule_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RemoveRuleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: remove_rule_state::State> RemoveRuleBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
-    pub fn maybe_comment(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -206,18 +197,12 @@ impl<'a, S: remove_rule_state::State> RemoveRuleBuilder<'a, S> {
 
 impl<'a, S: remove_rule_state::State> RemoveRuleBuilder<'a, S> {
     /// Set the `createdBy` field (optional)
-    pub fn created_by(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn created_by(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `createdBy` field to an Option value (optional)
-    pub fn maybe_created_by(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_created_by(mut self, value: Option<Did<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -231,13 +216,13 @@ where
     /// Set the `pattern` field (required)
     pub fn pattern(
         mut self,
-        value: impl Into<crate::tools_ozone::safelink::PatternType<'a>>,
+        value: impl Into<PatternType<'a>>,
     ) -> RemoveRuleBuilder<'a, remove_rule_state::SetPattern<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         RemoveRuleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -250,13 +235,13 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RemoveRuleBuilder<'a, remove_rule_state::SetUrl<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         RemoveRuleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -264,8 +249,8 @@ where
 impl<'a, S> RemoveRuleBuilder<'a, S>
 where
     S: remove_rule_state::State,
-    S::Pattern: remove_rule_state::IsSet,
     S::Url: remove_rule_state::IsSet,
+    S::Pattern: remove_rule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RemoveRule<'a> {
@@ -280,7 +265,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

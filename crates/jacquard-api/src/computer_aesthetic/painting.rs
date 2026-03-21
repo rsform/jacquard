@@ -5,87 +5,85 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A digital painting created on aesthetic.computer
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Painting<'a> {
     ///Short alphanumeric code for easy lookup (e.g., 'a3b')
     #[serde(borrow)]
-    pub code: jacquard_common::CowStr<'a>,
+    pub code: CowStr<'a>,
     ///URL to full resolution PNG
     #[serde(borrow)]
-    pub image_url: jacquard_common::types::string::UriValue<'a>,
+    pub image_url: UriValue<'a>,
     ///URL to .zip recording file (if available)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub recording_url: core::option::Option<
-        jacquard_common::types::string::UriValue<'a>,
-    >,
+    pub recording_url: Option<UriValue<'a>>,
     ///MongoDB ObjectId reference for bidirectional sync
     #[serde(borrow)]
-    pub r#ref: jacquard_common::CowStr<'a>,
+    pub r#ref: CowStr<'a>,
     ///Timestamp slug (may include recording: imageSlug:recordingSlug)
     #[serde(borrow)]
-    pub slug: jacquard_common::CowStr<'a>,
+    pub slug: CowStr<'a>,
     ///Thumbnail preview (max 1MB)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub thumbnail: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub thumbnail: Option<BlobRef<'a>>,
     ///Creation timestamp (ISO 8601)
-    pub when: jacquard_common::types::string::Datetime,
+    pub when: Datetime,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PaintingGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Painting<'a>,
 }
 
 impl<'a> Painting<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PaintingRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, PaintingRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PaintingRecord;
-impl jacquard_common::xrpc::XrpcResp for PaintingRecord {
+impl XrpcResp for PaintingRecord {
     const NSID: &'static str = "computer.aesthetic.painting";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = PaintingGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<PaintingGetRecordOutput<'_>> for Painting<'_> {
@@ -95,37 +93,33 @@ impl From<PaintingGetRecordOutput<'_>> for Painting<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Painting<'_> {
+impl Collection for Painting<'_> {
     const NSID: &'static str = "computer.aesthetic.painting";
     type Record = PaintingRecord;
 }
 
-impl jacquard_common::types::collection::Collection for PaintingRecord {
+impl Collection for PaintingRecord {
     const NSID: &'static str = "computer.aesthetic.painting";
     type Record = PaintingRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Painting<'a> {
+impl<'a> LexiconSchema for Painting<'a> {
     fn nsid() -> &'static str {
         "computer.aesthetic.painting"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_computer_aesthetic_painting()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.code;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "code",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("code"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -135,10 +129,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Painting<'a> {
             let value = &self.image_url;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "image_url",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("image_url"),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -147,10 +139,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Painting<'a> {
         if let Some(ref value) = self.recording_url {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "recording_url",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("recording_url"),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -160,10 +150,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Painting<'a> {
             let value = &self.r#ref;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 24usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ref",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("ref"),
                     max: 24usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -173,10 +161,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Painting<'a> {
             let value = &self.slug;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "slug",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("slug"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -186,10 +172,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Painting<'a> {
             {
                 let size = value.blob().size;
                 if size > 1048576usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "thumbnail",
-                        ),
+                    return Err(ConstraintError::BlobTooLarge {
+                        path: ValidationPath::from_field("thumbnail"),
                         max: 1048576usize,
                         actual: size,
                     });
@@ -214,10 +198,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Painting<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "thumbnail",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("thumbnail"),
                         accepted: vec![
                             "image/png".to_string(), "image/jpeg".to_string()
                         ],
@@ -240,101 +222,101 @@ pub mod painting_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Code;
         type Ref;
+        type Slug;
+        type Code;
         type When;
         type ImageUrl;
-        type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Code = Unset;
         type Ref = Unset;
+        type Slug = Unset;
+        type Code = Unset;
         type When = Unset;
         type ImageUrl = Unset;
-        type Slug = Unset;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type Code = Set<members::code>;
-        type Ref = S::Ref;
-        type When = S::When;
-        type ImageUrl = S::ImageUrl;
-        type Slug = S::Slug;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type Code = S::Code;
         type Ref = Set<members::r#ref>;
+        type Slug = S::Slug;
+        type Code = S::Code;
         type When = S::When;
         type ImageUrl = S::ImageUrl;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type Code = S::Code;
-        type Ref = S::Ref;
-        type When = Set<members::when>;
-        type ImageUrl = S::ImageUrl;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `image_url` field to Set
-    pub struct SetImageUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImageUrl<S> {}
-    impl<S: State> State for SetImageUrl<S> {
-        type Code = S::Code;
-        type Ref = S::Ref;
-        type When = S::When;
-        type ImageUrl = Set<members::image_url>;
-        type Slug = S::Slug;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type Code = S::Code;
         type Ref = S::Ref;
+        type Slug = Set<members::slug>;
+        type Code = S::Code;
         type When = S::When;
         type ImageUrl = S::ImageUrl;
-        type Slug = Set<members::slug>;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type Ref = S::Ref;
+        type Slug = S::Slug;
+        type Code = Set<members::code>;
+        type When = S::When;
+        type ImageUrl = S::ImageUrl;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Ref = S::Ref;
+        type Slug = S::Slug;
+        type Code = S::Code;
+        type When = Set<members::when>;
+        type ImageUrl = S::ImageUrl;
+    }
+    ///State transition - sets the `image_url` field to Set
+    pub struct SetImageUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImageUrl<S> {}
+    impl<S: State> State for SetImageUrl<S> {
+        type Ref = S::Ref;
+        type Slug = S::Slug;
+        type Code = S::Code;
+        type When = S::When;
+        type ImageUrl = Set<members::image_url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
+        ///Marker type for the `code` field
+        pub struct code(());
         ///Marker type for the `when` field
         pub struct when(());
         ///Marker type for the `image_url` field
         pub struct image_url(());
-        ///Marker type for the `slug` field
-        pub struct slug(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PaintingBuilder<'a, S: painting_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<CowStr<'a>>,
+        Option<UriValue<'a>>,
+        Option<UriValue<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<BlobRef<'a>>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Painting<'a> {
@@ -348,9 +330,9 @@ impl<'a> PaintingBuilder<'a, painting_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PaintingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -363,13 +345,13 @@ where
     /// Set the `code` field (required)
     pub fn code(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> PaintingBuilder<'a, painting_state::SetCode<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PaintingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -382,31 +364,25 @@ where
     /// Set the `imageUrl` field (required)
     pub fn image_url(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> PaintingBuilder<'a, painting_state::SetImageUrl<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         PaintingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: painting_state::State> PaintingBuilder<'a, S> {
     /// Set the `recordingUrl` field (optional)
-    pub fn recording_url(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn recording_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `recordingUrl` field to an Option value (optional)
-    pub fn maybe_recording_url(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_recording_url(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -420,13 +396,13 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> PaintingBuilder<'a, painting_state::SetRef<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         PaintingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -439,31 +415,25 @@ where
     /// Set the `slug` field (required)
     pub fn slug(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> PaintingBuilder<'a, painting_state::SetSlug<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         PaintingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: painting_state::State> PaintingBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
-    pub fn thumbnail(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
-    ) -> Self {
+    pub fn thumbnail(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
-    pub fn maybe_thumbnail(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_thumbnail(mut self, value: Option<BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -477,13 +447,13 @@ where
     /// Set the `when` field (required)
     pub fn when(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> PaintingBuilder<'a, painting_state::SetWhen<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         PaintingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -491,11 +461,11 @@ where
 impl<'a, S> PaintingBuilder<'a, S>
 where
     S: painting_state::State,
-    S::Code: painting_state::IsSet,
     S::Ref: painting_state::IsSet,
+    S::Slug: painting_state::IsSet,
+    S::Code: painting_state::IsSet,
     S::When: painting_state::IsSet,
     S::ImageUrl: painting_state::IsSet,
-    S::Slug: painting_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Painting<'a> {
@@ -513,7 +483,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -531,188 +501,119 @@ where
     }
 }
 
-fn lexicon_doc_computer_aesthetic_painting() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("computer.aesthetic.painting"),
-        revision: None,
-        description: None,
+fn lexicon_doc_computer_aesthetic_painting() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("computer.aesthetic.painting"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A digital painting created on aesthetic.computer",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("slug"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("code"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("imageUrl"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("when"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("ref")
+                                SmolStr::new_static("slug"), SmolStr::new_static("code"),
+                                SmolStr::new_static("imageUrl"),
+                                SmolStr::new_static("when"), SmolStr::new_static("ref")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "code",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("code"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Short alphanumeric code for easy lookup (e.g., 'a3b')",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(10usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "imageUrl",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("imageUrl"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "URL to full resolution PNG",
-                                        ),
+                                        CowStr::new_static("URL to full resolution PNG"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
+                                    format: Some(LexStringFormat::Uri),
                                     max_length: Some(512usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "recordingUrl",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("recordingUrl"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "URL to .zip recording file (if available)",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
+                                    format: Some(LexStringFormat::Uri),
                                     max_length: Some(512usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "ref",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("ref"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "MongoDB ObjectId reference for bidirectional sync",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(24usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "slug",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("slug"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp slug (may include recording: imageSlug:recordingSlug)",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(128usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "thumbnail",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                    description: None,
-                                    accept: None,
-                                    max_size: None,
-                                }),
+                                SmolStr::new_static("thumbnail"),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "when",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("when"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Creation timestamp (ISO 8601)",
-                                        ),
+                                        CowStr::new_static("Creation timestamp (ISO 8601)"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

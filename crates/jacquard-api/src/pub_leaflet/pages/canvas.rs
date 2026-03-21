@@ -5,138 +5,124 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::pub_leaflet::blocks::blockquote::Blockquote;
+use crate::pub_leaflet::blocks::bsky_post::BskyPost;
+use crate::pub_leaflet::blocks::button::Button;
+use crate::pub_leaflet::blocks::code::Code;
+use crate::pub_leaflet::blocks::header::Header;
+use crate::pub_leaflet::blocks::horizontal_rule::HorizontalRule;
+use crate::pub_leaflet::blocks::iframe::Iframe;
+use crate::pub_leaflet::blocks::image::Image;
+use crate::pub_leaflet::blocks::math::Math;
+use crate::pub_leaflet::blocks::ordered_list::OrderedList;
+use crate::pub_leaflet::blocks::page::Page;
+use crate::pub_leaflet::blocks::poll::Poll;
+use crate::pub_leaflet::blocks::text::Text;
+use crate::pub_leaflet::blocks::unordered_list::UnorderedList;
+use crate::pub_leaflet::blocks::website::Website;
+use crate::pub_leaflet::pages::canvas;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Block<'a> {
     #[serde(borrow)]
     pub block: BlockBlock<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub height: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub height: Option<i64>,
     ///The rotation of the block in degrees
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub rotation: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rotation: Option<i64>,
     pub width: i64,
     pub x: i64,
     pub y: i64,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum BlockBlock<'a> {
     #[serde(rename = "pub.leaflet.blocks.iframe")]
-    Iframe(Box<crate::pub_leaflet::blocks::iframe::Iframe<'a>>),
+    Iframe(Box<Iframe<'a>>),
     #[serde(rename = "pub.leaflet.blocks.text")]
-    Text(Box<crate::pub_leaflet::blocks::text::Text<'a>>),
+    Text(Box<Text<'a>>),
     #[serde(rename = "pub.leaflet.blocks.blockquote")]
-    Blockquote(Box<crate::pub_leaflet::blocks::blockquote::Blockquote<'a>>),
+    Blockquote(Box<Blockquote<'a>>),
     #[serde(rename = "pub.leaflet.blocks.header")]
-    Header(Box<crate::pub_leaflet::blocks::header::Header<'a>>),
+    Header(Box<Header<'a>>),
     #[serde(rename = "pub.leaflet.blocks.image")]
-    Image(Box<crate::pub_leaflet::blocks::image::Image<'a>>),
+    Image(Box<Image<'a>>),
     #[serde(rename = "pub.leaflet.blocks.unorderedList")]
-    UnorderedList(Box<crate::pub_leaflet::blocks::unordered_list::UnorderedList<'a>>),
+    UnorderedList(Box<UnorderedList<'a>>),
     #[serde(rename = "pub.leaflet.blocks.orderedList")]
-    OrderedList(Box<crate::pub_leaflet::blocks::ordered_list::OrderedList<'a>>),
+    OrderedList(Box<OrderedList<'a>>),
     #[serde(rename = "pub.leaflet.blocks.website")]
-    Website(Box<crate::pub_leaflet::blocks::website::Website<'a>>),
+    Website(Box<Website<'a>>),
     #[serde(rename = "pub.leaflet.blocks.math")]
-    Math(Box<crate::pub_leaflet::blocks::math::Math<'a>>),
+    Math(Box<Math<'a>>),
     #[serde(rename = "pub.leaflet.blocks.code")]
-    Code(Box<crate::pub_leaflet::blocks::code::Code<'a>>),
+    Code(Box<Code<'a>>),
     #[serde(rename = "pub.leaflet.blocks.horizontalRule")]
-    HorizontalRule(Box<crate::pub_leaflet::blocks::horizontal_rule::HorizontalRule<'a>>),
+    HorizontalRule(Box<HorizontalRule<'a>>),
     #[serde(rename = "pub.leaflet.blocks.bskyPost")]
-    BskyPost(Box<crate::pub_leaflet::blocks::bsky_post::BskyPost<'a>>),
+    BskyPost(Box<BskyPost<'a>>),
     #[serde(rename = "pub.leaflet.blocks.page")]
-    Page(Box<crate::pub_leaflet::blocks::page::Page<'a>>),
+    Page(Box<Page<'a>>),
     #[serde(rename = "pub.leaflet.blocks.poll")]
-    Poll(Box<crate::pub_leaflet::blocks::poll::Poll<'a>>),
+    Poll(Box<Poll<'a>>),
     #[serde(rename = "pub.leaflet.blocks.button")]
-    Button(Box<crate::pub_leaflet::blocks::button::Button<'a>>),
+    Button(Box<Button<'a>>),
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Canvas<'a> {
     #[serde(borrow)]
-    pub blocks: Vec<crate::pub_leaflet::pages::canvas::Block<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub blocks: Vec<canvas::Block<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub id: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Position<'a> {
     pub block: Vec<i64>,
     pub offset: i64,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Quote<'a> {
     #[serde(borrow)]
-    pub end: crate::pub_leaflet::pages::canvas::Position<'a>,
+    pub end: canvas::Position<'a>,
     #[serde(borrow)]
-    pub start: crate::pub_leaflet::pages::canvas::Position<'a>,
+    pub start: canvas::Position<'a>,
 }
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct TextAlignCenter;
 impl core::fmt::Display for TextAlignCenter {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -144,16 +130,8 @@ impl core::fmt::Display for TextAlignCenter {
     }
 }
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct TextAlignLeft;
 impl core::fmt::Display for TextAlignLeft {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -161,16 +139,8 @@ impl core::fmt::Display for TextAlignLeft {
     }
 }
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct TextAlignRight;
 impl core::fmt::Display for TextAlignRight {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -178,70 +148,62 @@ impl core::fmt::Display for TextAlignRight {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Block<'a> {
+impl<'a> LexiconSchema for Block<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
     }
     fn def_name() -> &'static str {
         "block"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_pages_canvas()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Canvas<'a> {
+impl<'a> LexiconSchema for Canvas<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_pages_canvas()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Position<'a> {
+impl<'a> LexiconSchema for Position<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
     }
     fn def_name() -> &'static str {
         "position"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_pages_canvas()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Quote<'a> {
+impl<'a> LexiconSchema for Quote<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
     }
     fn def_name() -> &'static str {
         "quote"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_pages_canvas()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -322,16 +284,16 @@ pub mod block_state {
 
 /// Builder for constructing an instance of this type
 pub struct BlockBuilder<'a, S: block_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<BlockBlock<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
+        Option<BlockBlock<'a>>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Block<'a> {
@@ -345,9 +307,9 @@ impl<'a> BlockBuilder<'a, block_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlockBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -362,11 +324,11 @@ where
         mut self,
         value: impl Into<BlockBlock<'a>>,
     ) -> BlockBuilder<'a, block_state::SetBlock<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         BlockBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -407,11 +369,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> BlockBuilder<'a, block_state::SetWidth<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         BlockBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -423,11 +385,11 @@ where
 {
     /// Set the `x` field (required)
     pub fn x(mut self, value: impl Into<i64>) -> BlockBuilder<'a, block_state::SetX<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         BlockBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -439,11 +401,11 @@ where
 {
     /// Set the `y` field (required)
     pub fn y(mut self, value: impl Into<i64>) -> BlockBuilder<'a, block_state::SetY<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         BlockBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -471,7 +433,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -488,276 +450,184 @@ where
     }
 }
 
-fn lexicon_doc_pub_leaflet_pages_canvas() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("pub.leaflet.pages.canvas"),
-        revision: None,
-        description: None,
+fn lexicon_doc_pub_leaflet_pages_canvas() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("pub.leaflet.pages.canvas"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("block"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("block"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("block"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("x"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("y"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("width")
+                            SmolStr::new_static("block"), SmolStr::new_static("x"),
+                            SmolStr::new_static("y"), SmolStr::new_static("width")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "block",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("block"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.iframe"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.text"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.blockquote"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.header"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.image"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.unorderedList"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.orderedList"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.website"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.math"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.code"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.horizontalRule"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.bskyPost"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.page"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.poll"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.button")
+                                    CowStr::new_static("pub.leaflet.blocks.iframe"),
+                                    CowStr::new_static("pub.leaflet.blocks.text"),
+                                    CowStr::new_static("pub.leaflet.blocks.blockquote"),
+                                    CowStr::new_static("pub.leaflet.blocks.header"),
+                                    CowStr::new_static("pub.leaflet.blocks.image"),
+                                    CowStr::new_static("pub.leaflet.blocks.unorderedList"),
+                                    CowStr::new_static("pub.leaflet.blocks.orderedList"),
+                                    CowStr::new_static("pub.leaflet.blocks.website"),
+                                    CowStr::new_static("pub.leaflet.blocks.math"),
+                                    CowStr::new_static("pub.leaflet.blocks.code"),
+                                    CowStr::new_static("pub.leaflet.blocks.horizontalRule"),
+                                    CowStr::new_static("pub.leaflet.blocks.bskyPost"),
+                                    CowStr::new_static("pub.leaflet.blocks.page"),
+                                    CowStr::new_static("pub.leaflet.blocks.poll"),
+                                    CowStr::new_static("pub.leaflet.blocks.button")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "height",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("height"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "rotation",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("rotation"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "width",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("width"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("x"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("x"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("y"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("y"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("blocks")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("main"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("blocks")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "blocks",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#block"),
+                            SmolStr::new_static("blocks"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#block"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("id"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("position"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("position"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("block"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("offset")
-                        ],
+                        vec![SmolStr::new_static("block"), SmolStr::new_static("offset")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "block",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                            SmolStr::new_static("block"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "offset",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("offset"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("quote"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("quote"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("start"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("end")
-                        ],
+                        vec![SmolStr::new_static("start"), SmolStr::new_static("end")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "end",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#position"),
+                            SmolStr::new_static("end"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#position"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "start",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#position"),
+                            SmolStr::new_static("start"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#position"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "textAlignCenter",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
-                    description: None,
-                }),
+                SmolStr::new_static("textAlignCenter"),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("textAlignLeft"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
-                    description: None,
-                }),
+                SmolStr::new_static("textAlignLeft"),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("textAlignRight"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
-                    description: None,
-                }),
+                SmolStr::new_static("textAlignRight"),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -795,12 +665,9 @@ pub mod canvas_state {
 
 /// Builder for constructing an instance of this type
 pub struct CanvasBuilder<'a, S: canvas_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::pub_leaflet::pages::canvas::Block<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<canvas::Block<'a>>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Canvas<'a> {
@@ -814,9 +681,9 @@ impl<'a> CanvasBuilder<'a, canvas_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CanvasBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -829,25 +696,25 @@ where
     /// Set the `blocks` field (required)
     pub fn blocks(
         mut self,
-        value: impl Into<Vec<crate::pub_leaflet::pages::canvas::Block<'a>>>,
+        value: impl Into<Vec<canvas::Block<'a>>>,
     ) -> CanvasBuilder<'a, canvas_state::SetBlocks<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CanvasBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: canvas_state::State> CanvasBuilder<'a, S> {
     /// Set the `id` field (optional)
-    pub fn id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
-    pub fn maybe_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -869,7 +736,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -928,12 +795,9 @@ pub mod position_state {
 
 /// Builder for constructing an instance of this type
 pub struct PositionBuilder<'a, S: position_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<i64>>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<i64>>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Position<'a> {
@@ -947,9 +811,9 @@ impl<'a> PositionBuilder<'a, position_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PositionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -964,11 +828,11 @@ where
         mut self,
         value: impl Into<Vec<i64>>,
     ) -> PositionBuilder<'a, position_state::SetBlock<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PositionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -983,11 +847,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PositionBuilder<'a, position_state::SetOffset<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         PositionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1009,7 +873,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1068,12 +932,9 @@ pub mod quote_state {
 
 /// Builder for constructing an instance of this type
 pub struct QuoteBuilder<'a, S: quote_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::pub_leaflet::pages::canvas::Position<'a>>,
-        ::core::option::Option<crate::pub_leaflet::pages::canvas::Position<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<canvas::Position<'a>>, Option<canvas::Position<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Quote<'a> {
@@ -1087,9 +948,9 @@ impl<'a> QuoteBuilder<'a, quote_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         QuoteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1102,13 +963,13 @@ where
     /// Set the `end` field (required)
     pub fn end(
         mut self,
-        value: impl Into<crate::pub_leaflet::pages::canvas::Position<'a>>,
+        value: impl Into<canvas::Position<'a>>,
     ) -> QuoteBuilder<'a, quote_state::SetEnd<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         QuoteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1121,13 +982,13 @@ where
     /// Set the `start` field (required)
     pub fn start(
         mut self,
-        value: impl Into<crate::pub_leaflet::pages::canvas::Position<'a>>,
+        value: impl Into<canvas::Position<'a>>,
     ) -> QuoteBuilder<'a, quote_state::SetStart<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         QuoteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1149,7 +1010,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

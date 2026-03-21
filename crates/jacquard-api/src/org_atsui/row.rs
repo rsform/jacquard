@@ -5,51 +5,52 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Row<'a> {
     ///Cross-axis (vertical) alignment of children.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub align: core::option::Option<RowAlign<'a>>,
+    pub align: Option<RowAlign<'a>>,
     #[serde(borrow)]
-    pub children: jacquard_common::types::value::Data<'a>,
+    pub children: Data<'a>,
     ///Space between children.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub gap: core::option::Option<RowGap<'a>>,
+    pub gap: Option<RowGap<'a>>,
     ///Whether this container has inset padding. The theme controls the amount.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub inset: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inset: Option<bool>,
     ///Main-axis distribution of children.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub justify: core::option::Option<RowJustify<'a>>,
+    pub justify: Option<RowJustify<'a>>,
     ///Whether the container has an opaque background.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub opaque: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opaque: Option<bool>,
     ///Whether the container sticks to the top of the scroll area.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub sticky: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sticky: Option<bool>,
 }
 
 /// Cross-axis (vertical) alignment of children.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RowAlign<'a> {
     Start,
     Center,
     End,
     Stretch,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> RowAlign<'a> {
@@ -71,7 +72,7 @@ impl<'a> From<&'a str> for RowAlign<'a> {
             "center" => Self::Center,
             "end" => Self::End,
             "stretch" => Self::Stretch,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -83,7 +84,7 @@ impl<'a> From<String> for RowAlign<'a> {
             "center" => Self::Center,
             "end" => Self::End,
             "stretch" => Self::Stretch,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -142,13 +143,14 @@ impl jacquard_common::IntoStatic for RowAlign<'_> {
 }
 
 /// Space between children.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RowGap<'a> {
     None,
     Small,
     Medium,
     Large,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> RowGap<'a> {
@@ -170,7 +172,7 @@ impl<'a> From<&'a str> for RowGap<'a> {
             "small" => Self::Small,
             "medium" => Self::Medium,
             "large" => Self::Large,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -182,7 +184,7 @@ impl<'a> From<String> for RowGap<'a> {
             "small" => Self::Small,
             "medium" => Self::Medium,
             "large" => Self::Large,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -241,13 +243,14 @@ impl jacquard_common::IntoStatic for RowGap<'_> {
 }
 
 /// Main-axis distribution of children.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RowJustify<'a> {
     Start,
     Center,
     End,
     Between,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> RowJustify<'a> {
@@ -269,7 +272,7 @@ impl<'a> From<&'a str> for RowJustify<'a> {
             "center" => Self::Center,
             "end" => Self::End,
             "between" => Self::Between,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -281,7 +284,7 @@ impl<'a> From<String> for RowJustify<'a> {
             "center" => Self::Center,
             "end" => Self::End,
             "between" => Self::Between,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -339,25 +342,17 @@ impl jacquard_common::IntoStatic for RowJustify<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RowOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
+    pub value: Response<'a>,
 }
 
-/// Response type for
-///org.atsui.Row
+/// Response type for org.atsui.Row
 pub struct RowResponse;
 impl jacquard_common::xrpc::XrpcResp for RowResponse {
     const NSID: &'static str = "org.atsui.Row";
@@ -374,8 +369,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Row<'a> {
     type Response = RowResponse;
 }
 
-/// Endpoint type for
-///org.atsui.Row
+/// Endpoint type for org.atsui.Row
 pub struct RowRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RowRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Row";
@@ -420,17 +414,17 @@ pub mod row_state {
 
 /// Builder for constructing an instance of this type
 pub struct RowBuilder<'a, S: row_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<RowAlign<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<RowGap<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<RowJustify<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<bool>,
+        Option<RowAlign<'a>>,
+        Option<Data<'a>>,
+        Option<RowGap<'a>>,
+        Option<bool>,
+        Option<RowJustify<'a>>,
+        Option<bool>,
+        Option<bool>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Row<'a> {
@@ -444,9 +438,9 @@ impl<'a> RowBuilder<'a, row_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RowBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -472,13 +466,13 @@ where
     /// Set the `children` field (required)
     pub fn children(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> RowBuilder<'a, row_state::SetChildren<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         RowBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -569,10 +563,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Row<'a> {
         Row {
             align: self.__unsafe_private_named.0,

@@ -5,66 +5,59 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::{Did, Datetime};
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::moderation::ModTool;
+use crate::tools_ozone::moderation::schedule_action;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct FailedScheduling<'a> {
     #[serde(borrow)]
-    pub error: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub error: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub error_code: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub error_code: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub subject: jacquard_common::types::string::Did<'a>,
+    pub subject: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ScheduleAction<'a> {
     #[serde(borrow)]
-    pub action: crate::tools_ozone::moderation::schedule_action::Takedown<'a>,
+    pub action: schedule_action::Takedown<'a>,
     #[serde(borrow)]
-    pub created_by: jacquard_common::types::string::Did<'a>,
+    pub created_by: Did<'a>,
     ///This will be propagated to the moderation event when it is applied
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub mod_tool: core::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    pub mod_tool: Option<ModTool<'a>>,
     #[serde(borrow)]
-    pub scheduling: crate::tools_ozone::moderation::schedule_action::SchedulingConfig<
-        'a,
-    >,
+    pub scheduling: schedule_action::SchedulingConfig<'a>,
     ///Array of DID subjects to schedule the action for
     #[serde(borrow)]
-    pub subjects: Vec<jacquard_common::types::string::Did<'a>>,
+    pub subjects: Vec<Did<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ScheduleActionOutput<'a> {
     #[serde(flatten)]
@@ -72,119 +65,89 @@ pub struct ScheduleActionOutput<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ScheduledActionResults<'a> {
     #[serde(borrow)]
-    pub failed: Vec<
-        crate::tools_ozone::moderation::schedule_action::FailedScheduling<'a>,
-    >,
+    pub failed: Vec<schedule_action::FailedScheduling<'a>>,
     #[serde(borrow)]
-    pub succeeded: Vec<jacquard_common::types::string::Did<'a>>,
+    pub succeeded: Vec<Did<'a>>,
 }
 
 /// Configuration for when the action should be executed
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct SchedulingConfig<'a> {
     ///Earliest time to execute the action (for randomized scheduling)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub execute_after: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub execute_after: Option<Datetime>,
     ///Exact time to execute the action
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub execute_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub execute_at: Option<Datetime>,
     ///Latest time to execute the action (for randomized scheduling)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub execute_until: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub execute_until: Option<Datetime>,
 }
 
 /// Schedule a takedown action
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Takedown<'a> {
     ///If true, all other reports on content authored by this account will be resolved (acknowledged).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub acknowledge_account_subjects: core::option::Option<bool>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub acknowledge_account_subjects: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<CowStr<'a>>,
     ///Indicates how long the takedown should be in effect before automatically expiring.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub duration_in_hours: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub duration_in_hours: Option<i64>,
     ///Email content to be sent to the user upon takedown.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub email_content: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub email_content: Option<CowStr<'a>>,
     ///Subject of the email to be sent to the user upon takedown.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub email_subject: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub email_subject: Option<CowStr<'a>>,
     ///Names/Keywords of the policies that drove the decision.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub policies: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub policies: Option<Vec<CowStr<'a>>>,
     ///Severity level of the violation (e.g., 'sev-0', 'sev-1', 'sev-2', etc.).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub severity_level: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub severity_level: Option<CowStr<'a>>,
     ///Number of strikes to assign to the user when takedown is applied.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub strike_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub strike_count: Option<i64>,
     ///When the strike should expire. If not provided, the strike never expires.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub strike_expires_at: core::option::Option<
-        jacquard_common::types::string::Datetime,
-    >,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub strike_expires_at: Option<Datetime>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for FailedScheduling<'a> {
+impl<'a> LexiconSchema for FailedScheduling<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.scheduleAction"
     }
     fn def_name() -> &'static str {
         "failedScheduling"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_scheduleAction()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-/// Response type for
-///tools.ozone.moderation.scheduleAction
+/// Response type for tools.ozone.moderation.scheduleAction
 pub struct ScheduleActionResponse;
 impl jacquard_common::xrpc::XrpcResp for ScheduleActionResponse {
     const NSID: &'static str = "tools.ozone.moderation.scheduleAction";
@@ -201,8 +164,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ScheduleAction<'a> {
     type Response = ScheduleActionResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.moderation.scheduleAction
+/// Endpoint type for tools.ozone.moderation.scheduleAction
 pub struct ScheduleActionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ScheduleActionRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.scheduleAction";
@@ -213,60 +175,52 @@ impl jacquard_common::xrpc::XrpcEndpoint for ScheduleActionRequest {
     type Response = ScheduleActionResponse;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledActionResults<'a> {
+impl<'a> LexiconSchema for ScheduledActionResults<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.scheduleAction"
     }
     fn def_name() -> &'static str {
         "scheduledActionResults"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_scheduleAction()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for SchedulingConfig<'a> {
+impl<'a> LexiconSchema for SchedulingConfig<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.scheduleAction"
     }
     fn def_name() -> &'static str {
         "schedulingConfig"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_scheduleAction()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Takedown<'a> {
+impl<'a> LexiconSchema for Takedown<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.scheduleAction"
     }
     fn def_name() -> &'static str {
         "takedown"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_scheduleAction()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.policies {
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "policies",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("policies"),
                     max: 5usize,
                     actual: value.len(),
                 });
@@ -286,49 +240,45 @@ pub mod failed_scheduling_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Error;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Error = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Error = S::Error;
+        type Subject = Unset;
     }
     ///State transition - sets the `error` field to Set
     pub struct SetError<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetError<S> {}
     impl<S: State> State for SetError<S> {
-        type Subject = S::Subject;
         type Error = Set<members::error>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Error = S::Error;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `error` field
         pub struct error(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FailedSchedulingBuilder<'a, S: failed_scheduling_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Did<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> FailedScheduling<'a> {
@@ -342,9 +292,9 @@ impl<'a> FailedSchedulingBuilder<'a, failed_scheduling_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FailedSchedulingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -357,31 +307,25 @@ where
     /// Set the `error` field (required)
     pub fn error(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> FailedSchedulingBuilder<'a, failed_scheduling_state::SetError<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         FailedSchedulingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: failed_scheduling_state::State> FailedSchedulingBuilder<'a, S> {
     /// Set the `errorCode` field (optional)
-    pub fn error_code(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn error_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `errorCode` field to an Option value (optional)
-    pub fn maybe_error_code(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_error_code(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -395,13 +339,13 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> FailedSchedulingBuilder<'a, failed_scheduling_state::SetSubject<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         FailedSchedulingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -409,8 +353,8 @@ where
 impl<'a, S> FailedSchedulingBuilder<'a, S>
 where
     S: failed_scheduling_state::State,
-    S::Subject: failed_scheduling_state::IsSet,
     S::Error: failed_scheduling_state::IsSet,
+    S::Subject: failed_scheduling_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FailedScheduling<'a> {
@@ -424,7 +368,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -438,538 +382,305 @@ where
     }
 }
 
-fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "tools.ozone.moderation.scheduleAction",
-        ),
-        revision: None,
-        description: None,
+fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("tools.ozone.moderation.scheduleAction"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "failedScheduling",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("failedScheduling"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("subject"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("error")
+                            SmolStr::new_static("subject"), SmolStr::new_static("error")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "error",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("error"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "errorCode",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("errorCode"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "subject",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("subject"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
-                    description: None,
-                    parameters: None,
-                    input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
-                        description: None,
-                        encoding: ::jacquard_common::CowStr::new_static(
-                            "application/json",
-                        ),
+                SmolStr::new_static("main"),
+                LexUserType::XrpcProcedure(LexXrpcProcedure {
+                    input: Some(LexXrpcBody {
+                        encoding: CowStr::new_static("application/json"),
                         schema: Some(
-                            ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
-                                description: None,
+                            LexXrpcBodySchema::Object(LexObject {
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("action"),
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("subjects"),
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("createdBy"),
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("scheduling")
+                                        SmolStr::new_static("action"),
+                                        SmolStr::new_static("subjects"),
+                                        SmolStr::new_static("createdBy"),
+                                        SmolStr::new_static("scheduling")
                                     ],
                                 ),
-                                nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
-                                    let mut map = ::alloc::collections::BTreeMap::new();
+                                    let mut map = BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "action",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                            description: None,
-                                            refs: vec![
-                                                ::jacquard_common::CowStr::new_static("#takedown")
-                                            ],
-                                            closed: None,
+                                        SmolStr::new_static("action"),
+                                        LexObjectProperty::Union(LexRefUnion {
+                                            refs: vec![CowStr::new_static("#takedown")],
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "createdBy",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
-                                            format: Some(
-                                                ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                            ),
-                                            default: None,
-                                            min_length: None,
-                                            max_length: None,
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                        SmolStr::new_static("createdBy"),
+                                        LexObjectProperty::String(LexString {
+                                            format: Some(LexStringFormat::Did),
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "modTool",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                            description: None,
-                                            r#ref: ::jacquard_common::CowStr::new_static(
+                                        SmolStr::new_static("modTool"),
+                                        LexObjectProperty::Ref(LexRef {
+                                            r#ref: CowStr::new_static(
                                                 "tools.ozone.moderation.defs#modTool",
                                             ),
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "scheduling",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                            description: None,
-                                            r#ref: ::jacquard_common::CowStr::new_static(
-                                                "#schedulingConfig",
-                                            ),
+                                        SmolStr::new_static("scheduling"),
+                                        LexObjectProperty::Ref(LexRef {
+                                            r#ref: CowStr::new_static("#schedulingConfig"),
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "subjects",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        SmolStr::new_static("subjects"),
+                                        LexObjectProperty::Array(LexArray {
                                             description: Some(
-                                                ::jacquard_common::CowStr::new_static(
+                                                CowStr::new_static(
                                                     "Array of DID subjects to schedule the action for",
                                                 ),
                                             ),
-                                            items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                                description: None,
-                                                format: Some(
-                                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                                ),
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                            items: LexArrayItem::String(LexString {
+                                                format: Some(LexStringFormat::Did),
+                                                ..Default::default()
                                             }),
-                                            min_length: None,
                                             max_length: Some(100usize),
+                                            ..Default::default()
                                         }),
                                     );
                                     map
                                 },
+                                ..Default::default()
                             }),
                         ),
+                        ..Default::default()
                     }),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "scheduledActionResults",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("scheduledActionResults"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("succeeded"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("failed")
+                            SmolStr::new_static("succeeded"),
+                            SmolStr::new_static("failed")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "failed",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#failedScheduling",
-                                    ),
+                            SmolStr::new_static("failed"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#failedScheduling"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "succeeded",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                            SmolStr::new_static("succeeded"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::String(LexString {
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "schedulingConfig",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("schedulingConfig"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Configuration for when the action should be executed",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "executeAfter",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("executeAfter"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Earliest time to execute the action (for randomized scheduling)",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "executeAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("executeAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Exact time to execute the action",
-                                    ),
+                                    CowStr::new_static("Exact time to execute the action"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "executeUntil",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("executeUntil"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Latest time to execute the action (for randomized scheduling)",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("takedown"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Schedule a takedown action",
-                        ),
-                    ),
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("takedown"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Schedule a takedown action")),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "acknowledgeAccountSubjects",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("acknowledgeAccountSubjects"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "comment",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("comment"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("durationInHours"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "durationInHours",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "emailContent",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("emailContent"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Email content to be sent to the user upon takedown.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "emailSubject",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("emailSubject"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Subject of the email to be sent to the user upon takedown.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "policies",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("policies"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Names/Keywords of the policies that drove the decision.",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(5usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "severityLevel",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("severityLevel"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Severity level of the violation (e.g., 'sev-0', 'sev-1', 'sev-2', etc.).",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "strikeCount",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("strikeCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "strikeExpiresAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("strikeExpiresAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "When the strike should expire. If not provided, the strike never expires.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -983,85 +694,81 @@ pub mod schedule_action_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subjects;
-        type Action;
         type Scheduling;
         type CreatedBy;
+        type Action;
+        type Subjects;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subjects = Unset;
-        type Action = Unset;
         type Scheduling = Unset;
         type CreatedBy = Unset;
-    }
-    ///State transition - sets the `subjects` field to Set
-    pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubjects<S> {}
-    impl<S: State> State for SetSubjects<S> {
-        type Subjects = Set<members::subjects>;
-        type Action = S::Action;
-        type Scheduling = S::Scheduling;
-        type CreatedBy = S::CreatedBy;
-    }
-    ///State transition - sets the `action` field to Set
-    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAction<S> {}
-    impl<S: State> State for SetAction<S> {
-        type Subjects = S::Subjects;
-        type Action = Set<members::action>;
-        type Scheduling = S::Scheduling;
-        type CreatedBy = S::CreatedBy;
+        type Action = Unset;
+        type Subjects = Unset;
     }
     ///State transition - sets the `scheduling` field to Set
     pub struct SetScheduling<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScheduling<S> {}
     impl<S: State> State for SetScheduling<S> {
-        type Subjects = S::Subjects;
-        type Action = S::Action;
         type Scheduling = Set<members::scheduling>;
         type CreatedBy = S::CreatedBy;
+        type Action = S::Action;
+        type Subjects = S::Subjects;
     }
     ///State transition - sets the `created_by` field to Set
     pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
     impl<S: State> State for SetCreatedBy<S> {
-        type Subjects = S::Subjects;
-        type Action = S::Action;
         type Scheduling = S::Scheduling;
         type CreatedBy = Set<members::created_by>;
+        type Action = S::Action;
+        type Subjects = S::Subjects;
+    }
+    ///State transition - sets the `action` field to Set
+    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAction<S> {}
+    impl<S: State> State for SetAction<S> {
+        type Scheduling = S::Scheduling;
+        type CreatedBy = S::CreatedBy;
+        type Action = Set<members::action>;
+        type Subjects = S::Subjects;
+    }
+    ///State transition - sets the `subjects` field to Set
+    pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubjects<S> {}
+    impl<S: State> State for SetSubjects<S> {
+        type Scheduling = S::Scheduling;
+        type CreatedBy = S::CreatedBy;
+        type Action = S::Action;
+        type Subjects = Set<members::subjects>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subjects` field
-        pub struct subjects(());
-        ///Marker type for the `action` field
-        pub struct action(());
         ///Marker type for the `scheduling` field
         pub struct scheduling(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
+        ///Marker type for the `action` field
+        pub struct action(());
+        ///Marker type for the `subjects` field
+        pub struct subjects(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ScheduleActionBuilder<'a, S: schedule_action_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            crate::tools_ozone::moderation::schedule_action::Takedown<'a>,
-        >,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
-        ::core::option::Option<
-            crate::tools_ozone::moderation::schedule_action::SchedulingConfig<'a>,
-        >,
-        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+        Option<schedule_action::Takedown<'a>>,
+        Option<Did<'a>>,
+        Option<ModTool<'a>>,
+        Option<schedule_action::SchedulingConfig<'a>>,
+        Option<Vec<Did<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ScheduleAction<'a> {
@@ -1075,9 +782,9 @@ impl<'a> ScheduleActionBuilder<'a, schedule_action_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ScheduleActionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1090,13 +797,13 @@ where
     /// Set the `action` field (required)
     pub fn action(
         mut self,
-        value: impl Into<crate::tools_ozone::moderation::schedule_action::Takedown<'a>>,
+        value: impl Into<schedule_action::Takedown<'a>>,
     ) -> ScheduleActionBuilder<'a, schedule_action_state::SetAction<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ScheduleActionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1109,31 +816,25 @@ where
     /// Set the `createdBy` field (required)
     pub fn created_by(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> ScheduleActionBuilder<'a, schedule_action_state::SetCreatedBy<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ScheduleActionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: schedule_action_state::State> ScheduleActionBuilder<'a, S> {
     /// Set the `modTool` field (optional)
-    pub fn mod_tool(
-        mut self,
-        value: impl Into<Option<crate::tools_ozone::moderation::ModTool<'a>>>,
-    ) -> Self {
+    pub fn mod_tool(mut self, value: impl Into<Option<ModTool<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `modTool` field to an Option value (optional)
-    pub fn maybe_mod_tool(
-        mut self,
-        value: Option<crate::tools_ozone::moderation::ModTool<'a>>,
-    ) -> Self {
+    pub fn maybe_mod_tool(mut self, value: Option<ModTool<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -1147,15 +848,13 @@ where
     /// Set the `scheduling` field (required)
     pub fn scheduling(
         mut self,
-        value: impl Into<
-            crate::tools_ozone::moderation::schedule_action::SchedulingConfig<'a>,
-        >,
+        value: impl Into<schedule_action::SchedulingConfig<'a>>,
     ) -> ScheduleActionBuilder<'a, schedule_action_state::SetScheduling<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         ScheduleActionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1168,13 +867,13 @@ where
     /// Set the `subjects` field (required)
     pub fn subjects(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+        value: impl Into<Vec<Did<'a>>>,
     ) -> ScheduleActionBuilder<'a, schedule_action_state::SetSubjects<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         ScheduleActionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1182,10 +881,10 @@ where
 impl<'a, S> ScheduleActionBuilder<'a, S>
 where
     S: schedule_action_state::State,
-    S::Subjects: schedule_action_state::IsSet,
-    S::Action: schedule_action_state::IsSet,
     S::Scheduling: schedule_action_state::IsSet,
     S::CreatedBy: schedule_action_state::IsSet,
+    S::Action: schedule_action_state::IsSet,
+    S::Subjects: schedule_action_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScheduleAction<'a> {
@@ -1201,7 +900,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1263,14 +962,12 @@ pub mod scheduled_action_results_state {
 
 /// Builder for constructing an instance of this type
 pub struct ScheduledActionResultsBuilder<'a, S: scheduled_action_results_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            Vec<crate::tools_ozone::moderation::schedule_action::FailedScheduling<'a>>,
-        >,
-        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+        Option<Vec<schedule_action::FailedScheduling<'a>>>,
+        Option<Vec<Did<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ScheduledActionResults<'a> {
@@ -1287,9 +984,9 @@ impl<'a> ScheduledActionResultsBuilder<'a, scheduled_action_results_state::Empty
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ScheduledActionResultsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1302,18 +999,16 @@ where
     /// Set the `failed` field (required)
     pub fn failed(
         mut self,
-        value: impl Into<
-            Vec<crate::tools_ozone::moderation::schedule_action::FailedScheduling<'a>>,
-        >,
+        value: impl Into<Vec<schedule_action::FailedScheduling<'a>>>,
     ) -> ScheduledActionResultsBuilder<
         'a,
         scheduled_action_results_state::SetFailed<S>,
     > {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ScheduledActionResultsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1326,16 +1021,16 @@ where
     /// Set the `succeeded` field (required)
     pub fn succeeded(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+        value: impl Into<Vec<Did<'a>>>,
     ) -> ScheduledActionResultsBuilder<
         'a,
         scheduled_action_results_state::SetSucceeded<S>,
     > {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ScheduledActionResultsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1357,7 +1052,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

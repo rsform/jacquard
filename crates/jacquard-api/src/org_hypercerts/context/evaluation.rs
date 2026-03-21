@@ -5,108 +5,94 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::app_certified::Did;
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::org_hypercerts::SmallBlob;
+use crate::org_hypercerts::Uri;
+use crate::org_hypercerts::context::evaluation;
 /// An evaluation of a hypercert record (e.g. an activity and its impact).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Evaluation<'a> {
     ///Evaluation data (URIs or blobs) containing detailed reports or methodology
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub content: core::option::Option<Vec<EvaluationContentItem<'a>>>,
+    pub content: Option<Vec<EvaluationContentItem<'a>>>,
     ///Client-declared timestamp when this record was originally created
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///DIDs of the evaluators
     #[serde(borrow)]
-    pub evaluators: Vec<crate::app_certified::Did<'a>>,
+    pub evaluators: Vec<Did<'a>>,
     ///An optional reference for georeferenced evaluations. The record referenced must conform with the lexicon app.certified.location.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub location: core::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub location: Option<StrongRef<'a>>,
     ///Optional references to the measurements that contributed to this evaluation. The record(s) referenced must conform with the lexicon org.hypercerts.context.measurement
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub measurements: core::option::Option<
-        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    >,
+    pub measurements: Option<Vec<StrongRef<'a>>>,
     ///Optional overall score for this evaluation on a numeric scale.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub score: core::option::Option<
-        crate::org_hypercerts::context::evaluation::Score<'a>,
-    >,
+    pub score: Option<evaluation::Score<'a>>,
     ///A strong reference to what is being evaluated (e.g. activity, measurement, contribution, etc.)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subject: core::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub subject: Option<StrongRef<'a>>,
     ///Brief evaluation summary
     #[serde(borrow)]
-    pub summary: jacquard_common::CowStr<'a>,
+    pub summary: CowStr<'a>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EvaluationContentItem<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<crate::org_hypercerts::Uri<'a>>),
+    Uri(Box<Uri<'a>>),
     #[serde(rename = "org.hypercerts.defs#smallBlob")]
-    SmallBlob(Box<crate::org_hypercerts::SmallBlob<'a>>),
+    SmallBlob(Box<SmallBlob<'a>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct EvaluationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Evaluation<'a>,
 }
 
 /// Overall score for an evaluation on a numeric scale.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Score<'a> {
     ///Maximum value of the scale, e.g. 5 or 10.
@@ -119,25 +105,21 @@ pub struct Score<'a> {
 
 impl<'a> Evaluation<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, EvaluationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, EvaluationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EvaluationRecord;
-impl jacquard_common::xrpc::XrpcResp for EvaluationRecord {
+impl XrpcResp for EvaluationRecord {
     const NSID: &'static str = "org.hypercerts.context.evaluation";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = EvaluationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<EvaluationGetRecordOutput<'_>> for Evaluation<'_> {
@@ -147,36 +129,32 @@ impl From<EvaluationGetRecordOutput<'_>> for Evaluation<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Evaluation<'_> {
+impl Collection for Evaluation<'_> {
     const NSID: &'static str = "org.hypercerts.context.evaluation";
     type Record = EvaluationRecord;
 }
 
-impl jacquard_common::types::collection::Collection for EvaluationRecord {
+impl Collection for EvaluationRecord {
     const NSID: &'static str = "org.hypercerts.context.evaluation";
     type Record = EvaluationRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
+impl<'a> LexiconSchema for Evaluation<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.context.evaluation"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_context_evaluation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.content {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "content",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("content"),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -186,10 +164,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
             let value = &self.evaluators;
             #[allow(unused_comparisons)]
             if value.len() > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "evaluators",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("evaluators"),
                     max: 1000usize,
                     actual: value.len(),
                 });
@@ -198,10 +174,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
         if let Some(ref value) = self.measurements {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "measurements",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("measurements"),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -211,10 +185,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
             let value = &self.summary;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "summary",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("summary"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -223,16 +195,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
         {
             let value = &self.summary;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "summary",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("summary"),
                         max: 1000usize,
                         actual: count,
                     });
@@ -243,19 +209,17 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Score<'a> {
+impl<'a> LexiconSchema for Score<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.context.evaluation"
     }
     fn def_name() -> &'static str {
         "score"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_context_evaluation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -270,49 +234,49 @@ pub mod evaluation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Summary;
         type CreatedAt;
+        type Summary;
         type Evaluators;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Summary = Unset;
         type CreatedAt = Unset;
+        type Summary = Unset;
         type Evaluators = Unset;
-    }
-    ///State transition - sets the `summary` field to Set
-    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSummary<S> {}
-    impl<S: State> State for SetSummary<S> {
-        type Summary = Set<members::summary>;
-        type CreatedAt = S::CreatedAt;
-        type Evaluators = S::Evaluators;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Summary = S::Summary;
         type CreatedAt = Set<members::created_at>;
+        type Summary = S::Summary;
+        type Evaluators = S::Evaluators;
+    }
+    ///State transition - sets the `summary` field to Set
+    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSummary<S> {}
+    impl<S: State> State for SetSummary<S> {
+        type CreatedAt = S::CreatedAt;
+        type Summary = Set<members::summary>;
         type Evaluators = S::Evaluators;
     }
     ///State transition - sets the `evaluators` field to Set
     pub struct SetEvaluators<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEvaluators<S> {}
     impl<S: State> State for SetEvaluators<S> {
-        type Summary = S::Summary;
         type CreatedAt = S::CreatedAt;
+        type Summary = S::Summary;
         type Evaluators = Set<members::evaluators>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `summary` field
-        pub struct summary(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `summary` field
+        pub struct summary(());
         ///Marker type for the `evaluators` field
         pub struct evaluators(());
     }
@@ -320,18 +284,18 @@ pub mod evaluation_state {
 
 /// Builder for constructing an instance of this type
 pub struct EvaluationBuilder<'a, S: evaluation_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<EvaluationContentItem<'a>>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<Vec<crate::app_certified::Did<'a>>>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        ::core::option::Option<crate::org_hypercerts::context::evaluation::Score<'a>>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<Vec<EvaluationContentItem<'a>>>,
+        Option<Datetime>,
+        Option<Vec<Did<'a>>>,
+        Option<StrongRef<'a>>,
+        Option<Vec<StrongRef<'a>>>,
+        Option<evaluation::Score<'a>>,
+        Option<StrongRef<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Evaluation<'a> {
@@ -345,9 +309,9 @@ impl<'a> EvaluationBuilder<'a, evaluation_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EvaluationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -379,13 +343,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> EvaluationBuilder<'a, evaluation_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         EvaluationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -398,31 +362,25 @@ where
     /// Set the `evaluators` field (required)
     pub fn evaluators(
         mut self,
-        value: impl Into<Vec<crate::app_certified::Did<'a>>>,
+        value: impl Into<Vec<Did<'a>>>,
     ) -> EvaluationBuilder<'a, evaluation_state::SetEvaluators<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         EvaluationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `location` field (optional)
-    pub fn location(
-        mut self,
-        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> Self {
+    pub fn location(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
-    pub fn maybe_location(
-        mut self,
-        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ) -> Self {
+    pub fn maybe_location(mut self, value: Option<StrongRef<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -430,20 +388,12 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `measurements` field (optional)
-    pub fn measurements(
-        mut self,
-        value: impl Into<
-            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        >,
-    ) -> Self {
+    pub fn measurements(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `measurements` field to an Option value (optional)
-    pub fn maybe_measurements(
-        mut self,
-        value: Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> Self {
+    pub fn maybe_measurements(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -451,18 +401,12 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `score` field (optional)
-    pub fn score(
-        mut self,
-        value: impl Into<Option<crate::org_hypercerts::context::evaluation::Score<'a>>>,
-    ) -> Self {
+    pub fn score(mut self, value: impl Into<Option<evaluation::Score<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `score` field to an Option value (optional)
-    pub fn maybe_score(
-        mut self,
-        value: Option<crate::org_hypercerts::context::evaluation::Score<'a>>,
-    ) -> Self {
+    pub fn maybe_score(mut self, value: Option<evaluation::Score<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -470,18 +414,12 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `subject` field (optional)
-    pub fn subject(
-        mut self,
-        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> Self {
+    pub fn subject(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
-    pub fn maybe_subject(
-        mut self,
-        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ) -> Self {
+    pub fn maybe_subject(mut self, value: Option<StrongRef<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -495,13 +433,13 @@ where
     /// Set the `summary` field (required)
     pub fn summary(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> EvaluationBuilder<'a, evaluation_state::SetSummary<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         EvaluationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -509,8 +447,8 @@ where
 impl<'a, S> EvaluationBuilder<'a, S>
 where
     S: evaluation_state::State,
-    S::Summary: evaluation_state::IsSet,
     S::CreatedAt: evaluation_state::IsSet,
+    S::Summary: evaluation_state::IsSet,
     S::Evaluators: evaluation_state::IsSet,
 {
     /// Build the final struct
@@ -530,7 +468,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -549,244 +487,179 @@ where
     }
 }
 
-fn lexicon_doc_org_hypercerts_context_evaluation() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.hypercerts.context.evaluation"),
-        revision: None,
-        description: None,
+fn lexicon_doc_org_hypercerts_context_evaluation() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("org.hypercerts.context.evaluation"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "An evaluation of a hypercert record (e.g. an activity and its impact).",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("evaluators"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("summary"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("evaluators"),
+                                SmolStr::new_static("summary"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "content",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("content"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Evaluation data (URIs or blobs) containing detailed reports or methodology",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                        description: None,
+                                    items: LexArrayItem::Union(LexRefUnion {
                                         refs: vec![
-                                            ::jacquard_common::CowStr::new_static("org.hypercerts.defs#uri"),
-                                            ::jacquard_common::CowStr::new_static("org.hypercerts.defs#smallBlob")
+                                            CowStr::new_static("org.hypercerts.defs#uri"),
+                                            CowStr::new_static("org.hypercerts.defs#smallBlob")
                                         ],
-                                        closed: None,
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(100usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Client-declared timestamp when this record was originally created",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "evaluators",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("evaluators"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "DIDs of the evaluators",
-                                        ),
+                                        CowStr::new_static("DIDs of the evaluators"),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "app.certified.defs#did",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("app.certified.defs#did"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(1000usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "location",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "com.atproto.repo.strongRef",
-                                    ),
+                                SmolStr::new_static("location"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "measurements",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("measurements"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Optional references to the measurements that contributed to this evaluation. The record(s) referenced must conform with the lexicon org.hypercerts.context.measurement",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "com.atproto.repo.strongRef",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(100usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "score",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#score"),
+                                SmolStr::new_static("score"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#score"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "subject",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "com.atproto.repo.strongRef",
-                                    ),
+                                SmolStr::new_static("subject"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "summary",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("summary"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Brief evaluation summary",
-                                        ),
+                                        CowStr::new_static("Brief evaluation summary"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(5000usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(1000usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("score"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("score"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Overall score for an evaluation on a numeric scale.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("min"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("max"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
+                            SmolStr::new_static("min"), SmolStr::new_static("max"),
+                            SmolStr::new_static("value")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "max",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("max"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "min",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("min"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "value",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("value"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -800,49 +673,49 @@ pub mod score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Min;
         type Max;
+        type Min;
         type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Min = Unset;
         type Max = Unset;
+        type Min = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `min` field to Set
-    pub struct SetMin<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMin<S> {}
-    impl<S: State> State for SetMin<S> {
-        type Min = Set<members::min>;
-        type Max = S::Max;
-        type Value = S::Value;
     }
     ///State transition - sets the `max` field to Set
     pub struct SetMax<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMax<S> {}
     impl<S: State> State for SetMax<S> {
-        type Min = S::Min;
         type Max = Set<members::max>;
+        type Min = S::Min;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `min` field to Set
+    pub struct SetMin<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMin<S> {}
+    impl<S: State> State for SetMin<S> {
+        type Max = S::Max;
+        type Min = Set<members::min>;
         type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Min = S::Min;
         type Max = S::Max;
+        type Min = S::Min;
         type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `min` field
-        pub struct min(());
         ///Marker type for the `max` field
         pub struct max(());
+        ///Marker type for the `min` field
+        pub struct min(());
         ///Marker type for the `value` field
         pub struct value(());
     }
@@ -850,13 +723,9 @@ pub mod score_state {
 
 /// Builder for constructing an instance of this type
 pub struct ScoreBuilder<'a, S: score_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<i64>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Score<'a> {
@@ -870,9 +739,9 @@ impl<'a> ScoreBuilder<'a, score_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ScoreBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -887,11 +756,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScoreBuilder<'a, score_state::SetMax<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ScoreBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -906,11 +775,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScoreBuilder<'a, score_state::SetMin<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ScoreBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -925,11 +794,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScoreBuilder<'a, score_state::SetValue<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         ScoreBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -937,8 +806,8 @@ where
 impl<'a, S> ScoreBuilder<'a, S>
 where
     S: score_state::State,
-    S::Min: score_state::IsSet,
     S::Max: score_state::IsSet,
+    S::Min: score_state::IsSet,
     S::Value: score_state::IsSet,
 {
     /// Build the final struct
@@ -953,7 +822,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

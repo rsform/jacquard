@@ -5,68 +5,61 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::unspecced::AgeAssuranceState;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct InitAgeAssurance<'a> {
     ///An ISO 3166-1 alpha-2 code of the user's location.
     #[serde(borrow)]
-    pub country_code: jacquard_common::CowStr<'a>,
+    pub country_code: CowStr<'a>,
     ///The user's email address to receive assurance instructions.
     #[serde(borrow)]
-    pub email: jacquard_common::CowStr<'a>,
+    pub email: CowStr<'a>,
     ///The user's preferred language for communication during the assurance process.
     #[serde(borrow)]
-    pub language: jacquard_common::CowStr<'a>,
+    pub language: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct InitAgeAssuranceOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_bsky::unspecced::AgeAssuranceState<'a>,
+    pub value: AgeAssuranceState<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum InitAgeAssuranceError<'a> {
     #[serde(rename = "InvalidEmail")]
-    InvalidEmail(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidEmail(Option<CowStr<'a>>),
     #[serde(rename = "DidTooLong")]
-    DidTooLong(core::option::Option<jacquard_common::CowStr<'a>>),
+    DidTooLong(Option<CowStr<'a>>),
     #[serde(rename = "InvalidInitiation")]
-    InvalidInitiation(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidInitiation(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for InitAgeAssuranceError<'_> {
@@ -98,8 +91,7 @@ impl core::fmt::Display for InitAgeAssuranceError<'_> {
     }
 }
 
-/// Response type for
-///app.bsky.unspecced.initAgeAssurance
+/// Response type for app.bsky.unspecced.initAgeAssurance
 pub struct InitAgeAssuranceResponse;
 impl jacquard_common::xrpc::XrpcResp for InitAgeAssuranceResponse {
     const NSID: &'static str = "app.bsky.unspecced.initAgeAssurance";
@@ -116,8 +108,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for InitAgeAssurance<'a> {
     type Response = InitAgeAssuranceResponse;
 }
 
-/// Endpoint type for
-///app.bsky.unspecced.initAgeAssurance
+/// Endpoint type for app.bsky.unspecced.initAgeAssurance
 pub struct InitAgeAssuranceRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for InitAgeAssuranceRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.initAgeAssurance";

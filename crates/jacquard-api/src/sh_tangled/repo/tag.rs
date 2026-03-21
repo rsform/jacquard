@@ -5,61 +5,54 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Tag<'a> {
     #[serde(borrow)]
-    pub repo: jacquard_common::CowStr<'a>,
+    pub repo: CowStr<'a>,
     #[serde(borrow)]
-    pub tag: jacquard_common::CowStr<'a>,
+    pub tag: CowStr<'a>,
 }
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct TagOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TagError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(Option<CowStr<'a>>),
     /// Tag not found
     #[serde(rename = "TagNotFound")]
-    TagNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    TagNotFound(Option<CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRequest(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for TagError<'_> {
@@ -91,8 +84,7 @@ impl core::fmt::Display for TagError<'_> {
     }
 }
 
-/// Response type for
-///sh.tangled.repo.tag
+/// Response type for sh.tangled.repo.tag
 pub struct TagResponse;
 impl jacquard_common::xrpc::XrpcResp for TagResponse {
     const NSID: &'static str = "sh.tangled.repo.tag";
@@ -122,8 +114,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Tag<'a> {
     type Response = TagResponse;
 }
 
-/// Endpoint type for
-///sh.tangled.repo.tag
+/// Endpoint type for sh.tangled.repo.tag
 pub struct TagRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for TagRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.tag";
@@ -142,48 +133,45 @@ pub mod tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Tag;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Tag = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Tag = S::Tag;
+        type Repo = Unset;
     }
     ///State transition - sets the `tag` field to Set
     pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTag<S> {}
     impl<S: State> State for SetTag<S> {
-        type Repo = S::Repo;
         type Tag = Set<members::tag>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Tag = S::Tag;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `tag` field
         pub struct tag(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TagBuilder<'a, S: tag_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Tag<'a> {
@@ -197,9 +185,9 @@ impl<'a> TagBuilder<'a, tag_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TagBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -212,13 +200,13 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> TagBuilder<'a, tag_state::SetRepo<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         TagBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -231,13 +219,13 @@ where
     /// Set the `tag` field (required)
     pub fn tag(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> TagBuilder<'a, tag_state::SetTag<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         TagBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -245,8 +233,8 @@ where
 impl<'a, S> TagBuilder<'a, S>
 where
     S: tag_state::State,
-    S::Repo: tag_state::IsSet,
     S::Tag: tag_state::IsSet,
+    S::Repo: tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tag<'a> {

@@ -5,104 +5,96 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Nsid, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::label::definition;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Definition<'a> {
     ///The hex value for the background color for the label. Appviews may choose to respect this.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub color: core::option::Option<jacquard_common::CowStr<'a>>,
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub color: Option<CowStr<'a>>,
+    pub created_at: Datetime,
     ///Whether this label can be repeated for a given entity, eg.: [reviewer:foo, reviewer:bar]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub multiple: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub multiple: Option<bool>,
     ///The display name of this label.
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///The areas of the repo this label may apply to, eg.: sh.tangled.repo.issue. Appviews may choose to respect this.
     #[serde(borrow)]
-    pub scope: Vec<jacquard_common::types::string::Nsid<'a>>,
+    pub scope: Vec<Nsid<'a>>,
     ///The type definition of this label. Appviews may allow sorting for certain types.
     #[serde(borrow)]
-    pub value_type: crate::sh_tangled::label::definition::ValueType<'a>,
+    pub value_type: definition::ValueType<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DefinitionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Definition<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ValueType<'a> {
     ///Closed set of values that this label can take.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#enum: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub r#enum: Option<Vec<CowStr<'a>>>,
     ///An optional constraint that can be applied on string concrete types.
     #[serde(borrow)]
-    pub format: jacquard_common::CowStr<'a>,
+    pub format: CowStr<'a>,
     ///The concrete type of this label's value.
     #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
+    pub r#type: CowStr<'a>,
 }
 
 impl<'a> Definition<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DefinitionRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, DefinitionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DefinitionRecord;
-impl jacquard_common::xrpc::XrpcResp for DefinitionRecord {
+impl XrpcResp for DefinitionRecord {
     const NSID: &'static str = "sh.tangled.label.definition";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = DefinitionGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<DefinitionGetRecordOutput<'_>> for Definition<'_> {
@@ -112,42 +104,34 @@ impl From<DefinitionGetRecordOutput<'_>> for Definition<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Definition<'_> {
+impl Collection for Definition<'_> {
     const NSID: &'static str = "sh.tangled.label.definition";
     type Record = DefinitionRecord;
 }
 
-impl jacquard_common::types::collection::Collection for DefinitionRecord {
+impl Collection for DefinitionRecord {
     const NSID: &'static str = "sh.tangled.label.definition";
     type Record = DefinitionRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
+impl<'a> LexiconSchema for Definition<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.label.definition"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_label_definition()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.name;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 40usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("name"),
                         max: 40usize,
                         actual: count,
                     });
@@ -157,16 +141,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
         {
             let value = &self.name;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count < 1usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
+                    return Err(ConstraintError::MinGraphemes {
+                        path: ValidationPath::from_field("name"),
                         min: 1usize,
                         actual: count,
                     });
@@ -177,19 +155,17 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ValueType<'a> {
+impl<'a> LexiconSchema for ValueType<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.label.definition"
     }
     fn def_name() -> &'static str {
         "valueType"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_label_definition()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -205,8 +181,8 @@ pub mod definition_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type ValueType;
         type Scope;
+        type ValueType;
         type Name;
     }
     /// Empty state - all required fields are unset
@@ -214,8 +190,8 @@ pub mod definition_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type ValueType = Unset;
         type Scope = Unset;
+        type ValueType = Unset;
         type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
@@ -223,17 +199,8 @@ pub mod definition_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Scope = S::Scope;
         type ValueType = S::ValueType;
-        type Scope = S::Scope;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `value_type` field to Set
-    pub struct SetValueType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValueType<S> {}
-    impl<S: State> State for SetValueType<S> {
-        type CreatedAt = S::CreatedAt;
-        type ValueType = Set<members::value_type>;
-        type Scope = S::Scope;
         type Name = S::Name;
     }
     ///State transition - sets the `scope` field to Set
@@ -241,8 +208,17 @@ pub mod definition_state {
     impl<S: State> sealed::Sealed for SetScope<S> {}
     impl<S: State> State for SetScope<S> {
         type CreatedAt = S::CreatedAt;
-        type ValueType = S::ValueType;
         type Scope = Set<members::scope>;
+        type ValueType = S::ValueType;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `value_type` field to Set
+    pub struct SetValueType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValueType<S> {}
+    impl<S: State> State for SetValueType<S> {
+        type CreatedAt = S::CreatedAt;
+        type Scope = S::Scope;
+        type ValueType = Set<members::value_type>;
         type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
@@ -250,8 +226,8 @@ pub mod definition_state {
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type CreatedAt = S::CreatedAt;
-        type ValueType = S::ValueType;
         type Scope = S::Scope;
+        type ValueType = S::ValueType;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -259,10 +235,10 @@ pub mod definition_state {
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `value_type` field
-        pub struct value_type(());
         ///Marker type for the `scope` field
         pub struct scope(());
+        ///Marker type for the `value_type` field
+        pub struct value_type(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -270,16 +246,16 @@ pub mod definition_state {
 
 /// Builder for constructing an instance of this type
 pub struct DefinitionBuilder<'a, S: definition_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
-        ::core::option::Option<crate::sh_tangled::label::definition::ValueType<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<bool>,
+        Option<CowStr<'a>>,
+        Option<Vec<Nsid<'a>>>,
+        Option<definition::ValueType<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Definition<'a> {
@@ -293,24 +269,21 @@ impl<'a> DefinitionBuilder<'a, definition_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DefinitionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
     /// Set the `color` field (optional)
-    pub fn color(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn color(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `color` field to an Option value (optional)
-    pub fn maybe_color(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_color(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -324,13 +297,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> DefinitionBuilder<'a, definition_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         DefinitionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -356,13 +329,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> DefinitionBuilder<'a, definition_state::SetName<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         DefinitionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -375,13 +348,13 @@ where
     /// Set the `scope` field (required)
     pub fn scope(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::Nsid<'a>>>,
+        value: impl Into<Vec<Nsid<'a>>>,
     ) -> DefinitionBuilder<'a, definition_state::SetScope<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         DefinitionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -394,13 +367,13 @@ where
     /// Set the `valueType` field (required)
     pub fn value_type(
         mut self,
-        value: impl Into<crate::sh_tangled::label::definition::ValueType<'a>>,
+        value: impl Into<definition::ValueType<'a>>,
     ) -> DefinitionBuilder<'a, definition_state::SetValueType<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         DefinitionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -409,8 +382,8 @@ impl<'a, S> DefinitionBuilder<'a, S>
 where
     S: definition_state::State,
     S::CreatedAt: definition_state::IsSet,
-    S::ValueType: definition_state::IsSet,
     S::Scope: definition_state::IsSet,
+    S::ValueType: definition_state::IsSet,
     S::Name: definition_state::IsSet,
 {
     /// Build the final struct
@@ -428,7 +401,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -445,235 +418,148 @@ where
     }
 }
 
-fn lexicon_doc_sh_tangled_label_definition() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("sh.tangled.label.definition"),
-        revision: None,
-        description: None,
+fn lexicon_doc_sh_tangled_label_definition() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("sh.tangled.label.definition"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("valueType"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("scope"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("valueType"),
+                                SmolStr::new_static("scope"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "color",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("color"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The hex value for the background color for the label. Appviews may choose to respect this.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "multiple",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
+                                SmolStr::new_static("multiple"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("name"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "The display name of this label.",
-                                        ),
+                                        CowStr::new_static("The display name of this label."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
                                     min_graphemes: Some(1usize),
                                     max_graphemes: Some(40usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "scope",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("scope"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The areas of the repo this label may apply to, eg.: sh.tangled.repo.issue. Appviews may choose to respect this.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Nsid,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    items: LexArrayItem::String(LexString {
+                                        format: Some(LexStringFormat::Nsid),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "valueType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#valueType"),
+                                SmolStr::new_static("valueType"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#valueType"),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("valueType"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("valueType"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("format")
-                        ],
+                        vec![SmolStr::new_static("type"), SmolStr::new_static("format")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "enum",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("enum"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Closed set of values that this label can take.",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "format",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("format"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "An optional constraint that can be applied on string concrete types.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The concrete type of this label's value.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

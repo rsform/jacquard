@@ -5,18 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::net_altq::aqfile;
 /// Cryptographic checksum for integrity verification.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Checksum<'a> {
     ///Hash algorithm name.
@@ -24,16 +36,17 @@ pub struct Checksum<'a> {
     pub algo: ChecksumAlgo<'a>,
     ///Hex or base64 encoded digest produced by the algorithm.
     #[serde(borrow)]
-    pub hash: jacquard_common::CowStr<'a>,
+    pub hash: CowStr<'a>,
 }
 
 /// Hash algorithm name.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ChecksumAlgo<'a> {
     Sha256,
     Sha512,
     Blake3,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ChecksumAlgo<'a> {
@@ -53,7 +66,7 @@ impl<'a> From<&'a str> for ChecksumAlgo<'a> {
             "sha256" => Self::Sha256,
             "sha512" => Self::Sha512,
             "blake3" => Self::Blake3,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -64,7 +77,7 @@ impl<'a> From<String> for ChecksumAlgo<'a> {
             "sha256" => Self::Sha256,
             "sha512" => Self::Sha512,
             "blake3" => Self::Blake3,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -122,120 +135,88 @@ impl jacquard_common::IntoStatic for ChecksumAlgo<'_> {
 }
 
 /// File metadata describing the uploaded blob.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct File<'a> {
     ///MIME type, e.g. 'video/mp4'.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub mime_type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub mime_type: Option<CowStr<'a>>,
     ///Client-side last-modified timestamp.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub modified_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub modified_at: Option<Datetime>,
     ///User-visible filename.
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///File size in bytes.
     pub size: i64,
 }
 
 /// A record representing an uploaded file blob with metadata.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Aqfile<'a> {
     ///Handle or DID of the account to attribute this upload to.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub attribution: core::option::Option<
-        jacquard_common::types::ident::AtIdentifier<'a>,
-    >,
+    pub attribution: Option<AtIdentifier<'a>>,
     ///The uploaded blob reference. Note: Individual PDS instances may enforce lower size limits.
     #[serde(borrow)]
-    pub blob: jacquard_common::types::blob::BlobRef<'a>,
+    pub blob: BlobRef<'a>,
     ///Optional cryptographic checksum for integrity verification.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub checksum: core::option::Option<crate::net_altq::aqfile::Checksum<'a>>,
+    pub checksum: Option<aqfile::Checksum<'a>>,
     ///Timestamp when this record was created.
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///Metadata about the file.
     #[serde(borrow)]
-    pub file: crate::net_altq::aqfile::File<'a>,
+    pub file: aqfile::File<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct AqfileGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Aqfile<'a>,
 }
 
 impl<'a> Aqfile<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, AqfileRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, AqfileRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Checksum<'a> {
+impl<'a> LexiconSchema for Checksum<'a> {
     fn nsid() -> &'static str {
         "net.altq.aqfile"
     }
     fn def_name() -> &'static str {
         "checksum"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_altq_aqfile()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.algo;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "algo",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("algo"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -245,10 +226,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Checksum<'a> {
             let value = &self.hash;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "hash",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("hash"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -258,26 +237,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Checksum<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for File<'a> {
+impl<'a> LexiconSchema for File<'a> {
     fn nsid() -> &'static str {
         "net.altq.aqfile"
     }
     fn def_name() -> &'static str {
         "file"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_altq_aqfile()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.mime_type {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mime_type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("mime_type"),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -287,10 +262,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for File<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -299,10 +272,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for File<'a> {
         {
             let value = &self.size;
             if *value > 1000000000i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "size",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("size"),
                     max: 1000000000i64,
                     actual: *value,
                 });
@@ -311,10 +282,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for File<'a> {
         {
             let value = &self.size;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "size",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("size"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -325,13 +294,14 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for File<'a> {
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct AqfileRecord;
-impl jacquard_common::xrpc::XrpcResp for AqfileRecord {
+impl XrpcResp for AqfileRecord {
     const NSID: &'static str = "net.altq.aqfile";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = AqfileGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<AqfileGetRecordOutput<'_>> for Aqfile<'_> {
@@ -341,38 +311,34 @@ impl From<AqfileGetRecordOutput<'_>> for Aqfile<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Aqfile<'_> {
+impl Collection for Aqfile<'_> {
     const NSID: &'static str = "net.altq.aqfile";
     type Record = AqfileRecord;
 }
 
-impl jacquard_common::types::collection::Collection for AqfileRecord {
+impl Collection for AqfileRecord {
     const NSID: &'static str = "net.altq.aqfile";
     type Record = AqfileRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Aqfile<'a> {
+impl<'a> LexiconSchema for Aqfile<'a> {
     fn nsid() -> &'static str {
         "net.altq.aqfile"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_altq_aqfile()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.blob;
             {
                 let size = value.blob().size;
                 if size > 1000000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
+                    return Err(ConstraintError::BlobTooLarge {
+                        path: ValidationPath::from_field("blob"),
                         max: 1000000000usize,
                         actual: size,
                     });
@@ -398,10 +364,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Aqfile<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("blob"),
                         accepted: vec!["*/*".to_string()],
                         actual: mime.to_string(),
                     });
@@ -412,281 +376,184 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Aqfile<'a> {
     }
 }
 
-fn lexicon_doc_net_altq_aqfile() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("net.altq.aqfile"),
-        revision: None,
-        description: None,
+fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("net.altq.aqfile"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("checksum"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("checksum"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Cryptographic checksum for integrity verification.",
                         ),
                     ),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("algo"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("hash")
-                        ],
+                        vec![SmolStr::new_static("algo"), SmolStr::new_static("hash")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "algo",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("algo"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Hash algorithm name.",
-                                    ),
+                                    CowStr::new_static("Hash algorithm name."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(32usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hash",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("hash"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Hex or base64 encoded digest produced by the algorithm.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(128usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("file"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("file"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "File metadata describing the uploaded blob.",
-                        ),
+                        CowStr::new_static("File metadata describing the uploaded blob."),
                     ),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("size")
-                        ],
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("size")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mimeType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("mimeType"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "MIME type, e.g. 'video/mp4'.",
-                                    ),
+                                    CowStr::new_static("MIME type, e.g. 'video/mp4'."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(255usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "modifiedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("modifiedAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Client-side last-modified timestamp.",
-                                    ),
+                                    CowStr::new_static("Client-side last-modified timestamp."),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "User-visible filename.",
-                                    ),
+                                    CowStr::new_static("User-visible filename."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(512usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "size",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("size"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(1000000000i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A record representing an uploaded file blob with metadata.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("blob"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("file")
+                                SmolStr::new_static("blob"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("file")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "attribution",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("attribution"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Handle or DID of the account to attribute this upload to.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtIdentifier,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::AtIdentifier),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "blob",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                    description: None,
-                                    accept: None,
-                                    max_size: None,
+                                SmolStr::new_static("blob"),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("checksum"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#checksum"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "checksum",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#checksum"),
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp when this record was created.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "file",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#file"),
+                                SmolStr::new_static("file"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#file"),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -736,14 +603,14 @@ pub mod file_state {
 
 /// Builder for constructing an instance of this type
 pub struct FileBuilder<'a, S: file_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> File<'a> {
@@ -757,27 +624,21 @@ impl<'a> FileBuilder<'a, file_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: file_state::State> FileBuilder<'a, S> {
     /// Set the `mimeType` field (optional)
-    pub fn mime_type(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn mime_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `mimeType` field to an Option value (optional)
-    pub fn maybe_mime_type(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_mime_type(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -785,18 +646,12 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
 
 impl<'a, S: file_state::State> FileBuilder<'a, S> {
     /// Set the `modifiedAt` field (optional)
-    pub fn modified_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn modified_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `modifiedAt` field to an Option value (optional)
-    pub fn maybe_modified_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_modified_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -810,13 +665,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> FileBuilder<'a, file_state::SetName<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         FileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -831,11 +686,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> FileBuilder<'a, file_state::SetSize<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         FileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -859,7 +714,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -884,65 +739,65 @@ pub mod aqfile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Blob;
         type File;
+        type Blob;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Blob = Unset;
         type File = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Blob = S::Blob;
-        type File = S::File;
-    }
-    ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
-        type CreatedAt = S::CreatedAt;
-        type Blob = Set<members::blob>;
-        type File = S::File;
+        type Blob = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `file` field to Set
     pub struct SetFile<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFile<S> {}
     impl<S: State> State for SetFile<S> {
-        type CreatedAt = S::CreatedAt;
-        type Blob = S::Blob;
         type File = Set<members::file>;
+        type Blob = S::Blob;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlob<S> {}
+    impl<S: State> State for SetBlob<S> {
+        type File = S::File;
+        type Blob = Set<members::blob>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type File = S::File;
+        type Blob = S::Blob;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `blob` field
-        pub struct blob(());
         ///Marker type for the `file` field
         pub struct file(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AqfileBuilder<'a, S: aqfile_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<crate::net_altq::aqfile::Checksum<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::net_altq::aqfile::File<'a>>,
+        Option<AtIdentifier<'a>>,
+        Option<BlobRef<'a>>,
+        Option<aqfile::Checksum<'a>>,
+        Option<Datetime>,
+        Option<aqfile::File<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Aqfile<'a> {
@@ -956,27 +811,21 @@ impl<'a> AqfileBuilder<'a, aqfile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AqfileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: aqfile_state::State> AqfileBuilder<'a, S> {
     /// Set the `attribution` field (optional)
-    pub fn attribution(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::ident::AtIdentifier<'a>>>,
-    ) -> Self {
+    pub fn attribution(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `attribution` field to an Option value (optional)
-    pub fn maybe_attribution(
-        mut self,
-        value: Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ) -> Self {
+    pub fn maybe_attribution(mut self, value: Option<AtIdentifier<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -990,31 +839,25 @@ where
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
-        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+        value: impl Into<BlobRef<'a>>,
     ) -> AqfileBuilder<'a, aqfile_state::SetBlob<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         AqfileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: aqfile_state::State> AqfileBuilder<'a, S> {
     /// Set the `checksum` field (optional)
-    pub fn checksum(
-        mut self,
-        value: impl Into<Option<crate::net_altq::aqfile::Checksum<'a>>>,
-    ) -> Self {
+    pub fn checksum(mut self, value: impl Into<Option<aqfile::Checksum<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `checksum` field to an Option value (optional)
-    pub fn maybe_checksum(
-        mut self,
-        value: Option<crate::net_altq::aqfile::Checksum<'a>>,
-    ) -> Self {
+    pub fn maybe_checksum(mut self, value: Option<aqfile::Checksum<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -1028,13 +871,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> AqfileBuilder<'a, aqfile_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         AqfileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1047,13 +890,13 @@ where
     /// Set the `file` field (required)
     pub fn file(
         mut self,
-        value: impl Into<crate::net_altq::aqfile::File<'a>>,
+        value: impl Into<aqfile::File<'a>>,
     ) -> AqfileBuilder<'a, aqfile_state::SetFile<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         AqfileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1061,9 +904,9 @@ where
 impl<'a, S> AqfileBuilder<'a, S>
 where
     S: aqfile_state::State,
-    S::CreatedAt: aqfile_state::IsSet,
-    S::Blob: aqfile_state::IsSet,
     S::File: aqfile_state::IsSet,
+    S::Blob: aqfile_state::IsSet,
+    S::CreatedAt: aqfile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Aqfile<'a> {
@@ -1079,7 +922,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

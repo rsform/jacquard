@@ -5,54 +5,48 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::app_chronosky::schedule::list_posts::ScheduledPost;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPost<'a> {
     #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
+    pub id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostOutput<'a> {
     #[serde(borrow)]
-    pub post: crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>,
+    pub post: ScheduledPost<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetPostError<'a> {
     #[serde(rename = "PostNotFound")]
-    PostNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    PostNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetPostError<'_> {
@@ -70,8 +64,7 @@ impl core::fmt::Display for GetPostError<'_> {
     }
 }
 
-/// Response type for
-///app.chronosky.schedule.getPost
+/// Response type for app.chronosky.schedule.getPost
 pub struct GetPostResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPostResponse {
     const NSID: &'static str = "app.chronosky.schedule.getPost";
@@ -86,8 +79,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPost<'a> {
     type Response = GetPostResponse;
 }
 
-/// Endpoint type for
-///app.chronosky.schedule.getPost
+/// Endpoint type for app.chronosky.schedule.getPost
 pub struct GetPostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.schedule.getPost";
@@ -130,9 +122,9 @@ pub mod get_post_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetPostBuilder<'a, S: get_post_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetPost<'a> {
@@ -146,9 +138,9 @@ impl<'a> GetPostBuilder<'a, get_post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -161,13 +153,13 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetPostBuilder<'a, get_post_state::SetId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

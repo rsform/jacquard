@@ -5,29 +5,25 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateGroupRelationship<'a> {
     #[serde(borrow)]
-    pub relation: jacquard_common::CowStr<'a>,
+    pub relation: CowStr<'a>,
     #[serde(borrow)]
-    pub resource: jacquard_common::CowStr<'a>,
+    pub resource: CowStr<'a>,
     #[serde(borrow)]
-    pub subject: jacquard_common::CowStr<'a>,
+    pub subject: CowStr<'a>,
 }
 
-/// Response type for
-///app.blebbit.authr.group.updateGroupRelationship
+/// Response type for app.blebbit.authr.group.updateGroupRelationship
 pub struct UpdateGroupRelationshipResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateGroupRelationshipResponse {
     const NSID: &'static str = "app.blebbit.authr.group.updateGroupRelationship";
@@ -44,8 +40,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateGroupRelationship<'a> {
     type Response = UpdateGroupRelationshipResponse;
 }
 
-/// Endpoint type for
-///app.blebbit.authr.group.updateGroupRelationship
+/// Endpoint type for app.blebbit.authr.group.updateGroupRelationship
 pub struct UpdateGroupRelationshipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateGroupRelationshipRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.group.updateGroupRelationship";

@@ -5,163 +5,139 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::science_alt::dataset::programming_language::ProgrammingLanguage;
+use crate::science_alt::dataset::lens;
 /// Reference to code in an external repository (GitHub, tangled.org, etc.)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CodeReference<'a> {
     ///Optional branch name (for reference, commit hash is authoritative)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub branch: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub branch: Option<CowStr<'a>>,
     ///Git commit hash (ensures immutability)
     #[serde(borrow)]
-    pub commit: jacquard_common::CowStr<'a>,
+    pub commit: CowStr<'a>,
     ///Programming language of the code at this reference. Prefer this over the top-level language field for per-function granularity.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub language: core::option::Option<
-        crate::science_alt::dataset::programming_language::ProgrammingLanguage<'a>,
-    >,
+    pub language: Option<ProgrammingLanguage<'a>>,
     ///Path to function within repository (e.g., 'lenses/vision.py:rgb_to_grayscale')
     #[serde(borrow)]
-    pub path: jacquard_common::CowStr<'a>,
+    pub path: CowStr<'a>,
     ///Repository URL (e.g., 'https://github.com/user/repo' or 'at://did/tangled.repo/...')
     #[serde(borrow)]
-    pub repository: jacquard_common::CowStr<'a>,
+    pub repository: CowStr<'a>,
 }
 
 /// Open metadata object for lens records. Applications may extend with additional fields (author, performance notes, etc.).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LensMetadata<'a> {}
 /// Bidirectional transformation (Lens) between two sample types, with code stored in external repositories
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Lens<'a> {
     ///Timestamp when this lens was created
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///What this transformation does
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<CowStr<'a>>,
     ///Code reference for getter function (Source -> Target)
     #[serde(borrow)]
-    pub getter_code: crate::science_alt::dataset::lens::CodeReference<'a>,
+    pub getter_code: lens::CodeReference<'a>,
     ///(Deprecated: use codeReference.language instead.) Programming language of the lens implementation (e.g., 'python', 'typescript')
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub language: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub language: Option<CowStr<'a>>,
     ///Arbitrary metadata (author, performance notes, etc.)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub metadata: core::option::Option<
-        crate::science_alt::dataset::lens::LensMetadata<'a>,
-    >,
+    pub metadata: Option<lens::LensMetadata<'a>>,
     ///Human-readable lens name
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///Code reference for putter function (Target, Source -> Source)
     #[serde(borrow)]
-    pub putter_code: crate::science_alt::dataset::lens::CodeReference<'a>,
+    pub putter_code: lens::CodeReference<'a>,
     ///AT-URI reference to source schema
     #[serde(borrow)]
-    pub source_schema: jacquard_common::types::string::AtUri<'a>,
+    pub source_schema: AtUri<'a>,
     ///Semver version or range for source schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub source_schema_version: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub source_schema_version: Option<CowStr<'a>>,
     ///AT-URI reference to target schema
     #[serde(borrow)]
-    pub target_schema: jacquard_common::types::string::AtUri<'a>,
+    pub target_schema: AtUri<'a>,
     ///Semver version or range for target schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub target_schema_version: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub target_schema_version: Option<CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct LensGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Lens<'a>,
 }
 
 impl<'a> Lens<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LensRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, LensRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CodeReference<'a> {
+impl<'a> LexiconSchema for CodeReference<'a> {
     fn nsid() -> &'static str {
         "science.alt.dataset.lens"
     }
     fn def_name() -> &'static str {
         "codeReference"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_science_alt_dataset_lens()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.branch {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "branch",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("branch"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -171,10 +147,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CodeReference<'a> {
             let value = &self.commit;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "commit",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("commit"),
                     max: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -184,10 +158,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CodeReference<'a> {
             let value = &self.path;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "path",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("path"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -197,10 +169,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CodeReference<'a> {
             let value = &self.repository;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "repository",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("repository"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -210,31 +180,30 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CodeReference<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for LensMetadata<'a> {
+impl<'a> LexiconSchema for LensMetadata<'a> {
     fn nsid() -> &'static str {
         "science.alt.dataset.lens"
     }
     fn def_name() -> &'static str {
         "lensMetadata"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_science_alt_dataset_lens()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LensRecord;
-impl jacquard_common::xrpc::XrpcResp for LensRecord {
+impl XrpcResp for LensRecord {
     const NSID: &'static str = "science.alt.dataset.lens";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = LensGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<LensGetRecordOutput<'_>> for Lens<'_> {
@@ -244,36 +213,32 @@ impl From<LensGetRecordOutput<'_>> for Lens<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Lens<'_> {
+impl Collection for Lens<'_> {
     const NSID: &'static str = "science.alt.dataset.lens";
     type Record = LensRecord;
 }
 
-impl jacquard_common::types::collection::Collection for LensRecord {
+impl Collection for LensRecord {
     const NSID: &'static str = "science.alt.dataset.lens";
     type Record = LensRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Lens<'a> {
+impl<'a> LexiconSchema for Lens<'a> {
     fn nsid() -> &'static str {
         "science.alt.dataset.lens"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_science_alt_dataset_lens()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("description"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -282,10 +247,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Lens<'a> {
         if let Some(ref value) = self.language {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "language",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("language"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -295,10 +258,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Lens<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -308,10 +269,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Lens<'a> {
             let value = &self.source_schema;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "source_schema",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("source_schema"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -320,10 +279,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Lens<'a> {
         if let Some(ref value) = self.source_schema_version {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "source_schema_version",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("source_schema_version"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -333,10 +290,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Lens<'a> {
             let value = &self.target_schema;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "target_schema",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("target_schema"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -345,10 +300,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Lens<'a> {
         if let Some(ref value) = self.target_schema_version {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "target_schema_version",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("target_schema_version"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -358,390 +311,251 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Lens<'a> {
     }
 }
 
-fn lexicon_doc_science_alt_dataset_lens() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("science.alt.dataset.lens"),
-        revision: None,
-        description: None,
+fn lexicon_doc_science_alt_dataset_lens() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("science.alt.dataset.lens"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("codeReference"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("codeReference"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Reference to code in an external repository (GitHub, tangled.org, etc.)",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("repository"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("commit"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("path")
+                            SmolStr::new_static("repository"),
+                            SmolStr::new_static("commit"), SmolStr::new_static("path")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "branch",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("branch"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Optional branch name (for reference, commit hash is authoritative)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "commit",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("commit"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Git commit hash (ensures immutability)",
-                                    ),
+                                    CowStr::new_static("Git commit hash (ensures immutability)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(40usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "language",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("language"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "science.alt.dataset.programmingLanguage",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "path",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("path"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Path to function within repository (e.g., 'lenses/vision.py:rgb_to_grayscale')",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "repository",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("repository"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Repository URL (e.g., 'https://github.com/user/repo' or 'at://did/tangled.repo/...')",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("lensMetadata"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("lensMetadata"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Open metadata object for lens records. Applications may extend with additional fields (author, performance notes, etc.).",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Bidirectional transformation (Lens) between two sample types, with code stored in external repositories",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("sourceSchema"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("targetSchema"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("getterCode"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("putterCode"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("sourceSchema"),
+                                SmolStr::new_static("targetSchema"),
+                                SmolStr::new_static("getterCode"),
+                                SmolStr::new_static("putterCode"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Timestamp when this lens was created",
-                                        ),
+                                        CowStr::new_static("Timestamp when this lens was created"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "description",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("description"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "What this transformation does",
-                                        ),
+                                        CowStr::new_static("What this transformation does"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(1000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "getterCode",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#codeReference",
-                                    ),
+                                SmolStr::new_static("getterCode"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#codeReference"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "language",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("language"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "(Deprecated: use codeReference.language instead.) Programming language of the lens implementation (e.g., 'python', 'typescript')",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(50usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "metadata",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#lensMetadata",
-                                    ),
+                                SmolStr::new_static("metadata"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#lensMetadata"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("name"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Human-readable lens name",
-                                        ),
+                                        CowStr::new_static("Human-readable lens name"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "putterCode",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#codeReference",
-                                    ),
+                                SmolStr::new_static("putterCode"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#codeReference"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sourceSchema",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("sourceSchema"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "AT-URI reference to source schema",
-                                        ),
+                                        CowStr::new_static("AT-URI reference to source schema"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
+                                    format: Some(LexStringFormat::AtUri),
                                     max_length: Some(500usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sourceSchemaVersion",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("sourceSchemaVersion"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Semver version or range for source schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "targetSchema",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("targetSchema"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "AT-URI reference to target schema",
-                                        ),
+                                        CowStr::new_static("AT-URI reference to target schema"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
+                                    format: Some(LexStringFormat::AtUri),
                                     max_length: Some(500usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "targetSchemaVersion",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("targetSchemaVersion"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Semver version or range for target schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -755,125 +569,125 @@ pub mod lens_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PutterCode;
         type Name;
-        type CreatedAt;
         type SourceSchema;
         type TargetSchema;
         type GetterCode;
+        type PutterCode;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PutterCode = Unset;
         type Name = Unset;
-        type CreatedAt = Unset;
         type SourceSchema = Unset;
         type TargetSchema = Unset;
         type GetterCode = Unset;
-    }
-    ///State transition - sets the `putter_code` field to Set
-    pub struct SetPutterCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPutterCode<S> {}
-    impl<S: State> State for SetPutterCode<S> {
-        type PutterCode = Set<members::putter_code>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-        type SourceSchema = S::SourceSchema;
-        type TargetSchema = S::TargetSchema;
-        type GetterCode = S::GetterCode;
+        type PutterCode = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type PutterCode = S::PutterCode;
         type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
         type SourceSchema = S::SourceSchema;
         type TargetSchema = S::TargetSchema;
         type GetterCode = S::GetterCode;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type PutterCode = S::PutterCode;
-        type Name = S::Name;
-        type CreatedAt = Set<members::created_at>;
-        type SourceSchema = S::SourceSchema;
-        type TargetSchema = S::TargetSchema;
-        type GetterCode = S::GetterCode;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `source_schema` field to Set
     pub struct SetSourceSchema<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSourceSchema<S> {}
     impl<S: State> State for SetSourceSchema<S> {
-        type PutterCode = S::PutterCode;
         type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
         type SourceSchema = Set<members::source_schema>;
         type TargetSchema = S::TargetSchema;
         type GetterCode = S::GetterCode;
+        type PutterCode = S::PutterCode;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `target_schema` field to Set
     pub struct SetTargetSchema<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTargetSchema<S> {}
     impl<S: State> State for SetTargetSchema<S> {
-        type PutterCode = S::PutterCode;
         type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
         type SourceSchema = S::SourceSchema;
         type TargetSchema = Set<members::target_schema>;
         type GetterCode = S::GetterCode;
+        type PutterCode = S::PutterCode;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `getter_code` field to Set
     pub struct SetGetterCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGetterCode<S> {}
     impl<S: State> State for SetGetterCode<S> {
-        type PutterCode = S::PutterCode;
         type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
         type SourceSchema = S::SourceSchema;
         type TargetSchema = S::TargetSchema;
         type GetterCode = Set<members::getter_code>;
+        type PutterCode = S::PutterCode;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `putter_code` field to Set
+    pub struct SetPutterCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPutterCode<S> {}
+    impl<S: State> State for SetPutterCode<S> {
+        type Name = S::Name;
+        type SourceSchema = S::SourceSchema;
+        type TargetSchema = S::TargetSchema;
+        type GetterCode = S::GetterCode;
+        type PutterCode = Set<members::putter_code>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type SourceSchema = S::SourceSchema;
+        type TargetSchema = S::TargetSchema;
+        type GetterCode = S::GetterCode;
+        type PutterCode = S::PutterCode;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `putter_code` field
-        pub struct putter_code(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `source_schema` field
         pub struct source_schema(());
         ///Marker type for the `target_schema` field
         pub struct target_schema(());
         ///Marker type for the `getter_code` field
         pub struct getter_code(());
+        ///Marker type for the `putter_code` field
+        pub struct putter_code(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LensBuilder<'a, S: lens_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::science_alt::dataset::lens::CodeReference<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::science_alt::dataset::lens::LensMetadata<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::science_alt::dataset::lens::CodeReference<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<lens::CodeReference<'a>>,
+        Option<CowStr<'a>>,
+        Option<lens::LensMetadata<'a>>,
+        Option<CowStr<'a>>,
+        Option<lens::CodeReference<'a>>,
+        Option<AtUri<'a>>,
+        Option<CowStr<'a>>,
+        Option<AtUri<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Lens<'a> {
@@ -887,7 +701,7 @@ impl<'a> LensBuilder<'a, lens_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LensBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -901,7 +715,7 @@ impl<'a> LensBuilder<'a, lens_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -914,31 +728,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> LensBuilder<'a, lens_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         LensBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: lens_state::State> LensBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -952,28 +760,25 @@ where
     /// Set the `getterCode` field (required)
     pub fn getter_code(
         mut self,
-        value: impl Into<crate::science_alt::dataset::lens::CodeReference<'a>>,
+        value: impl Into<lens::CodeReference<'a>>,
     ) -> LensBuilder<'a, lens_state::SetGetterCode<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         LensBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: lens_state::State> LensBuilder<'a, S> {
     /// Set the `language` field (optional)
-    pub fn language(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn language(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `language` field to an Option value (optional)
-    pub fn maybe_language(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_language(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -981,18 +786,12 @@ impl<'a, S: lens_state::State> LensBuilder<'a, S> {
 
 impl<'a, S: lens_state::State> LensBuilder<'a, S> {
     /// Set the `metadata` field (optional)
-    pub fn metadata(
-        mut self,
-        value: impl Into<Option<crate::science_alt::dataset::lens::LensMetadata<'a>>>,
-    ) -> Self {
+    pub fn metadata(mut self, value: impl Into<Option<lens::LensMetadata<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
-    pub fn maybe_metadata(
-        mut self,
-        value: Option<crate::science_alt::dataset::lens::LensMetadata<'a>>,
-    ) -> Self {
+    pub fn maybe_metadata(mut self, value: Option<lens::LensMetadata<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -1006,13 +805,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> LensBuilder<'a, lens_state::SetName<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         LensBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1025,13 +824,13 @@ where
     /// Set the `putterCode` field (required)
     pub fn putter_code(
         mut self,
-        value: impl Into<crate::science_alt::dataset::lens::CodeReference<'a>>,
+        value: impl Into<lens::CodeReference<'a>>,
     ) -> LensBuilder<'a, lens_state::SetPutterCode<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         LensBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1044,13 +843,13 @@ where
     /// Set the `sourceSchema` field (required)
     pub fn source_schema(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> LensBuilder<'a, lens_state::SetSourceSchema<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         LensBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1059,16 +858,13 @@ impl<'a, S: lens_state::State> LensBuilder<'a, S> {
     /// Set the `sourceSchemaVersion` field (optional)
     pub fn source_schema_version(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `sourceSchemaVersion` field to an Option value (optional)
-    pub fn maybe_source_schema_version(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_source_schema_version(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -1082,13 +878,13 @@ where
     /// Set the `targetSchema` field (required)
     pub fn target_schema(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> LensBuilder<'a, lens_state::SetTargetSchema<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         LensBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1097,16 +893,13 @@ impl<'a, S: lens_state::State> LensBuilder<'a, S> {
     /// Set the `targetSchemaVersion` field (optional)
     pub fn target_schema_version(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `targetSchemaVersion` field to an Option value (optional)
-    pub fn maybe_target_schema_version(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_target_schema_version(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -1115,12 +908,12 @@ impl<'a, S: lens_state::State> LensBuilder<'a, S> {
 impl<'a, S> LensBuilder<'a, S>
 where
     S: lens_state::State,
-    S::PutterCode: lens_state::IsSet,
     S::Name: lens_state::IsSet,
-    S::CreatedAt: lens_state::IsSet,
     S::SourceSchema: lens_state::IsSet,
     S::TargetSchema: lens_state::IsSet,
     S::GetterCode: lens_state::IsSet,
+    S::PutterCode: lens_state::IsSet,
+    S::CreatedAt: lens_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lens<'a> {
@@ -1142,7 +935,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

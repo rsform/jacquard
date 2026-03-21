@@ -8,16 +8,27 @@
 pub mod cancel_pipeline;
 pub mod status;
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::pipeline;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CloneOpts<'a> {
     pub depth: i64,
@@ -25,237 +36,162 @@ pub struct CloneOpts<'a> {
     pub submodules: bool,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Pipeline<'a> {
     #[serde(borrow)]
-    pub trigger_metadata: crate::sh_tangled::pipeline::TriggerMetadata<'a>,
+    pub trigger_metadata: pipeline::TriggerMetadata<'a>,
     #[serde(borrow)]
-    pub workflows: Vec<crate::sh_tangled::pipeline::Workflow<'a>>,
+    pub workflows: Vec<pipeline::Workflow<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PipelineGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Pipeline<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ManualTriggerData<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub inputs: core::option::Option<Vec<crate::sh_tangled::pipeline::Pair<'a>>>,
+    pub inputs: Option<Vec<pipeline::Pair<'a>>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Pair<'a> {
     #[serde(borrow)]
-    pub key: jacquard_common::CowStr<'a>,
+    pub key: CowStr<'a>,
     #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
+    pub value: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct PullRequestTriggerData<'a> {
     #[serde(borrow)]
-    pub action: jacquard_common::CowStr<'a>,
+    pub action: CowStr<'a>,
     #[serde(borrow)]
-    pub source_branch: jacquard_common::CowStr<'a>,
+    pub source_branch: CowStr<'a>,
     #[serde(borrow)]
-    pub source_sha: jacquard_common::CowStr<'a>,
+    pub source_sha: CowStr<'a>,
     #[serde(borrow)]
-    pub target_branch: jacquard_common::CowStr<'a>,
+    pub target_branch: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct PushTriggerData<'a> {
     #[serde(borrow)]
-    pub new_sha: jacquard_common::CowStr<'a>,
+    pub new_sha: CowStr<'a>,
     #[serde(borrow)]
-    pub old_sha: jacquard_common::CowStr<'a>,
+    pub old_sha: CowStr<'a>,
     #[serde(borrow)]
-    pub r#ref: jacquard_common::CowStr<'a>,
+    pub r#ref: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct TriggerMetadata<'a> {
     #[serde(borrow)]
-    pub kind: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub kind: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub manual: core::option::Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub manual: Option<pipeline::ManualTriggerData<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub pull_request: core::option::Option<
-        crate::sh_tangled::pipeline::PullRequestTriggerData<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub pull_request: Option<pipeline::PullRequestTriggerData<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub push: core::option::Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>,
+    pub push: Option<pipeline::PushTriggerData<'a>>,
     #[serde(borrow)]
-    pub repo: crate::sh_tangled::pipeline::TriggerRepo<'a>,
+    pub repo: pipeline::TriggerRepo<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct TriggerRepo<'a> {
     #[serde(borrow)]
-    pub default_branch: jacquard_common::CowStr<'a>,
+    pub default_branch: CowStr<'a>,
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
     #[serde(borrow)]
-    pub knot: jacquard_common::CowStr<'a>,
+    pub knot: CowStr<'a>,
     #[serde(borrow)]
-    pub repo: jacquard_common::CowStr<'a>,
+    pub repo: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Workflow<'a> {
     #[serde(borrow)]
-    pub clone: crate::sh_tangled::pipeline::CloneOpts<'a>,
+    pub clone: pipeline::CloneOpts<'a>,
     #[serde(borrow)]
-    pub engine: jacquard_common::CowStr<'a>,
+    pub engine: CowStr<'a>,
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     #[serde(borrow)]
-    pub raw: jacquard_common::CowStr<'a>,
+    pub raw: CowStr<'a>,
 }
 
 impl<'a> Pipeline<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PipelineRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, PipelineRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CloneOpts<'a> {
+impl<'a> LexiconSchema for CloneOpts<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "cloneOpts"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PipelineRecord;
-impl jacquard_common::xrpc::XrpcResp for PipelineRecord {
+impl XrpcResp for PipelineRecord {
     const NSID: &'static str = "sh.tangled.pipeline";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = PipelineGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<PipelineGetRecordOutput<'_>> for Pipeline<'_> {
@@ -265,88 +201,78 @@ impl From<PipelineGetRecordOutput<'_>> for Pipeline<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Pipeline<'_> {
+impl Collection for Pipeline<'_> {
     const NSID: &'static str = "sh.tangled.pipeline";
     type Record = PipelineRecord;
 }
 
-impl jacquard_common::types::collection::Collection for PipelineRecord {
+impl Collection for PipelineRecord {
     const NSID: &'static str = "sh.tangled.pipeline";
     type Record = PipelineRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Pipeline<'a> {
+impl<'a> LexiconSchema for Pipeline<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ManualTriggerData<'a> {
+impl<'a> LexiconSchema for ManualTriggerData<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "manualTriggerData"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Pair<'a> {
+impl<'a> LexiconSchema for Pair<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "pair"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for PullRequestTriggerData<'a> {
+impl<'a> LexiconSchema for PullRequestTriggerData<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "pullRequestTriggerData"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.source_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "source_sha",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("source_sha"),
                     max: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -356,10 +282,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PullRequestTriggerData<'a> 
             let value = &self.source_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "source_sha",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("source_sha"),
                     min: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -369,27 +293,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PullRequestTriggerData<'a> 
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
+impl<'a> LexiconSchema for PushTriggerData<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "pushTriggerData"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.new_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "new_sha",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("new_sha"),
                     max: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -399,10 +319,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
             let value = &self.new_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "new_sha",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("new_sha"),
                     min: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -412,10 +330,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
             let value = &self.old_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "old_sha",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("old_sha"),
                     max: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -425,10 +341,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
             let value = &self.old_sha;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 40usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "old_sha",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("old_sha"),
                     min: 40usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -438,53 +352,47 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for TriggerMetadata<'a> {
+impl<'a> LexiconSchema for TriggerMetadata<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "triggerMetadata"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for TriggerRepo<'a> {
+impl<'a> LexiconSchema for TriggerRepo<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "triggerRepo"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Workflow<'a> {
+impl<'a> LexiconSchema for Workflow<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "workflow"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -499,63 +407,59 @@ pub mod clone_opts_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Skip;
-        type Submodules;
         type Depth;
+        type Submodules;
+        type Skip;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Skip = Unset;
-        type Submodules = Unset;
         type Depth = Unset;
-    }
-    ///State transition - sets the `skip` field to Set
-    pub struct SetSkip<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSkip<S> {}
-    impl<S: State> State for SetSkip<S> {
-        type Skip = Set<members::skip>;
-        type Submodules = S::Submodules;
-        type Depth = S::Depth;
-    }
-    ///State transition - sets the `submodules` field to Set
-    pub struct SetSubmodules<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubmodules<S> {}
-    impl<S: State> State for SetSubmodules<S> {
-        type Skip = S::Skip;
-        type Submodules = Set<members::submodules>;
-        type Depth = S::Depth;
+        type Submodules = Unset;
+        type Skip = Unset;
     }
     ///State transition - sets the `depth` field to Set
     pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDepth<S> {}
     impl<S: State> State for SetDepth<S> {
-        type Skip = S::Skip;
-        type Submodules = S::Submodules;
         type Depth = Set<members::depth>;
+        type Submodules = S::Submodules;
+        type Skip = S::Skip;
+    }
+    ///State transition - sets the `submodules` field to Set
+    pub struct SetSubmodules<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubmodules<S> {}
+    impl<S: State> State for SetSubmodules<S> {
+        type Depth = S::Depth;
+        type Submodules = Set<members::submodules>;
+        type Skip = S::Skip;
+    }
+    ///State transition - sets the `skip` field to Set
+    pub struct SetSkip<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSkip<S> {}
+    impl<S: State> State for SetSkip<S> {
+        type Depth = S::Depth;
+        type Submodules = S::Submodules;
+        type Skip = Set<members::skip>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `skip` field
-        pub struct skip(());
-        ///Marker type for the `submodules` field
-        pub struct submodules(());
         ///Marker type for the `depth` field
         pub struct depth(());
+        ///Marker type for the `submodules` field
+        pub struct submodules(());
+        ///Marker type for the `skip` field
+        pub struct skip(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CloneOptsBuilder<'a, S: clone_opts_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<bool>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<bool>, Option<bool>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CloneOpts<'a> {
@@ -569,9 +473,9 @@ impl<'a> CloneOptsBuilder<'a, clone_opts_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CloneOptsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -586,11 +490,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CloneOptsBuilder<'a, clone_opts_state::SetDepth<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CloneOptsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -605,11 +509,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> CloneOptsBuilder<'a, clone_opts_state::SetSkip<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CloneOptsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -624,11 +528,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> CloneOptsBuilder<'a, clone_opts_state::SetSubmodules<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         CloneOptsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -636,9 +540,9 @@ where
 impl<'a, S> CloneOptsBuilder<'a, S>
 where
     S: clone_opts_state::State,
-    S::Skip: clone_opts_state::IsSet,
-    S::Submodules: clone_opts_state::IsSet,
     S::Depth: clone_opts_state::IsSet,
+    S::Submodules: clone_opts_state::IsSet,
+    S::Skip: clone_opts_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CloneOpts<'a> {
@@ -652,7 +556,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -666,607 +570,330 @@ where
     }
 }
 
-fn lexicon_doc_sh_tangled_pipeline() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("sh.tangled.pipeline"),
-        revision: None,
-        description: None,
+fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("sh.tangled.pipeline"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("cloneOpts"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("cloneOpts"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("skip"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("depth"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("submodules")
+                            SmolStr::new_static("skip"), SmolStr::new_static("depth"),
+                            SmolStr::new_static("submodules")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "depth",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("depth"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "skip",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("skip"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "submodules",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("submodules"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("triggerMetadata"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("workflows")
+                                SmolStr::new_static("triggerMetadata"),
+                                SmolStr::new_static("workflows")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "triggerMetadata",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#triggerMetadata",
-                                    ),
+                                SmolStr::new_static("triggerMetadata"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#triggerMetadata"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "workflows",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static("#workflow"),
+                                SmolStr::new_static("workflows"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#workflow"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "manualTriggerData",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("manualTriggerData"),
+                LexUserType::Object(LexObject {
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "inputs",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#pair"),
+                            SmolStr::new_static("inputs"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#pair"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("pair"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("pair"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("key"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
-                        ],
+                        vec![SmolStr::new_static("key"), SmolStr::new_static("value")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "key",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("key"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "value",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("value"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "pullRequestTriggerData",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("pullRequestTriggerData"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("sourceBranch"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("targetBranch"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("sourceSha"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("action")
+                            SmolStr::new_static("sourceBranch"),
+                            SmolStr::new_static("targetBranch"),
+                            SmolStr::new_static("sourceSha"),
+                            SmolStr::new_static("action")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "action",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("action"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sourceBranch",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("sourceBranch"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sourceSha",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
+                            SmolStr::new_static("sourceSha"),
+                            LexObjectProperty::String(LexString {
                                 min_length: Some(40usize),
                                 max_length: Some(40usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "targetBranch",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("targetBranch"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "pushTriggerData",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("pushTriggerData"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("ref"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("newSha"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("oldSha")
+                            SmolStr::new_static("ref"), SmolStr::new_static("newSha"),
+                            SmolStr::new_static("oldSha")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "newSha",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
+                            SmolStr::new_static("newSha"),
+                            LexObjectProperty::String(LexString {
                                 min_length: Some(40usize),
                                 max_length: Some(40usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "oldSha",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
+                            SmolStr::new_static("oldSha"),
+                            LexObjectProperty::String(LexString {
                                 min_length: Some(40usize),
                                 max_length: Some(40usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "ref",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("ref"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "triggerMetadata",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("triggerMetadata"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("kind"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("repo")
-                        ],
+                        vec![SmolStr::new_static("kind"), SmolStr::new_static("repo")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "kind",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("kind"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("manual"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#manualTriggerData"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "manual",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#manualTriggerData",
-                                ),
+                            SmolStr::new_static("pullRequest"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#pullRequestTriggerData"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "pullRequest",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#pullRequestTriggerData",
-                                ),
+                            SmolStr::new_static("push"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#pushTriggerData"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "push",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#pushTriggerData",
-                                ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "repo",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#triggerRepo"),
+                            SmolStr::new_static("repo"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#triggerRepo"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("triggerRepo"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("triggerRepo"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("knot"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("repo"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("defaultBranch")
+                            SmolStr::new_static("knot"), SmolStr::new_static("did"),
+                            SmolStr::new_static("repo"),
+                            SmolStr::new_static("defaultBranch")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "defaultBranch",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("defaultBranch"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("did"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "did",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("knot"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "knot",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "repo",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("repo"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("workflow"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("workflow"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("engine"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("clone"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("raw")
+                            SmolStr::new_static("name"), SmolStr::new_static("engine"),
+                            SmolStr::new_static("clone"), SmolStr::new_static("raw")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "clone",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#cloneOpts"),
+                            SmolStr::new_static("clone"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#cloneOpts"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "engine",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("engine"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "raw",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("raw"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1316,12 +943,12 @@ pub mod pipeline_state {
 
 /// Builder for constructing an instance of this type
 pub struct PipelineBuilder<'a, S: pipeline_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::sh_tangled::pipeline::TriggerMetadata<'a>>,
-        ::core::option::Option<Vec<crate::sh_tangled::pipeline::Workflow<'a>>>,
+        Option<pipeline::TriggerMetadata<'a>>,
+        Option<Vec<pipeline::Workflow<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Pipeline<'a> {
@@ -1335,9 +962,9 @@ impl<'a> PipelineBuilder<'a, pipeline_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PipelineBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1350,13 +977,13 @@ where
     /// Set the `triggerMetadata` field (required)
     pub fn trigger_metadata(
         mut self,
-        value: impl Into<crate::sh_tangled::pipeline::TriggerMetadata<'a>>,
+        value: impl Into<pipeline::TriggerMetadata<'a>>,
     ) -> PipelineBuilder<'a, pipeline_state::SetTriggerMetadata<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PipelineBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1369,13 +996,13 @@ where
     /// Set the `workflows` field (required)
     pub fn workflows(
         mut self,
-        value: impl Into<Vec<crate::sh_tangled::pipeline::Workflow<'a>>>,
+        value: impl Into<Vec<pipeline::Workflow<'a>>>,
     ) -> PipelineBuilder<'a, pipeline_state::SetWorkflows<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         PipelineBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1397,7 +1024,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1420,51 +1047,51 @@ pub mod trigger_metadata_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Kind;
         type Repo;
+        type Kind;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Kind = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `kind` field to Set
-    pub struct SetKind<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKind<S> {}
-    impl<S: State> State for SetKind<S> {
-        type Kind = Set<members::kind>;
-        type Repo = S::Repo;
+        type Kind = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Kind = S::Kind;
         type Repo = Set<members::repo>;
+        type Kind = S::Kind;
+    }
+    ///State transition - sets the `kind` field to Set
+    pub struct SetKind<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKind<S> {}
+    impl<S: State> State for SetKind<S> {
+        type Repo = S::Repo;
+        type Kind = Set<members::kind>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `kind` field
-        pub struct kind(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `kind` field
+        pub struct kind(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TriggerMetadataBuilder<'a, S: trigger_metadata_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>,
-        ::core::option::Option<crate::sh_tangled::pipeline::PullRequestTriggerData<'a>>,
-        ::core::option::Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>,
-        ::core::option::Option<crate::sh_tangled::pipeline::TriggerRepo<'a>>,
+        Option<CowStr<'a>>,
+        Option<pipeline::ManualTriggerData<'a>>,
+        Option<pipeline::PullRequestTriggerData<'a>>,
+        Option<pipeline::PushTriggerData<'a>>,
+        Option<pipeline::TriggerRepo<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> TriggerMetadata<'a> {
@@ -1478,9 +1105,9 @@ impl<'a> TriggerMetadataBuilder<'a, trigger_metadata_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TriggerMetadataBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1493,13 +1120,13 @@ where
     /// Set the `kind` field (required)
     pub fn kind(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> TriggerMetadataBuilder<'a, trigger_metadata_state::SetKind<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         TriggerMetadataBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1508,7 +1135,7 @@ impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
     /// Set the `manual` field (optional)
     pub fn manual(
         mut self,
-        value: impl Into<Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>>,
+        value: impl Into<Option<pipeline::ManualTriggerData<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
@@ -1516,7 +1143,7 @@ impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
     /// Set the `manual` field to an Option value (optional)
     pub fn maybe_manual(
         mut self,
-        value: Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>,
+        value: Option<pipeline::ManualTriggerData<'a>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
@@ -1527,7 +1154,7 @@ impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
     /// Set the `pullRequest` field (optional)
     pub fn pull_request(
         mut self,
-        value: impl Into<Option<crate::sh_tangled::pipeline::PullRequestTriggerData<'a>>>,
+        value: impl Into<Option<pipeline::PullRequestTriggerData<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -1535,7 +1162,7 @@ impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
     /// Set the `pullRequest` field to an Option value (optional)
     pub fn maybe_pull_request(
         mut self,
-        value: Option<crate::sh_tangled::pipeline::PullRequestTriggerData<'a>>,
+        value: Option<pipeline::PullRequestTriggerData<'a>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
@@ -1546,16 +1173,13 @@ impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
     /// Set the `push` field (optional)
     pub fn push(
         mut self,
-        value: impl Into<Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>>,
+        value: impl Into<Option<pipeline::PushTriggerData<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `push` field to an Option value (optional)
-    pub fn maybe_push(
-        mut self,
-        value: Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>,
-    ) -> Self {
+    pub fn maybe_push(mut self, value: Option<pipeline::PushTriggerData<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -1569,13 +1193,13 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<crate::sh_tangled::pipeline::TriggerRepo<'a>>,
+        value: impl Into<pipeline::TriggerRepo<'a>>,
     ) -> TriggerMetadataBuilder<'a, trigger_metadata_state::SetRepo<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         TriggerMetadataBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1583,8 +1207,8 @@ where
 impl<'a, S> TriggerMetadataBuilder<'a, S>
 where
     S: trigger_metadata_state::State,
-    S::Kind: trigger_metadata_state::IsSet,
     S::Repo: trigger_metadata_state::IsSet,
+    S::Kind: trigger_metadata_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TriggerMetadata<'a> {
@@ -1600,7 +1224,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1626,80 +1250,80 @@ pub mod trigger_repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DefaultBranch;
-        type Repo;
-        type Did;
         type Knot;
+        type DefaultBranch;
+        type Did;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DefaultBranch = Unset;
-        type Repo = Unset;
-        type Did = Unset;
         type Knot = Unset;
-    }
-    ///State transition - sets the `default_branch` field to Set
-    pub struct SetDefaultBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDefaultBranch<S> {}
-    impl<S: State> State for SetDefaultBranch<S> {
-        type DefaultBranch = Set<members::default_branch>;
-        type Repo = S::Repo;
-        type Did = S::Did;
-        type Knot = S::Knot;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type DefaultBranch = S::DefaultBranch;
-        type Repo = Set<members::repo>;
-        type Did = S::Did;
-        type Knot = S::Knot;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type DefaultBranch = S::DefaultBranch;
-        type Repo = S::Repo;
-        type Did = Set<members::did>;
-        type Knot = S::Knot;
+        type DefaultBranch = Unset;
+        type Did = Unset;
+        type Repo = Unset;
     }
     ///State transition - sets the `knot` field to Set
     pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKnot<S> {}
     impl<S: State> State for SetKnot<S> {
-        type DefaultBranch = S::DefaultBranch;
-        type Repo = S::Repo;
-        type Did = S::Did;
         type Knot = Set<members::knot>;
+        type DefaultBranch = S::DefaultBranch;
+        type Did = S::Did;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `default_branch` field to Set
+    pub struct SetDefaultBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDefaultBranch<S> {}
+    impl<S: State> State for SetDefaultBranch<S> {
+        type Knot = S::Knot;
+        type DefaultBranch = Set<members::default_branch>;
+        type Did = S::Did;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Knot = S::Knot;
+        type DefaultBranch = S::DefaultBranch;
+        type Did = Set<members::did>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Knot = S::Knot;
+        type DefaultBranch = S::DefaultBranch;
+        type Did = S::Did;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `default_branch` field
-        pub struct default_branch(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `knot` field
         pub struct knot(());
+        ///Marker type for the `default_branch` field
+        pub struct default_branch(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TriggerRepoBuilder<'a, S: trigger_repo_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Did<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> TriggerRepo<'a> {
@@ -1713,9 +1337,9 @@ impl<'a> TriggerRepoBuilder<'a, trigger_repo_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TriggerRepoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1728,13 +1352,13 @@ where
     /// Set the `defaultBranch` field (required)
     pub fn default_branch(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetDefaultBranch<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         TriggerRepoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1747,13 +1371,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         TriggerRepoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1766,13 +1390,13 @@ where
     /// Set the `knot` field (required)
     pub fn knot(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetKnot<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         TriggerRepoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1785,13 +1409,13 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetRepo<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         TriggerRepoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1799,10 +1423,10 @@ where
 impl<'a, S> TriggerRepoBuilder<'a, S>
 where
     S: trigger_repo_state::State,
-    S::DefaultBranch: trigger_repo_state::IsSet,
-    S::Repo: trigger_repo_state::IsSet,
-    S::Did: trigger_repo_state::IsSet,
     S::Knot: trigger_repo_state::IsSet,
+    S::DefaultBranch: trigger_repo_state::IsSet,
+    S::Did: trigger_repo_state::IsSet,
+    S::Repo: trigger_repo_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TriggerRepo<'a> {
@@ -1817,7 +1441,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1842,80 +1466,80 @@ pub mod workflow_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Raw;
-        type Clone;
         type Name;
         type Engine;
+        type Clone;
+        type Raw;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Raw = Unset;
-        type Clone = Unset;
         type Name = Unset;
         type Engine = Unset;
-    }
-    ///State transition - sets the `raw` field to Set
-    pub struct SetRaw<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRaw<S> {}
-    impl<S: State> State for SetRaw<S> {
-        type Raw = Set<members::raw>;
-        type Clone = S::Clone;
-        type Name = S::Name;
-        type Engine = S::Engine;
-    }
-    ///State transition - sets the `clone` field to Set
-    pub struct SetClone<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClone<S> {}
-    impl<S: State> State for SetClone<S> {
-        type Raw = S::Raw;
-        type Clone = Set<members::clone>;
-        type Name = S::Name;
-        type Engine = S::Engine;
+        type Clone = Unset;
+        type Raw = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Raw = S::Raw;
-        type Clone = S::Clone;
         type Name = Set<members::name>;
         type Engine = S::Engine;
+        type Clone = S::Clone;
+        type Raw = S::Raw;
     }
     ///State transition - sets the `engine` field to Set
     pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEngine<S> {}
     impl<S: State> State for SetEngine<S> {
-        type Raw = S::Raw;
-        type Clone = S::Clone;
         type Name = S::Name;
         type Engine = Set<members::engine>;
+        type Clone = S::Clone;
+        type Raw = S::Raw;
+    }
+    ///State transition - sets the `clone` field to Set
+    pub struct SetClone<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClone<S> {}
+    impl<S: State> State for SetClone<S> {
+        type Name = S::Name;
+        type Engine = S::Engine;
+        type Clone = Set<members::clone>;
+        type Raw = S::Raw;
+    }
+    ///State transition - sets the `raw` field to Set
+    pub struct SetRaw<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRaw<S> {}
+    impl<S: State> State for SetRaw<S> {
+        type Name = S::Name;
+        type Engine = S::Engine;
+        type Clone = S::Clone;
+        type Raw = Set<members::raw>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `raw` field
-        pub struct raw(());
-        ///Marker type for the `clone` field
-        pub struct clone(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `engine` field
         pub struct engine(());
+        ///Marker type for the `clone` field
+        pub struct clone(());
+        ///Marker type for the `raw` field
+        pub struct raw(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct WorkflowBuilder<'a, S: workflow_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::sh_tangled::pipeline::CloneOpts<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<pipeline::CloneOpts<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Workflow<'a> {
@@ -1929,9 +1553,9 @@ impl<'a> WorkflowBuilder<'a, workflow_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         WorkflowBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1944,13 +1568,13 @@ where
     /// Set the `clone` field (required)
     pub fn clone(
         mut self,
-        value: impl Into<crate::sh_tangled::pipeline::CloneOpts<'a>>,
+        value: impl Into<pipeline::CloneOpts<'a>>,
     ) -> WorkflowBuilder<'a, workflow_state::SetClone<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         WorkflowBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1963,13 +1587,13 @@ where
     /// Set the `engine` field (required)
     pub fn engine(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> WorkflowBuilder<'a, workflow_state::SetEngine<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         WorkflowBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1982,13 +1606,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> WorkflowBuilder<'a, workflow_state::SetName<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         WorkflowBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2001,13 +1625,13 @@ where
     /// Set the `raw` field (required)
     pub fn raw(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> WorkflowBuilder<'a, workflow_state::SetRaw<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         WorkflowBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2015,10 +1639,10 @@ where
 impl<'a, S> WorkflowBuilder<'a, S>
 where
     S: workflow_state::State,
-    S::Raw: workflow_state::IsSet,
-    S::Clone: workflow_state::IsSet,
     S::Name: workflow_state::IsSet,
     S::Engine: workflow_state::IsSet,
+    S::Clone: workflow_state::IsSet,
+    S::Raw: workflow_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Workflow<'a> {
@@ -2033,7 +1657,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

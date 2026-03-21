@@ -5,53 +5,44 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::ConvoView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListConvos<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub read_state: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub read_state: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListConvosOutput<'a> {
     #[serde(borrow)]
-    pub convos: Vec<crate::chat_bsky::convo::ConvoView<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub convos: Vec<ConvoView<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
 }
 
-/// Response type for
-///chat.bsky.convo.listConvos
+/// Response type for chat.bsky.convo.listConvos
 pub struct ListConvosResponse;
 impl jacquard_common::xrpc::XrpcResp for ListConvosResponse {
     const NSID: &'static str = "chat.bsky.convo.listConvos";
@@ -66,8 +57,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListConvos<'a> {
     type Response = ListConvosResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.convo.listConvos
+/// Endpoint type for chat.bsky.convo.listConvos
 pub struct ListConvosRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListConvosRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.listConvos";
@@ -76,7 +66,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListConvosRequest {
     type Response = ListConvosResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
@@ -101,14 +91,14 @@ pub mod list_convos_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListConvosBuilder<'a, S: list_convos_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ListConvos<'a> {
@@ -122,24 +112,21 @@ impl<'a> ListConvosBuilder<'a, list_convos_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListConvosBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: list_convos_state::State> ListConvosBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -160,18 +147,12 @@ impl<'a, S: list_convos_state::State> ListConvosBuilder<'a, S> {
 
 impl<'a, S: list_convos_state::State> ListConvosBuilder<'a, S> {
     /// Set the `readState` field (optional)
-    pub fn read_state(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn read_state(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `readState` field to an Option value (optional)
-    pub fn maybe_read_state(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_read_state(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -179,15 +160,12 @@ impl<'a, S: list_convos_state::State> ListConvosBuilder<'a, S> {
 
 impl<'a, S: list_convos_state::State> ListConvosBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn status(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }

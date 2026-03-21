@@ -5,28 +5,26 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateActorAccess<'a> {
     #[serde(borrow)]
-    pub actor: jacquard_common::types::string::Did<'a>,
+    pub actor: Did<'a>,
     pub allow_access: bool,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#ref: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#ref: Option<CowStr<'a>>,
 }
 
-/// Response type for
-///chat.bsky.moderation.updateActorAccess
+/// Response type for chat.bsky.moderation.updateActorAccess
 pub struct UpdateActorAccessResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateActorAccessResponse {
     const NSID: &'static str = "chat.bsky.moderation.updateActorAccess";
@@ -43,8 +41,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateActorAccess<'a> {
     type Response = UpdateActorAccessResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.moderation.updateActorAccess
+/// Endpoint type for chat.bsky.moderation.updateActorAccess
 pub struct UpdateActorAccessRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateActorAccessRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.moderation.updateActorAccess";
@@ -65,49 +62,45 @@ pub mod update_actor_access_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AllowAccess;
         type Actor;
+        type AllowAccess;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AllowAccess = Unset;
         type Actor = Unset;
-    }
-    ///State transition - sets the `allow_access` field to Set
-    pub struct SetAllowAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAllowAccess<S> {}
-    impl<S: State> State for SetAllowAccess<S> {
-        type AllowAccess = Set<members::allow_access>;
-        type Actor = S::Actor;
+        type AllowAccess = Unset;
     }
     ///State transition - sets the `actor` field to Set
     pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActor<S> {}
     impl<S: State> State for SetActor<S> {
-        type AllowAccess = S::AllowAccess;
         type Actor = Set<members::actor>;
+        type AllowAccess = S::AllowAccess;
+    }
+    ///State transition - sets the `allow_access` field to Set
+    pub struct SetAllowAccess<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAllowAccess<S> {}
+    impl<S: State> State for SetAllowAccess<S> {
+        type Actor = S::Actor;
+        type AllowAccess = Set<members::allow_access>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `allow_access` field
-        pub struct allow_access(());
         ///Marker type for the `actor` field
         pub struct actor(());
+        ///Marker type for the `allow_access` field
+        pub struct allow_access(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct UpdateActorAccessBuilder<'a, S: update_actor_access_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>, Option<bool>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateActorAccess<'a> {
@@ -121,9 +114,9 @@ impl<'a> UpdateActorAccessBuilder<'a, update_actor_access_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateActorAccessBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -136,13 +129,13 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> UpdateActorAccessBuilder<'a, update_actor_access_state::SetActor<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         UpdateActorAccessBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -157,26 +150,23 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> UpdateActorAccessBuilder<'a, update_actor_access_state::SetAllowAccess<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         UpdateActorAccessBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: update_actor_access_state::State> UpdateActorAccessBuilder<'a, S> {
     /// Set the `ref` field (optional)
-    pub fn r#ref(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn r#ref(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `ref` field to an Option value (optional)
-    pub fn maybe_ref(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_ref(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -185,8 +175,8 @@ impl<'a, S: update_actor_access_state::State> UpdateActorAccessBuilder<'a, S> {
 impl<'a, S> UpdateActorAccessBuilder<'a, S>
 where
     S: update_actor_access_state::State,
-    S::AllowAccess: update_actor_access_state::IsSet,
     S::Actor: update_actor_access_state::IsSet,
+    S::AllowAccess: update_actor_access_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateActorAccess<'a> {
@@ -200,7 +190,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

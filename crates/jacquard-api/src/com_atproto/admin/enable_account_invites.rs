@@ -5,28 +5,26 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct EnableAccountInvites<'a> {
     #[serde(borrow)]
-    pub account: jacquard_common::types::string::Did<'a>,
+    pub account: Did<'a>,
     ///Optional reason for enabled invites.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub note: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub note: Option<CowStr<'a>>,
 }
 
-/// Response type for
-///com.atproto.admin.enableAccountInvites
+/// Response type for com.atproto.admin.enableAccountInvites
 pub struct EnableAccountInvitesResponse;
 impl jacquard_common::xrpc::XrpcResp for EnableAccountInvitesResponse {
     const NSID: &'static str = "com.atproto.admin.enableAccountInvites";
@@ -43,8 +41,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for EnableAccountInvites<'a> {
     type Response = EnableAccountInvitesResponse;
 }
 
-/// Endpoint type for
-///com.atproto.admin.enableAccountInvites
+/// Endpoint type for com.atproto.admin.enableAccountInvites
 pub struct EnableAccountInvitesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for EnableAccountInvitesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.enableAccountInvites";
@@ -89,12 +86,9 @@ pub mod enable_account_invites_state {
 
 /// Builder for constructing an instance of this type
 pub struct EnableAccountInvitesBuilder<'a, S: enable_account_invites_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> EnableAccountInvites<'a> {
@@ -111,9 +105,9 @@ impl<'a> EnableAccountInvitesBuilder<'a, enable_account_invites_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EnableAccountInvitesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -126,28 +120,25 @@ where
     /// Set the `account` field (required)
     pub fn account(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> EnableAccountInvitesBuilder<'a, enable_account_invites_state::SetAccount<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         EnableAccountInvitesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: enable_account_invites_state::State> EnableAccountInvitesBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
-    pub fn maybe_note(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -169,7 +160,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

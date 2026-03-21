@@ -5,29 +5,25 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DisableInviteCodes<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accounts: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accounts: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub codes: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub codes: Option<Vec<CowStr<'a>>>,
 }
 
-/// Response type for
-///com.atproto.admin.disableInviteCodes
+/// Response type for com.atproto.admin.disableInviteCodes
 pub struct DisableInviteCodesResponse;
 impl jacquard_common::xrpc::XrpcResp for DisableInviteCodesResponse {
     const NSID: &'static str = "com.atproto.admin.disableInviteCodes";
@@ -44,8 +40,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DisableInviteCodes<'a> {
     type Response = DisableInviteCodesResponse;
 }
 
-/// Endpoint type for
-///com.atproto.admin.disableInviteCodes
+/// Endpoint type for com.atproto.admin.disableInviteCodes
 pub struct DisableInviteCodesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DisableInviteCodesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.disableInviteCodes";

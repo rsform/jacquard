@@ -5,41 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::org_passingreads::book::StatefulBook;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBook<'a> {
     #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
+    pub id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBookOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub book: core::option::Option<crate::org_passingreads::book::StatefulBook<'a>>,
+    pub book: Option<StatefulBook<'a>>,
 }
 
-/// Response type for
-///org.passingreads.book.getBook
+/// Response type for org.passingreads.book.getBook
 pub struct GetBookResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBookResponse {
     const NSID: &'static str = "org.passingreads.book.getBook";
@@ -54,8 +44,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetBook<'a> {
     type Response = GetBookResponse;
 }
 
-/// Endpoint type for
-///org.passingreads.book.getBook
+/// Endpoint type for org.passingreads.book.getBook
 pub struct GetBookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBookRequest {
     const PATH: &'static str = "/xrpc/org.passingreads.book.getBook";
@@ -98,9 +87,9 @@ pub mod get_book_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetBookBuilder<'a, S: get_book_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetBook<'a> {
@@ -114,9 +103,9 @@ impl<'a> GetBookBuilder<'a, get_book_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetBookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -129,13 +118,13 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetBookBuilder<'a, get_book_state::SetId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetBookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

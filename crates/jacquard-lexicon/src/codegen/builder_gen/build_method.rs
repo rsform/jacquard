@@ -18,6 +18,7 @@ pub fn generate_build_method(
     schema: &BuilderSchema,
     required_fields: &[RequiredField],
     has_lifetime: bool,
+    resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
     let builder_name = format_ident!("{}Builder", type_name);
     let state_mod_name = format_ident!("{}_state", type_name.to_snake_case());
@@ -60,7 +61,7 @@ pub fn generate_build_method(
             } else {
                 // Optional field: apply schema default if present, otherwise pass through.
                 let field_name_str: &str = field_name.as_ref();
-                match schema.get_object_property(field_name_str).and_then(schema_default_expr) {
+                match schema.get_object_property(field_name_str).and_then(|p| schema_default_expr(p, resolved)) {
                     Some(default_val) => {
                         quote! {
                             #field_snake: self.__unsafe_private_named.#index.or_else(|| Some(#default_val)),
@@ -80,13 +81,16 @@ pub fn generate_build_method(
         BuilderSchema::Object(_) => {
             let default_field = quote! { extra_data: Default::default(), };
 
+            let smol_str_path = resolved.type_path(&crate::codegen::prettify::CommonType::SmolStr);
+            let data_path = resolved.type_path(&crate::codegen::prettify::CommonType::Data);
+            let btree_path = resolved.btree_map_path();
             let with_data_method = quote! {
                 /// Build the final struct with custom extra_data
                 pub fn build_with_data(
                     self,
-                    extra_data: alloc::collections::BTreeMap<
-                        jacquard_common::deps::smol_str::SmolStr,
-                        jacquard_common::types::value::Data #lifetime_generic
+                    extra_data: #btree_path<
+                        #smol_str_path,
+                        #data_path #lifetime_generic
                     >,
                 ) -> #type_ident #lifetime_generic {
                     #type_ident {
@@ -121,7 +125,10 @@ pub fn generate_build_method(
 }
 
 /// Extract the default value expression for an object property, if one exists.
-fn schema_default_expr(prop: &LexObjectProperty<'static>) -> Option<TokenStream> {
+fn schema_default_expr(
+    prop: &LexObjectProperty<'static>,
+    resolved: &crate::codegen::prettify::ResolvedImports,
+) -> Option<TokenStream> {
     match prop {
         LexObjectProperty::Boolean(b) => {
             let v = b.default?;
@@ -133,7 +140,8 @@ fn schema_default_expr(prop: &LexObjectProperty<'static>) -> Option<TokenStream>
         }
         LexObjectProperty::String(s) if s.known_values.is_none() => {
             let v = s.default.as_ref()?.as_ref();
-            Some(quote! { jacquard_common::CowStr::from(#v) })
+            let cowstr_path = resolved.type_path(&crate::codegen::prettify::CommonType::CowStr);
+            Some(quote! { #cowstr_path::from(#v) })
         }
         _ => None,
     }

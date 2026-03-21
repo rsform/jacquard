@@ -5,24 +5,21 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UnmuteThread<'a> {
     #[serde(borrow)]
-    pub root: jacquard_common::types::string::AtUri<'a>,
+    pub root: AtUri<'a>,
 }
 
-/// Response type for
-///app.bsky.graph.unmuteThread
+/// Response type for app.bsky.graph.unmuteThread
 pub struct UnmuteThreadResponse;
 impl jacquard_common::xrpc::XrpcResp for UnmuteThreadResponse {
     const NSID: &'static str = "app.bsky.graph.unmuteThread";
@@ -39,8 +36,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UnmuteThread<'a> {
     type Response = UnmuteThreadResponse;
 }
 
-/// Endpoint type for
-///app.bsky.graph.unmuteThread
+/// Endpoint type for app.bsky.graph.unmuteThread
 pub struct UnmuteThreadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UnmuteThreadRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.unmuteThread";
@@ -85,11 +81,9 @@ pub mod unmute_thread_state {
 
 /// Builder for constructing an instance of this type
 pub struct UnmuteThreadBuilder<'a, S: unmute_thread_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UnmuteThread<'a> {
@@ -103,9 +97,9 @@ impl<'a> UnmuteThreadBuilder<'a, unmute_thread_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UnmuteThreadBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -118,13 +112,13 @@ where
     /// Set the `root` field (required)
     pub fn root(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> UnmuteThreadBuilder<'a, unmute_thread_state::SetRoot<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         UnmuteThreadBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -144,7 +138,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

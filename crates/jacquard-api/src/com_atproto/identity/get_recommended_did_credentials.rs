@@ -5,50 +5,37 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRecommendedDidCredentialsOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub also_known_as: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub also_known_as: Option<Vec<CowStr<'a>>>,
     ///Recommended rotation keys for PLC dids. Should be undefined (or ignored) for did:webs.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub rotation_keys: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub rotation_keys: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub services: core::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub services: Option<Data<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub verification_methods: core::option::Option<
-        jacquard_common::types::value::Data<'a>,
-    >,
+    pub verification_methods: Option<Data<'a>>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct GetRecommendedDidCredentials;
-/// Response type for
-///com.atproto.identity.getRecommendedDidCredentials
+/// Response type for com.atproto.identity.getRecommendedDidCredentials
 pub struct GetRecommendedDidCredentialsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecommendedDidCredentialsResponse {
     const NSID: &'static str = "com.atproto.identity.getRecommendedDidCredentials";
@@ -63,8 +50,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetRecommendedDidCredentials {
     type Response = GetRecommendedDidCredentialsResponse;
 }
 
-/// Endpoint type for
-///com.atproto.identity.getRecommendedDidCredentials
+/// Endpoint type for com.atproto.identity.getRecommendedDidCredentials
 pub struct GetRecommendedDidCredentialsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecommendedDidCredentialsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.getRecommendedDidCredentials";

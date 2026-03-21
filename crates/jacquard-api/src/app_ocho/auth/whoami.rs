@@ -5,42 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
 /// The session data
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct WhoamiOutput<'a> {
     ///The user's DID
     #[serde(borrow)]
-    pub did: jacquard_common::CowStr<'a>,
+    pub did: CowStr<'a>,
     ///The user's ID
     #[serde(borrow)]
-    pub handle: jacquard_common::CowStr<'a>,
+    pub handle: CowStr<'a>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct Whoami;
-/// Response type for
-///app.ocho.auth.whoami
+/// Response type for app.ocho.auth.whoami
 pub struct WhoamiResponse;
 impl jacquard_common::xrpc::XrpcResp for WhoamiResponse {
     const NSID: &'static str = "app.ocho.auth.whoami";
@@ -55,8 +43,7 @@ impl jacquard_common::xrpc::XrpcRequest for Whoami {
     type Response = WhoamiResponse;
 }
 
-/// Endpoint type for
-///app.ocho.auth.whoami
+/// Endpoint type for app.ocho.auth.whoami
 pub struct WhoamiRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for WhoamiRequest {
     const PATH: &'static str = "/xrpc/app.ocho.auth.whoami";

@@ -4,41 +4,93 @@ use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 use super::CodeGenerator;
 use super::nsid_utils::NsidPath;
-use super::utils::{make_ident, sanitize_name};
 use super::prettify::{FileOutput, ResolvedImports};
+use super::utils::{make_ident, sanitize_name};
 
 impl<'c> CodeGenerator<'c> {
     /// Generate all code for the corpus, organized by file
     /// Returns a map of file paths to FileOutput with reordered tokens
-    pub fn generate_all(
-        &self,
-    ) -> Result<BTreeMap<std::path::PathBuf, FileOutput>> {
-        let mut file_contents: BTreeMap<std::path::PathBuf, Vec<super::prettify::GeneratedCode>> = BTreeMap::new();
+    pub fn generate_all(&self) -> Result<BTreeMap<std::path::PathBuf, FileOutput>> {
+        let mut file_contents: BTreeMap<std::path::PathBuf, Vec<super::prettify::GeneratedCode>> =
+            BTreeMap::new();
         let mut file_nsids: BTreeMap<std::path::PathBuf, String> = BTreeMap::new();
 
-        // Step 1: Enumerate local type names per file
+        // Step 1: Enumerate local type names per file.
+        // Also collect all file paths so we can determine submodule names.
         let mut file_local_names: BTreeMap<std::path::PathBuf, HashSet<String>> = BTreeMap::new();
+        let mut all_file_paths: BTreeSet<std::path::PathBuf> = BTreeSet::new();
         for (nsid, doc) in self.corpus.iter() {
             let file_path = self.nsid_to_file_path(nsid.as_ref());
+            all_file_paths.insert(file_path.clone());
             let names = file_local_names.entry(file_path).or_default();
             for def_name in doc.defs.keys() {
                 names.insert(self.def_to_type_name(nsid.as_ref(), def_name.as_ref()));
             }
         }
 
-        // Step 2: Run collection pass and build ResolvedImports for each file
-        let mut file_resolved: BTreeMap<std::path::PathBuf, ResolvedImports> = BTreeMap::new();
+        // Determine submodule names for each file. If `foo.rs` exists and `foo/bar.rs`
+        // also exists, then `bar` is a submodule of `foo`. These names must be treated
+        // as reserved — importing `use crate::something::bar;` would collide with
+        // `pub mod bar;`.
+        let mut file_submodule_names: BTreeMap<std::path::PathBuf, HashSet<String>> =
+            BTreeMap::new();
+        for file_path in &all_file_paths {
+            // For a file like `app_bsky/feed/post.rs`, the parent module file is
+            // `app_bsky/feed.rs`. Check if this file's parent has an entry.
+            if let Some(parent_dir) = file_path.parent() {
+                let parent_file = parent_dir.with_extension("rs");
+                if all_file_paths.contains(&parent_file)
+                    || file_local_names.contains_key(&parent_file)
+                {
+                    // This file is a submodule of parent_file.
+                    if let Some(stem) = file_path.file_stem().and_then(|s| s.to_str()) {
+                        file_submodule_names
+                            .entry(parent_file)
+                            .or_default()
+                            .insert(stem.to_string());
+                    }
+                }
+            }
+        }
+
+        // Step 2: Run collection pass and build ResolvedImports for each file.
+        // Multiple NSIDs can map to the same file (e.g. `app.rocksky.album` and
+        // `app.rocksky.album.defs` both output to `album.rs`), so we accumulate
+        // imports per file path before resolving.
+        let mut file_imports_map: BTreeMap<std::path::PathBuf, super::prettify::ImportSet> = BTreeMap::new();
         for (nsid, doc) in self.corpus.iter() {
             let file_path = self.nsid_to_file_path(nsid.as_ref());
-            let mut file_imports = super::prettify::ImportSet::default();
+            let file_imports = file_imports_map.entry(file_path).or_default();
             for (def_name, def) in &doc.defs {
                 file_imports.merge(self.collect_def(nsid.as_ref(), def_name.as_ref(), def));
             }
-            let local_names = file_local_names.get(&file_path)
+        }
+
+        let mut file_resolved: BTreeMap<std::path::PathBuf, ResolvedImports> = BTreeMap::new();
+        for (file_path, file_imports) in &file_imports_map {
+            let local_names = file_local_names
+                .get(file_path)
                 .cloned()
                 .unwrap_or_default();
-            let resolved = ResolvedImports::resolve(&file_imports, &local_names, self.mode);
-            file_resolved.insert(file_path, resolved);
+
+            let lexicon_paths: BTreeMap<String, String> = file_imports
+                .lexicon_refs
+                .iter()
+                .filter_map(|ref_str| self.ref_to_crate_path(ref_str))
+                .collect();
+
+            let submodule_names = file_submodule_names
+                .get(file_path)
+                .cloned()
+                .unwrap_or_default();
+            let resolved = ResolvedImports::resolve(
+                file_imports,
+                &local_names,
+                &submodule_names,
+                self.mode,
+                &lexicon_paths,
+            );
+            file_resolved.insert(file_path.clone(), resolved);
         }
 
         // Step 3: Generate code for all lexicons
@@ -49,11 +101,13 @@ impl<'c> CodeGenerator<'c> {
             file_nsids.insert(file_path.clone(), nsid.to_string());
 
             // Get the per-file ResolvedImports (built in Step 2)
-            let resolved = file_resolved.get(&file_path)
+            let resolved = file_resolved
+                .get(&file_path)
                 .expect("resolved imports built for every file");
 
             for (_def_name, def) in &doc.defs {
-                let generated = self.generate_def(nsid.as_ref(), _def_name.as_ref(), def, resolved)?;
+                let generated =
+                    self.generate_def(nsid.as_ref(), _def_name.as_ref(), def, resolved)?;
                 file_contents
                     .entry(file_path.clone())
                     .or_default()
@@ -65,7 +119,8 @@ impl<'c> CodeGenerator<'c> {
         let mut result = BTreeMap::new();
         for (path, generated_vec) in file_contents {
             let nsid = file_nsids.get(&path).cloned();
-            let resolved = file_resolved.get(&path)
+            let resolved = file_resolved
+                .get(&path)
                 .expect("resolved imports built for every file");
             let file_output = FileOutput::combine(generated_vec, nsid, resolved);
             result.insert(path, file_output);
@@ -161,14 +216,19 @@ impl<'c> CodeGenerator<'c> {
             // If this file already exists in defs_only (e.g., from defs), merge the content
             let module_tokens = if is_root {
                 // lib.rs needs extern crate alloc for no_std compatibility
-                quote! { extern crate alloc; #(#mods)* }
+                quote! {
+                    extern crate alloc; #(#mods)*
+                }
             } else {
                 quote! { #(#mods)* }
             };
             if let Some(existing_output) = defs_only.get(&mod_file_path) {
                 // Put module declarations FIRST, then existing defs content
                 let existing_tokens = &existing_output.tokens;
-                let merged_tokens = quote! { #module_tokens #existing_tokens };
+                let merged_tokens = quote! {
+                    #module_tokens
+                    #existing_tokens
+                };
                 result.insert(
                     mod_file_path,
                     FileOutput {
@@ -240,12 +300,13 @@ impl<'c> CodeGenerator<'c> {
             }
 
             // Format code
-            let file: syn::File =
-                syn::parse2(file_output.tokens.clone()).map_err(|e| CodegenError::TokenParseError {
+            let file: syn::File = syn::parse2(file_output.tokens.clone()).map_err(|e| {
+                CodegenError::TokenParseError {
                     path: path.clone(),
                     source: e,
                     tokens: file_output.tokens.to_string(),
-                })?;
+                }
+            })?;
             let mut formatted = prettyplease::unparse(&file);
 
             // Add blank lines between top-level items for better readability
@@ -260,10 +321,20 @@ impl<'c> CodeGenerator<'c> {
                     result_lines.push("");
                 }
 
+                if !line.starts_with("#[") && i + 1 < lines.len() && !lines[i + 1].is_empty() {
+                    let next_line = lines[i + 1];
+                    if next_line.starts_with("#[") && !next_line.is_empty() {
+                        result_lines.push("");
+                    }
+                }
+
                 // Add blank line after last pub mod declaration before structs/enums
                 if line.starts_with("pub mod ") && i + 1 < lines.len() {
                     let next_line = lines[i + 1];
-                    if !next_line.starts_with("pub mod ") && !next_line.is_empty() {
+                    if !next_line.starts_with("pub mod ")
+                        && !next_line.starts_with("pub use ")
+                        && !next_line.is_empty()
+                    {
                         result_lines.push("");
                     }
                 }
@@ -412,7 +483,9 @@ mod tests {
         assert!(!result.is_empty(), "Should have generated files");
 
         // For pub.leaflet.poll.definition (multi-def), verify it's generated
-        let has_poll_defs = result.keys().any(|path| path.to_string_lossy().contains("poll"));
+        let has_poll_defs = result
+            .keys()
+            .any(|path| path.to_string_lossy().contains("poll"));
         assert!(has_poll_defs, "Should have poll defs in output");
     }
 
@@ -442,11 +515,15 @@ mod tests {
 
         // Verify specific types that we know post uses
         assert!(
-            imports.common.contains(&crate::codegen::prettify::CommonType::CowStr),
+            imports
+                .common
+                .contains(&crate::codegen::prettify::CommonType::CowStr),
             "Post should collect CowStr"
         );
         assert!(
-            imports.common.contains(&crate::codegen::prettify::CommonType::Datetime),
+            imports
+                .common
+                .contains(&crate::codegen::prettify::CommonType::Datetime),
             "Post should collect Datetime"
         );
     }
@@ -473,8 +550,10 @@ mod tests {
             // and internally use ResolvedImports (built in generate_all)
             // We can't directly inspect ResolvedImports since it's internal to Task 4,
             // but we verify the output was generated
-            assert!(!file_output.tokens.to_string().is_empty(),
-                "Generated code should not be empty");
+            assert!(
+                !file_output.tokens.to_string().is_empty(),
+                "Generated code should not be empty"
+            );
         }
     }
 
@@ -515,4 +594,3 @@ mod tests {
         assert!(!files.is_empty(), "Should generate at least one file");
     }
 }
-

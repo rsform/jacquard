@@ -5,54 +5,46 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Datetime;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notification::Notification;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListNotifications<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub reasons: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub seen_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    pub reasons: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub seen_at: Option<Datetime>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListNotificationsOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub notifications: Vec<crate::sh_weaver::notification::Notification<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub seen_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    pub notifications: Vec<Notification<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub seen_at: Option<Datetime>,
 }
 
-/// Response type for
-///sh.weaver.notification.listNotifications
+/// Response type for sh.weaver.notification.listNotifications
 pub struct ListNotificationsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListNotificationsResponse {
     const NSID: &'static str = "sh.weaver.notification.listNotifications";
@@ -67,8 +59,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListNotifications<'a> {
     type Response = ListNotificationsResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notification.listNotifications
+/// Endpoint type for sh.weaver.notification.listNotifications
 pub struct ListNotificationsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListNotificationsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notification.listNotifications";
@@ -77,7 +68,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListNotificationsRequest {
     type Response = ListNotificationsResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
@@ -102,14 +93,14 @@ pub mod list_notifications_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListNotificationsBuilder<'a, S: list_notifications_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ListNotifications<'a> {
@@ -123,24 +114,21 @@ impl<'a> ListNotificationsBuilder<'a, list_notifications_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListNotificationsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -161,18 +149,12 @@ impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
 
 impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
     /// Set the `reasons` field (optional)
-    pub fn reasons(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn reasons(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `reasons` field to an Option value (optional)
-    pub fn maybe_reasons(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_reasons(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -180,18 +162,12 @@ impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
 
 impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
     /// Set the `seenAt` field (optional)
-    pub fn seen_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn seen_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `seenAt` field to an Option value (optional)
-    pub fn maybe_seen_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_seen_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }

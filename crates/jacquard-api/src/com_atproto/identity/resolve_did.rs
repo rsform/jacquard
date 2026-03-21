@@ -5,59 +5,54 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveDid<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveDidOutput<'a> {
     ///The complete DID document for the identity.
     #[serde(borrow)]
-    pub did_doc: jacquard_common::types::value::Data<'a>,
+    pub did_doc: Data<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ResolveDidError<'a> {
     /// The DID resolution process confirmed that there is no current DID.
     #[serde(rename = "DidNotFound")]
-    DidNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    DidNotFound(Option<CowStr<'a>>),
     /// The DID previously existed, but has been deactivated.
     #[serde(rename = "DidDeactivated")]
-    DidDeactivated(core::option::Option<jacquard_common::CowStr<'a>>),
+    DidDeactivated(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for ResolveDidError<'_> {
@@ -82,8 +77,7 @@ impl core::fmt::Display for ResolveDidError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.identity.resolveDid
+/// Response type for com.atproto.identity.resolveDid
 pub struct ResolveDidResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveDidResponse {
     const NSID: &'static str = "com.atproto.identity.resolveDid";
@@ -98,8 +92,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveDid<'a> {
     type Response = ResolveDidResponse;
 }
 
-/// Endpoint type for
-///com.atproto.identity.resolveDid
+/// Endpoint type for com.atproto.identity.resolveDid
 pub struct ResolveDidRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveDidRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.resolveDid";
@@ -142,11 +135,9 @@ pub mod resolve_did_state {
 
 /// Builder for constructing an instance of this type
 pub struct ResolveDidBuilder<'a, S: resolve_did_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ResolveDid<'a> {
@@ -160,9 +151,9 @@ impl<'a> ResolveDidBuilder<'a, resolve_did_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ResolveDidBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -175,13 +166,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> ResolveDidBuilder<'a, resolve_did_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ResolveDidBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

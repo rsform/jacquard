@@ -5,35 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct VersionOutput<'a> {
     #[serde(borrow)]
-    pub version: jacquard_common::CowStr<'a>,
+    pub version: CowStr<'a>,
 }
+
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum VersionError<'a> {}
@@ -46,19 +45,10 @@ impl core::fmt::Display for VersionError<'_> {
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct Version;
-/// Response type for
-///sh.tangled.knot.version
+/// Response type for sh.tangled.knot.version
 pub struct VersionResponse;
 impl jacquard_common::xrpc::XrpcResp for VersionResponse {
     const NSID: &'static str = "sh.tangled.knot.version";
@@ -73,8 +63,7 @@ impl jacquard_common::xrpc::XrpcRequest for Version {
     type Response = VersionResponse;
 }
 
-/// Endpoint type for
-///sh.tangled.knot.version
+/// Endpoint type for sh.tangled.knot.version
 pub struct VersionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for VersionRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.knot.version";

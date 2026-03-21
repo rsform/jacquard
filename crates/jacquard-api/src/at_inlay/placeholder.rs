@@ -5,43 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Element;
+use crate::at_inlay::Response;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Placeholder<'a> {
     #[serde(borrow)]
-    pub children: Vec<crate::at_inlay::Element<'a>>,
+    pub children: Vec<Element<'a>>,
     #[serde(borrow)]
-    pub fallback: crate::at_inlay::Element<'a>,
+    pub fallback: Element<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PlaceholderOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
+    pub value: Response<'a>,
 }
 
-/// Response type for
-///at.inlay.Placeholder
+/// Response type for at.inlay.Placeholder
 pub struct PlaceholderResponse;
 impl jacquard_common::xrpc::XrpcResp for PlaceholderResponse {
     const NSID: &'static str = "at.inlay.Placeholder";
@@ -58,8 +49,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Placeholder<'a> {
     type Response = PlaceholderResponse;
 }
 
-/// Endpoint type for
-///at.inlay.Placeholder
+/// Endpoint type for at.inlay.Placeholder
 pub struct PlaceholderRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PlaceholderRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Placeholder";
@@ -80,48 +70,45 @@ pub mod placeholder_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Children;
         type Fallback;
+        type Children;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Children = Unset;
         type Fallback = Unset;
-    }
-    ///State transition - sets the `children` field to Set
-    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChildren<S> {}
-    impl<S: State> State for SetChildren<S> {
-        type Children = Set<members::children>;
-        type Fallback = S::Fallback;
+        type Children = Unset;
     }
     ///State transition - sets the `fallback` field to Set
     pub struct SetFallback<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFallback<S> {}
     impl<S: State> State for SetFallback<S> {
-        type Children = S::Children;
         type Fallback = Set<members::fallback>;
+        type Children = S::Children;
+    }
+    ///State transition - sets the `children` field to Set
+    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChildren<S> {}
+    impl<S: State> State for SetChildren<S> {
+        type Fallback = S::Fallback;
+        type Children = Set<members::children>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `children` field
-        pub struct children(());
         ///Marker type for the `fallback` field
         pub struct fallback(());
+        ///Marker type for the `children` field
+        pub struct children(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PlaceholderBuilder<'a, S: placeholder_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::at_inlay::Element<'a>>>,
-        ::core::option::Option<crate::at_inlay::Element<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<Element<'a>>>, Option<Element<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Placeholder<'a> {
@@ -135,9 +122,9 @@ impl<'a> PlaceholderBuilder<'a, placeholder_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PlaceholderBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -150,13 +137,13 @@ where
     /// Set the `children` field (required)
     pub fn children(
         mut self,
-        value: impl Into<Vec<crate::at_inlay::Element<'a>>>,
+        value: impl Into<Vec<Element<'a>>>,
     ) -> PlaceholderBuilder<'a, placeholder_state::SetChildren<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PlaceholderBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -169,13 +156,13 @@ where
     /// Set the `fallback` field (required)
     pub fn fallback(
         mut self,
-        value: impl Into<crate::at_inlay::Element<'a>>,
+        value: impl Into<Element<'a>>,
     ) -> PlaceholderBuilder<'a, placeholder_state::SetFallback<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         PlaceholderBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -183,8 +170,8 @@ where
 impl<'a, S> PlaceholderBuilder<'a, S>
 where
     S: placeholder_state::State,
-    S::Children: placeholder_state::IsSet,
     S::Fallback: placeholder_state::IsSet,
+    S::Children: placeholder_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Placeholder<'a> {
@@ -197,7 +184,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

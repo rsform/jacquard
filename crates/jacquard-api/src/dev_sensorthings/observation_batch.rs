@@ -5,34 +5,47 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::dev_sensorthings::observation_batch;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct BatchEntry<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub q: core::option::Option<BatchEntryQ<'a>>,
+    pub q: Option<BatchEntryQ<'a>>,
     ///Observation result, same union as dev.sensorthings.observation
     #[serde(borrow)]
     pub result: BatchEntryResult<'a>,
     ///phenomenonTime
-    pub t: jacquard_common::types::string::Datetime,
+    pub t: Datetime,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BatchEntryQ<'a> {
     Good,
     Suspect,
     Missing,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> BatchEntryQ<'a> {
@@ -52,7 +65,7 @@ impl<'a> From<&'a str> for BatchEntryQ<'a> {
             "dev.sensorthings.quality#good" => Self::Good,
             "dev.sensorthings.quality#suspect" => Self::Suspect,
             "dev.sensorthings.quality#missing" => Self::Missing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -63,7 +76,7 @@ impl<'a> From<String> for BatchEntryQ<'a> {
             "dev.sensorthings.quality#good" => Self::Good,
             "dev.sensorthings.quality#suspect" => Self::Suspect,
             "dev.sensorthings.quality#missing" => Self::Missing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -120,100 +133,73 @@ impl jacquard_common::IntoStatic for BatchEntryQ<'_> {
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum BatchEntryResult<'a> {}
 /// A batch of observations for a single Datastream, covering a contiguous time window. Trades individual addressability for reduced commit overhead.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ObservationBatch<'a> {
     #[serde(borrow)]
-    pub datastream: jacquard_common::types::string::AtUri<'a>,
+    pub datastream: AtUri<'a>,
     ///Array of observations in chronological order
     #[serde(borrow)]
-    pub observations: Vec<crate::dev_sensorthings::observation_batch::BatchEntry<'a>>,
-    pub window_end: jacquard_common::types::string::Datetime,
-    pub window_start: jacquard_common::types::string::Datetime,
+    pub observations: Vec<observation_batch::BatchEntry<'a>>,
+    pub window_end: Datetime,
+    pub window_start: Datetime,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ObservationBatchGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: ObservationBatch<'a>,
 }
 
 impl<'a> ObservationBatch<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ObservationBatchRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ObservationBatchRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for BatchEntry<'a> {
+impl<'a> LexiconSchema for BatchEntry<'a> {
     fn nsid() -> &'static str {
         "dev.sensorthings.observationBatch"
     }
     fn def_name() -> &'static str {
         "batchEntry"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_dev_sensorthings_observationBatch()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ObservationBatchRecord;
-impl jacquard_common::xrpc::XrpcResp for ObservationBatchRecord {
+impl XrpcResp for ObservationBatchRecord {
     const NSID: &'static str = "dev.sensorthings.observationBatch";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ObservationBatchGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ObservationBatchGetRecordOutput<'_>> for ObservationBatch<'_> {
@@ -223,37 +209,33 @@ impl From<ObservationBatchGetRecordOutput<'_>> for ObservationBatch<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for ObservationBatch<'_> {
+impl Collection for ObservationBatch<'_> {
     const NSID: &'static str = "dev.sensorthings.observationBatch";
     type Record = ObservationBatchRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ObservationBatchRecord {
+impl Collection for ObservationBatchRecord {
     const NSID: &'static str = "dev.sensorthings.observationBatch";
     type Record = ObservationBatchRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ObservationBatch<'a> {
+impl<'a> LexiconSchema for ObservationBatch<'a> {
     fn nsid() -> &'static str {
         "dev.sensorthings.observationBatch"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_dev_sensorthings_observationBatch()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.observations;
             #[allow(unused_comparisons)]
             if value.len() > 1440usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "observations",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("observations"),
                     max: 1440usize,
                     actual: value.len(),
                 });
@@ -309,13 +291,13 @@ pub mod batch_entry_state {
 
 /// Builder for constructing an instance of this type
 pub struct BatchEntryBuilder<'a, S: batch_entry_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<BatchEntryQ<'a>>,
-        ::core::option::Option<BatchEntryResult<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<BatchEntryQ<'a>>,
+        Option<BatchEntryResult<'a>>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> BatchEntry<'a> {
@@ -329,9 +311,9 @@ impl<'a> BatchEntryBuilder<'a, batch_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BatchEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -359,11 +341,11 @@ where
         mut self,
         value: impl Into<BatchEntryResult<'a>>,
     ) -> BatchEntryBuilder<'a, batch_entry_state::SetResult<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         BatchEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -376,13 +358,13 @@ where
     /// Set the `t` field (required)
     pub fn t(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> BatchEntryBuilder<'a, batch_entry_state::SetT<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         BatchEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -405,10 +387,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> BatchEntry<'a> {
         BatchEntry {
             q: self.__unsafe_private_named.0,
@@ -419,193 +398,128 @@ where
     }
 }
 
-fn lexicon_doc_dev_sensorthings_observationBatch() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("dev.sensorthings.observationBatch"),
-        revision: None,
-        description: None,
+fn lexicon_doc_dev_sensorthings_observationBatch() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("dev.sensorthings.observationBatch"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("batchEntry"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("batchEntry"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("t"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("result")
-                        ],
+                        vec![SmolStr::new_static("t"), SmolStr::new_static("result")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("q"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("q"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "result",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                            SmolStr::new_static("result"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Observation result, same union as dev.sensorthings.observation",
                                     ),
                                 ),
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("dev.sensorthings.observation#numericResult"),
-                                    ::jacquard_common::CowStr::new_static("dev.sensorthings.observation#categoryResult"),
-                                    ::jacquard_common::CowStr::new_static("dev.sensorthings.observation#booleanResult"),
-                                    ::jacquard_common::CowStr::new_static("dev.sensorthings.observation#arrayResult"),
-                                    ::jacquard_common::CowStr::new_static("dev.sensorthings.observation#geoPointResult")
+                                    CowStr::new_static("dev.sensorthings.observation#numericResult"),
+                                    CowStr::new_static("dev.sensorthings.observation#categoryResult"),
+                                    CowStr::new_static("dev.sensorthings.observation#booleanResult"),
+                                    CowStr::new_static("dev.sensorthings.observation#arrayResult"),
+                                    CowStr::new_static("dev.sensorthings.observation#geoPointResult")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("t"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("phenomenonTime"),
-                                ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("t"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("phenomenonTime")),
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A batch of observations for a single Datastream, covering a contiguous time window. Trades individual addressability for reduced commit overhead.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("datastream"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("windowStart"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("windowEnd"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("observations")
+                                SmolStr::new_static("datastream"),
+                                SmolStr::new_static("windowStart"),
+                                SmolStr::new_static("windowEnd"),
+                                SmolStr::new_static("observations")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "datastream",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("datastream"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "observations",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("observations"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Array of observations in chronological order",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static("#batchEntry"),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#batchEntry"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(1440usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "windowEnd",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("windowEnd"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "windowStart",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("windowStart"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -619,82 +533,80 @@ pub mod observation_batch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WindowStart;
-        type WindowEnd;
         type Datastream;
         type Observations;
+        type WindowStart;
+        type WindowEnd;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WindowStart = Unset;
-        type WindowEnd = Unset;
         type Datastream = Unset;
         type Observations = Unset;
-    }
-    ///State transition - sets the `window_start` field to Set
-    pub struct SetWindowStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWindowStart<S> {}
-    impl<S: State> State for SetWindowStart<S> {
-        type WindowStart = Set<members::window_start>;
-        type WindowEnd = S::WindowEnd;
-        type Datastream = S::Datastream;
-        type Observations = S::Observations;
-    }
-    ///State transition - sets the `window_end` field to Set
-    pub struct SetWindowEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWindowEnd<S> {}
-    impl<S: State> State for SetWindowEnd<S> {
-        type WindowStart = S::WindowStart;
-        type WindowEnd = Set<members::window_end>;
-        type Datastream = S::Datastream;
-        type Observations = S::Observations;
+        type WindowStart = Unset;
+        type WindowEnd = Unset;
     }
     ///State transition - sets the `datastream` field to Set
     pub struct SetDatastream<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDatastream<S> {}
     impl<S: State> State for SetDatastream<S> {
-        type WindowStart = S::WindowStart;
-        type WindowEnd = S::WindowEnd;
         type Datastream = Set<members::datastream>;
         type Observations = S::Observations;
+        type WindowStart = S::WindowStart;
+        type WindowEnd = S::WindowEnd;
     }
     ///State transition - sets the `observations` field to Set
     pub struct SetObservations<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObservations<S> {}
     impl<S: State> State for SetObservations<S> {
-        type WindowStart = S::WindowStart;
-        type WindowEnd = S::WindowEnd;
         type Datastream = S::Datastream;
         type Observations = Set<members::observations>;
+        type WindowStart = S::WindowStart;
+        type WindowEnd = S::WindowEnd;
+    }
+    ///State transition - sets the `window_start` field to Set
+    pub struct SetWindowStart<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWindowStart<S> {}
+    impl<S: State> State for SetWindowStart<S> {
+        type Datastream = S::Datastream;
+        type Observations = S::Observations;
+        type WindowStart = Set<members::window_start>;
+        type WindowEnd = S::WindowEnd;
+    }
+    ///State transition - sets the `window_end` field to Set
+    pub struct SetWindowEnd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWindowEnd<S> {}
+    impl<S: State> State for SetWindowEnd<S> {
+        type Datastream = S::Datastream;
+        type Observations = S::Observations;
+        type WindowStart = S::WindowStart;
+        type WindowEnd = Set<members::window_end>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `window_start` field
-        pub struct window_start(());
-        ///Marker type for the `window_end` field
-        pub struct window_end(());
         ///Marker type for the `datastream` field
         pub struct datastream(());
         ///Marker type for the `observations` field
         pub struct observations(());
+        ///Marker type for the `window_start` field
+        pub struct window_start(());
+        ///Marker type for the `window_end` field
+        pub struct window_end(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ObservationBatchBuilder<'a, S: observation_batch_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<
-            Vec<crate::dev_sensorthings::observation_batch::BatchEntry<'a>>,
-        >,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<AtUri<'a>>,
+        Option<Vec<observation_batch::BatchEntry<'a>>>,
+        Option<Datetime>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ObservationBatch<'a> {
@@ -708,9 +620,9 @@ impl<'a> ObservationBatchBuilder<'a, observation_batch_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ObservationBatchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -723,13 +635,13 @@ where
     /// Set the `datastream` field (required)
     pub fn datastream(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> ObservationBatchBuilder<'a, observation_batch_state::SetDatastream<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ObservationBatchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -742,13 +654,13 @@ where
     /// Set the `observations` field (required)
     pub fn observations(
         mut self,
-        value: impl Into<Vec<crate::dev_sensorthings::observation_batch::BatchEntry<'a>>>,
+        value: impl Into<Vec<observation_batch::BatchEntry<'a>>>,
     ) -> ObservationBatchBuilder<'a, observation_batch_state::SetObservations<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ObservationBatchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -761,13 +673,13 @@ where
     /// Set the `windowEnd` field (required)
     pub fn window_end(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ObservationBatchBuilder<'a, observation_batch_state::SetWindowEnd<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         ObservationBatchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -780,13 +692,13 @@ where
     /// Set the `windowStart` field (required)
     pub fn window_start(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ObservationBatchBuilder<'a, observation_batch_state::SetWindowStart<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         ObservationBatchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -794,10 +706,10 @@ where
 impl<'a, S> ObservationBatchBuilder<'a, S>
 where
     S: observation_batch_state::State,
-    S::WindowStart: observation_batch_state::IsSet,
-    S::WindowEnd: observation_batch_state::IsSet,
     S::Datastream: observation_batch_state::IsSet,
     S::Observations: observation_batch_state::IsSet,
+    S::WindowStart: observation_batch_state::IsSet,
+    S::WindowEnd: observation_batch_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ObservationBatch<'a> {
@@ -812,10 +724,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ObservationBatch<'a> {
         ObservationBatch {
             datastream: self.__unsafe_private_named.0.unwrap(),

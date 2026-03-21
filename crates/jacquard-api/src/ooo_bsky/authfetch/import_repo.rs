@@ -5,22 +5,18 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ImportRepo {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-/// Response type for
-///ooo.bsky.authfetch.importRepo
+/// Response type for ooo.bsky.authfetch.importRepo
 pub struct ImportRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for ImportRepoResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.importRepo";
@@ -52,8 +48,7 @@ impl jacquard_common::xrpc::XrpcRequest for ImportRepo {
     }
 }
 
-/// Endpoint type for
-///ooo.bsky.authfetch.importRepo
+/// Endpoint type for ooo.bsky.authfetch.importRepo
 pub struct ImportRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ImportRepoRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.importRepo";

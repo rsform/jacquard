@@ -5,49 +5,40 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Status<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct StatusOutput<'a> {
     ///Authoritative boundaries assigned. Only included when request is authenticated.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub boundaries: core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub boundaries: Option<Vec<Data<'a>>>,
     ///The DID that was checked.
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
     ///Whether the DID is enrolled in this Stratos service.
     pub enrolled: bool,
     ///When the DID was enrolled, if enrolled.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub enrolled_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub enrolled_at: Option<Datetime>,
 }
 
-/// Response type for
-///zone.stratos.enrollment.status
+/// Response type for zone.stratos.enrollment.status
 pub struct StatusResponse;
 impl jacquard_common::xrpc::XrpcResp for StatusResponse {
     const NSID: &'static str = "zone.stratos.enrollment.status";
@@ -62,8 +53,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Status<'a> {
     type Response = StatusResponse;
 }
 
-/// Endpoint type for
-///zone.stratos.enrollment.status
+/// Endpoint type for zone.stratos.enrollment.status
 pub struct StatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StatusRequest {
     const PATH: &'static str = "/xrpc/zone.stratos.enrollment.status";
@@ -106,11 +96,9 @@ pub mod status_state {
 
 /// Builder for constructing an instance of this type
 pub struct StatusBuilder<'a, S: status_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Status<'a> {
@@ -124,9 +112,9 @@ impl<'a> StatusBuilder<'a, status_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StatusBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -139,13 +127,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> StatusBuilder<'a, status_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         StatusBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

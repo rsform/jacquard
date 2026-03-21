@@ -5,20 +5,14 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use core::marker::PhantomData;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct Play;
-/// Response type for
-///app.rocksky.spotify.play
+/// Response type for app.rocksky.spotify.play
 pub struct PlayResponse;
 impl jacquard_common::xrpc::XrpcResp for PlayResponse {
     const NSID: &'static str = "app.rocksky.spotify.play";
@@ -35,8 +29,7 @@ impl jacquard_common::xrpc::XrpcRequest for Play {
     type Response = PlayResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.spotify.play
+/// Endpoint type for app.rocksky.spotify.play
 pub struct PlayRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PlayRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.spotify.play";

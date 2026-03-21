@@ -5,28 +5,25 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct AddValues<'a> {
     ///Name of the set to add values to
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///Array of string values to add to the set
     #[serde(borrow)]
-    pub values: Vec<jacquard_common::CowStr<'a>>,
+    pub values: Vec<CowStr<'a>>,
 }
 
-/// Response type for
-///tools.ozone.set.addValues
+/// Response type for tools.ozone.set.addValues
 pub struct AddValuesResponse;
 impl jacquard_common::xrpc::XrpcResp for AddValuesResponse {
     const NSID: &'static str = "tools.ozone.set.addValues";
@@ -43,8 +40,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for AddValues<'a> {
     type Response = AddValuesResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.set.addValues
+/// Endpoint type for tools.ozone.set.addValues
 pub struct AddValuesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddValuesRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.set.addValues";
@@ -101,12 +97,9 @@ pub mod add_values_state {
 
 /// Builder for constructing an instance of this type
 pub struct AddValuesBuilder<'a, S: add_values_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<Vec<CowStr<'a>>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> AddValues<'a> {
@@ -120,9 +113,9 @@ impl<'a> AddValuesBuilder<'a, add_values_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AddValuesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -135,13 +128,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> AddValuesBuilder<'a, add_values_state::SetName<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         AddValuesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -154,13 +147,13 @@ where
     /// Set the `values` field (required)
     pub fn values(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> AddValuesBuilder<'a, add_values_state::SetValues<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         AddValuesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -182,7 +175,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

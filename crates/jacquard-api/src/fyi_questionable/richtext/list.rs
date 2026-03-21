@@ -5,63 +5,61 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::fyi_questionable::richtext::text::Text;
+use crate::fyi_questionable::richtext::list;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct List<'a> {
     #[serde(borrow)]
     pub items: Vec<ListItemsItem<'a>>,
-    ///Defaults to `false`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    /// Defaults to `false`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_list_ordered")]
-    pub ordered: core::option::Option<bool>,
+    pub ordered: Option<bool>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ListItemsItem<'a> {
     #[serde(rename = "fyi.questionable.richtext.text")]
-    Text(Box<crate::fyi_questionable::richtext::text::Text<'a>>),
+    Text(Box<Text<'a>>),
     #[serde(rename = "fyi.questionable.richtext.list")]
-    List(Box<crate::fyi_questionable::richtext::list::List<'a>>),
+    List(Box<list::List<'a>>),
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for List<'a> {
+impl<'a> LexiconSchema for List<'a> {
     fn nsid() -> &'static str {
         "fyi.questionable.richtext.list"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_fyi_questionable_richtext_list()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_list_ordered() -> core::option::Option<bool> {
+fn _default_list_ordered() -> Option<bool> {
     Some(false)
 }
 
@@ -99,12 +97,9 @@ pub mod list_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListBuilder<'a, S: list_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<ListItemsItem<'a>>>,
-        ::core::option::Option<bool>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<ListItemsItem<'a>>>, Option<bool>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> List<'a> {
@@ -118,9 +113,9 @@ impl<'a> ListBuilder<'a, list_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -135,11 +130,11 @@ where
         mut self,
         value: impl Into<Vec<ListItemsItem<'a>>>,
     ) -> ListBuilder<'a, list_state::SetItems<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -173,7 +168,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -186,62 +181,49 @@ where
     }
 }
 
-fn lexicon_doc_fyi_questionable_richtext_list() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.list"),
-        revision: None,
-        description: None,
+fn lexicon_doc_fyi_questionable_richtext_list() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("fyi.questionable.richtext.list"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("items")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("main"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("items")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "items",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                            SmolStr::new_static("items"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.text"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.list")
+                                        CowStr::new_static("fyi.questionable.richtext.text"),
+                                        CowStr::new_static("fyi.questionable.richtext.list")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "ordered",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("ordered"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

@@ -5,135 +5,122 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::graph::list_mute;
 /// Configuration for which types of content to mute
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ContentTypes<'a> {
-    ///Mute regular posts from accounts on this list Defaults to `true`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    ///Mute regular posts from accounts on this list  Defaults to `true`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_content_types_posts")]
-    pub posts: core::option::Option<bool>,
-    ///Mute quote posts from accounts on this list Defaults to `true`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub posts: Option<bool>,
+    ///Mute quote posts from accounts on this list  Defaults to `true`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_content_types_quotes")]
-    pub quotes: core::option::Option<bool>,
-    ///Mute replies from accounts on this list Defaults to `true`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub quotes: Option<bool>,
+    ///Mute replies from accounts on this list  Defaults to `true`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_content_types_replies")]
-    pub replies: core::option::Option<bool>,
-    ///Mute reposts from accounts on this list Defaults to `true`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub replies: Option<bool>,
+    ///Mute reposts from accounts on this list  Defaults to `true`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_content_types_reposts")]
-    pub reposts: core::option::Option<bool>,
+    pub reposts: Option<bool>,
 }
 
 /// A record for muting content from all accounts on a list with fine-grained control over content types, duration, and feed targeting
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListMute<'a> {
     ///Types of content to mute from accounts on this list
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub content_types: core::option::Option<
-        crate::net_anisota::graph::list_mute::ContentTypes<'a>,
-    >,
+    pub content_types: Option<list_mute::ContentTypes<'a>>,
     ///When the mute was created
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///When this mute expires. If not set, mute is permanent
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub expires_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expires_at: Option<Datetime>,
     ///Optional reason for muting this list
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub reason: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub reason: Option<CowStr<'a>>,
     ///AT-URI of the list to mute (app.bsky.graph.list record)
     #[serde(borrow)]
-    pub subject: jacquard_common::types::string::AtUri<'a>,
+    pub subject: AtUri<'a>,
     ///Specific feeds where this mute should apply. If empty, applies to all feeds
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub target_feeds: core::option::Option<
-        Vec<jacquard_common::types::string::AtUri<'a>>,
-    >,
+    pub target_feeds: Option<Vec<AtUri<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListMuteGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: ListMute<'a>,
 }
 
 impl<'a> ListMute<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ListMuteRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ListMuteRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ContentTypes<'a> {
+impl<'a> LexiconSchema for ContentTypes<'a> {
     fn nsid() -> &'static str {
         "net.anisota.graph.listMute"
     }
     fn def_name() -> &'static str {
         "contentTypes"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_anisota_graph_listMute()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ListMuteRecord;
-impl jacquard_common::xrpc::XrpcResp for ListMuteRecord {
+impl XrpcResp for ListMuteRecord {
     const NSID: &'static str = "net.anisota.graph.listMute";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ListMuteGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ListMuteGetRecordOutput<'_>> for ListMute<'_> {
@@ -143,36 +130,32 @@ impl From<ListMuteGetRecordOutput<'_>> for ListMute<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for ListMute<'_> {
+impl Collection for ListMute<'_> {
     const NSID: &'static str = "net.anisota.graph.listMute";
     type Record = ListMuteRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ListMuteRecord {
+impl Collection for ListMuteRecord {
     const NSID: &'static str = "net.anisota.graph.listMute";
     type Record = ListMuteRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ListMute<'a> {
+impl<'a> LexiconSchema for ListMute<'a> {
     fn nsid() -> &'static str {
         "net.anisota.graph.listMute"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_anisota_graph_listMute()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.reason {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "reason",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("reason"),
                     max: 300usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -181,10 +164,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ListMute<'a> {
         if let Some(ref value) = self.target_feeds {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "target_feeds",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("target_feeds"),
                     max: 50usize,
                     actual: value.len(),
                 });
@@ -194,19 +175,19 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ListMute<'a> {
     }
 }
 
-fn _default_content_types_posts() -> core::option::Option<bool> {
+fn _default_content_types_posts() -> Option<bool> {
     Some(true)
 }
 
-fn _default_content_types_quotes() -> core::option::Option<bool> {
+fn _default_content_types_quotes() -> Option<bool> {
     Some(true)
 }
 
-fn _default_content_types_replies() -> core::option::Option<bool> {
+fn _default_content_types_replies() -> Option<bool> {
     Some(true)
 }
 
-fn _default_content_types_reposts() -> core::option::Option<bool> {
+fn _default_content_types_reposts() -> Option<bool> {
     Some(true)
 }
 
@@ -222,230 +203,152 @@ impl Default for ContentTypes<'_> {
     }
 }
 
-fn lexicon_doc_net_anisota_graph_listMute() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("net.anisota.graph.listMute"),
-        revision: None,
-        description: None,
+fn lexicon_doc_net_anisota_graph_listMute() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("net.anisota.graph.listMute"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("contentTypes"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("contentTypes"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Configuration for which types of content to mute",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "posts",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("posts"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "quotes",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("quotes"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "replies",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("replies"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "reposts",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("reposts"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A record for muting content from all accounts on a list with fine-grained control over content types, duration, and feed targeting",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("subject"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("subject"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "contentTypes",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#contentTypes",
-                                    ),
+                                SmolStr::new_static("contentTypes"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#contentTypes"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "When the mute was created",
-                                        ),
+                                        CowStr::new_static("When the mute was created"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "expiresAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("expiresAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "When this mute expires. If not set, mute is permanent",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "reason",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("reason"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Optional reason for muting this list",
-                                        ),
+                                        CowStr::new_static("Optional reason for muting this list"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(300usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "subject",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("subject"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "AT-URI of the list to mute (app.bsky.graph.list record)",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "targetFeeds",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("targetFeeds"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Specific feeds where this mute should apply. If empty, applies to all feeds",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    items: LexArrayItem::String(LexString {
+                                        format: Some(LexStringFormat::AtUri),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(50usize),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -495,16 +398,16 @@ pub mod list_mute_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListMuteBuilder<'a, S: list_mute_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::net_anisota::graph::list_mute::ContentTypes<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        Option<list_mute::ContentTypes<'a>>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<AtUri<'a>>,
+        Option<Vec<AtUri<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ListMute<'a> {
@@ -518,9 +421,9 @@ impl<'a> ListMuteBuilder<'a, list_mute_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListMuteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -529,7 +432,7 @@ impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
     /// Set the `contentTypes` field (optional)
     pub fn content_types(
         mut self,
-        value: impl Into<Option<crate::net_anisota::graph::list_mute::ContentTypes<'a>>>,
+        value: impl Into<Option<list_mute::ContentTypes<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -537,7 +440,7 @@ impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
     /// Set the `contentTypes` field to an Option value (optional)
     pub fn maybe_content_types(
         mut self,
-        value: Option<crate::net_anisota::graph::list_mute::ContentTypes<'a>>,
+        value: Option<list_mute::ContentTypes<'a>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
@@ -552,31 +455,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ListMuteBuilder<'a, list_mute_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ListMuteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
-    pub fn expires_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
-    pub fn maybe_expires_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -584,15 +481,12 @@ impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
 
 impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
     /// Set the `reason` field (optional)
-    pub fn reason(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `reason` field to an Option value (optional)
-    pub fn maybe_reason(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_reason(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -606,31 +500,25 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> ListMuteBuilder<'a, list_mute_state::SetSubject<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         ListMuteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
     /// Set the `targetFeeds` field (optional)
-    pub fn target_feeds(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
-    ) -> Self {
+    pub fn target_feeds(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `targetFeeds` field to an Option value (optional)
-    pub fn maybe_target_feeds(
-        mut self,
-        value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn maybe_target_feeds(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -657,7 +545,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

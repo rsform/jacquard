@@ -5,53 +5,65 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A master record validating one player's stats for one system. Multiple GMs can validate the same player.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Master<'a> {
     ///Name of the campaign this validation relates to
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub campaign: core::option::Option<jacquard_common::CowStr<'a>>,
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub campaign: Option<CowStr<'a>>,
+    pub created_at: Datetime,
     ///DID of the player this record validates
     #[serde(borrow)]
-    pub player: jacquard_common::types::string::Did<'a>,
+    pub player: Did<'a>,
     ///What portions of stats are validated. 'none' = inherent trust (always valid), 'custom' = selected fields only, 'full' = all fields must match
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub snapshot_scope: core::option::Option<MasterSnapshotScope<'a>>,
+    pub snapshot_scope: Option<MasterSnapshotScope<'a>>,
     ///CID of the approved sprite blob (optional)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sprite_cid: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub sprite_cid: Option<CowStr<'a>>,
     ///Snapshot of the player's stats for this system. Omitted when snapshotScope is 'none'.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub stats: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub stats: Option<Data<'a>>,
     ///The stat system being validated (e.g. 'dnd', 'reverie', 'rmmz')
     #[serde(borrow)]
-    pub system: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    pub system: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<Datetime>,
 }
 
 /// What portions of stats are validated. 'none' = inherent trust (always valid), 'custom' = selected fields only, 'full' = all fields must match
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MasterSnapshotScope<'a> {
     None,
     Custom,
     Full,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> MasterSnapshotScope<'a> {
@@ -71,7 +83,7 @@ impl<'a> From<&'a str> for MasterSnapshotScope<'a> {
             "none" => Self::None,
             "custom" => Self::Custom,
             "full" => Self::Full,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -82,7 +94,7 @@ impl<'a> From<String> for MasterSnapshotScope<'a> {
             "none" => Self::None,
             "custom" => Self::Custom,
             "full" => Self::Full,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -140,47 +152,36 @@ impl jacquard_common::IntoStatic for MasterSnapshotScope<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MasterGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Master<'a>,
 }
 
 impl<'a> Master<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, MasterRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, MasterRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MasterRecord;
-impl jacquard_common::xrpc::XrpcResp for MasterRecord {
+impl XrpcResp for MasterRecord {
     const NSID: &'static str = "actor.rpg.master";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = MasterGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<MasterGetRecordOutput<'_>> for Master<'_> {
@@ -190,36 +191,32 @@ impl From<MasterGetRecordOutput<'_>> for Master<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Master<'_> {
+impl Collection for Master<'_> {
     const NSID: &'static str = "actor.rpg.master";
     type Record = MasterRecord;
 }
 
-impl jacquard_common::types::collection::Collection for MasterRecord {
+impl Collection for MasterRecord {
     const NSID: &'static str = "actor.rpg.master";
     type Record = MasterRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Master<'a> {
+impl<'a> LexiconSchema for Master<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.master"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_master()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.campaign {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "campaign",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("campaign"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -229,10 +226,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Master<'a> {
             let value = &self.system;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "system",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("system"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -253,67 +248,67 @@ pub mod master_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Player;
-        type System;
         type CreatedAt;
+        type System;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Player = Unset;
-        type System = Unset;
         type CreatedAt = Unset;
+        type System = Unset;
     }
     ///State transition - sets the `player` field to Set
     pub struct SetPlayer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayer<S> {}
     impl<S: State> State for SetPlayer<S> {
         type Player = Set<members::player>;
+        type CreatedAt = S::CreatedAt;
         type System = S::System;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `system` field to Set
-    pub struct SetSystem<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSystem<S> {}
-    impl<S: State> State for SetSystem<S> {
-        type Player = S::Player;
-        type System = Set<members::system>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Player = S::Player;
-        type System = S::System;
         type CreatedAt = Set<members::created_at>;
+        type System = S::System;
+    }
+    ///State transition - sets the `system` field to Set
+    pub struct SetSystem<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSystem<S> {}
+    impl<S: State> State for SetSystem<S> {
+        type Player = S::Player;
+        type CreatedAt = S::CreatedAt;
+        type System = Set<members::system>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `player` field
         pub struct player(());
-        ///Marker type for the `system` field
-        pub struct system(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `system` field
+        pub struct system(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MasterBuilder<'a, S: master_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<MasterSnapshotScope<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<Did<'a>>,
+        Option<MasterSnapshotScope<'a>>,
+        Option<CowStr<'a>>,
+        Option<Data<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Master<'a> {
@@ -327,24 +322,21 @@ impl<'a> MasterBuilder<'a, master_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MasterBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `campaign` field (optional)
-    pub fn campaign(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn campaign(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `campaign` field to an Option value (optional)
-    pub fn maybe_campaign(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_campaign(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -358,13 +350,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> MasterBuilder<'a, master_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         MasterBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -377,13 +369,13 @@ where
     /// Set the `player` field (required)
     pub fn player(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> MasterBuilder<'a, master_state::SetPlayer<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         MasterBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -409,18 +401,12 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
 
 impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `spriteCid` field (optional)
-    pub fn sprite_cid(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn sprite_cid(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `spriteCid` field to an Option value (optional)
-    pub fn maybe_sprite_cid(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_sprite_cid(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -428,18 +414,12 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
 
 impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `stats` field (optional)
-    pub fn stats(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn stats(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `stats` field to an Option value (optional)
-    pub fn maybe_stats(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_stats(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -453,31 +433,25 @@ where
     /// Set the `system` field (required)
     pub fn system(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> MasterBuilder<'a, master_state::SetSystem<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         MasterBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
-    pub fn updated_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
-    pub fn maybe_updated_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -487,8 +461,8 @@ impl<'a, S> MasterBuilder<'a, S>
 where
     S: master_state::State,
     S::Player: master_state::IsSet,
-    S::System: master_state::IsSet,
     S::CreatedAt: master_state::IsSet,
+    S::System: master_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Master<'a> {
@@ -507,10 +481,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Master<'a> {
         Master {
             campaign: self.__unsafe_private_named.0,
@@ -526,195 +497,123 @@ where
     }
 }
 
-fn lexicon_doc_actor_rpg_master() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("actor.rpg.master"),
-        revision: None,
-        description: None,
+fn lexicon_doc_actor_rpg_master() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("actor.rpg.master"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A master record validating one player's stats for one system. Multiple GMs can validate the same player.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("player"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("system"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("player"),
+                                SmolStr::new_static("system"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "campaign",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("campaign"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Name of the campaign this validation relates to",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "player",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("player"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "DID of the player this record validates",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "snapshotScope",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("snapshotScope"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "What portions of stats are validated. 'none' = inherent trust (always valid), 'custom' = selected fields only, 'full' = all fields must match",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "spriteCid",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("spriteCid"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "CID of the approved sprite blob (optional)",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "stats",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
-                                    description: None,
+                                SmolStr::new_static("stats"),
+                                LexObjectProperty::Unknown(LexUnknown {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "system",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("system"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The stat system being validated (e.g. 'dnd', 'reverie', 'rmmz')",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(50usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "updatedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("updatedAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

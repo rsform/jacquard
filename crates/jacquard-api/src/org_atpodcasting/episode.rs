@@ -5,110 +5,111 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Language, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::org_atpodcasting::PodcastRef;
+use crate::org_atpodcasting::episode;
 /// Reference to an externally hosted chapters file.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ChaptersRef<'a> {
     ///MIME type of the chapters file (e.g. application/json+chapters).
     #[serde(borrow)]
-    pub mime_type: jacquard_common::CowStr<'a>,
+    pub mime_type: CowStr<'a>,
     ///URL of the chapters file.
     #[serde(borrow)]
-    pub url: jacquard_common::types::string::UriValue<'a>,
+    pub url: UriValue<'a>,
 }
 
 /// A podcast episode. Record key is a UUIDv5 derived from the podcast GUID (as namespace) and the episode's feedItemGuid (as name), enabling deterministic lookup from RSS feed metadata.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Episode<'a> {
     ///Alternate versions of the episode media (e.g. different formats or audio-only versions of video episodes).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alternate_media: core::option::Option<
-        Vec<crate::org_atpodcasting::episode::MediaRef<'a>>,
-    >,
+    pub alternate_media: Option<Vec<episode::MediaRef<'a>>>,
     ///Episode-specific artwork. Overrides the podcast artwork when set. Recommended: 1400x1400 to 3000x3000 pixels, square, no alpha channel.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub artwork: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub artwork: Option<BlobRef<'a>>,
     ///Reference to an externally hosted chapters file.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub chapters: core::option::Option<
-        crate::org_atpodcasting::episode::ChaptersRef<'a>,
-    >,
+    pub chapters: Option<episode::ChaptersRef<'a>>,
     ///When the episode record was created.
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///A description or show notes for the episode.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<CowStr<'a>>,
     ///Duration of the episode in seconds.
     pub duration: i64,
     ///Episode number within its season or the overall series.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub episode_number: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub episode_number: Option<i64>,
     ///The type of episode. Defaults to full.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub episode_type: core::option::Option<EpisodeEpisodeType<'a>>,
+    pub episode_type: Option<EpisodeEpisodeType<'a>>,
     ///Whether the episode contains explicit content. Overrides the podcast-level setting when set.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub explicit: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub explicit: Option<bool>,
     ///The original feed item identifier. Must match the <guid> element of the corresponding RSS feed item. The record key (rkey) is derived from this value as uuid5(<podcast:guid>, feedItemGuid).
     #[serde(borrow)]
-    pub feed_item_guid: jacquard_common::CowStr<'a>,
+    pub feed_item_guid: CowStr<'a>,
     ///URL of a companion webpage or show notes page for the episode.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub link: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub link: Option<UriValue<'a>>,
     ///The primary media file for the episode.
     #[serde(borrow)]
-    pub media: crate::org_atpodcasting::episode::MediaRef<'a>,
+    pub media: episode::MediaRef<'a>,
     ///Identifies the parent podcast. Since episodes live in the same repository as their podcast, the AT URI is always derivable from the episode's DID and the podcastGuid.
     #[serde(borrow)]
-    pub podcast: crate::org_atpodcasting::PodcastRef<'a>,
+    pub podcast: PodcastRef<'a>,
     ///When the episode was published.
-    pub published_at: jacquard_common::types::string::Datetime,
+    pub published_at: Datetime,
     ///Season number of the episode.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub season_number: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub season_number: Option<i64>,
     ///The title of the episode.
     #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
+    pub title: CowStr<'a>,
     ///References to externally hosted transcript files (e.g. VTT, SRT, JSON). Multiple entries allow providing transcripts in different formats.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub transcript: core::option::Option<
-        Vec<crate::org_atpodcasting::episode::TranscriptRef<'a>>,
-    >,
+    pub transcript: Option<Vec<episode::TranscriptRef<'a>>>,
 }
 
 /// The type of episode. Defaults to full.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EpisodeEpisodeType<'a> {
     Full,
     Trailer,
     Bonus,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> EpisodeEpisodeType<'a> {
@@ -128,7 +129,7 @@ impl<'a> From<&'a str> for EpisodeEpisodeType<'a> {
             "full" => Self::Full,
             "trailer" => Self::Trailer,
             "bonus" => Self::Bonus,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -139,7 +140,7 @@ impl<'a> From<String> for EpisodeEpisodeType<'a> {
             "full" => Self::Full,
             "trailer" => Self::Trailer,
             "bonus" => Self::Bonus,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -197,109 +198,82 @@ impl jacquard_common::IntoStatic for EpisodeEpisodeType<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct EpisodeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Episode<'a>,
 }
 
 /// Reference to an externally hosted media file.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaRef<'a> {
     ///MIME type of the media file (e.g. audio/mpeg, video/mp4).
     #[serde(borrow)]
-    pub mime_type: jacquard_common::CowStr<'a>,
+    pub mime_type: CowStr<'a>,
     ///URL of the media file.
     #[serde(borrow)]
-    pub url: jacquard_common::types::string::UriValue<'a>,
+    pub url: UriValue<'a>,
 }
 
 /// Reference to an externally hosted transcript file.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct TranscriptRef<'a> {
     ///Language of the transcript (ISO 639-1 two-letter code, e.g. 'en', 'es', 'pt').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub language: core::option::Option<jacquard_common::types::string::Language>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub language: Option<Language>,
     ///MIME type of the transcript file (e.g. text/vtt, application/x-subrip, application/json).
     #[serde(borrow)]
-    pub mime_type: jacquard_common::CowStr<'a>,
+    pub mime_type: CowStr<'a>,
     ///URL of the transcript file.
     #[serde(borrow)]
-    pub url: jacquard_common::types::string::UriValue<'a>,
+    pub url: UriValue<'a>,
 }
 
 impl<'a> Episode<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, EpisodeRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, EpisodeRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ChaptersRef<'a> {
+impl<'a> LexiconSchema for ChaptersRef<'a> {
     fn nsid() -> &'static str {
         "org.atpodcasting.episode"
     }
     fn def_name() -> &'static str {
         "chaptersRef"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_atpodcasting_episode()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EpisodeRecord;
-impl jacquard_common::xrpc::XrpcResp for EpisodeRecord {
+impl XrpcResp for EpisodeRecord {
     const NSID: &'static str = "org.atpodcasting.episode";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = EpisodeGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<EpisodeGetRecordOutput<'_>> for Episode<'_> {
@@ -309,36 +283,32 @@ impl From<EpisodeGetRecordOutput<'_>> for Episode<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Episode<'_> {
+impl Collection for Episode<'_> {
     const NSID: &'static str = "org.atpodcasting.episode";
     type Record = EpisodeRecord;
 }
 
-impl jacquard_common::types::collection::Collection for EpisodeRecord {
+impl Collection for EpisodeRecord {
     const NSID: &'static str = "org.atpodcasting.episode";
     type Record = EpisodeRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
+impl<'a> LexiconSchema for Episode<'a> {
     fn nsid() -> &'static str {
         "org.atpodcasting.episode"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_atpodcasting_episode()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.alternate_media {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "alternate_media",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("alternate_media"),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -348,10 +318,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
             {
                 let size = value.blob().size;
                 if size > 5000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "artwork",
-                        ),
+                    return Err(ConstraintError::BlobTooLarge {
+                        path: ValidationPath::from_field("artwork"),
                         max: 5000000usize,
                         actual: size,
                     });
@@ -376,10 +344,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "artwork",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("artwork"),
                         accepted: vec![
                             "image/png".to_string(), "image/jpeg".to_string()
                         ],
@@ -391,10 +357,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("description"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -403,10 +367,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
         {
             let value = &self.duration;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "duration",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("duration"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -414,10 +376,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
         }
         if let Some(ref value) = self.episode_number {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "episode_number",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("episode_number"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -427,10 +387,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
             let value = &self.feed_item_guid;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "feed_item_guid",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("feed_item_guid"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -438,10 +396,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
         }
         if let Some(ref value) = self.season_number {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "season_number",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("season_number"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -451,10 +407,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("title"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -463,10 +417,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
         if let Some(ref value) = self.transcript {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "transcript",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("transcript"),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -476,36 +428,32 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for MediaRef<'a> {
+impl<'a> LexiconSchema for MediaRef<'a> {
     fn nsid() -> &'static str {
         "org.atpodcasting.episode"
     }
     fn def_name() -> &'static str {
         "mediaRef"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_atpodcasting_episode()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for TranscriptRef<'a> {
+impl<'a> LexiconSchema for TranscriptRef<'a> {
     fn nsid() -> &'static str {
         "org.atpodcasting.episode"
     }
     fn def_name() -> &'static str {
         "transcriptRef"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_atpodcasting_episode()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -520,48 +468,45 @@ pub mod chapters_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MimeType;
         type Url;
+        type MimeType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MimeType = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `mime_type` field to Set
-    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMimeType<S> {}
-    impl<S: State> State for SetMimeType<S> {
-        type MimeType = Set<members::mime_type>;
-        type Url = S::Url;
+        type MimeType = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type MimeType = S::MimeType;
         type Url = Set<members::url>;
+        type MimeType = S::MimeType;
+    }
+    ///State transition - sets the `mime_type` field to Set
+    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMimeType<S> {}
+    impl<S: State> State for SetMimeType<S> {
+        type Url = S::Url;
+        type MimeType = Set<members::mime_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mime_type` field
-        pub struct mime_type(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `mime_type` field
+        pub struct mime_type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ChaptersRefBuilder<'a, S: chapters_ref_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ChaptersRef<'a> {
@@ -575,9 +520,9 @@ impl<'a> ChaptersRefBuilder<'a, chapters_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ChaptersRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -590,13 +535,13 @@ where
     /// Set the `mimeType` field (required)
     pub fn mime_type(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ChaptersRefBuilder<'a, chapters_ref_state::SetMimeType<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ChaptersRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -609,13 +554,13 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> ChaptersRefBuilder<'a, chapters_ref_state::SetUrl<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ChaptersRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -623,8 +568,8 @@ where
 impl<'a, S> ChaptersRefBuilder<'a, S>
 where
     S: chapters_ref_state::State,
-    S::MimeType: chapters_ref_state::IsSet,
     S::Url: chapters_ref_state::IsSet,
+    S::MimeType: chapters_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ChaptersRef<'a> {
@@ -637,7 +582,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -650,549 +595,342 @@ where
     }
 }
 
-fn lexicon_doc_org_atpodcasting_episode() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.atpodcasting.episode"),
-        revision: None,
-        description: None,
+fn lexicon_doc_org_atpodcasting_episode() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("org.atpodcasting.episode"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("chaptersRef"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("chaptersRef"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Reference to an externally hosted chapters file.",
                         ),
                     ),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("url"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mimeType")
-                        ],
+                        vec![SmolStr::new_static("url"), SmolStr::new_static("mimeType")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mimeType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("mimeType"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "MIME type of the chapters file (e.g. application/json+chapters).",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "url",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("url"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "URL of the chapters file.",
-                                    ),
+                                    CowStr::new_static("URL of the chapters file."),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A podcast episode. Record key is a UUIDv5 derived from the podcast GUID (as namespace) and the episode's feedItemGuid (as name), enabling deterministic lookup from RSS feed metadata.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("podcast"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("media"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("publishedAt"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("duration"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("feedItemGuid"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("podcast"),
+                                SmolStr::new_static("title"), SmolStr::new_static("media"),
+                                SmolStr::new_static("publishedAt"),
+                                SmolStr::new_static("duration"),
+                                SmolStr::new_static("feedItemGuid"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "alternateMedia",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("alternateMedia"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Alternate versions of the episode media (e.g. different formats or audio-only versions of video episodes).",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static("#mediaRef"),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#mediaRef"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(10usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "artwork",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                    description: None,
-                                    accept: None,
-                                    max_size: None,
+                                SmolStr::new_static("artwork"),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("chapters"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#chaptersRef"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "chapters",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#chaptersRef"),
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "When the episode record was created.",
-                                        ),
+                                        CowStr::new_static("When the episode record was created."),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "description",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("description"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "A description or show notes for the episode.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(10000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "duration",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("duration"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "episodeNumber",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("episodeNumber"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "episodeType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("episodeType"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "The type of episode. Defaults to full.",
-                                        ),
+                                        CowStr::new_static("The type of episode. Defaults to full."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "explicit",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
+                                SmolStr::new_static("explicit"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "feedItemGuid",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("feedItemGuid"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The original feed item identifier. Must match the <guid> element of the corresponding RSS feed item. The record key (rkey) is derived from this value as uuid5(<podcast:guid>, feedItemGuid).",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(2000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "link",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("link"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "URL of a companion webpage or show notes page for the episode.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Uri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "media",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#mediaRef"),
+                                SmolStr::new_static("media"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#mediaRef"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "podcast",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("podcast"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "org.atpodcasting.defs#podcastRef",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "publishedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("publishedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "When the episode was published.",
-                                        ),
+                                        CowStr::new_static("When the episode was published."),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "seasonNumber",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("seasonNumber"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "title",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("title"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "The title of the episode.",
-                                        ),
+                                        CowStr::new_static("The title of the episode."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(500usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "transcript",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("transcript"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "References to externally hosted transcript files (e.g. VTT, SRT, JSON). Multiple entries allow providing transcripts in different formats.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "#transcriptRef",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#transcriptRef"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(10usize),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("mediaRef"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("mediaRef"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Reference to an externally hosted media file.",
                         ),
                     ),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("url"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mimeType")
-                        ],
+                        vec![SmolStr::new_static("url"), SmolStr::new_static("mimeType")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mimeType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("mimeType"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "MIME type of the media file (e.g. audio/mpeg, video/mp4).",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "url",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("url"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "URL of the media file.",
-                                    ),
+                                    CowStr::new_static("URL of the media file."),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("transcriptRef"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("transcriptRef"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Reference to an externally hosted transcript file.",
                         ),
                     ),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("url"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mimeType")
-                        ],
+                        vec![SmolStr::new_static("url"), SmolStr::new_static("mimeType")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "language",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("language"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Language of the transcript (ISO 639-1 two-letter code, e.g. 'en', 'es', 'pt').",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Language,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Language),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mimeType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("mimeType"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "MIME type of the transcript file (e.g. text/vtt, application/x-subrip, application/json).",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "url",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("url"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "URL of the transcript file.",
-                                    ),
+                                    CowStr::new_static("URL of the transcript file."),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1206,153 +944,153 @@ pub mod episode_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Media;
-        type Duration;
         type FeedItemGuid;
-        type Podcast;
-        type PublishedAt;
+        type Media;
         type CreatedAt;
+        type Title;
+        type PublishedAt;
+        type Duration;
+        type Podcast;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Media = Unset;
-        type Duration = Unset;
         type FeedItemGuid = Unset;
-        type Podcast = Unset;
-        type PublishedAt = Unset;
+        type Media = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Media = S::Media;
-        type Duration = S::Duration;
-        type FeedItemGuid = S::FeedItemGuid;
-        type Podcast = S::Podcast;
-        type PublishedAt = S::PublishedAt;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `media` field to Set
-    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMedia<S> {}
-    impl<S: State> State for SetMedia<S> {
-        type Title = S::Title;
-        type Media = Set<members::media>;
-        type Duration = S::Duration;
-        type FeedItemGuid = S::FeedItemGuid;
-        type Podcast = S::Podcast;
-        type PublishedAt = S::PublishedAt;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type Title = S::Title;
-        type Media = S::Media;
-        type Duration = Set<members::duration>;
-        type FeedItemGuid = S::FeedItemGuid;
-        type Podcast = S::Podcast;
-        type PublishedAt = S::PublishedAt;
-        type CreatedAt = S::CreatedAt;
+        type Title = Unset;
+        type PublishedAt = Unset;
+        type Duration = Unset;
+        type Podcast = Unset;
     }
     ///State transition - sets the `feed_item_guid` field to Set
     pub struct SetFeedItemGuid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFeedItemGuid<S> {}
     impl<S: State> State for SetFeedItemGuid<S> {
-        type Title = S::Title;
-        type Media = S::Media;
-        type Duration = S::Duration;
         type FeedItemGuid = Set<members::feed_item_guid>;
-        type Podcast = S::Podcast;
-        type PublishedAt = S::PublishedAt;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `podcast` field to Set
-    pub struct SetPodcast<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPodcast<S> {}
-    impl<S: State> State for SetPodcast<S> {
-        type Title = S::Title;
         type Media = S::Media;
-        type Duration = S::Duration;
-        type FeedItemGuid = S::FeedItemGuid;
-        type Podcast = Set<members::podcast>;
-        type PublishedAt = S::PublishedAt;
         type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `published_at` field to Set
-    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
-    impl<S: State> State for SetPublishedAt<S> {
         type Title = S::Title;
-        type Media = S::Media;
+        type PublishedAt = S::PublishedAt;
         type Duration = S::Duration;
-        type FeedItemGuid = S::FeedItemGuid;
         type Podcast = S::Podcast;
-        type PublishedAt = Set<members::published_at>;
+    }
+    ///State transition - sets the `media` field to Set
+    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMedia<S> {}
+    impl<S: State> State for SetMedia<S> {
+        type FeedItemGuid = S::FeedItemGuid;
+        type Media = Set<members::media>;
         type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type PublishedAt = S::PublishedAt;
+        type Duration = S::Duration;
+        type Podcast = S::Podcast;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type Media = S::Media;
-        type Duration = S::Duration;
         type FeedItemGuid = S::FeedItemGuid;
-        type Podcast = S::Podcast;
-        type PublishedAt = S::PublishedAt;
+        type Media = S::Media;
         type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+        type PublishedAt = S::PublishedAt;
+        type Duration = S::Duration;
+        type Podcast = S::Podcast;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type FeedItemGuid = S::FeedItemGuid;
+        type Media = S::Media;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
+        type PublishedAt = S::PublishedAt;
+        type Duration = S::Duration;
+        type Podcast = S::Podcast;
+    }
+    ///State transition - sets the `published_at` field to Set
+    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
+    impl<S: State> State for SetPublishedAt<S> {
+        type FeedItemGuid = S::FeedItemGuid;
+        type Media = S::Media;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type PublishedAt = Set<members::published_at>;
+        type Duration = S::Duration;
+        type Podcast = S::Podcast;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type FeedItemGuid = S::FeedItemGuid;
+        type Media = S::Media;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type PublishedAt = S::PublishedAt;
+        type Duration = Set<members::duration>;
+        type Podcast = S::Podcast;
+    }
+    ///State transition - sets the `podcast` field to Set
+    pub struct SetPodcast<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPodcast<S> {}
+    impl<S: State> State for SetPodcast<S> {
+        type FeedItemGuid = S::FeedItemGuid;
+        type Media = S::Media;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type PublishedAt = S::PublishedAt;
+        type Duration = S::Duration;
+        type Podcast = Set<members::podcast>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `media` field
-        pub struct media(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
         ///Marker type for the `feed_item_guid` field
         pub struct feed_item_guid(());
-        ///Marker type for the `podcast` field
-        pub struct podcast(());
-        ///Marker type for the `published_at` field
-        pub struct published_at(());
+        ///Marker type for the `media` field
+        pub struct media(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `published_at` field
+        pub struct published_at(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
+        ///Marker type for the `podcast` field
+        pub struct podcast(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EpisodeBuilder<'a, S: episode_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::org_atpodcasting::episode::MediaRef<'a>>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<crate::org_atpodcasting::episode::ChaptersRef<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<EpisodeEpisodeType<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<crate::org_atpodcasting::episode::MediaRef<'a>>,
-        ::core::option::Option<crate::org_atpodcasting::PodcastRef<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::org_atpodcasting::episode::TranscriptRef<'a>>>,
+        Option<Vec<episode::MediaRef<'a>>>,
+        Option<BlobRef<'a>>,
+        Option<episode::ChaptersRef<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<i64>,
+        Option<EpisodeEpisodeType<'a>>,
+        Option<bool>,
+        Option<CowStr<'a>>,
+        Option<UriValue<'a>>,
+        Option<episode::MediaRef<'a>>,
+        Option<PodcastRef<'a>>,
+        Option<Datetime>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<Vec<episode::TranscriptRef<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Episode<'a> {
@@ -1366,7 +1104,7 @@ impl<'a> EpisodeBuilder<'a, episode_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EpisodeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -1386,7 +1124,7 @@ impl<'a> EpisodeBuilder<'a, episode_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1395,7 +1133,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `alternateMedia` field (optional)
     pub fn alternate_media(
         mut self,
-        value: impl Into<Option<Vec<crate::org_atpodcasting::episode::MediaRef<'a>>>>,
+        value: impl Into<Option<Vec<episode::MediaRef<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -1403,7 +1141,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `alternateMedia` field to an Option value (optional)
     pub fn maybe_alternate_media(
         mut self,
-        value: Option<Vec<crate::org_atpodcasting::episode::MediaRef<'a>>>,
+        value: Option<Vec<episode::MediaRef<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
@@ -1412,18 +1150,12 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
 
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `artwork` field (optional)
-    pub fn artwork(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
-    ) -> Self {
+    pub fn artwork(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `artwork` field to an Option value (optional)
-    pub fn maybe_artwork(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_artwork(mut self, value: Option<BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -1433,16 +1165,13 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `chapters` field (optional)
     pub fn chapters(
         mut self,
-        value: impl Into<Option<crate::org_atpodcasting::episode::ChaptersRef<'a>>>,
+        value: impl Into<Option<episode::ChaptersRef<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `chapters` field to an Option value (optional)
-    pub fn maybe_chapters(
-        mut self,
-        value: Option<crate::org_atpodcasting::episode::ChaptersRef<'a>>,
-    ) -> Self {
+    pub fn maybe_chapters(mut self, value: Option<episode::ChaptersRef<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -1456,31 +1185,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> EpisodeBuilder<'a, episode_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -1496,11 +1219,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> EpisodeBuilder<'a, episode_state::SetDuration<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1555,31 +1278,25 @@ where
     /// Set the `feedItemGuid` field (required)
     pub fn feed_item_guid(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> EpisodeBuilder<'a, episode_state::SetFeedItemGuid<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `link` field (optional)
-    pub fn link(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `link` field to an Option value (optional)
-    pub fn maybe_link(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_link(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -1593,13 +1310,13 @@ where
     /// Set the `media` field (required)
     pub fn media(
         mut self,
-        value: impl Into<crate::org_atpodcasting::episode::MediaRef<'a>>,
+        value: impl Into<episode::MediaRef<'a>>,
     ) -> EpisodeBuilder<'a, episode_state::SetMedia<S>> {
-        self.__unsafe_private_named.11 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.11 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1612,13 +1329,13 @@ where
     /// Set the `podcast` field (required)
     pub fn podcast(
         mut self,
-        value: impl Into<crate::org_atpodcasting::PodcastRef<'a>>,
+        value: impl Into<PodcastRef<'a>>,
     ) -> EpisodeBuilder<'a, episode_state::SetPodcast<S>> {
-        self.__unsafe_private_named.12 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.12 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1631,13 +1348,13 @@ where
     /// Set the `publishedAt` field (required)
     pub fn published_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> EpisodeBuilder<'a, episode_state::SetPublishedAt<S>> {
-        self.__unsafe_private_named.13 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.13 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1663,13 +1380,13 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> EpisodeBuilder<'a, episode_state::SetTitle<S>> {
-        self.__unsafe_private_named.15 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.15 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1678,9 +1395,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `transcript` field (optional)
     pub fn transcript(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::org_atpodcasting::episode::TranscriptRef<'a>>>,
-        >,
+        value: impl Into<Option<Vec<episode::TranscriptRef<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.16 = value.into();
         self
@@ -1688,7 +1403,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `transcript` field to an Option value (optional)
     pub fn maybe_transcript(
         mut self,
-        value: Option<Vec<crate::org_atpodcasting::episode::TranscriptRef<'a>>>,
+        value: Option<Vec<episode::TranscriptRef<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.16 = value;
         self
@@ -1698,13 +1413,13 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
 impl<'a, S> EpisodeBuilder<'a, S>
 where
     S: episode_state::State,
-    S::Title: episode_state::IsSet,
-    S::Media: episode_state::IsSet,
-    S::Duration: episode_state::IsSet,
     S::FeedItemGuid: episode_state::IsSet,
-    S::Podcast: episode_state::IsSet,
-    S::PublishedAt: episode_state::IsSet,
+    S::Media: episode_state::IsSet,
     S::CreatedAt: episode_state::IsSet,
+    S::Title: episode_state::IsSet,
+    S::PublishedAt: episode_state::IsSet,
+    S::Duration: episode_state::IsSet,
+    S::Podcast: episode_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Episode<'a> {
@@ -1732,7 +1447,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1770,48 +1485,45 @@ pub mod media_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type MimeType;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type MimeType = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type MimeType = S::MimeType;
+        type Url = Unset;
     }
     ///State transition - sets the `mime_type` field to Set
     pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMimeType<S> {}
     impl<S: State> State for SetMimeType<S> {
-        type Url = S::Url;
         type MimeType = Set<members::mime_type>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type MimeType = S::MimeType;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `mime_type` field
         pub struct mime_type(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MediaRefBuilder<'a, S: media_ref_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> MediaRef<'a> {
@@ -1825,9 +1537,9 @@ impl<'a> MediaRefBuilder<'a, media_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MediaRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1840,13 +1552,13 @@ where
     /// Set the `mimeType` field (required)
     pub fn mime_type(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> MediaRefBuilder<'a, media_ref_state::SetMimeType<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         MediaRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1859,13 +1571,13 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> MediaRefBuilder<'a, media_ref_state::SetUrl<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         MediaRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1873,8 +1585,8 @@ where
 impl<'a, S> MediaRefBuilder<'a, S>
 where
     S: media_ref_state::State,
-    S::Url: media_ref_state::IsSet,
     S::MimeType: media_ref_state::IsSet,
+    S::Url: media_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MediaRef<'a> {
@@ -1887,7 +1599,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1910,49 +1622,45 @@ pub mod transcript_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type MimeType;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type MimeType = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type MimeType = S::MimeType;
+        type Url = Unset;
     }
     ///State transition - sets the `mime_type` field to Set
     pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMimeType<S> {}
     impl<S: State> State for SetMimeType<S> {
-        type Url = S::Url;
         type MimeType = Set<members::mime_type>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type MimeType = S::MimeType;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `mime_type` field
         pub struct mime_type(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TranscriptRefBuilder<'a, S: transcript_ref_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Language>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Language>, Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> TranscriptRef<'a> {
@@ -1966,27 +1674,21 @@ impl<'a> TranscriptRefBuilder<'a, transcript_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TranscriptRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: transcript_ref_state::State> TranscriptRefBuilder<'a, S> {
     /// Set the `language` field (optional)
-    pub fn language(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Language>>,
-    ) -> Self {
+    pub fn language(mut self, value: impl Into<Option<Language>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `language` field to an Option value (optional)
-    pub fn maybe_language(
-        mut self,
-        value: Option<jacquard_common::types::string::Language>,
-    ) -> Self {
+    pub fn maybe_language(mut self, value: Option<Language>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -2000,13 +1702,13 @@ where
     /// Set the `mimeType` field (required)
     pub fn mime_type(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> TranscriptRefBuilder<'a, transcript_ref_state::SetMimeType<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         TranscriptRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2019,13 +1721,13 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> TranscriptRefBuilder<'a, transcript_ref_state::SetUrl<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         TranscriptRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2033,8 +1735,8 @@ where
 impl<'a, S> TranscriptRefBuilder<'a, S>
 where
     S: transcript_ref_state::State,
-    S::Url: transcript_ref_state::IsSet,
     S::MimeType: transcript_ref_state::IsSet,
+    S::Url: transcript_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TranscriptRef<'a> {
@@ -2048,7 +1750,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

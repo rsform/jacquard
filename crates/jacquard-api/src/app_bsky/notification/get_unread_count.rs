@@ -5,40 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::Datetime;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetUnreadCount {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub priority: core::option::Option<bool>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub seen_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub priority: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub seen_at: Option<Datetime>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetUnreadCountOutput<'a> {
     pub count: i64,
 }
 
-/// Response type for
-///app.bsky.notification.getUnreadCount
+/// Response type for app.bsky.notification.getUnreadCount
 pub struct GetUnreadCountResponse;
 impl jacquard_common::xrpc::XrpcResp for GetUnreadCountResponse {
     const NSID: &'static str = "app.bsky.notification.getUnreadCount";
@@ -53,8 +43,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetUnreadCount {
     type Response = GetUnreadCountResponse;
 }
 
-/// Endpoint type for
-///app.bsky.notification.getUnreadCount
+/// Endpoint type for app.bsky.notification.getUnreadCount
 pub struct GetUnreadCountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetUnreadCountRequest {
     const PATH: &'static str = "/xrpc/app.bsky.notification.getUnreadCount";
@@ -84,11 +73,8 @@ pub mod get_unread_count_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetUnreadCountBuilder<S: get_unread_count_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-    ),
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<bool>, Option<Datetime>),
 }
 
 impl GetUnreadCount {
@@ -102,7 +88,7 @@ impl GetUnreadCountBuilder<get_unread_count_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetUnreadCountBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
         }
     }
@@ -123,18 +109,12 @@ impl<S: get_unread_count_state::State> GetUnreadCountBuilder<S> {
 
 impl<S: get_unread_count_state::State> GetUnreadCountBuilder<S> {
     /// Set the `seenAt` field (optional)
-    pub fn seen_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn seen_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `seenAt` field to an Option value (optional)
-    pub fn maybe_seen_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_seen_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }

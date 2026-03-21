@@ -5,40 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::Datetime;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Timestamp<'a> {
-    pub value: jacquard_common::types::string::Datetime,
+    pub value: Datetime,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct TimestampOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
+    pub value: Response<'a>,
 }
 
-/// Response type for
-///org.atsui.Timestamp
+/// Response type for org.atsui.Timestamp
 pub struct TimestampResponse;
 impl jacquard_common::xrpc::XrpcResp for TimestampResponse {
     const NSID: &'static str = "org.atsui.Timestamp";
@@ -55,8 +46,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Timestamp<'a> {
     type Response = TimestampResponse;
 }
 
-/// Endpoint type for
-///org.atsui.Timestamp
+/// Endpoint type for org.atsui.Timestamp
 pub struct TimestampRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for TimestampRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Timestamp";
@@ -101,11 +91,9 @@ pub mod timestamp_state {
 
 /// Builder for constructing an instance of this type
 pub struct TimestampBuilder<'a, S: timestamp_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Datetime>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Timestamp<'a> {
@@ -119,9 +107,9 @@ impl<'a> TimestampBuilder<'a, timestamp_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TimestampBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -134,13 +122,13 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> TimestampBuilder<'a, timestamp_state::SetValue<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         TimestampBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -160,7 +148,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

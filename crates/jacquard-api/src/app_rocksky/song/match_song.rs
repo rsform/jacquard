@@ -5,42 +5,32 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::song::SongViewDetailed;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MatchSong<'a> {
     #[serde(borrow)]
-    pub artist: jacquard_common::CowStr<'a>,
+    pub artist: CowStr<'a>,
     #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
+    pub title: CowStr<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MatchSongOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::song::SongViewDetailed<'a>,
+    pub value: SongViewDetailed<'a>,
 }
 
-/// Response type for
-///app.rocksky.song.matchSong
+/// Response type for app.rocksky.song.matchSong
 pub struct MatchSongResponse;
 impl jacquard_common::xrpc::XrpcResp for MatchSongResponse {
     const NSID: &'static str = "app.rocksky.song.matchSong";
@@ -55,8 +45,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for MatchSong<'a> {
     type Response = MatchSongResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.song.matchSong
+/// Endpoint type for app.rocksky.song.matchSong
 pub struct MatchSongRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MatchSongRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.song.matchSong";
@@ -111,12 +100,9 @@ pub mod match_song_state {
 
 /// Builder for constructing an instance of this type
 pub struct MatchSongBuilder<'a, S: match_song_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> MatchSong<'a> {
@@ -130,9 +116,9 @@ impl<'a> MatchSongBuilder<'a, match_song_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MatchSongBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -145,13 +131,13 @@ where
     /// Set the `artist` field (required)
     pub fn artist(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> MatchSongBuilder<'a, match_song_state::SetArtist<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         MatchSongBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -164,13 +150,13 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> MatchSongBuilder<'a, match_song_state::SetTitle<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         MatchSongBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

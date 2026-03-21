@@ -5,54 +5,67 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::buzz_bookhive::BookProgress;
 /// A book in the user's library
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Book<'a> {
     ///The authors of the book (tab separated)
     #[serde(borrow)]
-    pub authors: jacquard_common::CowStr<'a>,
+    pub authors: CowStr<'a>,
     ///Progress tracking details for the book
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub book_progress: core::option::Option<crate::buzz_bookhive::BookProgress<'a>>,
+    pub book_progress: Option<BookProgress<'a>>,
     ///Cover image of the book
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cover: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub cover: Option<BlobRef<'a>>,
+    pub created_at: Datetime,
     ///The date the user finished reading the book
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub finished_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub finished_at: Option<Datetime>,
     ///The book's hive id, used to correlate user's books with the hive
     #[serde(borrow)]
-    pub hive_id: jacquard_common::CowStr<'a>,
+    pub hive_id: CowStr<'a>,
     ///The book's review
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub review: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub review: Option<CowStr<'a>>,
     ///Number of stars given to the book (1-10) which will be mapped to 1-5 stars
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub stars: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stars: Option<i64>,
     ///The date the user started reading the book
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub started_at: core::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: core::option::Option<BookStatus<'a>>,
+    pub status: Option<BookStatus<'a>>,
     ///The title of the book
     #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
+    pub title: CowStr<'a>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BookStatus<'a> {
@@ -61,7 +74,7 @@ pub enum BookStatus<'a> {
     WantToRead,
     Abandoned,
     Owned,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> BookStatus<'a> {
@@ -85,7 +98,7 @@ impl<'a> From<&'a str> for BookStatus<'a> {
             "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
             "buzz.bookhive.defs#abandoned" => Self::Abandoned,
             "buzz.bookhive.defs#owned" => Self::Owned,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -98,7 +111,7 @@ impl<'a> From<String> for BookStatus<'a> {
             "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
             "buzz.bookhive.defs#abandoned" => Self::Abandoned,
             "buzz.bookhive.defs#owned" => Self::Owned,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -158,47 +171,36 @@ impl jacquard_common::IntoStatic for BookStatus<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct BookGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Book<'a>,
 }
 
 impl<'a> Book<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, BookRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, BookRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct BookRecord;
-impl jacquard_common::xrpc::XrpcResp for BookRecord {
+impl XrpcResp for BookRecord {
     const NSID: &'static str = "buzz.bookhive.book";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = BookGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<BookGetRecordOutput<'_>> for Book<'_> {
@@ -208,37 +210,33 @@ impl From<BookGetRecordOutput<'_>> for Book<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Book<'_> {
+impl Collection for Book<'_> {
     const NSID: &'static str = "buzz.bookhive.book";
     type Record = BookRecord;
 }
 
-impl jacquard_common::types::collection::Collection for BookRecord {
+impl Collection for BookRecord {
     const NSID: &'static str = "buzz.bookhive.book";
     type Record = BookRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Book<'a> {
+impl<'a> LexiconSchema for Book<'a> {
     fn nsid() -> &'static str {
         "buzz.bookhive.book"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_buzz_bookhive_book()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.authors;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "authors",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("authors"),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -248,10 +246,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Book<'a> {
             let value = &self.authors;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "authors",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("authors"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -261,10 +257,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Book<'a> {
             {
                 let size = value.blob().size;
                 if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "cover",
-                        ),
+                    return Err(ConstraintError::BlobTooLarge {
+                        path: ValidationPath::from_field("cover"),
                         max: 1000000usize,
                         actual: size,
                     });
@@ -289,10 +283,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Book<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "cover",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("cover"),
                         accepted: vec![
                             "image/png".to_string(), "image/jpeg".to_string()
                         ],
@@ -303,16 +295,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Book<'a> {
         }
         if let Some(ref value) = self.review {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 15000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "review",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("review"),
                         max: 15000usize,
                         actual: count,
                     });
@@ -321,10 +307,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Book<'a> {
         }
         if let Some(ref value) = self.stars {
             if *value > 10i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "stars",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("stars"),
                     max: 10i64,
                     actual: *value,
                 });
@@ -332,10 +316,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Book<'a> {
         }
         if let Some(ref value) = self.stars {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "stars",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("stars"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -345,10 +327,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Book<'a> {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("title"),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -358,10 +338,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Book<'a> {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("title"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -381,8 +359,8 @@ pub mod book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type HiveId;
         type Authors;
+        type HiveId;
         type CreatedAt;
         type Title;
     }
@@ -390,26 +368,26 @@ pub mod book_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type HiveId = Unset;
         type Authors = Unset;
+        type HiveId = Unset;
         type CreatedAt = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `hive_id` field to Set
-    pub struct SetHiveId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHiveId<S> {}
-    impl<S: State> State for SetHiveId<S> {
-        type HiveId = Set<members::hive_id>;
-        type Authors = S::Authors;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthors<S> {}
     impl<S: State> State for SetAuthors<S> {
-        type HiveId = S::HiveId;
         type Authors = Set<members::authors>;
+        type HiveId = S::HiveId;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `hive_id` field to Set
+    pub struct SetHiveId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHiveId<S> {}
+    impl<S: State> State for SetHiveId<S> {
+        type Authors = S::Authors;
+        type HiveId = Set<members::hive_id>;
         type CreatedAt = S::CreatedAt;
         type Title = S::Title;
     }
@@ -417,8 +395,8 @@ pub mod book_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type HiveId = S::HiveId;
         type Authors = S::Authors;
+        type HiveId = S::HiveId;
         type CreatedAt = Set<members::created_at>;
         type Title = S::Title;
     }
@@ -426,18 +404,18 @@ pub mod book_state {
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type HiveId = S::HiveId;
         type Authors = S::Authors;
+        type HiveId = S::HiveId;
         type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `hive_id` field
-        pub struct hive_id(());
         ///Marker type for the `authors` field
         pub struct authors(());
+        ///Marker type for the `hive_id` field
+        pub struct hive_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `title` field
@@ -447,21 +425,21 @@ pub mod book_state {
 
 /// Builder for constructing an instance of this type
 pub struct BookBuilder<'a, S: book_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::buzz_bookhive::BookProgress<'a>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<BookStatus<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<BookProgress<'a>>,
+        Option<BlobRef<'a>>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<Datetime>,
+        Option<BookStatus<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Book<'a> {
@@ -475,7 +453,7 @@ impl<'a> BookBuilder<'a, book_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -489,7 +467,7 @@ impl<'a> BookBuilder<'a, book_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -502,31 +480,25 @@ where
     /// Set the `authors` field (required)
     pub fn authors(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> BookBuilder<'a, book_state::SetAuthors<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         BookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `bookProgress` field (optional)
-    pub fn book_progress(
-        mut self,
-        value: impl Into<Option<crate::buzz_bookhive::BookProgress<'a>>>,
-    ) -> Self {
+    pub fn book_progress(mut self, value: impl Into<Option<BookProgress<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `bookProgress` field to an Option value (optional)
-    pub fn maybe_book_progress(
-        mut self,
-        value: Option<crate::buzz_bookhive::BookProgress<'a>>,
-    ) -> Self {
+    pub fn maybe_book_progress(mut self, value: Option<BookProgress<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -534,18 +506,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `cover` field (optional)
-    pub fn cover(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
-    ) -> Self {
+    pub fn cover(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `cover` field to an Option value (optional)
-    pub fn maybe_cover(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_cover(mut self, value: Option<BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -559,31 +525,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> BookBuilder<'a, book_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         BookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `finishedAt` field (optional)
-    pub fn finished_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn finished_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `finishedAt` field to an Option value (optional)
-    pub fn maybe_finished_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_finished_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -597,28 +557,25 @@ where
     /// Set the `hiveId` field (required)
     pub fn hive_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> BookBuilder<'a, book_state::SetHiveId<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         BookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `review` field (optional)
-    pub fn review(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn review(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
-    pub fn maybe_review(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_review(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -639,18 +596,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `startedAt` field (optional)
-    pub fn started_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn started_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `startedAt` field to an Option value (optional)
-    pub fn maybe_started_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_started_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -677,13 +628,13 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> BookBuilder<'a, book_state::SetTitle<S>> {
-        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.10 = Option::Some(value.into());
         BookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -691,8 +642,8 @@ where
 impl<'a, S> BookBuilder<'a, S>
 where
     S: book_state::State,
-    S::HiveId: book_state::IsSet,
     S::Authors: book_state::IsSet,
+    S::HiveId: book_state::IsSet,
     S::CreatedAt: book_state::IsSet,
     S::Title: book_state::IsSet,
 {
@@ -716,7 +667,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -738,241 +689,145 @@ where
     }
 }
 
-fn lexicon_doc_buzz_bookhive_book() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("buzz.bookhive.book"),
-        revision: None,
-        description: None,
+fn lexicon_doc_buzz_bookhive_book() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("buzz.bookhive.book"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A book in the user's library",
-                        ),
+                        CowStr::new_static("A book in the user's library"),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("authors"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("hiveId"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("title"),
+                                SmolStr::new_static("authors"),
+                                SmolStr::new_static("hiveId"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "authors",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("authors"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The authors of the book (tab separated)",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
                                     min_length: Some(1usize),
                                     max_length: Some(2048usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "bookProgress",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("bookProgress"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "buzz.bookhive.defs#bookProgress",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "cover",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                    description: None,
-                                    accept: None,
-                                    max_size: None,
+                                SmolStr::new_static("cover"),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "finishedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("finishedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The date the user finished reading the book",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "hiveId",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("hiveId"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The book's hive id, used to correlate user's books with the hive",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "review",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static("The book's review"),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
+                                SmolStr::new_static("review"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(CowStr::new_static("The book's review")),
                                     max_graphemes: Some(15000usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "stars",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("stars"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
                                     maximum: Some(10i64),
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "startedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("startedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The date the user started reading the book",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "status",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("status"),
+                                LexObjectProperty::String(LexString {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "title",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("title"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "The title of the book",
-                                        ),
+                                        CowStr::new_static("The title of the book"),
                                     ),
-                                    format: None,
-                                    default: None,
                                     min_length: Some(1usize),
                                     max_length: Some(512usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

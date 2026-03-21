@@ -5,47 +5,37 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetArtistShouts<'a> {
     ///(min: 1)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
     ///(min: 0)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub offset: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub offset: Option<i64>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetArtistShoutsOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub shouts: core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub shouts: Option<Vec<Data<'a>>>,
 }
 
-/// Response type for
-///app.rocksky.shout.getArtistShouts
+/// Response type for app.rocksky.shout.getArtistShouts
 pub struct GetArtistShoutsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetArtistShoutsResponse {
     const NSID: &'static str = "app.rocksky.shout.getArtistShouts";
@@ -60,8 +50,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetArtistShouts<'a> {
     type Response = GetArtistShoutsResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.shout.getArtistShouts
+/// Endpoint type for app.rocksky.shout.getArtistShouts
 pub struct GetArtistShoutsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetArtistShoutsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.getArtistShouts";
@@ -104,13 +93,9 @@ pub mod get_artist_shouts_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetArtistShoutsBuilder<'a, S: get_artist_shouts_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<i64>, Option<AtUri<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetArtistShouts<'a> {
@@ -124,9 +109,9 @@ impl<'a> GetArtistShoutsBuilder<'a, get_artist_shouts_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetArtistShoutsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -165,13 +150,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetArtistShoutsBuilder<'a, get_artist_shouts_state::SetUri<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         GetArtistShoutsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

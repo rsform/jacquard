@@ -5,29 +5,27 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAllRead<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: core::option::Option<UpdateAllReadStatus<'a>>,
+    pub status: Option<UpdateAllReadStatus<'a>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UpdateAllReadStatus<'a> {
     Request,
     Accepted,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> UpdateAllReadStatus<'a> {
@@ -45,7 +43,7 @@ impl<'a> From<&'a str> for UpdateAllReadStatus<'a> {
         match s {
             "request" => Self::Request,
             "accepted" => Self::Accepted,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -55,7 +53,7 @@ impl<'a> From<String> for UpdateAllReadStatus<'a> {
         match s.as_str() {
             "request" => Self::Request,
             "accepted" => Self::Accepted,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -111,24 +109,16 @@ impl jacquard_common::IntoStatic for UpdateAllReadStatus<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAllReadOutput<'a> {
     ///The count of updated convos.
     pub updated_count: i64,
 }
 
-/// Response type for
-///chat.bsky.convo.updateAllRead
+/// Response type for chat.bsky.convo.updateAllRead
 pub struct UpdateAllReadResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateAllReadResponse {
     const NSID: &'static str = "chat.bsky.convo.updateAllRead";
@@ -145,8 +135,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAllRead<'a> {
     type Response = UpdateAllReadResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.convo.updateAllRead
+/// Endpoint type for chat.bsky.convo.updateAllRead
 pub struct UpdateAllReadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAllReadRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.updateAllRead";

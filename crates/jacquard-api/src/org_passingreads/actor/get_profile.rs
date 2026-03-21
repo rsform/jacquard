@@ -5,41 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::org_passingreads::actor::ProfileView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfile<'a> {
     #[serde(borrow)]
-    pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub actor: AtIdentifier<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfileOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub profile: core::option::Option<crate::org_passingreads::actor::ProfileView<'a>>,
+    pub profile: Option<ProfileView<'a>>,
 }
 
-/// Response type for
-///org.passingreads.actor.getProfile
+/// Response type for org.passingreads.actor.getProfile
 pub struct GetProfileResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfileResponse {
     const NSID: &'static str = "org.passingreads.actor.getProfile";
@@ -54,8 +44,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfile<'a> {
     type Response = GetProfileResponse;
 }
 
-/// Endpoint type for
-///org.passingreads.actor.getProfile
+/// Endpoint type for org.passingreads.actor.getProfile
 pub struct GetProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfileRequest {
     const PATH: &'static str = "/xrpc/org.passingreads.actor.getProfile";
@@ -98,11 +87,9 @@ pub mod get_profile_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetProfileBuilder<'a, S: get_profile_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetProfile<'a> {
@@ -116,9 +103,9 @@ impl<'a> GetProfileBuilder<'a, get_profile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetProfileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -131,13 +118,13 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> GetProfileBuilder<'a, get_profile_state::SetActor<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetProfileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

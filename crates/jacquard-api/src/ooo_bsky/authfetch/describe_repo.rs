@@ -5,40 +5,29 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::{Did, Nsid};
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DescribeRepoOutput<'a> {
     ///The list of collection NSIDs in the hidden repository.
     #[serde(borrow)]
-    pub collections: Vec<jacquard_common::types::string::Nsid<'a>>,
+    pub collections: Vec<Nsid<'a>>,
     ///The DID of the repository owner.
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct DescribeRepo;
-/// Response type for
-///ooo.bsky.authfetch.describeRepo
+/// Response type for ooo.bsky.authfetch.describeRepo
 pub struct DescribeRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for DescribeRepoResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.describeRepo";
@@ -53,8 +42,7 @@ impl jacquard_common::xrpc::XrpcRequest for DescribeRepo {
     type Response = DescribeRepoResponse;
 }
 
-/// Endpoint type for
-///ooo.bsky.authfetch.describeRepo
+/// Endpoint type for ooo.bsky.authfetch.describeRepo
 pub struct DescribeRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DescribeRepoRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.describeRepo";

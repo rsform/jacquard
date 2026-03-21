@@ -5,20 +5,14 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use core::marker::PhantomData;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct Pause;
-/// Response type for
-///app.rocksky.spotify.pause
+/// Response type for app.rocksky.spotify.pause
 pub struct PauseResponse;
 impl jacquard_common::xrpc::XrpcResp for PauseResponse {
     const NSID: &'static str = "app.rocksky.spotify.pause";
@@ -35,8 +29,7 @@ impl jacquard_common::xrpc::XrpcRequest for Pause {
     type Response = PauseResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.spotify.pause
+/// Endpoint type for app.rocksky.spotify.pause
 pub struct PauseRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PauseRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.spotify.pause";

@@ -5,45 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ReserveSigningKey<'a> {
     ///The DID to reserve a key for.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub did: Option<Did<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ReserveSigningKeyOutput<'a> {
     ///The public key for the reserved signing key, in did:key serialization.
     #[serde(borrow)]
-    pub signing_key: jacquard_common::CowStr<'a>,
+    pub signing_key: CowStr<'a>,
 }
 
-/// Response type for
-///com.atproto.server.reserveSigningKey
+/// Response type for com.atproto.server.reserveSigningKey
 pub struct ReserveSigningKeyResponse;
 impl jacquard_common::xrpc::XrpcResp for ReserveSigningKeyResponse {
     const NSID: &'static str = "com.atproto.server.reserveSigningKey";
@@ -60,8 +49,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ReserveSigningKey<'a> {
     type Response = ReserveSigningKeyResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.reserveSigningKey
+/// Endpoint type for com.atproto.server.reserveSigningKey
 pub struct ReserveSigningKeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ReserveSigningKeyRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.reserveSigningKey";

@@ -5,44 +5,32 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteOAuthClient<'a> {
     ///OAuth client ID to delete
     #[serde(borrow)]
-    pub client_id: jacquard_common::CowStr<'a>,
+    pub client_id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteOAuthClientOutput<'a> {
     ///Success confirmation message
     #[serde(borrow)]
-    pub message: jacquard_common::CowStr<'a>,
+    pub message: CowStr<'a>,
 }
 
-/// Response type for
-///network.slices.slice.deleteOAuthClient
+/// Response type for network.slices.slice.deleteOAuthClient
 pub struct DeleteOAuthClientResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteOAuthClientResponse {
     const NSID: &'static str = "network.slices.slice.deleteOAuthClient";
@@ -59,8 +47,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteOAuthClient<'a> {
     type Response = DeleteOAuthClientResponse;
 }
 
-/// Endpoint type for
-///network.slices.slice.deleteOAuthClient
+/// Endpoint type for network.slices.slice.deleteOAuthClient
 pub struct DeleteOAuthClientRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteOAuthClientRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.deleteOAuthClient";

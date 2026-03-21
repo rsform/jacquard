@@ -5,64 +5,56 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, Datetime};
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::verification::VerificationView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListVerifications<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub created_after: core::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub created_before: core::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_after: Option<Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_before: Option<Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub is_revoked: core::option::Option<bool>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cursor: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_revoked: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub issuers: core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    pub issuers: Option<Vec<Did<'a>>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
     ///Defaults to `"desc"`.
     #[serde(default = "_default_sort_direction")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort_direction: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sort_direction: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subjects: core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    pub subjects: Option<Vec<Did<'a>>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListVerificationsOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub verifications: Vec<crate::tools_ozone::verification::VerificationView<'a>>,
+    pub verifications: Vec<VerificationView<'a>>,
 }
 
-/// Response type for
-///tools.ozone.verification.listVerifications
+/// Response type for tools.ozone.verification.listVerifications
 pub struct ListVerificationsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListVerificationsResponse {
     const NSID: &'static str = "tools.ozone.verification.listVerifications";
@@ -77,8 +69,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListVerifications<'a> {
     type Response = ListVerificationsResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.verification.listVerifications
+/// Endpoint type for tools.ozone.verification.listVerifications
 pub struct ListVerificationsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListVerificationsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.verification.listVerifications";
@@ -87,12 +78,12 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListVerificationsRequest {
     type Response = ListVerificationsResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_sort_direction() -> core::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("desc"))
+fn _default_sort_direction() -> Option<CowStr<'static>> {
+    Some(CowStr::from("desc"))
 }
 
 pub mod list_verifications_state {
@@ -116,18 +107,18 @@ pub mod list_verifications_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListVerificationsBuilder<'a, S: list_verifications_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<bool>,
+        Option<Vec<Did<'a>>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<Vec<Did<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ListVerifications<'a> {
@@ -141,27 +132,21 @@ impl<'a> ListVerificationsBuilder<'a, list_verifications_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListVerificationsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
     /// Set the `createdAfter` field (optional)
-    pub fn created_after(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn created_after(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `createdAfter` field to an Option value (optional)
-    pub fn maybe_created_after(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_created_after(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -169,18 +154,12 @@ impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
 
 impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
     /// Set the `createdBefore` field (optional)
-    pub fn created_before(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn created_before(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `createdBefore` field to an Option value (optional)
-    pub fn maybe_created_before(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_created_before(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -188,15 +167,12 @@ impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
 
 impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -217,18 +193,12 @@ impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
 
 impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
     /// Set the `issuers` field (optional)
-    pub fn issuers(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::string::Did<'a>>>>,
-    ) -> Self {
+    pub fn issuers(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `issuers` field to an Option value (optional)
-    pub fn maybe_issuers(
-        mut self,
-        value: Option<Vec<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn maybe_issuers(mut self, value: Option<Vec<Did<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -249,18 +219,12 @@ impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
 
 impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
     /// Set the `sortDirection` field (optional)
-    pub fn sort_direction(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn sort_direction(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
-    pub fn maybe_sort_direction(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_sort_direction(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -268,18 +232,12 @@ impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
 
 impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
     /// Set the `subjects` field (optional)
-    pub fn subjects(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::string::Did<'a>>>>,
-    ) -> Self {
+    pub fn subjects(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `subjects` field to an Option value (optional)
-    pub fn maybe_subjects(
-        mut self,
-        value: Option<Vec<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn maybe_subjects(mut self, value: Option<Vec<Did<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }

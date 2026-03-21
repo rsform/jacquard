@@ -5,90 +5,85 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::deps::bytes::Bytes;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_germnetwork::declaration;
 /// A declaration of a Germ Network account
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Declaration<'a> {
     ///Array of opaque values to allow for key rolling
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub continuity_proofs: core::option::Option<
-        Vec<jacquard_common::deps::bytes::Bytes>,
-    >,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub continuity_proofs: Option<Vec<Bytes>>,
     ///Opaque value, an ed25519 public key prefixed with a byte enum
     #[serde(with = "jacquard_common::serde_bytes_helper")]
-    pub current_key: jacquard_common::deps::bytes::Bytes,
+    pub current_key: Bytes,
     ///Opaque value, contains MLS KeyPackage(s), and other signature data, and is signed by the currentKey
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
-    pub key_package: core::option::Option<jacquard_common::deps::bytes::Bytes>,
+    pub key_package: Option<Bytes>,
     ///Controls who can message this account
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub message_me: core::option::Option<
-        crate::com_germnetwork::declaration::MessageMe<'a>,
-    >,
+    pub message_me: Option<declaration::MessageMe<'a>>,
     ///Semver version number, without pre-release or build information, for the format of opaque content
     #[serde(borrow)]
-    pub version: jacquard_common::CowStr<'a>,
+    pub version: CowStr<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DeclarationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Declaration<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MessageMe<'a> {
     ///A URL to present to an account that does not have its own com.germnetwork.declaration record, must have an empty fragment component, where the app should fill in the fragment component with the DIDs of the two accounts who wish to message each other
     #[serde(borrow)]
-    pub message_me_url: jacquard_common::types::string::UriValue<'a>,
+    pub message_me_url: UriValue<'a>,
     ///The policy of who can message the account, this value is included in the keyPackage, but is duplicated here to allow applications to decide if they should show a 'Message on Germ' button to the viewer.
     #[serde(borrow)]
     pub show_button_to: MessageMeShowButtonTo<'a>,
 }
 
 /// The policy of who can message the account, this value is included in the keyPackage, but is duplicated here to allow applications to decide if they should show a 'Message on Germ' button to the viewer.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MessageMeShowButtonTo<'a> {
     None,
     UsersIFollow,
     Everyone,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> MessageMeShowButtonTo<'a> {
@@ -108,7 +103,7 @@ impl<'a> From<&'a str> for MessageMeShowButtonTo<'a> {
             "none" => Self::None,
             "usersIFollow" => Self::UsersIFollow,
             "everyone" => Self::Everyone,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -119,7 +114,7 @@ impl<'a> From<String> for MessageMeShowButtonTo<'a> {
             "none" => Self::None,
             "usersIFollow" => Self::UsersIFollow,
             "everyone" => Self::Everyone,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -180,25 +175,21 @@ impl jacquard_common::IntoStatic for MessageMeShowButtonTo<'_> {
 
 impl<'a> Declaration<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, DeclarationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, DeclarationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DeclarationRecord;
-impl jacquard_common::xrpc::XrpcResp for DeclarationRecord {
+impl XrpcResp for DeclarationRecord {
     const NSID: &'static str = "com.germnetwork.declaration";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = DeclarationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
@@ -208,36 +199,32 @@ impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Declaration<'_> {
+impl Collection for Declaration<'_> {
     const NSID: &'static str = "com.germnetwork.declaration";
     type Record = DeclarationRecord;
 }
 
-impl jacquard_common::types::collection::Collection for DeclarationRecord {
+impl Collection for DeclarationRecord {
     const NSID: &'static str = "com.germnetwork.declaration";
     type Record = DeclarationRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
+impl<'a> LexiconSchema for Declaration<'a> {
     fn nsid() -> &'static str {
         "com.germnetwork.declaration"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_com_germnetwork_declaration()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.continuity_proofs {
             #[allow(unused_comparisons)]
             if value.len() > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "continuity_proofs",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("continuity_proofs"),
                     max: 1000usize,
                     actual: value.len(),
                 });
@@ -247,10 +234,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
             let value = &self.version;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 14usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "version",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("version"),
                     max: 14usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -260,10 +245,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
             let value = &self.version;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 5usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "version",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("version"),
                     min: 5usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -273,27 +256,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for MessageMe<'a> {
+impl<'a> LexiconSchema for MessageMe<'a> {
     fn nsid() -> &'static str {
         "com.germnetwork.declaration"
     }
     fn def_name() -> &'static str {
         "messageMe"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_com_germnetwork_declaration()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.message_me_url;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2047usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "message_me_url",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("message_me_url"),
                     max: 2047usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -303,10 +282,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for MessageMe<'a> {
             let value = &self.message_me_url;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "message_me_url",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("message_me_url"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -316,10 +293,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for MessageMe<'a> {
             let value = &self.show_button_to;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "show_button_to",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("show_button_to"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -329,10 +304,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for MessageMe<'a> {
             let value = &self.show_button_to;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "show_button_to",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("show_button_to"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -352,51 +325,51 @@ pub mod declaration_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CurrentKey;
         type Version;
+        type CurrentKey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CurrentKey = Unset;
         type Version = Unset;
-    }
-    ///State transition - sets the `current_key` field to Set
-    pub struct SetCurrentKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrentKey<S> {}
-    impl<S: State> State for SetCurrentKey<S> {
-        type CurrentKey = Set<members::current_key>;
-        type Version = S::Version;
+        type CurrentKey = Unset;
     }
     ///State transition - sets the `version` field to Set
     pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVersion<S> {}
     impl<S: State> State for SetVersion<S> {
-        type CurrentKey = S::CurrentKey;
         type Version = Set<members::version>;
+        type CurrentKey = S::CurrentKey;
+    }
+    ///State transition - sets the `current_key` field to Set
+    pub struct SetCurrentKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrentKey<S> {}
+    impl<S: State> State for SetCurrentKey<S> {
+        type Version = S::Version;
+        type CurrentKey = Set<members::current_key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `current_key` field
-        pub struct current_key(());
         ///Marker type for the `version` field
         pub struct version(());
+        ///Marker type for the `current_key` field
+        pub struct current_key(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DeclarationBuilder<'a, S: declaration_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::deps::bytes::Bytes>>,
-        ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
-        ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
-        ::core::option::Option<crate::com_germnetwork::declaration::MessageMe<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<Vec<Bytes>>,
+        Option<Bytes>,
+        Option<Bytes>,
+        Option<declaration::MessageMe<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Declaration<'a> {
@@ -410,27 +383,21 @@ impl<'a> DeclarationBuilder<'a, declaration_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeclarationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `continuityProofs` field (optional)
-    pub fn continuity_proofs(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::deps::bytes::Bytes>>>,
-    ) -> Self {
+    pub fn continuity_proofs(mut self, value: impl Into<Option<Vec<Bytes>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `continuityProofs` field to an Option value (optional)
-    pub fn maybe_continuity_proofs(
-        mut self,
-        value: Option<Vec<jacquard_common::deps::bytes::Bytes>>,
-    ) -> Self {
+    pub fn maybe_continuity_proofs(mut self, value: Option<Vec<Bytes>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -444,31 +411,25 @@ where
     /// Set the `currentKey` field (required)
     pub fn current_key(
         mut self,
-        value: impl Into<jacquard_common::deps::bytes::Bytes>,
+        value: impl Into<Bytes>,
     ) -> DeclarationBuilder<'a, declaration_state::SetCurrentKey<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         DeclarationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `keyPackage` field (optional)
-    pub fn key_package(
-        mut self,
-        value: impl Into<Option<jacquard_common::deps::bytes::Bytes>>,
-    ) -> Self {
+    pub fn key_package(mut self, value: impl Into<Option<Bytes>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `keyPackage` field to an Option value (optional)
-    pub fn maybe_key_package(
-        mut self,
-        value: Option<jacquard_common::deps::bytes::Bytes>,
-    ) -> Self {
+    pub fn maybe_key_package(mut self, value: Option<Bytes>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -478,7 +439,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `messageMe` field (optional)
     pub fn message_me(
         mut self,
-        value: impl Into<Option<crate::com_germnetwork::declaration::MessageMe<'a>>>,
+        value: impl Into<Option<declaration::MessageMe<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
@@ -486,7 +447,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `messageMe` field to an Option value (optional)
     pub fn maybe_message_me(
         mut self,
-        value: Option<crate::com_germnetwork::declaration::MessageMe<'a>>,
+        value: Option<declaration::MessageMe<'a>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
@@ -501,13 +462,13 @@ where
     /// Set the `version` field (required)
     pub fn version(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> DeclarationBuilder<'a, declaration_state::SetVersion<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         DeclarationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -515,8 +476,8 @@ where
 impl<'a, S> DeclarationBuilder<'a, S>
 where
     S: declaration_state::State,
-    S::CurrentKey: declaration_state::IsSet,
     S::Version: declaration_state::IsSet,
+    S::CurrentKey: declaration_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Declaration<'a> {
@@ -532,7 +493,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -548,175 +509,130 @@ where
     }
 }
 
-fn lexicon_doc_com_germnetwork_declaration() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("com.germnetwork.declaration"),
-        revision: None,
-        description: None,
+fn lexicon_doc_com_germnetwork_declaration() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("com.germnetwork.declaration"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A declaration of a Germ Network account",
-                        ),
+                        CowStr::new_static("A declaration of a Germ Network account"),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("literal:self")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("version"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("currentKey")
+                                SmolStr::new_static("version"),
+                                SmolStr::new_static("currentKey")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "continuityProofs",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("continuityProofs"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Array of opaque values to allow for key rolling",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Bytes(::jacquard_lexicon::lexicon::LexBytes {
-                                        description: None,
-                                        max_length: None,
-                                        min_length: None,
+                                    items: LexArrayItem::Bytes(LexBytes {
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(1000usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "currentKey",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
-                                    description: None,
-                                    max_length: None,
-                                    min_length: None,
+                                SmolStr::new_static("currentKey"),
+                                LexObjectProperty::Bytes(LexBytes { ..Default::default() }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("keyPackage"),
+                                LexObjectProperty::Bytes(LexBytes { ..Default::default() }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("messageMe"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#messageMe"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "keyPackage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
-                                    description: None,
-                                    max_length: None,
-                                    min_length: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "messageMe",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#messageMe"),
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "version",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("version"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Semver version number, without pre-release or build information, for the format of opaque content",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
                                     min_length: Some(5usize),
                                     max_length: Some(14usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("messageMe"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("messageMe"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("showButtonTo"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("messageMeUrl")
+                            SmolStr::new_static("showButtonTo"),
+                            SmolStr::new_static("messageMeUrl")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "messageMeUrl",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("messageMeUrl"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "A URL to present to an account that does not have its own com.germnetwork.declaration record, must have an empty fragment component, where the app should fill in the fragment component with the DIDs of the two accounts who wish to message each other",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
+                                format: Some(LexStringFormat::Uri),
                                 min_length: Some(1usize),
                                 max_length: Some(2047usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "showButtonTo",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("showButtonTo"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The policy of who can message the account, this value is included in the keyPackage, but is duplicated here to allow applications to decide if they should show a 'Message on Germ' button to the viewer.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
                                 min_length: Some(1usize),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -730,48 +646,45 @@ pub mod message_me_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ShowButtonTo;
         type MessageMeUrl;
+        type ShowButtonTo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ShowButtonTo = Unset;
         type MessageMeUrl = Unset;
-    }
-    ///State transition - sets the `show_button_to` field to Set
-    pub struct SetShowButtonTo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShowButtonTo<S> {}
-    impl<S: State> State for SetShowButtonTo<S> {
-        type ShowButtonTo = Set<members::show_button_to>;
-        type MessageMeUrl = S::MessageMeUrl;
+        type ShowButtonTo = Unset;
     }
     ///State transition - sets the `message_me_url` field to Set
     pub struct SetMessageMeUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessageMeUrl<S> {}
     impl<S: State> State for SetMessageMeUrl<S> {
-        type ShowButtonTo = S::ShowButtonTo;
         type MessageMeUrl = Set<members::message_me_url>;
+        type ShowButtonTo = S::ShowButtonTo;
+    }
+    ///State transition - sets the `show_button_to` field to Set
+    pub struct SetShowButtonTo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShowButtonTo<S> {}
+    impl<S: State> State for SetShowButtonTo<S> {
+        type MessageMeUrl = S::MessageMeUrl;
+        type ShowButtonTo = Set<members::show_button_to>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `show_button_to` field
-        pub struct show_button_to(());
         ///Marker type for the `message_me_url` field
         pub struct message_me_url(());
+        ///Marker type for the `show_button_to` field
+        pub struct show_button_to(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MessageMeBuilder<'a, S: message_me_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<MessageMeShowButtonTo<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<UriValue<'a>>, Option<MessageMeShowButtonTo<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> MessageMe<'a> {
@@ -785,9 +698,9 @@ impl<'a> MessageMeBuilder<'a, message_me_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MessageMeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -800,13 +713,13 @@ where
     /// Set the `messageMeUrl` field (required)
     pub fn message_me_url(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> MessageMeBuilder<'a, message_me_state::SetMessageMeUrl<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         MessageMeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -821,11 +734,11 @@ where
         mut self,
         value: impl Into<MessageMeShowButtonTo<'a>>,
     ) -> MessageMeBuilder<'a, message_me_state::SetShowButtonTo<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         MessageMeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -833,8 +746,8 @@ where
 impl<'a, S> MessageMeBuilder<'a, S>
 where
     S: message_me_state::State,
-    S::ShowButtonTo: message_me_state::IsSet,
     S::MessageMeUrl: message_me_state::IsSet,
+    S::ShowButtonTo: message_me_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageMe<'a> {
@@ -847,7 +760,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

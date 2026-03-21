@@ -5,68 +5,53 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::DeletedMessageView;
+use crate::chat_bsky::convo::MessageView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetMessages<'a> {
     #[serde(borrow)]
-    pub convo_id: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub convo_id: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetMessagesOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
     pub messages: Vec<GetMessagesOutputMessagesItem<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetMessagesOutputMessagesItem<'a> {
     #[serde(rename = "chat.bsky.convo.defs#messageView")]
-    MessageView(Box<crate::chat_bsky::convo::MessageView<'a>>),
+    MessageView(Box<MessageView<'a>>),
     #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
-    DeletedMessageView(Box<crate::chat_bsky::convo::DeletedMessageView<'a>>),
+    DeletedMessageView(Box<DeletedMessageView<'a>>),
 }
 
-/// Response type for
-///chat.bsky.convo.getMessages
+/// Response type for chat.bsky.convo.getMessages
 pub struct GetMessagesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetMessagesResponse {
     const NSID: &'static str = "chat.bsky.convo.getMessages";
@@ -81,8 +66,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetMessages<'a> {
     type Response = GetMessagesResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.convo.getMessages
+/// Endpoint type for chat.bsky.convo.getMessages
 pub struct GetMessagesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetMessagesRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.getMessages";
@@ -91,7 +75,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetMessagesRequest {
     type Response = GetMessagesResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
@@ -129,13 +113,9 @@ pub mod get_messages_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetMessagesBuilder<'a, S: get_messages_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetMessages<'a> {
@@ -149,9 +129,9 @@ impl<'a> GetMessagesBuilder<'a, get_messages_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetMessagesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -164,28 +144,25 @@ where
     /// Set the `convoId` field (required)
     pub fn convo_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetMessagesBuilder<'a, get_messages_state::SetConvoId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetMessagesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_messages_state::State> GetMessagesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }

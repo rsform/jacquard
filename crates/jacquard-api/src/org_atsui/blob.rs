@@ -5,87 +5,79 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::Did;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
+use crate::org_atsui::blob;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct AspectRatio<'a> {
     pub height: i64,
     pub width: i64,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Blob<'a> {
     ///DID of the blob owner. Used to resolve blob URLs.
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
     ///When set, Blob fills its container height. 'cover' crops to fill; 'contain' letterboxes.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub fit: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub fit: Option<CowStr<'a>>,
     ///Known aspect ratio for CLS prevention. Reserves space before the image loads.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub ratio: core::option::Option<crate::org_atsui::blob::AspectRatio<'a>>,
+    pub ratio: Option<blob::AspectRatio<'a>>,
     ///Blob ref for the image.
     #[serde(borrow)]
-    pub src: jacquard_common::types::value::Data<'a>,
+    pub src: Data<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct BlobOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
+    pub value: Response<'a>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
+impl<'a> LexiconSchema for AspectRatio<'a> {
     fn nsid() -> &'static str {
         "org.atsui.Blob"
     }
     fn def_name() -> &'static str {
         "aspectRatio"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_atsui_Blob()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.height;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "height",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("height"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -94,10 +86,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
         {
             let value = &self.width;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "width",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("width"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -107,8 +97,7 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
     }
 }
 
-/// Response type for
-///org.atsui.Blob
+/// Response type for org.atsui.Blob
 pub struct BlobResponse;
 impl jacquard_common::xrpc::XrpcResp for BlobResponse {
     const NSID: &'static str = "org.atsui.Blob";
@@ -125,8 +114,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Blob<'a> {
     type Response = BlobResponse;
 }
 
-/// Endpoint type for
-///org.atsui.Blob
+/// Endpoint type for org.atsui.Blob
 pub struct BlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for BlobRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Blob";
@@ -147,45 +135,45 @@ pub mod aspect_ratio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Width;
         type Height;
+        type Width;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Width = Unset;
         type Height = Unset;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Width = Set<members::width>;
-        type Height = S::Height;
+        type Width = Unset;
     }
     ///State transition - sets the `height` field to Set
     pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHeight<S> {}
     impl<S: State> State for SetHeight<S> {
-        type Width = S::Width;
         type Height = Set<members::height>;
+        type Width = S::Width;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Height = S::Height;
+        type Width = Set<members::width>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `width` field
-        pub struct width(());
         ///Marker type for the `height` field
         pub struct height(());
+        ///Marker type for the `width` field
+        pub struct width(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AspectRatioBuilder<'a, S: aspect_ratio_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>, ::core::option::Option<i64>),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> AspectRatio<'a> {
@@ -199,9 +187,9 @@ impl<'a> AspectRatioBuilder<'a, aspect_ratio_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AspectRatioBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -216,11 +204,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetHeight<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         AspectRatioBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -235,11 +223,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetWidth<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         AspectRatioBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -247,8 +235,8 @@ where
 impl<'a, S> AspectRatioBuilder<'a, S>
 where
     S: aspect_ratio_state::State,
-    S::Width: aspect_ratio_state::IsSet,
     S::Height: aspect_ratio_state::IsSet,
+    S::Width: aspect_ratio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AspectRatio<'a> {
@@ -261,10 +249,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> AspectRatio<'a> {
         AspectRatio {
             height: self.__unsafe_private_named.0.unwrap(),
@@ -274,153 +259,107 @@ where
     }
 }
 
-fn lexicon_doc_org_atsui_Blob() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.atsui.Blob"),
-        revision: None,
-        description: None,
+fn lexicon_doc_org_atsui_Blob() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("org.atsui.Blob"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("aspectRatio"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("aspectRatio"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("width"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("height")
-                        ],
+                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "height",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("height"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "width",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("width"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
-                    description: None,
-                    parameters: None,
-                    input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
-                        description: None,
-                        encoding: ::jacquard_common::CowStr::new_static(
-                            "application/json",
-                        ),
+                SmolStr::new_static("main"),
+                LexUserType::XrpcProcedure(LexXrpcProcedure {
+                    input: Some(LexXrpcBody {
+                        encoding: CowStr::new_static("application/json"),
                         schema: Some(
-                            ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
-                                description: None,
+                            LexXrpcBodySchema::Object(LexObject {
                                 required: Some(
-                                    vec![
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("src"),
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("did")
-                                    ],
+                                    vec![SmolStr::new_static("src"), SmolStr::new_static("did")],
                                 ),
-                                nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
-                                    let mut map = ::alloc::collections::BTreeMap::new();
+                                    let mut map = BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "did",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        SmolStr::new_static("did"),
+                                        LexObjectProperty::String(LexString {
                                             description: Some(
-                                                ::jacquard_common::CowStr::new_static(
+                                                CowStr::new_static(
                                                     "DID of the blob owner. Used to resolve blob URLs.",
                                                 ),
                                             ),
-                                            format: Some(
-                                                ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                            ),
-                                            default: None,
-                                            min_length: None,
-                                            max_length: None,
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                            format: Some(LexStringFormat::Did),
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "fit",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        SmolStr::new_static("fit"),
+                                        LexObjectProperty::String(LexString {
                                             description: Some(
-                                                ::jacquard_common::CowStr::new_static(
+                                                CowStr::new_static(
                                                     "When set, Blob fills its container height. 'cover' crops to fill; 'contain' letterboxes.",
                                                 ),
                                             ),
-                                            format: None,
-                                            default: None,
-                                            min_length: None,
                                             max_length: Some(32usize),
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "ratio",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                            description: None,
-                                            r#ref: ::jacquard_common::CowStr::new_static("#aspectRatio"),
+                                        SmolStr::new_static("ratio"),
+                                        LexObjectProperty::Ref(LexRef {
+                                            r#ref: CowStr::new_static("#aspectRatio"),
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "src",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
-                                            description: None,
+                                        SmolStr::new_static("src"),
+                                        LexObjectProperty::Unknown(LexUnknown {
+                                            ..Default::default()
                                         }),
                                     );
                                     map
                                 },
+                                ..Default::default()
                             }),
                         ),
+                        ..Default::default()
                     }),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -434,50 +373,50 @@ pub mod blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Src;
         type Did;
+        type Src;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Src = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `src` field to Set
-    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrc<S> {}
-    impl<S: State> State for SetSrc<S> {
-        type Src = Set<members::src>;
-        type Did = S::Did;
+        type Src = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Src = S::Src;
         type Did = Set<members::did>;
+        type Src = S::Src;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrc<S> {}
+    impl<S: State> State for SetSrc<S> {
+        type Did = S::Did;
+        type Src = Set<members::src>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `src` field
-        pub struct src(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `src` field
+        pub struct src(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BlobBuilder<'a, S: blob_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::org_atsui::blob::AspectRatio<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        Option<Did<'a>>,
+        Option<CowStr<'a>>,
+        Option<blob::AspectRatio<'a>>,
+        Option<Data<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Blob<'a> {
@@ -491,9 +430,9 @@ impl<'a> BlobBuilder<'a, blob_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlobBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -506,25 +445,25 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> BlobBuilder<'a, blob_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         BlobBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: blob_state::State> BlobBuilder<'a, S> {
     /// Set the `fit` field (optional)
-    pub fn fit(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn fit(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `fit` field to an Option value (optional)
-    pub fn maybe_fit(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_fit(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -532,18 +471,12 @@ impl<'a, S: blob_state::State> BlobBuilder<'a, S> {
 
 impl<'a, S: blob_state::State> BlobBuilder<'a, S> {
     /// Set the `ratio` field (optional)
-    pub fn ratio(
-        mut self,
-        value: impl Into<Option<crate::org_atsui::blob::AspectRatio<'a>>>,
-    ) -> Self {
+    pub fn ratio(mut self, value: impl Into<Option<blob::AspectRatio<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `ratio` field to an Option value (optional)
-    pub fn maybe_ratio(
-        mut self,
-        value: Option<crate::org_atsui::blob::AspectRatio<'a>>,
-    ) -> Self {
+    pub fn maybe_ratio(mut self, value: Option<blob::AspectRatio<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -557,13 +490,13 @@ where
     /// Set the `src` field (required)
     pub fn src(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> BlobBuilder<'a, blob_state::SetSrc<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         BlobBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -571,8 +504,8 @@ where
 impl<'a, S> BlobBuilder<'a, S>
 where
     S: blob_state::State,
-    S::Src: blob_state::IsSet,
     S::Did: blob_state::IsSet,
+    S::Src: blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Blob<'a> {
@@ -587,10 +520,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Blob<'a> {
         Blob {
             did: self.__unsafe_private_named.0.unwrap(),

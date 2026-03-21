@@ -5,50 +5,49 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateEmail<'a> {
     #[serde(borrow)]
-    pub email: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub email_auth_factor: core::option::Option<bool>,
+    pub email: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email_auth_factor: Option<bool>,
     ///Requires a token from com.atproto.sever.requestEmailUpdate if the account's email has been confirmed.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub token: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub token: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UpdateEmailError<'a> {
     #[serde(rename = "ExpiredToken")]
-    ExpiredToken(core::option::Option<jacquard_common::CowStr<'a>>),
+    ExpiredToken(Option<CowStr<'a>>),
     #[serde(rename = "InvalidToken")]
-    InvalidToken(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidToken(Option<CowStr<'a>>),
     #[serde(rename = "TokenRequired")]
-    TokenRequired(core::option::Option<jacquard_common::CowStr<'a>>),
+    TokenRequired(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for UpdateEmailError<'_> {
@@ -80,8 +79,7 @@ impl core::fmt::Display for UpdateEmailError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.server.updateEmail
+/// Response type for com.atproto.server.updateEmail
 pub struct UpdateEmailResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateEmailResponse {
     const NSID: &'static str = "com.atproto.server.updateEmail";
@@ -98,8 +96,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateEmail<'a> {
     type Response = UpdateEmailResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.updateEmail
+/// Endpoint type for com.atproto.server.updateEmail
 pub struct UpdateEmailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateEmailRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.updateEmail";

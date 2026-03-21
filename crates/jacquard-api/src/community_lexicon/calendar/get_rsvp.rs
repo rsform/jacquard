@@ -5,63 +5,58 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, AtUri};
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::community_lexicon::calendar::rsvp::Rsvp;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRsvp<'a> {
     #[serde(borrow)]
-    pub event: jacquard_common::types::string::AtUri<'a>,
+    pub event: AtUri<'a>,
     #[serde(borrow)]
-    pub identity: jacquard_common::types::string::Did<'a>,
+    pub identity: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRsvpOutput<'a> {
     ///CID of the RSVP record.
     #[serde(borrow)]
-    pub cid: jacquard_common::CowStr<'a>,
+    pub cid: CowStr<'a>,
     ///The RSVP record.
     #[serde(borrow)]
-    pub record: crate::community_lexicon::calendar::rsvp::Rsvp<'a>,
+    pub record: Rsvp<'a>,
     ///AT-URI of the RSVP record.
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetRsvpError<'a> {
     #[serde(rename = "NotFound")]
-    NotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    NotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetRsvpError<'_> {
@@ -79,8 +74,7 @@ impl core::fmt::Display for GetRsvpError<'_> {
     }
 }
 
-/// Response type for
-///community.lexicon.calendar.getRSVP
+/// Response type for community.lexicon.calendar.getRSVP
 pub struct GetRsvpResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRsvpResponse {
     const NSID: &'static str = "community.lexicon.calendar.getRSVP";
@@ -95,8 +89,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetRsvp<'a> {
     type Response = GetRsvpResponse;
 }
 
-/// Endpoint type for
-///community.lexicon.calendar.getRSVP
+/// Endpoint type for community.lexicon.calendar.getRSVP
 pub struct GetRsvpRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRsvpRequest {
     const PATH: &'static str = "/xrpc/community.lexicon.calendar.getRSVP";
@@ -151,12 +144,9 @@ pub mod get_rsvp_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetRsvpBuilder<'a, S: get_rsvp_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>, Option<Did<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetRsvp<'a> {
@@ -170,9 +160,9 @@ impl<'a> GetRsvpBuilder<'a, get_rsvp_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetRsvpBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -185,13 +175,13 @@ where
     /// Set the `event` field (required)
     pub fn event(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetRsvpBuilder<'a, get_rsvp_state::SetEvent<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetRsvpBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -204,13 +194,13 @@ where
     /// Set the `identity` field (required)
     pub fn identity(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetRsvpBuilder<'a, get_rsvp_state::SetIdentity<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetRsvpBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

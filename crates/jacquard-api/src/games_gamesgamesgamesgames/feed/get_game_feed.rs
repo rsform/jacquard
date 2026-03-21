@@ -5,64 +5,59 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::GameFeedViewItem;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetGameFeed<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub feed: jacquard_common::types::string::AtUri<'a>,
+    pub feed: AtUri<'a>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetGameFeedOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub feed: Vec<crate::games_gamesgamesgamesgames::GameFeedViewItem<'a>>,
+    pub feed: Vec<GameFeedViewItem<'a>>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetGameFeedError<'a> {
     #[serde(rename = "UnknownFeed")]
-    UnknownFeed(core::option::Option<jacquard_common::CowStr<'a>>),
+    UnknownFeed(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetGameFeedError<'_> {
@@ -80,8 +75,7 @@ impl core::fmt::Display for GetGameFeedError<'_> {
     }
 }
 
-/// Response type for
-///games.gamesgamesgamesgames.feed.getGameFeed
+/// Response type for games.gamesgamesgamesgames.feed.getGameFeed
 pub struct GetGameFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetGameFeedResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.getGameFeed";
@@ -96,8 +90,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetGameFeed<'a> {
     type Response = GetGameFeedResponse;
 }
 
-/// Endpoint type for
-///games.gamesgamesgamesgames.feed.getGameFeed
+/// Endpoint type for games.gamesgamesgamesgames.feed.getGameFeed
 pub struct GetGameFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetGameFeedRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.getGameFeed";
@@ -106,7 +99,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetGameFeedRequest {
     type Response = GetGameFeedResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
@@ -144,13 +137,9 @@ pub mod get_game_feed_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetGameFeedBuilder<'a, S: get_game_feed_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<AtUri<'a>>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetGameFeed<'a> {
@@ -164,24 +153,21 @@ impl<'a> GetGameFeedBuilder<'a, get_game_feed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetGameFeedBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_game_feed_state::State> GetGameFeedBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -195,13 +181,13 @@ where
     /// Set the `feed` field (required)
     pub fn feed(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetGameFeedBuilder<'a, get_game_feed_state::SetFeed<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetGameFeedBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

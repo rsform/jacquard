@@ -5,173 +5,162 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::AgeRating;
+use crate::games_gamesgamesgamesgames::AlternativeName;
+use crate::games_gamesgamesgamesgames::ApplicationType;
+use crate::games_gamesgamesgamesgames::ExternalIds;
+use crate::games_gamesgamesgamesgames::ExternalVideo;
+use crate::games_gamesgamesgamesgames::Genre;
+use crate::games_gamesgamesgamesgames::LanguageSupport;
+use crate::games_gamesgamesgamesgames::MediaItem;
+use crate::games_gamesgamesgamesgames::Mode;
+use crate::games_gamesgamesgamesgames::MultiplayerMode;
+use crate::games_gamesgamesgamesgames::PlatformFeatures;
+use crate::games_gamesgamesgamesgames::PlayerPerspective;
+use crate::games_gamesgamesgamesgames::Release;
+use crate::games_gamesgamesgamesgames::SystemRequirements;
+use crate::games_gamesgamesgamesgames::Theme;
+use crate::games_gamesgamesgamesgames::TimeToBeat;
+use crate::games_gamesgamesgamesgames::Website;
+use crate::games_gamesgamesgamesgames::richtext::facet::Facet;
 /// A video game.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Game<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub age_ratings: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub age_ratings: Option<Vec<AgeRating<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alternative_names: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>,
-    >,
+    pub alternative_names: Option<Vec<AlternativeName<'a>>>,
     #[serde(borrow)]
-    pub application_type: crate::games_gamesgamesgamesgames::ApplicationType<'a>,
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub application_type: ApplicationType<'a>,
+    pub created_at: Datetime,
     ///Detailed game description in plain text, with formatting expressed via descriptionFacets.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<CowStr<'a>>,
     ///Rich text facets for the description field.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::richtext::facet::Facet<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub description_facets: Option<Vec<Facet<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub engines: core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub engines: Option<Vec<AtUri<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub external_ids: core::option::Option<
-        crate::games_gamesgamesgamesgames::ExternalIds<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub external_ids: Option<ExternalIds<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub genres: core::option::Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub genres: Option<Vec<Genre<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub keywords: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub keywords: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub language_supports: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>,
-    >,
+    pub language_supports: Option<Vec<LanguageSupport<'a>>>,
     ///Images associated with the game.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub media: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub media: Option<Vec<MediaItem<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub modes: core::option::Option<Vec<crate::games_gamesgamesgamesgames::Mode<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub modes: Option<Vec<Mode<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub multiplayer_modes: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>,
-    >,
+    pub multiplayer_modes: Option<Vec<MultiplayerMode<'a>>>,
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub name: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub parent: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub parent: Option<AtUri<'a>>,
     ///Platform-specific feature support.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub platform_features: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::PlatformFeatures<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub platform_features: Option<Vec<PlatformFeatures<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub player_perspectives: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>,
-    >,
+    pub player_perspectives: Option<Vec<PlayerPerspective<'a>>>,
     ///When this record was marked ready for public viewing.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub published_at: core::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub published_at: Option<Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub releases: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::Release<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub releases: Option<Vec<Release<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub storyline: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub storyline: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub summary: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub summary: Option<CowStr<'a>>,
     ///System requirements per platform.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub system_requirements: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::SystemRequirements<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub system_requirements: Option<Vec<SystemRequirements<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub themes: core::option::Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub themes: Option<Vec<Theme<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub time_to_beat: core::option::Option<
-        crate::games_gamesgamesgamesgames::TimeToBeat<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub time_to_beat: Option<TimeToBeat<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub videos: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub videos: Option<Vec<ExternalVideo<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub websites: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
-    >,
+    pub websites: Option<Vec<Website<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GameGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Game<'a>,
 }
 
 impl<'a> Game<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, GameRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, GameRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct GameRecord;
-impl jacquard_common::xrpc::XrpcResp for GameRecord {
+impl XrpcResp for GameRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.game";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = GameGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<GameGetRecordOutput<'_>> for Game<'_> {
@@ -181,29 +170,27 @@ impl From<GameGetRecordOutput<'_>> for Game<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Game<'_> {
+impl Collection for Game<'_> {
     const NSID: &'static str = "games.gamesgamesgamesgames.game";
     type Record = GameRecord;
 }
 
-impl jacquard_common::types::collection::Collection for GameRecord {
+impl Collection for GameRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.game";
     type Record = GameRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Game<'a> {
+impl<'a> LexiconSchema for Game<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.game"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_game()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -218,103 +205,87 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type ApplicationType;
         type Name;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type ApplicationType = Unset;
         type Name = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `application_type` field to Set
-    pub struct SetApplicationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetApplicationType<S> {}
-    impl<S: State> State for SetApplicationType<S> {
-        type ApplicationType = Set<members::application_type>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type ApplicationType = S::ApplicationType;
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type ApplicationType = S::ApplicationType;
         type Name = S::Name;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `application_type` field to Set
+    pub struct SetApplicationType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetApplicationType<S> {}
+    impl<S: State> State for SetApplicationType<S> {
+        type CreatedAt = S::CreatedAt;
+        type ApplicationType = Set<members::application_type>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type ApplicationType = S::ApplicationType;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `application_type` field
         pub struct application_type(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GameBuilder<'a, S: game_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>>,
-        ::core::option::Option<
-            Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>,
-        >,
-        ::core::option::Option<crate::games_gamesgamesgamesgames::ApplicationType<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<
-            Vec<crate::games_gamesgamesgamesgames::richtext::facet::Facet<'a>>,
-        >,
-        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-        ::core::option::Option<crate::games_gamesgamesgamesgames::ExternalIds<'a>>,
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<
-            Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>,
-        >,
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>>,
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::Mode<'a>>>,
-        ::core::option::Option<
-            Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>,
-        >,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<
-            Vec<crate::games_gamesgamesgamesgames::PlatformFeatures<'a>>,
-        >,
-        ::core::option::Option<
-            Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>,
-        >,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::Release<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<
-            Vec<crate::games_gamesgamesgamesgames::SystemRequirements<'a>>,
-        >,
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
-        ::core::option::Option<crate::games_gamesgamesgamesgames::TimeToBeat<'a>>,
-        ::core::option::Option<
-            Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>,
-        >,
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>,
+        Option<Vec<AgeRating<'a>>>,
+        Option<Vec<AlternativeName<'a>>>,
+        Option<ApplicationType<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<Vec<Facet<'a>>>,
+        Option<Vec<AtUri<'a>>>,
+        Option<ExternalIds<'a>>,
+        Option<Vec<Genre<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<LanguageSupport<'a>>>,
+        Option<Vec<MediaItem<'a>>>,
+        Option<Vec<Mode<'a>>>,
+        Option<Vec<MultiplayerMode<'a>>>,
+        Option<CowStr<'a>>,
+        Option<AtUri<'a>>,
+        Option<Vec<PlatformFeatures<'a>>>,
+        Option<Vec<PlayerPerspective<'a>>>,
+        Option<Datetime>,
+        Option<Vec<Release<'a>>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Vec<SystemRequirements<'a>>>,
+        Option<Vec<Theme<'a>>>,
+        Option<TimeToBeat<'a>>,
+        Option<Vec<ExternalVideo<'a>>>,
+        Option<Vec<Website<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Game<'a> {
@@ -328,7 +299,7 @@ impl<'a> GameBuilder<'a, game_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GameBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -358,25 +329,19 @@ impl<'a> GameBuilder<'a, game_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `ageRatings` field (optional)
-    pub fn age_ratings(
-        mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>>>,
-    ) -> Self {
+    pub fn age_ratings(mut self, value: impl Into<Option<Vec<AgeRating<'a>>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `ageRatings` field to an Option value (optional)
-    pub fn maybe_age_ratings(
-        mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>>,
-    ) -> Self {
+    pub fn maybe_age_ratings(mut self, value: Option<Vec<AgeRating<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -386,9 +351,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `alternativeNames` field (optional)
     pub fn alternative_names(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>>,
-        >,
+        value: impl Into<Option<Vec<AlternativeName<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
@@ -396,7 +359,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `alternativeNames` field to an Option value (optional)
     pub fn maybe_alternative_names(
         mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>>,
+        value: Option<Vec<AlternativeName<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
@@ -411,13 +374,13 @@ where
     /// Set the `applicationType` field (required)
     pub fn application_type(
         mut self,
-        value: impl Into<crate::games_gamesgamesgamesgames::ApplicationType<'a>>,
+        value: impl Into<ApplicationType<'a>>,
     ) -> GameBuilder<'a, game_state::SetApplicationType<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -430,31 +393,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> GameBuilder<'a, game_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -464,18 +421,13 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::games_gamesgamesgamesgames::richtext::facet::Facet<'a>>>,
-        >,
+        value: impl Into<Option<Vec<Facet<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
-    pub fn maybe_description_facets(
-        mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::richtext::facet::Facet<'a>>>,
-    ) -> Self {
+    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -483,18 +435,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `engines` field (optional)
-    pub fn engines(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
-    ) -> Self {
+    pub fn engines(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `engines` field to an Option value (optional)
-    pub fn maybe_engines(
-        mut self,
-        value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn maybe_engines(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -502,18 +448,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `externalIds` field (optional)
-    pub fn external_ids(
-        mut self,
-        value: impl Into<Option<crate::games_gamesgamesgamesgames::ExternalIds<'a>>>,
-    ) -> Self {
+    pub fn external_ids(mut self, value: impl Into<Option<ExternalIds<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `externalIds` field to an Option value (optional)
-    pub fn maybe_external_ids(
-        mut self,
-        value: Option<crate::games_gamesgamesgamesgames::ExternalIds<'a>>,
-    ) -> Self {
+    pub fn maybe_external_ids(mut self, value: Option<ExternalIds<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -521,18 +461,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `genres` field (optional)
-    pub fn genres(
-        mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>>,
-    ) -> Self {
+    pub fn genres(mut self, value: impl Into<Option<Vec<Genre<'a>>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `genres` field to an Option value (optional)
-    pub fn maybe_genres(
-        mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>,
-    ) -> Self {
+    pub fn maybe_genres(mut self, value: Option<Vec<Genre<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -540,18 +474,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
-    pub fn maybe_keywords(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_keywords(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -561,9 +489,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `languageSupports` field (optional)
     pub fn language_supports(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>>,
-        >,
+        value: impl Into<Option<Vec<LanguageSupport<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
@@ -571,7 +497,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `languageSupports` field to an Option value (optional)
     pub fn maybe_language_supports(
         mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>>,
+        value: Option<Vec<LanguageSupport<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.10 = value;
         self
@@ -580,18 +506,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `media` field (optional)
-    pub fn media(
-        mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>>>,
-    ) -> Self {
+    pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<'a>>>>) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `media` field to an Option value (optional)
-    pub fn maybe_media(
-        mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>>,
-    ) -> Self {
+    pub fn maybe_media(mut self, value: Option<Vec<MediaItem<'a>>>) -> Self {
         self.__unsafe_private_named.11 = value;
         self
     }
@@ -599,18 +519,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `modes` field (optional)
-    pub fn modes(
-        mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::Mode<'a>>>>,
-    ) -> Self {
+    pub fn modes(mut self, value: impl Into<Option<Vec<Mode<'a>>>>) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `modes` field to an Option value (optional)
-    pub fn maybe_modes(
-        mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::Mode<'a>>>,
-    ) -> Self {
+    pub fn maybe_modes(mut self, value: Option<Vec<Mode<'a>>>) -> Self {
         self.__unsafe_private_named.12 = value;
         self
     }
@@ -620,9 +534,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `multiplayerModes` field (optional)
     pub fn multiplayer_modes(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>>,
-        >,
+        value: impl Into<Option<Vec<MultiplayerMode<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.13 = value.into();
         self
@@ -630,7 +542,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `multiplayerModes` field to an Option value (optional)
     pub fn maybe_multiplayer_modes(
         mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>>,
+        value: Option<Vec<MultiplayerMode<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.13 = value;
         self
@@ -645,31 +557,25 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GameBuilder<'a, game_state::SetName<S>> {
-        self.__unsafe_private_named.14 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.14 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `parent` field (optional)
-    pub fn parent(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn parent(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.15 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
-    pub fn maybe_parent(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_parent(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.15 = value;
         self
     }
@@ -679,9 +585,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `platformFeatures` field (optional)
     pub fn platform_features(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::games_gamesgamesgamesgames::PlatformFeatures<'a>>>,
-        >,
+        value: impl Into<Option<Vec<PlatformFeatures<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.16 = value.into();
         self
@@ -689,7 +593,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `platformFeatures` field to an Option value (optional)
     pub fn maybe_platform_features(
         mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::PlatformFeatures<'a>>>,
+        value: Option<Vec<PlatformFeatures<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.16 = value;
         self
@@ -700,9 +604,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `playerPerspectives` field (optional)
     pub fn player_perspectives(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>>,
-        >,
+        value: impl Into<Option<Vec<PlayerPerspective<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.17 = value.into();
         self
@@ -710,7 +612,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `playerPerspectives` field to an Option value (optional)
     pub fn maybe_player_perspectives(
         mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>>,
+        value: Option<Vec<PlayerPerspective<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.17 = value;
         self
@@ -719,18 +621,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `publishedAt` field (optional)
-    pub fn published_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.18 = value.into();
         self
     }
     /// Set the `publishedAt` field to an Option value (optional)
-    pub fn maybe_published_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_published_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.18 = value;
         self
     }
@@ -738,18 +634,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `releases` field (optional)
-    pub fn releases(
-        mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::Release<'a>>>>,
-    ) -> Self {
+    pub fn releases(mut self, value: impl Into<Option<Vec<Release<'a>>>>) -> Self {
         self.__unsafe_private_named.19 = value.into();
         self
     }
     /// Set the `releases` field to an Option value (optional)
-    pub fn maybe_releases(
-        mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::Release<'a>>>,
-    ) -> Self {
+    pub fn maybe_releases(mut self, value: Option<Vec<Release<'a>>>) -> Self {
         self.__unsafe_private_named.19 = value;
         self
     }
@@ -757,18 +647,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `storyline` field (optional)
-    pub fn storyline(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn storyline(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.20 = value.into();
         self
     }
     /// Set the `storyline` field to an Option value (optional)
-    pub fn maybe_storyline(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_storyline(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.20 = value;
         self
     }
@@ -776,15 +660,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `summary` field (optional)
-    pub fn summary(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn summary(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.21 = value.into();
         self
     }
     /// Set the `summary` field to an Option value (optional)
-    pub fn maybe_summary(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_summary(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.21 = value;
         self
     }
@@ -794,9 +675,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `systemRequirements` field (optional)
     pub fn system_requirements(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::games_gamesgamesgamesgames::SystemRequirements<'a>>>,
-        >,
+        value: impl Into<Option<Vec<SystemRequirements<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.22 = value.into();
         self
@@ -804,7 +683,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `systemRequirements` field to an Option value (optional)
     pub fn maybe_system_requirements(
         mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::SystemRequirements<'a>>>,
+        value: Option<Vec<SystemRequirements<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.22 = value;
         self
@@ -813,18 +692,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `themes` field (optional)
-    pub fn themes(
-        mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>>,
-    ) -> Self {
+    pub fn themes(mut self, value: impl Into<Option<Vec<Theme<'a>>>>) -> Self {
         self.__unsafe_private_named.23 = value.into();
         self
     }
     /// Set the `themes` field to an Option value (optional)
-    pub fn maybe_themes(
-        mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
-    ) -> Self {
+    pub fn maybe_themes(mut self, value: Option<Vec<Theme<'a>>>) -> Self {
         self.__unsafe_private_named.23 = value;
         self
     }
@@ -832,18 +705,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `timeToBeat` field (optional)
-    pub fn time_to_beat(
-        mut self,
-        value: impl Into<Option<crate::games_gamesgamesgamesgames::TimeToBeat<'a>>>,
-    ) -> Self {
+    pub fn time_to_beat(mut self, value: impl Into<Option<TimeToBeat<'a>>>) -> Self {
         self.__unsafe_private_named.24 = value.into();
         self
     }
     /// Set the `timeToBeat` field to an Option value (optional)
-    pub fn maybe_time_to_beat(
-        mut self,
-        value: Option<crate::games_gamesgamesgamesgames::TimeToBeat<'a>>,
-    ) -> Self {
+    pub fn maybe_time_to_beat(mut self, value: Option<TimeToBeat<'a>>) -> Self {
         self.__unsafe_private_named.24 = value;
         self
     }
@@ -851,20 +718,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `videos` field (optional)
-    pub fn videos(
-        mut self,
-        value: impl Into<
-            Option<Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>>,
-        >,
-    ) -> Self {
+    pub fn videos(mut self, value: impl Into<Option<Vec<ExternalVideo<'a>>>>) -> Self {
         self.__unsafe_private_named.25 = value.into();
         self
     }
     /// Set the `videos` field to an Option value (optional)
-    pub fn maybe_videos(
-        mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>>,
-    ) -> Self {
+    pub fn maybe_videos(mut self, value: Option<Vec<ExternalVideo<'a>>>) -> Self {
         self.__unsafe_private_named.25 = value;
         self
     }
@@ -872,18 +731,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `websites` field (optional)
-    pub fn websites(
-        mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>>,
-    ) -> Self {
+    pub fn websites(mut self, value: impl Into<Option<Vec<Website<'a>>>>) -> Self {
         self.__unsafe_private_named.26 = value.into();
         self
     }
     /// Set the `websites` field to an Option value (optional)
-    pub fn maybe_websites(
-        mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>,
-    ) -> Self {
+    pub fn maybe_websites(mut self, value: Option<Vec<Website<'a>>>) -> Self {
         self.__unsafe_private_named.26 = value;
         self
     }
@@ -892,9 +745,9 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
+    S::CreatedAt: game_state::IsSet,
     S::ApplicationType: game_state::IsSet,
     S::Name: game_state::IsSet,
-    S::CreatedAt: game_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Game<'a> {
@@ -932,7 +785,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -970,510 +823,336 @@ where
     }
 }
 
-fn lexicon_doc_games_gamesgamesgamesgames_game() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("games.gamesgamesgamesgames.game"),
-        revision: None,
-        description: None,
+fn lexicon_doc_games_gamesgamesgamesgames_game() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("games.gamesgamesgamesgames.game"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("A video game."),
-                    ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
+                    description: Some(CowStr::new_static("A video game.")),
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("applicationType")
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("applicationType")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "ageRatings",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("ageRatings"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "games.gamesgamesgamesgames.defs#ageRating",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "alternativeNames",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("alternativeNames"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "games.gamesgamesgamesgames.defs#alternativeName",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "applicationType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("applicationType"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "games.gamesgamesgamesgames.defs#applicationType",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "description",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("description"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Detailed game description in plain text, with formatting expressed via descriptionFacets.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "descriptionFacets",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("descriptionFacets"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Rich text facets for the description field.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "games.gamesgamesgamesgames.richtext.facet",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "engines",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                SmolStr::new_static("engines"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::String(LexString {
+                                        format: Some(LexStringFormat::AtUri),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "externalIds",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("externalIds"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "games.gamesgamesgamesgames.defs#externalIds",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "genres",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("genres"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "games.gamesgamesgamesgames.defs#genre",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "keywords",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                SmolStr::new_static("keywords"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::String(LexString {
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "languageSupports",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("languageSupports"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "games.gamesgamesgamesgames.defs#languageSupport",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "media",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("media"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Images associated with the game.",
-                                        ),
+                                        CowStr::new_static("Images associated with the game."),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "games.gamesgamesgamesgames.defs#mediaItem",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "modes",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("modes"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "games.gamesgamesgamesgames.defs#mode",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "multiplayerModes",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("multiplayerModes"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "games.gamesgamesgamesgames.defs#multiplayerMode",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("name"),
+                                LexObjectProperty::String(LexString {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "parent",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("parent"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "platformFeatures",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("platformFeatures"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Platform-specific feature support.",
-                                        ),
+                                        CowStr::new_static("Platform-specific feature support."),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "games.gamesgamesgamesgames.defs#platformFeatures",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "playerPerspectives",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("playerPerspectives"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "games.gamesgamesgamesgames.defs#playerPerspective",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "publishedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("publishedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "When this record was marked ready for public viewing.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "releases",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("releases"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "games.gamesgamesgamesgames.defs#release",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "storyline",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("storyline"),
+                                LexObjectProperty::String(LexString {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "summary",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("summary"),
+                                LexObjectProperty::String(LexString {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "systemRequirements",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("systemRequirements"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "System requirements per platform.",
-                                        ),
+                                        CowStr::new_static("System requirements per platform."),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "games.gamesgamesgamesgames.defs#systemRequirements",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "themes",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("themes"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "games.gamesgamesgamesgames.defs#theme",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "timeToBeat",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("timeToBeat"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "games.gamesgamesgamesgames.defs#timeToBeat",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "videos",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("videos"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "games.gamesgamesgamesgames.defs#externalVideo",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "websites",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("websites"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "games.gamesgamesgamesgames.defs#website",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

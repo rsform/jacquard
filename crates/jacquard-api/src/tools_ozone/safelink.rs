@@ -11,12 +11,28 @@ pub mod query_rules;
 pub mod remove_rule;
 pub mod update_rule;
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::{Did, Datetime};
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::safelink;
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ActionType<'a> {
     Block,
     Warn,
     Whitelist,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ActionType<'a> {
@@ -36,7 +52,7 @@ impl<'a> From<&'a str> for ActionType<'a> {
             "block" => Self::Block,
             "warn" => Self::Warn,
             "whitelist" => Self::Whitelist,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -47,7 +63,7 @@ impl<'a> From<String> for ActionType<'a> {
             "block" => Self::Block,
             "warn" => Self::Warn,
             "whitelist" => Self::Whitelist,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -99,47 +115,41 @@ impl jacquard_common::IntoStatic for ActionType<'_> {
 }
 
 /// An event for URL safety decisions
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Event<'a> {
     #[serde(borrow)]
-    pub action: crate::tools_ozone::safelink::ActionType<'a>,
+    pub action: safelink::ActionType<'a>,
     ///Optional comment about the decision
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub comment: Option<CowStr<'a>>,
+    pub created_at: Datetime,
     ///DID of the user who created this rule
     #[serde(borrow)]
-    pub created_by: jacquard_common::types::string::Did<'a>,
+    pub created_by: Did<'a>,
     #[serde(borrow)]
-    pub event_type: crate::tools_ozone::safelink::EventType<'a>,
+    pub event_type: safelink::EventType<'a>,
     ///Auto-incrementing row ID
     pub id: i64,
     #[serde(borrow)]
-    pub pattern: crate::tools_ozone::safelink::PatternType<'a>,
+    pub pattern: safelink::PatternType<'a>,
     #[serde(borrow)]
-    pub reason: crate::tools_ozone::safelink::ReasonType<'a>,
+    pub reason: safelink::ReasonType<'a>,
     ///The URL that this rule applies to
     #[serde(borrow)]
-    pub url: jacquard_common::CowStr<'a>,
+    pub url: CowStr<'a>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EventType<'a> {
     AddRule,
     UpdateRule,
     RemoveRule,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> EventType<'a> {
@@ -159,7 +169,7 @@ impl<'a> From<&'a str> for EventType<'a> {
             "addRule" => Self::AddRule,
             "updateRule" => Self::UpdateRule,
             "removeRule" => Self::RemoveRule,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -170,7 +180,7 @@ impl<'a> From<String> for EventType<'a> {
             "addRule" => Self::AddRule,
             "updateRule" => Self::UpdateRule,
             "removeRule" => Self::RemoveRule,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -221,11 +231,12 @@ impl jacquard_common::IntoStatic for EventType<'_> {
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PatternType<'a> {
     Domain,
     Url,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> PatternType<'a> {
@@ -243,7 +254,7 @@ impl<'a> From<&'a str> for PatternType<'a> {
         match s {
             "domain" => Self::Domain,
             "url" => Self::Url,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -253,7 +264,7 @@ impl<'a> From<String> for PatternType<'a> {
         match s.as_str() {
             "domain" => Self::Domain,
             "url" => Self::Url,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -303,13 +314,14 @@ impl jacquard_common::IntoStatic for PatternType<'_> {
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReasonType<'a> {
     Csam,
     Spam,
     Phishing,
     None,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ReasonType<'a> {
@@ -331,7 +343,7 @@ impl<'a> From<&'a str> for ReasonType<'a> {
             "spam" => Self::Spam,
             "phishing" => Self::Phishing,
             "none" => Self::None,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -343,7 +355,7 @@ impl<'a> From<String> for ReasonType<'a> {
             "spam" => Self::Spam,
             "phishing" => Self::Phishing,
             "none" => Self::None,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -396,70 +408,59 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
 }
 
 /// Input for creating a URL safety rule
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UrlRule<'a> {
     #[serde(borrow)]
-    pub action: crate::tools_ozone::safelink::ActionType<'a>,
+    pub action: safelink::ActionType<'a>,
     ///Optional comment about the decision
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<CowStr<'a>>,
     ///Timestamp when the rule was created
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///DID of the user added the rule.
     #[serde(borrow)]
-    pub created_by: jacquard_common::types::string::Did<'a>,
+    pub created_by: Did<'a>,
     #[serde(borrow)]
-    pub pattern: crate::tools_ozone::safelink::PatternType<'a>,
+    pub pattern: safelink::PatternType<'a>,
     #[serde(borrow)]
-    pub reason: crate::tools_ozone::safelink::ReasonType<'a>,
+    pub reason: safelink::ReasonType<'a>,
     ///Timestamp when the rule was last updated
-    pub updated_at: jacquard_common::types::string::Datetime,
+    pub updated_at: Datetime,
     ///The URL or domain to apply the rule to
     #[serde(borrow)]
-    pub url: jacquard_common::CowStr<'a>,
+    pub url: CowStr<'a>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Event<'a> {
+impl<'a> LexiconSchema for Event<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.safelink.defs"
     }
     fn def_name() -> &'static str {
         "event"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_tools_ozone_safelink_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for UrlRule<'a> {
+impl<'a> LexiconSchema for UrlRule<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.safelink.defs"
     }
     fn def_name() -> &'static str {
         "urlRule"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_tools_ozone_safelink_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -474,137 +475,143 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Action;
+        type Reason;
+        type Pattern;
         type Url;
         type CreatedBy;
         type Id;
         type EventType;
-        type Pattern;
-        type Reason;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Action = Unset;
+        type Reason = Unset;
+        type Pattern = Unset;
         type Url = Unset;
         type CreatedBy = Unset;
         type Id = Unset;
         type EventType = Unset;
-        type Pattern = Unset;
-        type Reason = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `action` field to Set
-    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAction<S> {}
-    impl<S: State> State for SetAction<S> {
-        type Action = Set<members::action>;
-        type Url = S::Url;
-        type CreatedBy = S::CreatedBy;
-        type Id = S::Id;
-        type EventType = S::EventType;
-        type Pattern = S::Pattern;
-        type Reason = S::Reason;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Action = S::Action;
-        type Url = Set<members::url>;
-        type CreatedBy = S::CreatedBy;
-        type Id = S::Id;
-        type EventType = S::EventType;
-        type Pattern = S::Pattern;
-        type Reason = S::Reason;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
-    impl<S: State> State for SetCreatedBy<S> {
-        type Action = S::Action;
-        type Url = S::Url;
-        type CreatedBy = Set<members::created_by>;
-        type Id = S::Id;
-        type EventType = S::EventType;
-        type Pattern = S::Pattern;
-        type Reason = S::Reason;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Action = S::Action;
-        type Url = S::Url;
-        type CreatedBy = S::CreatedBy;
-        type Id = Set<members::id>;
-        type EventType = S::EventType;
-        type Pattern = S::Pattern;
-        type Reason = S::Reason;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `event_type` field to Set
-    pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventType<S> {}
-    impl<S: State> State for SetEventType<S> {
-        type Action = S::Action;
-        type Url = S::Url;
-        type CreatedBy = S::CreatedBy;
-        type Id = S::Id;
-        type EventType = Set<members::event_type>;
-        type Pattern = S::Pattern;
-        type Reason = S::Reason;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `pattern` field to Set
-    pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPattern<S> {}
-    impl<S: State> State for SetPattern<S> {
-        type Action = S::Action;
-        type Url = S::Url;
-        type CreatedBy = S::CreatedBy;
-        type Id = S::Id;
-        type EventType = S::EventType;
-        type Pattern = Set<members::pattern>;
-        type Reason = S::Reason;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type Action = S::Action;
-        type Url = S::Url;
-        type CreatedBy = S::CreatedBy;
-        type Id = S::Id;
-        type EventType = S::EventType;
-        type Pattern = S::Pattern;
-        type Reason = Set<members::reason>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Action = S::Action;
+        type Reason = S::Reason;
+        type Pattern = S::Pattern;
         type Url = S::Url;
         type CreatedBy = S::CreatedBy;
         type Id = S::Id;
         type EventType = S::EventType;
-        type Pattern = S::Pattern;
+    }
+    ///State transition - sets the `action` field to Set
+    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAction<S> {}
+    impl<S: State> State for SetAction<S> {
+        type CreatedAt = S::CreatedAt;
+        type Action = Set<members::action>;
         type Reason = S::Reason;
-        type CreatedAt = Set<members::created_at>;
+        type Pattern = S::Pattern;
+        type Url = S::Url;
+        type CreatedBy = S::CreatedBy;
+        type Id = S::Id;
+        type EventType = S::EventType;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type CreatedAt = S::CreatedAt;
+        type Action = S::Action;
+        type Reason = Set<members::reason>;
+        type Pattern = S::Pattern;
+        type Url = S::Url;
+        type CreatedBy = S::CreatedBy;
+        type Id = S::Id;
+        type EventType = S::EventType;
+    }
+    ///State transition - sets the `pattern` field to Set
+    pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPattern<S> {}
+    impl<S: State> State for SetPattern<S> {
+        type CreatedAt = S::CreatedAt;
+        type Action = S::Action;
+        type Reason = S::Reason;
+        type Pattern = Set<members::pattern>;
+        type Url = S::Url;
+        type CreatedBy = S::CreatedBy;
+        type Id = S::Id;
+        type EventType = S::EventType;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type CreatedAt = S::CreatedAt;
+        type Action = S::Action;
+        type Reason = S::Reason;
+        type Pattern = S::Pattern;
+        type Url = Set<members::url>;
+        type CreatedBy = S::CreatedBy;
+        type Id = S::Id;
+        type EventType = S::EventType;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type CreatedAt = S::CreatedAt;
+        type Action = S::Action;
+        type Reason = S::Reason;
+        type Pattern = S::Pattern;
+        type Url = S::Url;
+        type CreatedBy = Set<members::created_by>;
+        type Id = S::Id;
+        type EventType = S::EventType;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type CreatedAt = S::CreatedAt;
+        type Action = S::Action;
+        type Reason = S::Reason;
+        type Pattern = S::Pattern;
+        type Url = S::Url;
+        type CreatedBy = S::CreatedBy;
+        type Id = Set<members::id>;
+        type EventType = S::EventType;
+    }
+    ///State transition - sets the `event_type` field to Set
+    pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventType<S> {}
+    impl<S: State> State for SetEventType<S> {
+        type CreatedAt = S::CreatedAt;
+        type Action = S::Action;
+        type Reason = S::Reason;
+        type Pattern = S::Pattern;
+        type Url = S::Url;
+        type CreatedBy = S::CreatedBy;
+        type Id = S::Id;
+        type EventType = Set<members::event_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `action` field
         pub struct action(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
+        ///Marker type for the `pattern` field
+        pub struct pattern(());
         ///Marker type for the `url` field
         pub struct url(());
         ///Marker type for the `created_by` field
@@ -613,30 +620,24 @@ pub mod event_state {
         pub struct id(());
         ///Marker type for the `event_type` field
         pub struct event_type(());
-        ///Marker type for the `pattern` field
-        pub struct pattern(());
-        ///Marker type for the `reason` field
-        pub struct reason(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EventBuilder<'a, S: event_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::tools_ozone::safelink::ActionType<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<crate::tools_ozone::safelink::EventType<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<crate::tools_ozone::safelink::PatternType<'a>>,
-        ::core::option::Option<crate::tools_ozone::safelink::ReasonType<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<safelink::ActionType<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<Did<'a>>,
+        Option<safelink::EventType<'a>>,
+        Option<i64>,
+        Option<safelink::PatternType<'a>>,
+        Option<safelink::ReasonType<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Event<'a> {
@@ -650,7 +651,7 @@ impl<'a> EventBuilder<'a, event_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -662,7 +663,7 @@ impl<'a> EventBuilder<'a, event_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -675,28 +676,25 @@ where
     /// Set the `action` field (required)
     pub fn action(
         mut self,
-        value: impl Into<crate::tools_ozone::safelink::ActionType<'a>>,
+        value: impl Into<safelink::ActionType<'a>>,
     ) -> EventBuilder<'a, event_state::SetAction<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
-    pub fn maybe_comment(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -710,13 +708,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> EventBuilder<'a, event_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -729,13 +727,13 @@ where
     /// Set the `createdBy` field (required)
     pub fn created_by(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> EventBuilder<'a, event_state::SetCreatedBy<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -748,13 +746,13 @@ where
     /// Set the `eventType` field (required)
     pub fn event_type(
         mut self,
-        value: impl Into<crate::tools_ozone::safelink::EventType<'a>>,
+        value: impl Into<safelink::EventType<'a>>,
     ) -> EventBuilder<'a, event_state::SetEventType<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -769,11 +767,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> EventBuilder<'a, event_state::SetId<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -786,13 +784,13 @@ where
     /// Set the `pattern` field (required)
     pub fn pattern(
         mut self,
-        value: impl Into<crate::tools_ozone::safelink::PatternType<'a>>,
+        value: impl Into<safelink::PatternType<'a>>,
     ) -> EventBuilder<'a, event_state::SetPattern<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -805,13 +803,13 @@ where
     /// Set the `reason` field (required)
     pub fn reason(
         mut self,
-        value: impl Into<crate::tools_ozone::safelink::ReasonType<'a>>,
+        value: impl Into<safelink::ReasonType<'a>>,
     ) -> EventBuilder<'a, event_state::SetReason<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -824,13 +822,13 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> EventBuilder<'a, event_state::SetUrl<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -838,14 +836,14 @@ where
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
+    S::CreatedAt: event_state::IsSet,
     S::Action: event_state::IsSet,
+    S::Reason: event_state::IsSet,
+    S::Pattern: event_state::IsSet,
     S::Url: event_state::IsSet,
     S::CreatedBy: event_state::IsSet,
     S::Id: event_state::IsSet,
     S::EventType: event_state::IsSet,
-    S::Pattern: event_state::IsSet,
-    S::Reason: event_state::IsSet,
-    S::CreatedAt: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -865,7 +863,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -885,402 +883,221 @@ where
     }
 }
 
-fn lexicon_doc_tools_ozone_safelink_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("tools.ozone.safelink.defs"),
-        revision: None,
-        description: None,
+fn lexicon_doc_tools_ozone_safelink_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("tools.ozone.safelink.defs"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("actionType"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: None,
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
-                    max_graphemes: None,
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
-                }),
+                SmolStr::new_static("actionType"),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("event"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("event"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "An event for URL safety decisions",
-                        ),
+                        CowStr::new_static("An event for URL safety decisions"),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("eventType"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("url"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("pattern"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("action"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("reason"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdBy"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                            SmolStr::new_static("id"), SmolStr::new_static("eventType"),
+                            SmolStr::new_static("url"), SmolStr::new_static("pattern"),
+                            SmolStr::new_static("action"), SmolStr::new_static("reason"),
+                            SmolStr::new_static("createdBy"),
+                            SmolStr::new_static("createdAt")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "action",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#actionType"),
+                            SmolStr::new_static("action"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#actionType"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "comment",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("comment"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Optional comment about the decision",
-                                    ),
+                                    CowStr::new_static("Optional comment about the decision"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "createdAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("createdAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "createdBy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("createdBy"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "DID of the user who created this rule",
-                                    ),
+                                    CowStr::new_static("DID of the user who created this rule"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "eventType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#eventType"),
+                            SmolStr::new_static("eventType"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#eventType"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("id"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "pattern",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#patternType"),
+                            SmolStr::new_static("pattern"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#patternType"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "reason",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#reasonType"),
+                            SmolStr::new_static("reason"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#reasonType"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "url",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("url"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The URL that this rule applies to",
-                                    ),
+                                    CowStr::new_static("The URL that this rule applies to"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("eventType"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: None,
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
-                    max_graphemes: None,
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
-                }),
+                SmolStr::new_static("eventType"),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("patternType"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: None,
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
-                    max_graphemes: None,
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
-                }),
+                SmolStr::new_static("patternType"),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("reasonType"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: None,
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
-                    max_graphemes: None,
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
-                }),
+                SmolStr::new_static("reasonType"),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("urlRule"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("urlRule"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Input for creating a URL safety rule",
-                        ),
+                        CowStr::new_static("Input for creating a URL safety rule"),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("url"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("pattern"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("action"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("reason"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdBy"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
+                            SmolStr::new_static("url"), SmolStr::new_static("pattern"),
+                            SmolStr::new_static("action"), SmolStr::new_static("reason"),
+                            SmolStr::new_static("createdBy"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("updatedAt")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "action",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#actionType"),
+                            SmolStr::new_static("action"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#actionType"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "comment",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("comment"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Optional comment about the decision",
-                                    ),
+                                    CowStr::new_static("Optional comment about the decision"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "createdAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("createdAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Timestamp when the rule was created",
-                                    ),
+                                    CowStr::new_static("Timestamp when the rule was created"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "createdBy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("createdBy"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "DID of the user added the rule.",
-                                    ),
+                                    CowStr::new_static("DID of the user added the rule."),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "pattern",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#patternType"),
+                            SmolStr::new_static("pattern"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#patternType"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "reason",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#reasonType"),
+                            SmolStr::new_static("reason"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#reasonType"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "updatedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("updatedAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Timestamp when the rule was last updated",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "url",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("url"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The URL or domain to apply the rule to",
-                                    ),
+                                    CowStr::new_static("The URL or domain to apply the rule to"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1294,144 +1111,144 @@ pub mod url_rule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
+        type CreatedBy;
+        type UpdatedAt;
         type Pattern;
+        type Url;
         type Action;
         type Reason;
-        type CreatedBy;
         type CreatedAt;
-        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
+        type CreatedBy = Unset;
+        type UpdatedAt = Unset;
         type Pattern = Unset;
+        type Url = Unset;
         type Action = Unset;
         type Reason = Unset;
-        type CreatedBy = Unset;
         type CreatedAt = Unset;
-        type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Pattern = S::Pattern;
-        type Action = S::Action;
-        type Reason = S::Reason;
-        type CreatedBy = S::CreatedBy;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `pattern` field to Set
-    pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPattern<S> {}
-    impl<S: State> State for SetPattern<S> {
-        type Url = S::Url;
-        type Pattern = Set<members::pattern>;
-        type Action = S::Action;
-        type Reason = S::Reason;
-        type CreatedBy = S::CreatedBy;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `action` field to Set
-    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAction<S> {}
-    impl<S: State> State for SetAction<S> {
-        type Url = S::Url;
-        type Pattern = S::Pattern;
-        type Action = Set<members::action>;
-        type Reason = S::Reason;
-        type CreatedBy = S::CreatedBy;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type Url = S::Url;
-        type Pattern = S::Pattern;
-        type Action = S::Action;
-        type Reason = Set<members::reason>;
-        type CreatedBy = S::CreatedBy;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `created_by` field to Set
     pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
     impl<S: State> State for SetCreatedBy<S> {
-        type Url = S::Url;
-        type Pattern = S::Pattern;
-        type Action = S::Action;
-        type Reason = S::Reason;
         type CreatedBy = Set<members::created_by>;
-        type CreatedAt = S::CreatedAt;
         type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Url = S::Url;
         type Pattern = S::Pattern;
+        type Url = S::Url;
         type Action = S::Action;
         type Reason = S::Reason;
-        type CreatedBy = S::CreatedBy;
-        type CreatedAt = Set<members::created_at>;
-        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type Url = S::Url;
+        type CreatedBy = S::CreatedBy;
+        type UpdatedAt = Set<members::updated_at>;
         type Pattern = S::Pattern;
+        type Url = S::Url;
         type Action = S::Action;
         type Reason = S::Reason;
-        type CreatedBy = S::CreatedBy;
         type CreatedAt = S::CreatedAt;
-        type UpdatedAt = Set<members::updated_at>;
+    }
+    ///State transition - sets the `pattern` field to Set
+    pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPattern<S> {}
+    impl<S: State> State for SetPattern<S> {
+        type CreatedBy = S::CreatedBy;
+        type UpdatedAt = S::UpdatedAt;
+        type Pattern = Set<members::pattern>;
+        type Url = S::Url;
+        type Action = S::Action;
+        type Reason = S::Reason;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type CreatedBy = S::CreatedBy;
+        type UpdatedAt = S::UpdatedAt;
+        type Pattern = S::Pattern;
+        type Url = Set<members::url>;
+        type Action = S::Action;
+        type Reason = S::Reason;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `action` field to Set
+    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAction<S> {}
+    impl<S: State> State for SetAction<S> {
+        type CreatedBy = S::CreatedBy;
+        type UpdatedAt = S::UpdatedAt;
+        type Pattern = S::Pattern;
+        type Url = S::Url;
+        type Action = Set<members::action>;
+        type Reason = S::Reason;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type CreatedBy = S::CreatedBy;
+        type UpdatedAt = S::UpdatedAt;
+        type Pattern = S::Pattern;
+        type Url = S::Url;
+        type Action = S::Action;
+        type Reason = Set<members::reason>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CreatedBy = S::CreatedBy;
+        type UpdatedAt = S::UpdatedAt;
+        type Pattern = S::Pattern;
+        type Url = S::Url;
+        type Action = S::Action;
+        type Reason = S::Reason;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
         ///Marker type for the `pattern` field
         pub struct pattern(());
+        ///Marker type for the `url` field
+        pub struct url(());
         ///Marker type for the `action` field
         pub struct action(());
         ///Marker type for the `reason` field
         pub struct reason(());
-        ///Marker type for the `created_by` field
-        pub struct created_by(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct UrlRuleBuilder<'a, S: url_rule_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::tools_ozone::safelink::ActionType<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<crate::tools_ozone::safelink::PatternType<'a>>,
-        ::core::option::Option<crate::tools_ozone::safelink::ReasonType<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<safelink::ActionType<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<Did<'a>>,
+        Option<safelink::PatternType<'a>>,
+        Option<safelink::ReasonType<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UrlRule<'a> {
@@ -1445,9 +1262,9 @@ impl<'a> UrlRuleBuilder<'a, url_rule_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UrlRuleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1460,28 +1277,25 @@ where
     /// Set the `action` field (required)
     pub fn action(
         mut self,
-        value: impl Into<crate::tools_ozone::safelink::ActionType<'a>>,
+        value: impl Into<safelink::ActionType<'a>>,
     ) -> UrlRuleBuilder<'a, url_rule_state::SetAction<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         UrlRuleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: url_rule_state::State> UrlRuleBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
-    pub fn maybe_comment(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -1495,13 +1309,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> UrlRuleBuilder<'a, url_rule_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         UrlRuleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1514,13 +1328,13 @@ where
     /// Set the `createdBy` field (required)
     pub fn created_by(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> UrlRuleBuilder<'a, url_rule_state::SetCreatedBy<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         UrlRuleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1533,13 +1347,13 @@ where
     /// Set the `pattern` field (required)
     pub fn pattern(
         mut self,
-        value: impl Into<crate::tools_ozone::safelink::PatternType<'a>>,
+        value: impl Into<safelink::PatternType<'a>>,
     ) -> UrlRuleBuilder<'a, url_rule_state::SetPattern<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         UrlRuleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1552,13 +1366,13 @@ where
     /// Set the `reason` field (required)
     pub fn reason(
         mut self,
-        value: impl Into<crate::tools_ozone::safelink::ReasonType<'a>>,
+        value: impl Into<safelink::ReasonType<'a>>,
     ) -> UrlRuleBuilder<'a, url_rule_state::SetReason<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         UrlRuleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1571,13 +1385,13 @@ where
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> UrlRuleBuilder<'a, url_rule_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         UrlRuleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1590,13 +1404,13 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> UrlRuleBuilder<'a, url_rule_state::SetUrl<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         UrlRuleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1604,13 +1418,13 @@ where
 impl<'a, S> UrlRuleBuilder<'a, S>
 where
     S: url_rule_state::State,
-    S::Url: url_rule_state::IsSet,
+    S::CreatedBy: url_rule_state::IsSet,
+    S::UpdatedAt: url_rule_state::IsSet,
     S::Pattern: url_rule_state::IsSet,
+    S::Url: url_rule_state::IsSet,
     S::Action: url_rule_state::IsSet,
     S::Reason: url_rule_state::IsSet,
-    S::CreatedBy: url_rule_state::IsSet,
     S::CreatedAt: url_rule_state::IsSet,
-    S::UpdatedAt: url_rule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UrlRule<'a> {
@@ -1629,7 +1443,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

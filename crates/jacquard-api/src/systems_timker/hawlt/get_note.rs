@@ -5,47 +5,37 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_common::types::string::{AtUri, Cid, RecordKey, Rkey};
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::systems_timker::hawlt::note::Note;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetNote<'a> {
     #[serde(borrow)]
-    pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub repo: AtIdentifier<'a>,
     #[serde(borrow)]
-    pub rkey: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub rkey: RecordKey<Rkey<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetNoteOutput<'a> {
     #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub cid: Cid<'a>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
-    pub value: crate::systems_timker::hawlt::note::Note<'a>,
+    pub value: Note<'a>,
 }
 
-/// Response type for
-///systems.timker.hawlt.getNote
+/// Response type for systems.timker.hawlt.getNote
 pub struct GetNoteResponse;
 impl jacquard_common::xrpc::XrpcResp for GetNoteResponse {
     const NSID: &'static str = "systems.timker.hawlt.getNote";
@@ -60,8 +50,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetNote<'a> {
     type Response = GetNoteResponse;
 }
 
-/// Endpoint type for
-///systems.timker.hawlt.getNote
+/// Endpoint type for systems.timker.hawlt.getNote
 pub struct GetNoteRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetNoteRequest {
     const PATH: &'static str = "/xrpc/systems.timker.hawlt.getNote";
@@ -80,52 +69,45 @@ pub mod get_note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Rkey;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Rkey = S::Rkey;
+        type Repo = Unset;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type Repo = S::Repo;
         type Rkey = Set<members::rkey>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Rkey = S::Rkey;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetNoteBuilder<'a, S: get_note_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-        ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>, Option<RecordKey<Rkey<'a>>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetNote<'a> {
@@ -139,9 +121,9 @@ impl<'a> GetNoteBuilder<'a, get_note_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetNoteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -154,13 +136,13 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> GetNoteBuilder<'a, get_note_state::SetRepo<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetNoteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -173,17 +155,13 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
+        value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> GetNoteBuilder<'a, get_note_state::SetRkey<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetNoteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -191,8 +169,8 @@ where
 impl<'a, S> GetNoteBuilder<'a, S>
 where
     S: get_note_state::State,
-    S::Repo: get_note_state::IsSet,
     S::Rkey: get_note_state::IsSet,
+    S::Repo: get_note_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetNote<'a> {

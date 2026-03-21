@@ -5,26 +5,24 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteBranch<'a> {
     #[serde(borrow)]
-    pub branch: jacquard_common::CowStr<'a>,
+    pub branch: CowStr<'a>,
     #[serde(borrow)]
-    pub repo: jacquard_common::types::string::AtUri<'a>,
+    pub repo: AtUri<'a>,
 }
 
-/// Response type for
-///sh.tangled.repo.deleteBranch
+/// Response type for sh.tangled.repo.deleteBranch
 pub struct DeleteBranchResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteBranchResponse {
     const NSID: &'static str = "sh.tangled.repo.deleteBranch";
@@ -41,8 +39,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBranch<'a> {
     type Response = DeleteBranchResponse;
 }
 
-/// Endpoint type for
-///sh.tangled.repo.deleteBranch
+/// Endpoint type for sh.tangled.repo.deleteBranch
 pub struct DeleteBranchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteBranchRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.deleteBranch";
@@ -99,12 +96,9 @@ pub mod delete_branch_state {
 
 /// Builder for constructing an instance of this type
 pub struct DeleteBranchBuilder<'a, S: delete_branch_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> DeleteBranch<'a> {
@@ -118,9 +112,9 @@ impl<'a> DeleteBranchBuilder<'a, delete_branch_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeleteBranchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -133,13 +127,13 @@ where
     /// Set the `branch` field (required)
     pub fn branch(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> DeleteBranchBuilder<'a, delete_branch_state::SetBranch<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         DeleteBranchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -152,13 +146,13 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> DeleteBranchBuilder<'a, delete_branch_state::SetRepo<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         DeleteBranchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -180,7 +174,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

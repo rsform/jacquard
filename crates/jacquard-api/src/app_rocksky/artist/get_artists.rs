@@ -5,53 +5,41 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::artist::ArtistViewBasic;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetArtists<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub genre: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub genre: Option<CowStr<'a>>,
     ///(min: 1)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub names: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub names: Option<CowStr<'a>>,
     ///(min: 0)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub offset: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub offset: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetArtistsOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub artists: core::option::Option<
-        Vec<crate::app_rocksky::artist::ArtistViewBasic<'a>>,
-    >,
+    pub artists: Option<Vec<ArtistViewBasic<'a>>>,
 }
 
-/// Response type for
-///app.rocksky.artist.getArtists
+/// Response type for app.rocksky.artist.getArtists
 pub struct GetArtistsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetArtistsResponse {
     const NSID: &'static str = "app.rocksky.artist.getArtists";
@@ -66,8 +54,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetArtists<'a> {
     type Response = GetArtistsResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.artist.getArtists
+/// Endpoint type for app.rocksky.artist.getArtists
 pub struct GetArtistsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetArtistsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.artist.getArtists";
@@ -97,14 +84,14 @@ pub mod get_artists_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetArtistsBuilder<'a, S: get_artists_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetArtists<'a> {
@@ -118,24 +105,21 @@ impl<'a> GetArtistsBuilder<'a, get_artists_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetArtistsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_artists_state::State> GetArtistsBuilder<'a, S> {
     /// Set the `genre` field (optional)
-    pub fn genre(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn genre(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_genre(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -156,15 +140,12 @@ impl<'a, S: get_artists_state::State> GetArtistsBuilder<'a, S> {
 
 impl<'a, S: get_artists_state::State> GetArtistsBuilder<'a, S> {
     /// Set the `names` field (optional)
-    pub fn names(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn names(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `names` field to an Option value (optional)
-    pub fn maybe_names(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_names(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }

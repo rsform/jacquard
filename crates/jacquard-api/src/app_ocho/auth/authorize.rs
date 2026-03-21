@@ -5,43 +5,33 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Authorize<'a> {
     #[serde(borrow)]
-    pub authorize_options: jacquard_common::types::value::Data<'a>,
+    pub authorize_options: Data<'a>,
     #[serde(borrow)]
-    pub input: jacquard_common::CowStr<'a>,
+    pub input: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct AuthorizeOutput<'a> {
     #[serde(borrow)]
-    pub url: jacquard_common::CowStr<'a>,
+    pub url: CowStr<'a>,
 }
 
-/// Response type for
-///app.ocho.auth.authorize
+/// Response type for app.ocho.auth.authorize
 pub struct AuthorizeResponse;
 impl jacquard_common::xrpc::XrpcResp for AuthorizeResponse {
     const NSID: &'static str = "app.ocho.auth.authorize";
@@ -58,8 +48,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Authorize<'a> {
     type Response = AuthorizeResponse;
 }
 
-/// Endpoint type for
-///app.ocho.auth.authorize
+/// Endpoint type for app.ocho.auth.authorize
 pub struct AuthorizeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AuthorizeRequest {
     const PATH: &'static str = "/xrpc/app.ocho.auth.authorize";
@@ -116,12 +105,9 @@ pub mod authorize_state {
 
 /// Builder for constructing an instance of this type
 pub struct AuthorizeBuilder<'a, S: authorize_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Data<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Authorize<'a> {
@@ -135,9 +121,9 @@ impl<'a> AuthorizeBuilder<'a, authorize_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AuthorizeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -150,13 +136,13 @@ where
     /// Set the `authorizeOptions` field (required)
     pub fn authorize_options(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> AuthorizeBuilder<'a, authorize_state::SetAuthorizeOptions<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         AuthorizeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -169,13 +155,13 @@ where
     /// Set the `input` field (required)
     pub fn input(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> AuthorizeBuilder<'a, authorize_state::SetInput<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         AuthorizeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -197,10 +183,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Authorize<'a> {
         Authorize {
             authorize_options: self.__unsafe_private_named.0.unwrap(),

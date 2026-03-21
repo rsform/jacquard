@@ -5,76 +5,68 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::UriValue;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::slice::get_o_auth_clients::OauthClientDetails;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateOAuthClient<'a> {
     ///Human-readable name of the OAuth client
     #[serde(borrow)]
-    pub client_name: jacquard_common::CowStr<'a>,
+    pub client_name: CowStr<'a>,
     ///URI of the client application
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub client_uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub client_uri: Option<UriValue<'a>>,
     ///OAuth grant types
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub grant_types: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub grant_types: Option<Vec<CowStr<'a>>>,
     ///URI of the client logo
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub logo_uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub logo_uri: Option<UriValue<'a>>,
     ///URI of the privacy policy
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub policy_uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub policy_uri: Option<UriValue<'a>>,
     ///Allowed redirect URIs for OAuth flow (must use HTTP or HTTPS)
     #[serde(borrow)]
-    pub redirect_uris: Vec<jacquard_common::types::string::UriValue<'a>>,
+    pub redirect_uris: Vec<UriValue<'a>>,
     ///OAuth response types
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub response_types: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub response_types: Option<Vec<CowStr<'a>>>,
     ///OAuth scope
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub scope: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub scope: Option<CowStr<'a>>,
     ///AT-URI of the slice to register the OAuth client for
     #[serde(borrow)]
-    pub slice_uri: jacquard_common::CowStr<'a>,
+    pub slice_uri: CowStr<'a>,
     ///URI of the terms of service
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tos_uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub tos_uri: Option<UriValue<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateOAuthClientOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::network_slices::slice::get_o_auth_clients::OauthClientDetails<'a>,
+    pub value: OauthClientDetails<'a>,
 }
 
-/// Response type for
-///network.slices.slice.createOAuthClient
+/// Response type for network.slices.slice.createOAuthClient
 pub struct CreateOAuthClientResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateOAuthClientResponse {
     const NSID: &'static str = "network.slices.slice.createOAuthClient";
@@ -91,8 +83,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateOAuthClient<'a> {
     type Response = CreateOAuthClientResponse;
 }
 
-/// Endpoint type for
-///network.slices.slice.createOAuthClient
+/// Endpoint type for network.slices.slice.createOAuthClient
 pub struct CreateOAuthClientRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateOAuthClientRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.createOAuthClient";
@@ -113,70 +104,70 @@ pub mod create_o_auth_client_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SliceUri;
         type ClientName;
         type RedirectUris;
+        type SliceUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SliceUri = Unset;
         type ClientName = Unset;
         type RedirectUris = Unset;
-    }
-    ///State transition - sets the `slice_uri` field to Set
-    pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSliceUri<S> {}
-    impl<S: State> State for SetSliceUri<S> {
-        type SliceUri = Set<members::slice_uri>;
-        type ClientName = S::ClientName;
-        type RedirectUris = S::RedirectUris;
+        type SliceUri = Unset;
     }
     ///State transition - sets the `client_name` field to Set
     pub struct SetClientName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClientName<S> {}
     impl<S: State> State for SetClientName<S> {
-        type SliceUri = S::SliceUri;
         type ClientName = Set<members::client_name>;
         type RedirectUris = S::RedirectUris;
+        type SliceUri = S::SliceUri;
     }
     ///State transition - sets the `redirect_uris` field to Set
     pub struct SetRedirectUris<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRedirectUris<S> {}
     impl<S: State> State for SetRedirectUris<S> {
-        type SliceUri = S::SliceUri;
         type ClientName = S::ClientName;
         type RedirectUris = Set<members::redirect_uris>;
+        type SliceUri = S::SliceUri;
+    }
+    ///State transition - sets the `slice_uri` field to Set
+    pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSliceUri<S> {}
+    impl<S: State> State for SetSliceUri<S> {
+        type ClientName = S::ClientName;
+        type RedirectUris = S::RedirectUris;
+        type SliceUri = Set<members::slice_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slice_uri` field
-        pub struct slice_uri(());
         ///Marker type for the `client_name` field
         pub struct client_name(());
         ///Marker type for the `redirect_uris` field
         pub struct redirect_uris(());
+        ///Marker type for the `slice_uri` field
+        pub struct slice_uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CreateOAuthClientBuilder<'a, S: create_o_auth_client_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+        Option<CowStr<'a>>,
+        Option<UriValue<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<UriValue<'a>>,
+        Option<UriValue<'a>>,
+        Option<Vec<UriValue<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<UriValue<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CreateOAuthClient<'a> {
@@ -190,7 +181,7 @@ impl<'a> CreateOAuthClientBuilder<'a, create_o_auth_client_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateOAuthClientBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -203,7 +194,7 @@ impl<'a> CreateOAuthClientBuilder<'a, create_o_auth_client_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -216,31 +207,25 @@ where
     /// Set the `clientName` field (required)
     pub fn client_name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CreateOAuthClientBuilder<'a, create_o_auth_client_state::SetClientName<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CreateOAuthClientBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
     /// Set the `clientUri` field (optional)
-    pub fn client_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn client_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `clientUri` field to an Option value (optional)
-    pub fn maybe_client_uri(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_client_uri(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -248,18 +233,12 @@ impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
 
 impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
     /// Set the `grantTypes` field (optional)
-    pub fn grant_types(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn grant_types(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `grantTypes` field to an Option value (optional)
-    pub fn maybe_grant_types(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_grant_types(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -267,18 +246,12 @@ impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
 
 impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
     /// Set the `logoUri` field (optional)
-    pub fn logo_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn logo_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `logoUri` field to an Option value (optional)
-    pub fn maybe_logo_uri(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_logo_uri(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -286,18 +259,12 @@ impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
 
 impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
     /// Set the `policyUri` field (optional)
-    pub fn policy_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn policy_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `policyUri` field to an Option value (optional)
-    pub fn maybe_policy_uri(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_policy_uri(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -311,31 +278,25 @@ where
     /// Set the `redirectUris` field (required)
     pub fn redirect_uris(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::UriValue<'a>>>,
+        value: impl Into<Vec<UriValue<'a>>>,
     ) -> CreateOAuthClientBuilder<'a, create_o_auth_client_state::SetRedirectUris<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         CreateOAuthClientBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
     /// Set the `responseTypes` field (optional)
-    pub fn response_types(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn response_types(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `responseTypes` field to an Option value (optional)
-    pub fn maybe_response_types(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_response_types(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -343,15 +304,12 @@ impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
 
 impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
     /// Set the `scope` field (optional)
-    pub fn scope(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn scope(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `scope` field to an Option value (optional)
-    pub fn maybe_scope(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_scope(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -365,31 +323,25 @@ where
     /// Set the `sliceUri` field (required)
     pub fn slice_uri(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CreateOAuthClientBuilder<'a, create_o_auth_client_state::SetSliceUri<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         CreateOAuthClientBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
     /// Set the `tosUri` field (optional)
-    pub fn tos_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn tos_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `tosUri` field to an Option value (optional)
-    pub fn maybe_tos_uri(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_tos_uri(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -398,9 +350,9 @@ impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
 impl<'a, S> CreateOAuthClientBuilder<'a, S>
 where
     S: create_o_auth_client_state::State,
-    S::SliceUri: create_o_auth_client_state::IsSet,
     S::ClientName: create_o_auth_client_state::IsSet,
     S::RedirectUris: create_o_auth_client_state::IsSet,
+    S::SliceUri: create_o_auth_client_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateOAuthClient<'a> {
@@ -421,7 +373,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -5,98 +5,98 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A declaration of an organization or project
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Info<'a> {
     ///The country of the organization or project in two letter code (ISO 3166-1 alpha-2)
     #[serde(borrow)]
-    pub country: jacquard_common::CowStr<'a>,
+    pub country: CowStr<'a>,
     ///Cover image for the organization
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cover_image: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub cover_image: Option<Data<'a>>,
     ///The date and time of the creation of the record
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///The name of the organization or project
     #[serde(borrow)]
-    pub display_name: jacquard_common::CowStr<'a>,
+    pub display_name: CowStr<'a>,
     ///Logo for the organization
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub logo: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub logo: Option<Data<'a>>,
     ///The long description of the organization or project in richtext
     #[serde(borrow)]
-    pub long_description: jacquard_common::CowStr<'a>,
+    pub long_description: CowStr<'a>,
     ///The objectives of the organization or project
     #[serde(borrow)]
-    pub objectives: Vec<jacquard_common::CowStr<'a>>,
+    pub objectives: Vec<CowStr<'a>>,
     ///The description of the organization or project
     #[serde(borrow)]
-    pub short_description: jacquard_common::CowStr<'a>,
+    pub short_description: CowStr<'a>,
     ///The start date of the organization or project
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub start_date: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_date: Option<Datetime>,
     ///The visibility of the organization or project in the Green Globe
     #[serde(borrow)]
-    pub visibility: jacquard_common::CowStr<'a>,
+    pub visibility: CowStr<'a>,
     ///The website of the organization or project
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub website: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub website: Option<UriValue<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct InfoGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Info<'a>,
 }
 
 impl<'a> Info<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, InfoRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, InfoRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct InfoRecord;
-impl jacquard_common::xrpc::XrpcResp for InfoRecord {
+impl XrpcResp for InfoRecord {
     const NSID: &'static str = "app.gainforest.organization.info";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = InfoGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<InfoGetRecordOutput<'_>> for Info<'_> {
@@ -106,37 +106,33 @@ impl From<InfoGetRecordOutput<'_>> for Info<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Info<'_> {
+impl Collection for Info<'_> {
     const NSID: &'static str = "app.gainforest.organization.info";
     type Record = InfoRecord;
 }
 
-impl jacquard_common::types::collection::Collection for InfoRecord {
+impl Collection for InfoRecord {
     const NSID: &'static str = "app.gainforest.organization.info";
     type Record = InfoRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Info<'a> {
+impl<'a> LexiconSchema for Info<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.organization.info"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_gainforest_organization_info()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.display_name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("display_name"),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -146,10 +142,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Info<'a> {
             let value = &self.display_name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 8usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("display_name"),
                     min: 8usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -159,10 +153,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Info<'a> {
             let value = &self.long_description;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "long_description",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("long_description"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -172,10 +164,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Info<'a> {
             let value = &self.long_description;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "long_description",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("long_description"),
                     min: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -185,10 +175,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Info<'a> {
             let value = &self.short_description;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "short_description",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("short_description"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -198,10 +186,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Info<'a> {
             let value = &self.short_description;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "short_description",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("short_description"),
                     min: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -221,147 +207,147 @@ pub mod info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LongDescription;
-        type Objectives;
-        type DisplayName;
         type ShortDescription;
-        type Country;
+        type Objectives;
         type Visibility;
         type CreatedAt;
+        type DisplayName;
+        type LongDescription;
+        type Country;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LongDescription = Unset;
-        type Objectives = Unset;
-        type DisplayName = Unset;
         type ShortDescription = Unset;
-        type Country = Unset;
+        type Objectives = Unset;
         type Visibility = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `long_description` field to Set
-    pub struct SetLongDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLongDescription<S> {}
-    impl<S: State> State for SetLongDescription<S> {
-        type LongDescription = Set<members::long_description>;
-        type Objectives = S::Objectives;
-        type DisplayName = S::DisplayName;
-        type ShortDescription = S::ShortDescription;
-        type Country = S::Country;
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `objectives` field to Set
-    pub struct SetObjectives<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObjectives<S> {}
-    impl<S: State> State for SetObjectives<S> {
-        type LongDescription = S::LongDescription;
-        type Objectives = Set<members::objectives>;
-        type DisplayName = S::DisplayName;
-        type ShortDescription = S::ShortDescription;
-        type Country = S::Country;
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type LongDescription = S::LongDescription;
-        type Objectives = S::Objectives;
-        type DisplayName = Set<members::display_name>;
-        type ShortDescription = S::ShortDescription;
-        type Country = S::Country;
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
+        type DisplayName = Unset;
+        type LongDescription = Unset;
+        type Country = Unset;
     }
     ///State transition - sets the `short_description` field to Set
     pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShortDescription<S> {}
     impl<S: State> State for SetShortDescription<S> {
-        type LongDescription = S::LongDescription;
-        type Objectives = S::Objectives;
-        type DisplayName = S::DisplayName;
         type ShortDescription = Set<members::short_description>;
-        type Country = S::Country;
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `country` field to Set
-    pub struct SetCountry<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountry<S> {}
-    impl<S: State> State for SetCountry<S> {
-        type LongDescription = S::LongDescription;
         type Objectives = S::Objectives;
-        type DisplayName = S::DisplayName;
-        type ShortDescription = S::ShortDescription;
-        type Country = Set<members::country>;
         type Visibility = S::Visibility;
         type CreatedAt = S::CreatedAt;
+        type DisplayName = S::DisplayName;
+        type LongDescription = S::LongDescription;
+        type Country = S::Country;
+    }
+    ///State transition - sets the `objectives` field to Set
+    pub struct SetObjectives<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObjectives<S> {}
+    impl<S: State> State for SetObjectives<S> {
+        type ShortDescription = S::ShortDescription;
+        type Objectives = Set<members::objectives>;
+        type Visibility = S::Visibility;
+        type CreatedAt = S::CreatedAt;
+        type DisplayName = S::DisplayName;
+        type LongDescription = S::LongDescription;
+        type Country = S::Country;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVisibility<S> {}
     impl<S: State> State for SetVisibility<S> {
-        type LongDescription = S::LongDescription;
-        type Objectives = S::Objectives;
-        type DisplayName = S::DisplayName;
         type ShortDescription = S::ShortDescription;
-        type Country = S::Country;
+        type Objectives = S::Objectives;
         type Visibility = Set<members::visibility>;
         type CreatedAt = S::CreatedAt;
+        type DisplayName = S::DisplayName;
+        type LongDescription = S::LongDescription;
+        type Country = S::Country;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type LongDescription = S::LongDescription;
-        type Objectives = S::Objectives;
-        type DisplayName = S::DisplayName;
         type ShortDescription = S::ShortDescription;
-        type Country = S::Country;
+        type Objectives = S::Objectives;
         type Visibility = S::Visibility;
         type CreatedAt = Set<members::created_at>;
+        type DisplayName = S::DisplayName;
+        type LongDescription = S::LongDescription;
+        type Country = S::Country;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type ShortDescription = S::ShortDescription;
+        type Objectives = S::Objectives;
+        type Visibility = S::Visibility;
+        type CreatedAt = S::CreatedAt;
+        type DisplayName = Set<members::display_name>;
+        type LongDescription = S::LongDescription;
+        type Country = S::Country;
+    }
+    ///State transition - sets the `long_description` field to Set
+    pub struct SetLongDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLongDescription<S> {}
+    impl<S: State> State for SetLongDescription<S> {
+        type ShortDescription = S::ShortDescription;
+        type Objectives = S::Objectives;
+        type Visibility = S::Visibility;
+        type CreatedAt = S::CreatedAt;
+        type DisplayName = S::DisplayName;
+        type LongDescription = Set<members::long_description>;
+        type Country = S::Country;
+    }
+    ///State transition - sets the `country` field to Set
+    pub struct SetCountry<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountry<S> {}
+    impl<S: State> State for SetCountry<S> {
+        type ShortDescription = S::ShortDescription;
+        type Objectives = S::Objectives;
+        type Visibility = S::Visibility;
+        type CreatedAt = S::CreatedAt;
+        type DisplayName = S::DisplayName;
+        type LongDescription = S::LongDescription;
+        type Country = Set<members::country>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `long_description` field
-        pub struct long_description(());
-        ///Marker type for the `objectives` field
-        pub struct objectives(());
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
         ///Marker type for the `short_description` field
         pub struct short_description(());
-        ///Marker type for the `country` field
-        pub struct country(());
+        ///Marker type for the `objectives` field
+        pub struct objectives(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
+        ///Marker type for the `long_description` field
+        pub struct long_description(());
+        ///Marker type for the `country` field
+        pub struct country(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct InfoBuilder<'a, S: info_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+        Option<CowStr<'a>>,
+        Option<Data<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<Data<'a>>,
+        Option<CowStr<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<UriValue<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Info<'a> {
@@ -375,7 +361,7 @@ impl<'a> InfoBuilder<'a, info_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         InfoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -389,7 +375,7 @@ impl<'a> InfoBuilder<'a, info_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -402,31 +388,25 @@ where
     /// Set the `country` field (required)
     pub fn country(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> InfoBuilder<'a, info_state::SetCountry<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         InfoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: info_state::State> InfoBuilder<'a, S> {
     /// Set the `coverImage` field (optional)
-    pub fn cover_image(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn cover_image(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `coverImage` field to an Option value (optional)
-    pub fn maybe_cover_image(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_cover_image(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -440,13 +420,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> InfoBuilder<'a, info_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         InfoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -459,31 +439,25 @@ where
     /// Set the `displayName` field (required)
     pub fn display_name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> InfoBuilder<'a, info_state::SetDisplayName<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         InfoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: info_state::State> InfoBuilder<'a, S> {
     /// Set the `logo` field (optional)
-    pub fn logo(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn logo(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `logo` field to an Option value (optional)
-    pub fn maybe_logo(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_logo(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -497,13 +471,13 @@ where
     /// Set the `longDescription` field (required)
     pub fn long_description(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> InfoBuilder<'a, info_state::SetLongDescription<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         InfoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -516,13 +490,13 @@ where
     /// Set the `objectives` field (required)
     pub fn objectives(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> InfoBuilder<'a, info_state::SetObjectives<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         InfoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -535,31 +509,25 @@ where
     /// Set the `shortDescription` field (required)
     pub fn short_description(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> InfoBuilder<'a, info_state::SetShortDescription<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         InfoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: info_state::State> InfoBuilder<'a, S> {
     /// Set the `startDate` field (optional)
-    pub fn start_date(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn start_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `startDate` field to an Option value (optional)
-    pub fn maybe_start_date(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_start_date(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -573,31 +541,25 @@ where
     /// Set the `visibility` field (required)
     pub fn visibility(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> InfoBuilder<'a, info_state::SetVisibility<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         InfoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: info_state::State> InfoBuilder<'a, S> {
     /// Set the `website` field (optional)
-    pub fn website(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn website(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `website` field to an Option value (optional)
-    pub fn maybe_website(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_website(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -606,13 +568,13 @@ impl<'a, S: info_state::State> InfoBuilder<'a, S> {
 impl<'a, S> InfoBuilder<'a, S>
 where
     S: info_state::State,
-    S::LongDescription: info_state::IsSet,
-    S::Objectives: info_state::IsSet,
-    S::DisplayName: info_state::IsSet,
     S::ShortDescription: info_state::IsSet,
-    S::Country: info_state::IsSet,
+    S::Objectives: info_state::IsSet,
     S::Visibility: info_state::IsSet,
     S::CreatedAt: info_state::IsSet,
+    S::DisplayName: info_state::IsSet,
+    S::LongDescription: info_state::IsSet,
+    S::Country: info_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Info<'a> {
@@ -634,10 +596,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Info<'a> {
         Info {
             country: self.__unsafe_private_named.0.unwrap(),
@@ -656,270 +615,176 @@ where
     }
 }
 
-fn lexicon_doc_app_gainforest_organization_info() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.gainforest.organization.info"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_gainforest_organization_info() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.gainforest.organization.info"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A declaration of an organization or project",
-                        ),
+                        CowStr::new_static("A declaration of an organization or project"),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("literal:self")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("displayName"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("shortDescription"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("longDescription"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("objectives"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("country"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("visibility"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("displayName"),
+                                SmolStr::new_static("shortDescription"),
+                                SmolStr::new_static("longDescription"),
+                                SmolStr::new_static("objectives"),
+                                SmolStr::new_static("country"),
+                                SmolStr::new_static("visibility"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "country",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("country"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The country of the organization or project in two letter code (ISO 3166-1 alpha-2)",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "coverImage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("coverImage"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "app.gainforest.common.defs#smallImage",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The date and time of the creation of the record",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "displayName",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("displayName"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The name of the organization or project",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
                                     min_length: Some(8usize),
                                     max_length: Some(255usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "logo",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("logo"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "app.gainforest.common.defs#smallImage",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "longDescription",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("longDescription"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The long description of the organization or project in richtext",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
                                     min_length: Some(50usize),
                                     max_length: Some(5000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "objectives",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("objectives"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The objectives of the organization or project",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    items: LexArrayItem::String(LexString {
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "shortDescription",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("shortDescription"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The description of the organization or project",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
                                     min_length: Some(50usize),
                                     max_length: Some(2000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "startDate",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("startDate"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The start date of the organization or project",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "visibility",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("visibility"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The visibility of the organization or project in the Green Globe",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "website",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("website"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The website of the organization or project",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Uri),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

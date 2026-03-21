@@ -5,111 +5,97 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::CollectionSummaryView;
+use crate::games_gamesgamesgamesgames::EngineSummaryView;
+use crate::games_gamesgamesgamesgames::GameSummaryView;
+use crate::games_gamesgamesgamesgames::PlatformSummaryView;
+use crate::games_gamesgamesgamesgames::ProfileSummaryView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Search<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub age_ratings: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub age_ratings: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub application_types: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub application_types: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cursor: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub genres: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub genres: Option<Vec<CowStr<'a>>>,
     /// Defaults to `false`.
     #[serde(default = "_default_include_cancelled")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub include_cancelled: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_cancelled: Option<bool>,
     /// Defaults to `false`.
     #[serde(default = "_default_include_unrated")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub include_unrated: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_unrated: Option<bool>,
     ///Defaults to `20`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub modes: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub modes: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub player_perspectives: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub player_perspectives: Option<Vec<CowStr<'a>>>,
     #[serde(borrow)]
-    pub q: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub q: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sort: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub themes: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub themes: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub types: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub types: Option<Vec<CowStr<'a>>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
     pub results: Vec<SearchOutputResultsItem<'a>>,
     ///Total number of results matching the query above the relevance threshold.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub total_results: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_results: Option<i64>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SearchOutputResultsItem<'a> {
     #[serde(rename = "games.gamesgamesgamesgames.defs#gameSummaryView")]
-    GameSummaryView(Box<crate::games_gamesgamesgamesgames::GameSummaryView<'a>>),
+    GameSummaryView(Box<GameSummaryView<'a>>),
     #[serde(rename = "games.gamesgamesgamesgames.defs#profileSummaryView")]
-    ProfileSummaryView(Box<crate::games_gamesgamesgamesgames::ProfileSummaryView<'a>>),
+    ProfileSummaryView(Box<ProfileSummaryView<'a>>),
     #[serde(rename = "games.gamesgamesgamesgames.defs#platformSummaryView")]
-    PlatformSummaryView(Box<crate::games_gamesgamesgamesgames::PlatformSummaryView<'a>>),
+    PlatformSummaryView(Box<PlatformSummaryView<'a>>),
     #[serde(rename = "games.gamesgamesgamesgames.defs#collectionSummaryView")]
-    CollectionSummaryView(
-        Box<crate::games_gamesgamesgamesgames::CollectionSummaryView<'a>>,
-    ),
+    CollectionSummaryView(Box<CollectionSummaryView<'a>>),
     #[serde(rename = "games.gamesgamesgamesgames.defs#engineSummaryView")]
-    EngineSummaryView(Box<crate::games_gamesgamesgamesgames::EngineSummaryView<'a>>),
+    EngineSummaryView(Box<EngineSummaryView<'a>>),
 }
 
-/// Response type for
-///games.gamesgamesgamesgames.search
+/// Response type for games.gamesgamesgamesgames.search
 pub struct SearchResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.search";
@@ -124,8 +110,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Search<'a> {
     type Response = SearchResponse;
 }
 
-/// Endpoint type for
-///games.gamesgamesgamesgames.search
+/// Endpoint type for games.gamesgamesgamesgames.search
 pub struct SearchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.search";
@@ -134,15 +119,15 @@ impl jacquard_common::xrpc::XrpcEndpoint for SearchRequest {
     type Response = SearchResponse;
 }
 
-fn _default_include_cancelled() -> core::option::Option<bool> {
+fn _default_include_cancelled() -> Option<bool> {
     Some(false)
 }
 
-fn _default_include_unrated() -> core::option::Option<bool> {
+fn _default_include_unrated() -> Option<bool> {
     Some(false)
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(20i64)
 }
 
@@ -180,23 +165,23 @@ pub mod search_state {
 
 /// Builder for constructing an instance of this type
 pub struct SearchBuilder<'a, S: search_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<CowStr<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<bool>,
+        Option<bool>,
+        Option<i64>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Search<'a> {
@@ -210,7 +195,7 @@ impl<'a> SearchBuilder<'a, search_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SearchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -226,25 +211,19 @@ impl<'a> SearchBuilder<'a, search_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `ageRatings` field (optional)
-    pub fn age_ratings(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn age_ratings(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `ageRatings` field to an Option value (optional)
-    pub fn maybe_age_ratings(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_age_ratings(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -254,16 +233,13 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `applicationTypes` field (optional)
     pub fn application_types(
         mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+        value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `applicationTypes` field to an Option value (optional)
-    pub fn maybe_application_types(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_application_types(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -271,15 +247,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -287,18 +260,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `genres` field (optional)
-    pub fn genres(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn genres(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `genres` field to an Option value (optional)
-    pub fn maybe_genres(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_genres(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -345,18 +312,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `modes` field (optional)
-    pub fn modes(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn modes(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `modes` field to an Option value (optional)
-    pub fn maybe_modes(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_modes(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -366,16 +327,13 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `playerPerspectives` field (optional)
     pub fn player_perspectives(
         mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+        value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `playerPerspectives` field to an Option value (optional)
-    pub fn maybe_player_perspectives(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_player_perspectives(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -389,28 +347,25 @@ where
     /// Set the `q` field (required)
     pub fn q(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SearchBuilder<'a, search_state::SetQ<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         SearchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -418,18 +373,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `themes` field (optional)
-    pub fn themes(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn themes(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `themes` field to an Option value (optional)
-    pub fn maybe_themes(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_themes(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.11 = value;
         self
     }
@@ -437,18 +386,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `types` field (optional)
-    pub fn types(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn types(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `types` field to an Option value (optional)
-    pub fn maybe_types(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_types(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.12 = value;
         self
     }

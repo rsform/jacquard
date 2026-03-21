@@ -5,52 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveApikeyParams<'a> {
     #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
+    pub id: CowStr<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveApikeyOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
+    pub value: Data<'a>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct RemoveApikey;
-/// Response type for
-///app.rocksky.apikey.removeApikey
+/// Response type for app.rocksky.apikey.removeApikey
 pub struct RemoveApikeyResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveApikeyResponse {
     const NSID: &'static str = "app.rocksky.apikey.removeApikey";
@@ -67,8 +49,7 @@ impl jacquard_common::xrpc::XrpcRequest for RemoveApikey {
     type Response = RemoveApikeyResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.apikey.removeApikey
+/// Endpoint type for app.rocksky.apikey.removeApikey
 pub struct RemoveApikeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveApikeyRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.apikey.removeApikey";
@@ -113,9 +94,9 @@ pub mod remove_apikey_params_state {
 
 /// Builder for constructing an instance of this type
 pub struct RemoveApikeyParamsBuilder<'a, S: remove_apikey_params_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> RemoveApikeyParams<'a> {
@@ -129,9 +110,9 @@ impl<'a> RemoveApikeyParamsBuilder<'a, remove_apikey_params_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RemoveApikeyParamsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -144,13 +125,13 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RemoveApikeyParamsBuilder<'a, remove_apikey_params_state::SetId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         RemoveApikeyParamsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

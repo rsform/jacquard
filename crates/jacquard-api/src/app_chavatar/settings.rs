@@ -5,45 +5,51 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::app_chavatar::settings;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct AvatarItem<'a> {
     #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
+    pub id: CowStr<'a>,
     #[serde(borrow)]
-    pub image: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    pub image: StrongRef<'a>,
 }
 
 /// Rotation configuration for a user.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Settings<'a> {
     #[serde(borrow)]
-    pub avatars: Vec<crate::app_chavatar::settings::AvatarItem<'a>>,
+    pub avatars: Vec<settings::AvatarItem<'a>>,
     pub enabled: bool,
     #[serde(borrow)]
     pub interval: SettingsInterval<'a>,
     #[serde(borrow)]
     pub mode: SettingsMode<'a>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SettingsInterval<'a> {
@@ -54,7 +60,7 @@ pub enum SettingsInterval<'a> {
     _1d,
     _1w,
     _1mo,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> SettingsInterval<'a> {
@@ -82,7 +88,7 @@ impl<'a> From<&'a str> for SettingsInterval<'a> {
             "1d" => Self::_1d,
             "1w" => Self::_1w,
             "1mo" => Self::_1mo,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -97,7 +103,7 @@ impl<'a> From<String> for SettingsInterval<'a> {
             "1d" => Self::_1d,
             "1w" => Self::_1w,
             "1mo" => Self::_1mo,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -158,11 +164,12 @@ impl jacquard_common::IntoStatic for SettingsInterval<'_> {
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SettingsMode<'a> {
     Sequential,
     Random,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> SettingsMode<'a> {
@@ -180,7 +187,7 @@ impl<'a> From<&'a str> for SettingsMode<'a> {
         match s {
             "sequential" => Self::Sequential,
             "random" => Self::Random,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -190,7 +197,7 @@ impl<'a> From<String> for SettingsMode<'a> {
         match s.as_str() {
             "sequential" => Self::Sequential,
             "random" => Self::Random,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -247,60 +254,44 @@ impl jacquard_common::IntoStatic for SettingsMode<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SettingsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Settings<'a>,
 }
 
 impl<'a> Settings<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SettingsRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, SettingsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for AvatarItem<'a> {
+impl<'a> LexiconSchema for AvatarItem<'a> {
     fn nsid() -> &'static str {
         "app.chavatar.settings"
     }
     fn def_name() -> &'static str {
         "avatarItem"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_chavatar_settings()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 13usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("id"),
                     max: 13usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -311,13 +302,14 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for AvatarItem<'a> {
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SettingsRecord;
-impl jacquard_common::xrpc::XrpcResp for SettingsRecord {
+impl XrpcResp for SettingsRecord {
     const NSID: &'static str = "app.chavatar.settings";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = SettingsGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<SettingsGetRecordOutput<'_>> for Settings<'_> {
@@ -327,37 +319,33 @@ impl From<SettingsGetRecordOutput<'_>> for Settings<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Settings<'_> {
+impl Collection for Settings<'_> {
     const NSID: &'static str = "app.chavatar.settings";
     type Record = SettingsRecord;
 }
 
-impl jacquard_common::types::collection::Collection for SettingsRecord {
+impl Collection for SettingsRecord {
     const NSID: &'static str = "app.chavatar.settings";
     type Record = SettingsRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
+impl<'a> LexiconSchema for Settings<'a> {
     fn nsid() -> &'static str {
         "app.chavatar.settings"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_chavatar_settings()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.interval;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "interval",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("interval"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -367,10 +355,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
             let value = &self.mode;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mode",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("mode"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -390,48 +376,45 @@ pub mod avatar_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Image;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Image = S::Image;
+        type Id = Unset;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type Id = S::Id;
         type Image = Set<members::image>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Image = S::Image;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AvatarItemBuilder<'a, S: avatar_item_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<StrongRef<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> AvatarItem<'a> {
@@ -445,9 +428,9 @@ impl<'a> AvatarItemBuilder<'a, avatar_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AvatarItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -460,13 +443,13 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> AvatarItemBuilder<'a, avatar_item_state::SetId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         AvatarItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -479,13 +462,13 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        value: impl Into<StrongRef<'a>>,
     ) -> AvatarItemBuilder<'a, avatar_item_state::SetImage<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         AvatarItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -493,8 +476,8 @@ where
 impl<'a, S> AvatarItemBuilder<'a, S>
 where
     S: avatar_item_state::State,
-    S::Id: avatar_item_state::IsSet,
     S::Image: avatar_item_state::IsSet,
+    S::Id: avatar_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AvatarItem<'a> {
@@ -507,7 +490,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -520,148 +503,102 @@ where
     }
 }
 
-fn lexicon_doc_app_chavatar_settings() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.chavatar.settings"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.chavatar.settings"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("avatarItem"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("avatarItem"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("image")
-                        ],
+                        vec![SmolStr::new_static("id"), SmolStr::new_static("image")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("id"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(13usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "image",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "com.atproto.repo.strongRef",
-                                ),
+                            SmolStr::new_static("image"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Rotation configuration for a user.",
-                        ),
+                        CowStr::new_static("Rotation configuration for a user."),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("literal:self")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("enabled"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("interval"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("mode"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("avatars")
+                                SmolStr::new_static("enabled"),
+                                SmolStr::new_static("interval"),
+                                SmolStr::new_static("mode"), SmolStr::new_static("avatars")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "avatars",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static("#avatarItem"),
+                                SmolStr::new_static("avatars"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#avatarItem"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "enabled",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
+                                SmolStr::new_static("enabled"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "interval",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("interval"),
+                                LexObjectProperty::String(LexString {
                                     max_length: Some(10usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "mode",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("mode"),
+                                LexObjectProperty::String(LexString {
                                     max_length: Some(20usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -675,8 +612,8 @@ pub mod settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Enabled;
         type Interval;
+        type Enabled;
         type Mode;
         type Avatars;
     }
@@ -684,26 +621,26 @@ pub mod settings_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Enabled = Unset;
         type Interval = Unset;
+        type Enabled = Unset;
         type Mode = Unset;
         type Avatars = Unset;
-    }
-    ///State transition - sets the `enabled` field to Set
-    pub struct SetEnabled<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEnabled<S> {}
-    impl<S: State> State for SetEnabled<S> {
-        type Enabled = Set<members::enabled>;
-        type Interval = S::Interval;
-        type Mode = S::Mode;
-        type Avatars = S::Avatars;
     }
     ///State transition - sets the `interval` field to Set
     pub struct SetInterval<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInterval<S> {}
     impl<S: State> State for SetInterval<S> {
-        type Enabled = S::Enabled;
         type Interval = Set<members::interval>;
+        type Enabled = S::Enabled;
+        type Mode = S::Mode;
+        type Avatars = S::Avatars;
+    }
+    ///State transition - sets the `enabled` field to Set
+    pub struct SetEnabled<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEnabled<S> {}
+    impl<S: State> State for SetEnabled<S> {
+        type Interval = S::Interval;
+        type Enabled = Set<members::enabled>;
         type Mode = S::Mode;
         type Avatars = S::Avatars;
     }
@@ -711,8 +648,8 @@ pub mod settings_state {
     pub struct SetMode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMode<S> {}
     impl<S: State> State for SetMode<S> {
-        type Enabled = S::Enabled;
         type Interval = S::Interval;
+        type Enabled = S::Enabled;
         type Mode = Set<members::mode>;
         type Avatars = S::Avatars;
     }
@@ -720,18 +657,18 @@ pub mod settings_state {
     pub struct SetAvatars<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAvatars<S> {}
     impl<S: State> State for SetAvatars<S> {
-        type Enabled = S::Enabled;
         type Interval = S::Interval;
+        type Enabled = S::Enabled;
         type Mode = S::Mode;
         type Avatars = Set<members::avatars>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `enabled` field
-        pub struct enabled(());
         ///Marker type for the `interval` field
         pub struct interval(());
+        ///Marker type for the `enabled` field
+        pub struct enabled(());
         ///Marker type for the `mode` field
         pub struct mode(());
         ///Marker type for the `avatars` field
@@ -741,14 +678,14 @@ pub mod settings_state {
 
 /// Builder for constructing an instance of this type
 pub struct SettingsBuilder<'a, S: settings_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::app_chavatar::settings::AvatarItem<'a>>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<SettingsInterval<'a>>,
-        ::core::option::Option<SettingsMode<'a>>,
+        Option<Vec<settings::AvatarItem<'a>>>,
+        Option<bool>,
+        Option<SettingsInterval<'a>>,
+        Option<SettingsMode<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Settings<'a> {
@@ -762,9 +699,9 @@ impl<'a> SettingsBuilder<'a, settings_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SettingsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -777,13 +714,13 @@ where
     /// Set the `avatars` field (required)
     pub fn avatars(
         mut self,
-        value: impl Into<Vec<crate::app_chavatar::settings::AvatarItem<'a>>>,
+        value: impl Into<Vec<settings::AvatarItem<'a>>>,
     ) -> SettingsBuilder<'a, settings_state::SetAvatars<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SettingsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -798,11 +735,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> SettingsBuilder<'a, settings_state::SetEnabled<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         SettingsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -817,11 +754,11 @@ where
         mut self,
         value: impl Into<SettingsInterval<'a>>,
     ) -> SettingsBuilder<'a, settings_state::SetInterval<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         SettingsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -836,11 +773,11 @@ where
         mut self,
         value: impl Into<SettingsMode<'a>>,
     ) -> SettingsBuilder<'a, settings_state::SetMode<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         SettingsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -848,8 +785,8 @@ where
 impl<'a, S> SettingsBuilder<'a, S>
 where
     S: settings_state::State,
-    S::Enabled: settings_state::IsSet,
     S::Interval: settings_state::IsSet,
+    S::Enabled: settings_state::IsSet,
     S::Mode: settings_state::IsSet,
     S::Avatars: settings_state::IsSet,
 {
@@ -866,7 +803,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

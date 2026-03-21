@@ -5,52 +5,42 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateClaim<'a> {
     #[serde(borrow)]
-    pub contact: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub contact: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub games: core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub games: Option<Vec<AtUri<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub message: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub org: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub org: Option<AtUri<'a>>,
     #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
+    pub r#type: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateClaimOutput<'a> {
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-/// Response type for
-///games.gamesgamesgamesgames.createClaim
+/// Response type for games.gamesgamesgamesgames.createClaim
 pub struct CreateClaimResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateClaimResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.createClaim";
@@ -67,8 +57,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateClaim<'a> {
     type Response = CreateClaimResponse;
 }
 
-/// Endpoint type for
-///games.gamesgamesgamesgames.createClaim
+/// Endpoint type for games.gamesgamesgamesgames.createClaim
 pub struct CreateClaimRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateClaimRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.createClaim";

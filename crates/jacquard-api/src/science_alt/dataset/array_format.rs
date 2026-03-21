@@ -5,17 +5,12 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use jacquard_common::CowStr;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 /// Arrow tensor format. Stores multi-dimensional arrays using Arrow's tensor IPC format. Versions maintained at https://json-schema.alt.science/atdata-arrow-tensor/{version}/
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ArrowTensor;
 impl core::fmt::Display for ArrowTensor {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -24,6 +19,7 @@ impl core::fmt::Display for ArrowTensor {
 }
 
 /// Array serialization format identifier for NDArray fields in sample schemas. Known values correspond to token definitions in this Lexicon. Each format has versioned specifications maintained by alt.science at canonical URLs.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ArrayFormat<'a> {
     NdarrayBytes,
@@ -31,7 +27,7 @@ pub enum ArrayFormat<'a> {
     StructuredBytes,
     ArrowTensor,
     Safetensors,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ArrayFormat<'a> {
@@ -55,7 +51,7 @@ impl<'a> From<&'a str> for ArrayFormat<'a> {
             "structuredBytes" => Self::StructuredBytes,
             "arrowTensor" => Self::ArrowTensor,
             "safetensors" => Self::Safetensors,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -68,7 +64,7 @@ impl<'a> From<String> for ArrayFormat<'a> {
             "structuredBytes" => Self::StructuredBytes,
             "arrowTensor" => Self::ArrowTensor,
             "safetensors" => Self::Safetensors,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -122,16 +118,8 @@ impl jacquard_common::IntoStatic for ArrayFormat<'_> {
 }
 
 /// Numpy .npy binary format for NDArray serialization. Stores arrays with dtype and shape in binary header. Versions maintained at https://json-schema.alt.science/atdata-ndarray-bytes/{version}/
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct NdarrayBytes;
 impl core::fmt::Display for NdarrayBytes {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -140,16 +128,8 @@ impl core::fmt::Display for NdarrayBytes {
 }
 
 /// Safetensors format (HuggingFace). Stores ML tensors with safe, memory-mapped access. Versions maintained at https://json-schema.alt.science/atdata-safetensors/{version}/
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Safetensors;
 impl core::fmt::Display for Safetensors {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -158,16 +138,8 @@ impl core::fmt::Display for Safetensors {
 }
 
 /// Scipy sparse matrix format (CSR/CSC/COO). Stores sparse matrices with indices and data arrays. Versions maintained at https://json-schema.alt.science/atdata-sparse-bytes/{version}/
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct SparseBytes;
 impl core::fmt::Display for SparseBytes {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -176,16 +148,8 @@ impl core::fmt::Display for SparseBytes {
 }
 
 /// Numpy structured array format. Stores arrays with named, typed fields (compound dtypes). Versions maintained at https://json-schema.alt.science/atdata-structured-bytes/{version}/
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct StructuredBytes;
 impl core::fmt::Display for StructuredBytes {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {

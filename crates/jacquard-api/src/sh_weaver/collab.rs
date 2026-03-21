@@ -13,17 +13,27 @@ pub mod get_resource_sessions;
 pub mod invite;
 pub mod session;
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::sh_weaver::actor::ProfileViewBasic;
+use crate::sh_weaver::notebook::PublishedVersionView;
+use crate::sh_weaver::collab;
 /// Collaboration scoped to a chapter.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Chapter;
 impl core::fmt::Display for Chapter {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -32,66 +42,54 @@ impl core::fmt::Display for Chapter {
 }
 
 /// Full state of a collaboration relationship including version reconciliation. Tracks both current and former collaborators.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CollaborationStateView<'a> {
     ///The 'canonical' version URI (usually owner's)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub canonical_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub first_collaborator_added_at: core::option::Option<
-        jacquard_common::types::string::Datetime,
-    >,
+    pub canonical_uri: Option<AtUri<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_collaborator_added_at: Option<Datetime>,
     ///People who used to collaborate but relationship ended
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub former_participants: core::option::Option<
-        Vec<crate::sh_weaver::collab::FormerCollaboratorView<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub has_divergence: core::option::Option<bool>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub has_former_collaborators: core::option::Option<bool>,
+    pub former_participants: Option<Vec<collab::FormerCollaboratorView<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_divergence: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_former_collaborators: Option<bool>,
     ///Published versions from former collaborators still exist
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub has_orphaned_versions: core::option::Option<bool>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub last_synced_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_orphaned_versions: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_synced_at: Option<Datetime>,
     ///Current active + invited participants
     #[serde(borrow)]
-    pub participants: Vec<crate::sh_weaver::collab::ParticipantStateView<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub participants: Vec<collab::ParticipantStateView<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub published_versions: core::option::Option<
-        Vec<crate::sh_weaver::notebook::PublishedVersionView<'a>>,
-    >,
+    pub published_versions: Option<Vec<PublishedVersionView<'a>>>,
     #[serde(borrow)]
-    pub resource: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    pub resource: StrongRef<'a>,
     ///active=normal, broken=all invites revoked/expired, diverged=versions differ, reconciled=was diverged but resolved
     #[serde(borrow)]
     pub status: CollaborationStateViewStatus<'a>,
 }
 
 /// active=normal, broken=all invites revoked/expired, diverged=versions differ, reconciled=was diverged but resolved
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CollaborationStateViewStatus<'a> {
     Active,
     Broken,
     Diverged,
     Reconciled,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> CollaborationStateViewStatus<'a> {
@@ -113,7 +111,7 @@ impl<'a> From<&'a str> for CollaborationStateViewStatus<'a> {
             "broken" => Self::Broken,
             "diverged" => Self::Diverged,
             "reconciled" => Self::Reconciled,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -125,7 +123,7 @@ impl<'a> From<String> for CollaborationStateViewStatus<'a> {
             "broken" => Self::Broken,
             "diverged" => Self::Diverged,
             "reconciled" => Self::Reconciled,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -190,16 +188,8 @@ impl jacquard_common::IntoStatic for CollaborationStateViewStatus<'_> {
 }
 
 /// Collaboration scoped to a single entry.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Entry;
 impl core::fmt::Display for Entry {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -208,35 +198,27 @@ impl core::fmt::Display for Entry {
 }
 
 /// Lightweight view for 'this person used to collaborate but doesn't anymore'.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct FormerCollaboratorView<'a> {
     ///Number of diffs they created while active
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub contribution_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contribution_count: Option<i64>,
     #[serde(borrow)]
     pub end_reason: FormerCollaboratorViewEndReason<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub has_published_version: core::option::Option<bool>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_published_version: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub published_version_uri: core::option::Option<
-        jacquard_common::types::string::AtUri<'a>,
-    >,
+    pub published_version_uri: Option<AtUri<'a>>,
     #[serde(borrow)]
-    pub user: crate::sh_weaver::actor::ProfileViewBasic<'a>,
-    pub was_active_from: jacquard_common::types::string::Datetime,
-    pub was_active_until: jacquard_common::types::string::Datetime,
+    pub user: ProfileViewBasic<'a>,
+    pub was_active_from: Datetime,
+    pub was_active_until: Datetime,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum FormerCollaboratorViewEndReason<'a> {
@@ -244,7 +226,7 @@ pub enum FormerCollaboratorViewEndReason<'a> {
     InviteRevoked,
     InviteExpired,
     OwnerDeletedResource,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> FormerCollaboratorViewEndReason<'a> {
@@ -266,7 +248,7 @@ impl<'a> From<&'a str> for FormerCollaboratorViewEndReason<'a> {
             "invite_revoked" => Self::InviteRevoked,
             "invite_expired" => Self::InviteExpired,
             "owner_deleted_resource" => Self::OwnerDeletedResource,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -278,7 +260,7 @@ impl<'a> From<String> for FormerCollaboratorViewEndReason<'a> {
             "invite_revoked" => Self::InviteRevoked,
             "invite_expired" => Self::InviteExpired,
             "owner_deleted_resource" => Self::OwnerDeletedResource,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -347,55 +329,49 @@ impl jacquard_common::IntoStatic for FormerCollaboratorViewEndReason<'_> {
 }
 
 /// Hydrated view of a collaboration invite with status.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct InviteView<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accept_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub accepted_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    pub accept_uri: Option<AtUri<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub accepted_at: Option<Datetime>,
     #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub expires_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    pub cid: Cid<'a>,
+    pub created_at: Datetime,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expires_at: Option<Datetime>,
     #[serde(borrow)]
-    pub invitee: crate::sh_weaver::actor::ProfileViewBasic<'a>,
+    pub invitee: ProfileViewBasic<'a>,
     #[serde(borrow)]
-    pub inviter: crate::sh_weaver::actor::ProfileViewBasic<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub inviter: ProfileViewBasic<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub resource: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub resource: StrongRef<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub resource_title: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub resource_title: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub scope: core::option::Option<InviteViewScope<'a>>,
+    pub scope: Option<InviteViewScope<'a>>,
     #[serde(borrow)]
     pub status: InviteViewStatus<'a>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum InviteViewScope<'a> {
     Notebook,
     Entry,
     Chapter,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> InviteViewScope<'a> {
@@ -415,7 +391,7 @@ impl<'a> From<&'a str> for InviteViewScope<'a> {
             "notebook" => Self::Notebook,
             "entry" => Self::Entry,
             "chapter" => Self::Chapter,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -426,7 +402,7 @@ impl<'a> From<String> for InviteViewScope<'a> {
             "notebook" => Self::Notebook,
             "entry" => Self::Entry,
             "chapter" => Self::Chapter,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -483,13 +459,14 @@ impl jacquard_common::IntoStatic for InviteViewScope<'_> {
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum InviteViewStatus<'a> {
     Pending,
     Accepted,
     Expired,
     Revoked,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> InviteViewStatus<'a> {
@@ -511,7 +488,7 @@ impl<'a> From<&'a str> for InviteViewStatus<'a> {
             "accepted" => Self::Accepted,
             "expired" => Self::Expired,
             "revoked" => Self::Revoked,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -523,7 +500,7 @@ impl<'a> From<String> for InviteViewStatus<'a> {
             "accepted" => Self::Accepted,
             "expired" => Self::Expired,
             "revoked" => Self::Revoked,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -582,16 +559,8 @@ impl jacquard_common::IntoStatic for InviteViewStatus<'_> {
 }
 
 /// Collaboration scoped to an entire notebook.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Notebook;
 impl core::fmt::Display for Notebook {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -600,65 +569,55 @@ impl core::fmt::Display for Notebook {
 }
 
 /// Individual participant's state in a collaboration. Distinguishes 'was collaborator' vs 'never was'.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ParticipantStateView<'a> {
     ///If they accepted (even if later broken)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accept_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub accept_uri: Option<AtUri<'a>>,
     ///Why the relationship ended, if applicable
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub end_reason: core::option::Option<ParticipantStateViewEndReason<'a>>,
+    pub end_reason: Option<ParticipantStateViewEndReason<'a>>,
     ///When they first contributed
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub first_edit_at: core::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_edit_at: Option<Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub invite_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub last_edit_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    pub invite_uri: Option<AtUri<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_edit_at: Option<Datetime>,
     ///Their published copy if any
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub published_version: core::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub published_version: Option<StrongRef<'a>>,
     ///When left/removed/expired
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub relationship_ended_at: core::option::Option<
-        jacquard_common::types::string::Datetime,
-    >,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub relationship_ended_at: Option<Datetime>,
     #[serde(borrow)]
     pub role: ParticipantStateViewRole<'a>,
     ///active=can edit, invited=pending, left=voluntarily departed, removed=invite revoked, expired=invite timed out
     #[serde(borrow)]
     pub status: ParticipantStateViewStatus<'a>,
     #[serde(borrow)]
-    pub user: crate::sh_weaver::actor::ProfileViewBasic<'a>,
+    pub user: ProfileViewBasic<'a>,
     ///True if they ever had active collaboration status
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub was_collaborator: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub was_collaborator: Option<bool>,
 }
 
 /// Why the relationship ended, if applicable
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ParticipantStateViewEndReason<'a> {
     VoluntaryLeave,
     InviteRevoked,
     InviteExpired,
     OwnerDeletedResource,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ParticipantStateViewEndReason<'a> {
@@ -680,7 +639,7 @@ impl<'a> From<&'a str> for ParticipantStateViewEndReason<'a> {
             "invite_revoked" => Self::InviteRevoked,
             "invite_expired" => Self::InviteExpired,
             "owner_deleted_resource" => Self::OwnerDeletedResource,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -692,7 +651,7 @@ impl<'a> From<String> for ParticipantStateViewEndReason<'a> {
             "invite_revoked" => Self::InviteRevoked,
             "invite_expired" => Self::InviteExpired,
             "owner_deleted_resource" => Self::OwnerDeletedResource,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -760,12 +719,13 @@ impl jacquard_common::IntoStatic for ParticipantStateViewEndReason<'_> {
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ParticipantStateViewRole<'a> {
     Owner,
     Collaborator,
     FormerCollaborator,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ParticipantStateViewRole<'a> {
@@ -785,7 +745,7 @@ impl<'a> From<&'a str> for ParticipantStateViewRole<'a> {
             "owner" => Self::Owner,
             "collaborator" => Self::Collaborator,
             "former_collaborator" => Self::FormerCollaborator,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -796,7 +756,7 @@ impl<'a> From<String> for ParticipantStateViewRole<'a> {
             "owner" => Self::Owner,
             "collaborator" => Self::Collaborator,
             "former_collaborator" => Self::FormerCollaborator,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -860,6 +820,7 @@ impl jacquard_common::IntoStatic for ParticipantStateViewRole<'_> {
 }
 
 /// active=can edit, invited=pending, left=voluntarily departed, removed=invite revoked, expired=invite timed out
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ParticipantStateViewStatus<'a> {
     Active,
@@ -867,7 +828,7 @@ pub enum ParticipantStateViewStatus<'a> {
     Left,
     Removed,
     Expired,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ParticipantStateViewStatus<'a> {
@@ -891,7 +852,7 @@ impl<'a> From<&'a str> for ParticipantStateViewStatus<'a> {
             "left" => Self::Left,
             "removed" => Self::Removed,
             "expired" => Self::Expired,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -904,7 +865,7 @@ impl<'a> From<String> for ParticipantStateViewStatus<'a> {
             "left" => Self::Left,
             "removed" => Self::Removed,
             "expired" => Self::Expired,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -966,115 +927,98 @@ impl jacquard_common::IntoStatic for ParticipantStateViewStatus<'_> {
 }
 
 /// Active real-time collaboration session.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SessionView<'a> {
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub expires_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    pub created_at: Datetime,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expires_at: Option<Datetime>,
     #[serde(borrow)]
-    pub node_id: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub node_id: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub relay_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub relay_url: Option<UriValue<'a>>,
     #[serde(borrow)]
-    pub resource: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    pub resource: StrongRef<'a>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
-    pub user: crate::sh_weaver::actor::ProfileViewBasic<'a>,
+    pub user: ProfileViewBasic<'a>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CollaborationStateView<'a> {
+impl<'a> LexiconSchema for CollaborationStateView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.defs"
     }
     fn def_name() -> &'static str {
         "collaborationStateView"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_collab_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for FormerCollaboratorView<'a> {
+impl<'a> LexiconSchema for FormerCollaboratorView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.defs"
     }
     fn def_name() -> &'static str {
         "formerCollaboratorView"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_collab_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for InviteView<'a> {
+impl<'a> LexiconSchema for InviteView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.defs"
     }
     fn def_name() -> &'static str {
         "inviteView"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_collab_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ParticipantStateView<'a> {
+impl<'a> LexiconSchema for ParticipantStateView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.defs"
     }
     fn def_name() -> &'static str {
         "participantStateView"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_collab_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for SessionView<'a> {
+impl<'a> LexiconSchema for SessionView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.defs"
     }
     fn def_name() -> &'static str {
         "sessionView"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_collab_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -1089,49 +1033,49 @@ pub mod collaboration_state_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Participants;
         type Status;
+        type Participants;
         type Resource;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Participants = Unset;
         type Status = Unset;
+        type Participants = Unset;
         type Resource = Unset;
-    }
-    ///State transition - sets the `participants` field to Set
-    pub struct SetParticipants<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParticipants<S> {}
-    impl<S: State> State for SetParticipants<S> {
-        type Participants = Set<members::participants>;
-        type Status = S::Status;
-        type Resource = S::Resource;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Participants = S::Participants;
         type Status = Set<members::status>;
+        type Participants = S::Participants;
+        type Resource = S::Resource;
+    }
+    ///State transition - sets the `participants` field to Set
+    pub struct SetParticipants<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParticipants<S> {}
+    impl<S: State> State for SetParticipants<S> {
+        type Status = S::Status;
+        type Participants = Set<members::participants>;
         type Resource = S::Resource;
     }
     ///State transition - sets the `resource` field to Set
     pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResource<S> {}
     impl<S: State> State for SetResource<S> {
-        type Participants = S::Participants;
         type Status = S::Status;
+        type Participants = S::Participants;
         type Resource = Set<members::resource>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `participants` field
-        pub struct participants(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `participants` field
+        pub struct participants(());
         ///Marker type for the `resource` field
         pub struct resource(());
     }
@@ -1139,26 +1083,22 @@ pub mod collaboration_state_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct CollaborationStateViewBuilder<'a, S: collaboration_state_view_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<
-            Vec<crate::sh_weaver::collab::FormerCollaboratorView<'a>>,
-        >,
-        ::core::option::Option<bool>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<Vec<crate::sh_weaver::collab::ParticipantStateView<'a>>>,
-        ::core::option::Option<
-            Vec<crate::sh_weaver::notebook::PublishedVersionView<'a>>,
-        >,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<CollaborationStateViewStatus<'a>>,
+        Option<AtUri<'a>>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<Vec<collab::FormerCollaboratorView<'a>>>,
+        Option<bool>,
+        Option<bool>,
+        Option<bool>,
+        Option<Datetime>,
+        Option<Vec<collab::ParticipantStateView<'a>>>,
+        Option<Vec<PublishedVersionView<'a>>>,
+        Option<StrongRef<'a>>,
+        Option<CollaborationStateViewStatus<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CollaborationStateView<'a> {
@@ -1175,7 +1115,7 @@ impl<'a> CollaborationStateViewBuilder<'a, collaboration_state_view_state::Empty
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CollaborationStateViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -1190,25 +1130,19 @@ impl<'a> CollaborationStateViewBuilder<'a, collaboration_state_view_state::Empty
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
     /// Set the `canonicalUri` field (optional)
-    pub fn canonical_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn canonical_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `canonicalUri` field to an Option value (optional)
-    pub fn maybe_canonical_uri(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_canonical_uri(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -1216,18 +1150,12 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
 
 impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
-    pub fn created_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
-    pub fn maybe_created_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -1237,16 +1165,13 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
     /// Set the `firstCollaboratorAddedAt` field (optional)
     pub fn first_collaborator_added_at(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+        value: impl Into<Option<Datetime>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `firstCollaboratorAddedAt` field to an Option value (optional)
-    pub fn maybe_first_collaborator_added_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_first_collaborator_added_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -1256,9 +1181,7 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
     /// Set the `formerParticipants` field (optional)
     pub fn former_participants(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::sh_weaver::collab::FormerCollaboratorView<'a>>>,
-        >,
+        value: impl Into<Option<Vec<collab::FormerCollaboratorView<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
@@ -1266,7 +1189,7 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
     /// Set the `formerParticipants` field to an Option value (optional)
     pub fn maybe_former_participants(
         mut self,
-        value: Option<Vec<crate::sh_weaver::collab::FormerCollaboratorView<'a>>>,
+        value: Option<Vec<collab::FormerCollaboratorView<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
@@ -1314,18 +1237,12 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
 
 impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
     /// Set the `lastSyncedAt` field (optional)
-    pub fn last_synced_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn last_synced_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `lastSyncedAt` field to an Option value (optional)
-    pub fn maybe_last_synced_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_last_synced_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -1339,16 +1256,16 @@ where
     /// Set the `participants` field (required)
     pub fn participants(
         mut self,
-        value: impl Into<Vec<crate::sh_weaver::collab::ParticipantStateView<'a>>>,
+        value: impl Into<Vec<collab::ParticipantStateView<'a>>>,
     ) -> CollaborationStateViewBuilder<
         'a,
         collaboration_state_view_state::SetParticipants<S>,
     > {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         CollaborationStateViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1357,9 +1274,7 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
     /// Set the `publishedVersions` field (optional)
     pub fn published_versions(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::sh_weaver::notebook::PublishedVersionView<'a>>>,
-        >,
+        value: impl Into<Option<Vec<PublishedVersionView<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
@@ -1367,7 +1282,7 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
     /// Set the `publishedVersions` field to an Option value (optional)
     pub fn maybe_published_versions(
         mut self,
-        value: Option<Vec<crate::sh_weaver::notebook::PublishedVersionView<'a>>>,
+        value: Option<Vec<PublishedVersionView<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.9 = value;
         self
@@ -1382,16 +1297,16 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        value: impl Into<StrongRef<'a>>,
     ) -> CollaborationStateViewBuilder<
         'a,
         collaboration_state_view_state::SetResource<S>,
     > {
-        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.10 = Option::Some(value.into());
         CollaborationStateViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1409,11 +1324,11 @@ where
         'a,
         collaboration_state_view_state::SetStatus<S>,
     > {
-        self.__unsafe_private_named.11 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.11 = Option::Some(value.into());
         CollaborationStateViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1421,8 +1336,8 @@ where
 impl<'a, S> CollaborationStateViewBuilder<'a, S>
 where
     S: collaboration_state_view_state::State,
-    S::Participants: collaboration_state_view_state::IsSet,
     S::Status: collaboration_state_view_state::IsSet,
+    S::Participants: collaboration_state_view_state::IsSet,
     S::Resource: collaboration_state_view_state::IsSet,
 {
     /// Build the final struct
@@ -1446,7 +1361,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1469,998 +1384,528 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_collab_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("sh.weaver.collab.defs"),
-        revision: None,
-        description: None,
+fn lexicon_doc_sh_weaver_collab_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("sh.weaver.collab.defs"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("chapter"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
-                    description: None,
-                }),
+                SmolStr::new_static("chapter"),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "collaborationStateView",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("collaborationStateView"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Full state of a collaboration relationship including version reconciliation. Tracks both current and former collaborators.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("resource"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("status"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("participants")
+                            SmolStr::new_static("resource"),
+                            SmolStr::new_static("status"),
+                            SmolStr::new_static("participants")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "canonicalUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("canonicalUri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The 'canonical' version URI (usually owner's)",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "createdAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("createdAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "firstCollaboratorAddedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("firstCollaboratorAddedAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "formerParticipants",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("formerParticipants"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "People who used to collaborate but relationship ended",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#formerCollaboratorView",
-                                    ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#formerCollaboratorView"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasDivergence",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("hasDivergence"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasFormerCollaborators",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("hasFormerCollaborators"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasOrphanedVersions",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("hasOrphanedVersions"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "lastSyncedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("lastSyncedAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "participants",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("participants"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Current active + invited participants",
-                                    ),
+                                    CowStr::new_static("Current active + invited participants"),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#participantStateView",
-                                    ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#participantStateView"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "publishedVersions",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("publishedVersions"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "sh.weaver.notebook.defs#publishedVersionView",
                                     ),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "resource",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "com.atproto.repo.strongRef",
-                                ),
+                            SmolStr::new_static("resource"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "status",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("status"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "active=normal, broken=all invites revoked/expired, diverged=versions differ, reconciled=was diverged but resolved",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("entry"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
-                    description: None,
-                }),
+                SmolStr::new_static("entry"),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "formerCollaboratorView",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("formerCollaboratorView"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Lightweight view for 'this person used to collaborate but doesn't anymore'.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("user"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("wasActiveFrom"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("wasActiveUntil"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("endReason")
+                            SmolStr::new_static("user"),
+                            SmolStr::new_static("wasActiveFrom"),
+                            SmolStr::new_static("wasActiveUntil"),
+                            SmolStr::new_static("endReason")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "contributionCount",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("contributionCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "endReason",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("endReason"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("hasPublishedVersion"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasPublishedVersion",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("publishedVersionUri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "publishedVersionUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "user",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("user"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "sh.weaver.actor.defs#profileViewBasic",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "wasActiveFrom",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("wasActiveFrom"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "wasActiveUntil",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("wasActiveUntil"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("inviteView"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("inviteView"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Hydrated view of a collaboration invite with status.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cid"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("inviter"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("invitee"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("resource"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("status")
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("inviter"),
+                            SmolStr::new_static("invitee"),
+                            SmolStr::new_static("resource"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("status")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "acceptUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("acceptUri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "acceptedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("acceptedAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cid",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("cid"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Cid),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "createdAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("createdAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "expiresAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("expiresAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "invitee",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("invitee"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "sh.weaver.actor.defs#profileViewBasic",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "inviter",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("inviter"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "sh.weaver.actor.defs#profileViewBasic",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "message",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("message"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("resource"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "resource",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "com.atproto.repo.strongRef",
-                                ),
-                            }),
+                            SmolStr::new_static("resourceTitle"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "resourceTitle",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("scope"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "scope",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("status"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "status",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("notebook"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
-                    description: None,
-                }),
+                SmolStr::new_static("notebook"),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "participantStateView",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("participantStateView"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Individual participant's state in a collaboration. Distinguishes 'was collaborator' vs 'never was'.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("user"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("role"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("status")
+                            SmolStr::new_static("user"), SmolStr::new_static("role"),
+                            SmolStr::new_static("status")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "acceptUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("acceptUri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "If they accepted (even if later broken)",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "endReason",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("endReason"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Why the relationship ended, if applicable",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "firstEditAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("firstEditAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "When they first contributed",
-                                    ),
+                                    CowStr::new_static("When they first contributed"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "inviteUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("inviteUri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "lastEditAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("lastEditAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "publishedVersion",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "com.atproto.repo.strongRef",
-                                ),
+                            SmolStr::new_static("publishedVersion"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "relationshipEndedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("relationshipEndedAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "When left/removed/expired",
-                                    ),
+                                    CowStr::new_static("When left/removed/expired"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "role",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("role"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "status",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("status"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "active=can edit, invited=pending, left=voluntarily departed, removed=invite revoked, expired=invite timed out",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "user",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("user"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "sh.weaver.actor.defs#profileViewBasic",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "wasCollaborator",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("wasCollaborator"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("sessionView"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("sessionView"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Active real-time collaboration session.",
-                        ),
+                        CowStr::new_static("Active real-time collaboration session."),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("user"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("resource"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("nodeId"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                            SmolStr::new_static("uri"), SmolStr::new_static("user"),
+                            SmolStr::new_static("resource"),
+                            SmolStr::new_static("nodeId"),
+                            SmolStr::new_static("createdAt")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "createdAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("createdAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "expiresAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("expiresAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "nodeId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("nodeId"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("relayUrl"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "relayUrl",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("resource"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "resource",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "com.atproto.repo.strongRef",
-                                ),
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "user",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("user"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "sh.weaver.actor.defs#profileViewBasic",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -2474,83 +1919,83 @@ pub mod former_collaborator_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EndReason;
+        type WasActiveUntil;
         type User;
         type WasActiveFrom;
-        type WasActiveUntil;
+        type EndReason;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EndReason = Unset;
+        type WasActiveUntil = Unset;
         type User = Unset;
         type WasActiveFrom = Unset;
-        type WasActiveUntil = Unset;
-    }
-    ///State transition - sets the `end_reason` field to Set
-    pub struct SetEndReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEndReason<S> {}
-    impl<S: State> State for SetEndReason<S> {
-        type EndReason = Set<members::end_reason>;
-        type User = S::User;
-        type WasActiveFrom = S::WasActiveFrom;
-        type WasActiveUntil = S::WasActiveUntil;
-    }
-    ///State transition - sets the `user` field to Set
-    pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUser<S> {}
-    impl<S: State> State for SetUser<S> {
-        type EndReason = S::EndReason;
-        type User = Set<members::user>;
-        type WasActiveFrom = S::WasActiveFrom;
-        type WasActiveUntil = S::WasActiveUntil;
-    }
-    ///State transition - sets the `was_active_from` field to Set
-    pub struct SetWasActiveFrom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWasActiveFrom<S> {}
-    impl<S: State> State for SetWasActiveFrom<S> {
-        type EndReason = S::EndReason;
-        type User = S::User;
-        type WasActiveFrom = Set<members::was_active_from>;
-        type WasActiveUntil = S::WasActiveUntil;
+        type EndReason = Unset;
     }
     ///State transition - sets the `was_active_until` field to Set
     pub struct SetWasActiveUntil<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWasActiveUntil<S> {}
     impl<S: State> State for SetWasActiveUntil<S> {
-        type EndReason = S::EndReason;
+        type WasActiveUntil = Set<members::was_active_until>;
         type User = S::User;
         type WasActiveFrom = S::WasActiveFrom;
-        type WasActiveUntil = Set<members::was_active_until>;
+        type EndReason = S::EndReason;
+    }
+    ///State transition - sets the `user` field to Set
+    pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUser<S> {}
+    impl<S: State> State for SetUser<S> {
+        type WasActiveUntil = S::WasActiveUntil;
+        type User = Set<members::user>;
+        type WasActiveFrom = S::WasActiveFrom;
+        type EndReason = S::EndReason;
+    }
+    ///State transition - sets the `was_active_from` field to Set
+    pub struct SetWasActiveFrom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWasActiveFrom<S> {}
+    impl<S: State> State for SetWasActiveFrom<S> {
+        type WasActiveUntil = S::WasActiveUntil;
+        type User = S::User;
+        type WasActiveFrom = Set<members::was_active_from>;
+        type EndReason = S::EndReason;
+    }
+    ///State transition - sets the `end_reason` field to Set
+    pub struct SetEndReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEndReason<S> {}
+    impl<S: State> State for SetEndReason<S> {
+        type WasActiveUntil = S::WasActiveUntil;
+        type User = S::User;
+        type WasActiveFrom = S::WasActiveFrom;
+        type EndReason = Set<members::end_reason>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `end_reason` field
-        pub struct end_reason(());
+        ///Marker type for the `was_active_until` field
+        pub struct was_active_until(());
         ///Marker type for the `user` field
         pub struct user(());
         ///Marker type for the `was_active_from` field
         pub struct was_active_from(());
-        ///Marker type for the `was_active_until` field
-        pub struct was_active_until(());
+        ///Marker type for the `end_reason` field
+        pub struct end_reason(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FormerCollaboratorViewBuilder<'a, S: former_collaborator_view_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<FormerCollaboratorViewEndReason<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<i64>,
+        Option<FormerCollaboratorViewEndReason<'a>>,
+        Option<bool>,
+        Option<AtUri<'a>>,
+        Option<ProfileViewBasic<'a>>,
+        Option<Datetime>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> FormerCollaboratorView<'a> {
@@ -2567,9 +2012,9 @@ impl<'a> FormerCollaboratorViewBuilder<'a, former_collaborator_view_state::Empty
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FormerCollaboratorViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2600,11 +2045,11 @@ where
         'a,
         former_collaborator_view_state::SetEndReason<S>,
     > {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         FormerCollaboratorViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2624,18 +2069,12 @@ impl<'a, S: former_collaborator_view_state::State> FormerCollaboratorViewBuilder
 
 impl<'a, S: former_collaborator_view_state::State> FormerCollaboratorViewBuilder<'a, S> {
     /// Set the `publishedVersionUri` field (optional)
-    pub fn published_version_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn published_version_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `publishedVersionUri` field to an Option value (optional)
-    pub fn maybe_published_version_uri(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_published_version_uri(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -2649,13 +2088,13 @@ where
     /// Set the `user` field (required)
     pub fn user(
         mut self,
-        value: impl Into<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+        value: impl Into<ProfileViewBasic<'a>>,
     ) -> FormerCollaboratorViewBuilder<'a, former_collaborator_view_state::SetUser<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         FormerCollaboratorViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2668,16 +2107,16 @@ where
     /// Set the `wasActiveFrom` field (required)
     pub fn was_active_from(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> FormerCollaboratorViewBuilder<
         'a,
         former_collaborator_view_state::SetWasActiveFrom<S>,
     > {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         FormerCollaboratorViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2690,16 +2129,16 @@ where
     /// Set the `wasActiveUntil` field (required)
     pub fn was_active_until(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> FormerCollaboratorViewBuilder<
         'a,
         former_collaborator_view_state::SetWasActiveUntil<S>,
     > {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         FormerCollaboratorViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2707,10 +2146,10 @@ where
 impl<'a, S> FormerCollaboratorViewBuilder<'a, S>
 where
     S: former_collaborator_view_state::State,
-    S::EndReason: former_collaborator_view_state::IsSet,
+    S::WasActiveUntil: former_collaborator_view_state::IsSet,
     S::User: former_collaborator_view_state::IsSet,
     S::WasActiveFrom: former_collaborator_view_state::IsSet,
-    S::WasActiveUntil: former_collaborator_view_state::IsSet,
+    S::EndReason: former_collaborator_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FormerCollaboratorView<'a> {
@@ -2728,7 +2167,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2756,149 +2195,149 @@ pub mod invite_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
-        type Cid;
-        type Uri;
         type Inviter;
-        type Invitee;
-        type CreatedAt;
         type Resource;
+        type Cid;
+        type Invitee;
+        type Uri;
+        type CreatedAt;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
-        type Cid = Unset;
-        type Uri = Unset;
         type Inviter = Unset;
-        type Invitee = Unset;
-        type CreatedAt = Unset;
         type Resource = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Inviter = S::Inviter;
-        type Invitee = S::Invitee;
-        type CreatedAt = S::CreatedAt;
-        type Resource = S::Resource;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Status = S::Status;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Inviter = S::Inviter;
-        type Invitee = S::Invitee;
-        type CreatedAt = S::CreatedAt;
-        type Resource = S::Resource;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Status = S::Status;
-        type Cid = S::Cid;
-        type Uri = Set<members::uri>;
-        type Inviter = S::Inviter;
-        type Invitee = S::Invitee;
-        type CreatedAt = S::CreatedAt;
-        type Resource = S::Resource;
+        type Cid = Unset;
+        type Invitee = Unset;
+        type Uri = Unset;
+        type CreatedAt = Unset;
+        type Status = Unset;
     }
     ///State transition - sets the `inviter` field to Set
     pub struct SetInviter<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInviter<S> {}
     impl<S: State> State for SetInviter<S> {
-        type Status = S::Status;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
         type Inviter = Set<members::inviter>;
-        type Invitee = S::Invitee;
-        type CreatedAt = S::CreatedAt;
         type Resource = S::Resource;
-    }
-    ///State transition - sets the `invitee` field to Set
-    pub struct SetInvitee<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInvitee<S> {}
-    impl<S: State> State for SetInvitee<S> {
-        type Status = S::Status;
         type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Inviter = S::Inviter;
-        type Invitee = Set<members::invitee>;
-        type CreatedAt = S::CreatedAt;
-        type Resource = S::Resource;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Status = S::Status;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Inviter = S::Inviter;
         type Invitee = S::Invitee;
-        type CreatedAt = Set<members::created_at>;
-        type Resource = S::Resource;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
     }
     ///State transition - sets the `resource` field to Set
     pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResource<S> {}
     impl<S: State> State for SetResource<S> {
-        type Status = S::Status;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
         type Inviter = S::Inviter;
-        type Invitee = S::Invitee;
-        type CreatedAt = S::CreatedAt;
         type Resource = Set<members::resource>;
+        type Cid = S::Cid;
+        type Invitee = S::Invitee;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Inviter = S::Inviter;
+        type Resource = S::Resource;
+        type Cid = Set<members::cid>;
+        type Invitee = S::Invitee;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `invitee` field to Set
+    pub struct SetInvitee<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInvitee<S> {}
+    impl<S: State> State for SetInvitee<S> {
+        type Inviter = S::Inviter;
+        type Resource = S::Resource;
+        type Cid = S::Cid;
+        type Invitee = Set<members::invitee>;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Inviter = S::Inviter;
+        type Resource = S::Resource;
+        type Cid = S::Cid;
+        type Invitee = S::Invitee;
+        type Uri = Set<members::uri>;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Inviter = S::Inviter;
+        type Resource = S::Resource;
+        type Cid = S::Cid;
+        type Invitee = S::Invitee;
+        type Uri = S::Uri;
+        type CreatedAt = Set<members::created_at>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Inviter = S::Inviter;
+        type Resource = S::Resource;
+        type Cid = S::Cid;
+        type Invitee = S::Invitee;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `inviter` field
         pub struct inviter(());
-        ///Marker type for the `invitee` field
-        pub struct invitee(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `resource` field
         pub struct resource(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `invitee` field
+        pub struct invitee(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct InviteViewBuilder<'a, S: invite_view_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
-        ::core::option::Option<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<InviteViewScope<'a>>,
-        ::core::option::Option<InviteViewStatus<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        Option<AtUri<'a>>,
+        Option<Datetime>,
+        Option<Cid<'a>>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<ProfileViewBasic<'a>>,
+        Option<ProfileViewBasic<'a>>,
+        Option<CowStr<'a>>,
+        Option<StrongRef<'a>>,
+        Option<CowStr<'a>>,
+        Option<InviteViewScope<'a>>,
+        Option<InviteViewStatus<'a>>,
+        Option<AtUri<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> InviteView<'a> {
@@ -2912,7 +2351,7 @@ impl<'a> InviteViewBuilder<'a, invite_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         InviteViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -2928,25 +2367,19 @@ impl<'a> InviteViewBuilder<'a, invite_view_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `acceptUri` field (optional)
-    pub fn accept_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn accept_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `acceptUri` field to an Option value (optional)
-    pub fn maybe_accept_uri(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_accept_uri(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -2954,18 +2387,12 @@ impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
 
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `acceptedAt` field (optional)
-    pub fn accepted_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn accepted_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `acceptedAt` field to an Option value (optional)
-    pub fn maybe_accepted_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_accepted_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -2979,13 +2406,13 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+        value: impl Into<Cid<'a>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetCid<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2998,31 +2425,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
-    pub fn expires_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
-    pub fn maybe_expires_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -3036,13 +2457,13 @@ where
     /// Set the `invitee` field (required)
     pub fn invitee(
         mut self,
-        value: impl Into<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+        value: impl Into<ProfileViewBasic<'a>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetInvitee<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3055,28 +2476,25 @@ where
     /// Set the `inviter` field (required)
     pub fn inviter(
         mut self,
-        value: impl Into<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+        value: impl Into<ProfileViewBasic<'a>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetInviter<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
-    pub fn maybe_message(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -3090,31 +2508,25 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        value: impl Into<StrongRef<'a>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetResource<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `resourceTitle` field (optional)
-    pub fn resource_title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn resource_title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `resourceTitle` field to an Option value (optional)
-    pub fn maybe_resource_title(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_resource_title(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -3143,11 +2555,11 @@ where
         mut self,
         value: impl Into<InviteViewStatus<'a>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetStatus<S>> {
-        self.__unsafe_private_named.11 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.11 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3160,13 +2572,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetUri<S>> {
-        self.__unsafe_private_named.12 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.12 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3174,13 +2586,13 @@ where
 impl<'a, S> InviteViewBuilder<'a, S>
 where
     S: invite_view_state::State,
-    S::Status: invite_view_state::IsSet,
-    S::Cid: invite_view_state::IsSet,
-    S::Uri: invite_view_state::IsSet,
     S::Inviter: invite_view_state::IsSet,
-    S::Invitee: invite_view_state::IsSet,
-    S::CreatedAt: invite_view_state::IsSet,
     S::Resource: invite_view_state::IsSet,
+    S::Cid: invite_view_state::IsSet,
+    S::Invitee: invite_view_state::IsSet,
+    S::Uri: invite_view_state::IsSet,
+    S::CreatedAt: invite_view_state::IsSet,
+    S::Status: invite_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> InviteView<'a> {
@@ -3204,7 +2616,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3238,49 +2650,49 @@ pub mod participant_state_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type User;
         type Role;
+        type User;
         type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type User = Unset;
         type Role = Unset;
+        type User = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `user` field to Set
-    pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUser<S> {}
-    impl<S: State> State for SetUser<S> {
-        type User = Set<members::user>;
-        type Role = S::Role;
-        type Status = S::Status;
     }
     ///State transition - sets the `role` field to Set
     pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRole<S> {}
     impl<S: State> State for SetRole<S> {
-        type User = S::User;
         type Role = Set<members::role>;
+        type User = S::User;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `user` field to Set
+    pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUser<S> {}
+    impl<S: State> State for SetUser<S> {
+        type Role = S::Role;
+        type User = Set<members::user>;
         type Status = S::Status;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type User = S::User;
         type Role = S::Role;
+        type User = S::User;
         type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `user` field
-        pub struct user(());
         ///Marker type for the `role` field
         pub struct role(());
+        ///Marker type for the `user` field
+        pub struct user(());
         ///Marker type for the `status` field
         pub struct status(());
     }
@@ -3288,21 +2700,21 @@ pub mod participant_state_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct ParticipantStateViewBuilder<'a, S: participant_state_view_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<ParticipantStateViewEndReason<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<ParticipantStateViewRole<'a>>,
-        ::core::option::Option<ParticipantStateViewStatus<'a>>,
-        ::core::option::Option<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
-        ::core::option::Option<bool>,
+        Option<AtUri<'a>>,
+        Option<ParticipantStateViewEndReason<'a>>,
+        Option<Datetime>,
+        Option<AtUri<'a>>,
+        Option<Datetime>,
+        Option<StrongRef<'a>>,
+        Option<Datetime>,
+        Option<ParticipantStateViewRole<'a>>,
+        Option<ParticipantStateViewStatus<'a>>,
+        Option<ProfileViewBasic<'a>>,
+        Option<bool>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ParticipantStateView<'a> {
@@ -3319,7 +2731,7 @@ impl<'a> ParticipantStateViewBuilder<'a, participant_state_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ParticipantStateViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -3333,25 +2745,19 @@ impl<'a> ParticipantStateViewBuilder<'a, participant_state_view_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
     /// Set the `acceptUri` field (optional)
-    pub fn accept_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn accept_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `acceptUri` field to an Option value (optional)
-    pub fn maybe_accept_uri(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_accept_uri(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -3378,18 +2784,12 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
 
 impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
     /// Set the `firstEditAt` field (optional)
-    pub fn first_edit_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn first_edit_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `firstEditAt` field to an Option value (optional)
-    pub fn maybe_first_edit_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_first_edit_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -3397,18 +2797,12 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
 
 impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
     /// Set the `inviteUri` field (optional)
-    pub fn invite_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn invite_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `inviteUri` field to an Option value (optional)
-    pub fn maybe_invite_uri(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_invite_uri(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -3416,18 +2810,12 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
 
 impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
     /// Set the `lastEditAt` field (optional)
-    pub fn last_edit_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn last_edit_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `lastEditAt` field to an Option value (optional)
-    pub fn maybe_last_edit_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_last_edit_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -3435,18 +2823,12 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
 
 impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
     /// Set the `publishedVersion` field (optional)
-    pub fn published_version(
-        mut self,
-        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> Self {
+    pub fn published_version(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `publishedVersion` field to an Option value (optional)
-    pub fn maybe_published_version(
-        mut self,
-        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ) -> Self {
+    pub fn maybe_published_version(mut self, value: Option<StrongRef<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -3454,18 +2836,12 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
 
 impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
     /// Set the `relationshipEndedAt` field (optional)
-    pub fn relationship_ended_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn relationship_ended_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `relationshipEndedAt` field to an Option value (optional)
-    pub fn maybe_relationship_ended_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_relationship_ended_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -3481,11 +2857,11 @@ where
         mut self,
         value: impl Into<ParticipantStateViewRole<'a>>,
     ) -> ParticipantStateViewBuilder<'a, participant_state_view_state::SetRole<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         ParticipantStateViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3500,11 +2876,11 @@ where
         mut self,
         value: impl Into<ParticipantStateViewStatus<'a>>,
     ) -> ParticipantStateViewBuilder<'a, participant_state_view_state::SetStatus<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         ParticipantStateViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3517,13 +2893,13 @@ where
     /// Set the `user` field (required)
     pub fn user(
         mut self,
-        value: impl Into<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+        value: impl Into<ProfileViewBasic<'a>>,
     ) -> ParticipantStateViewBuilder<'a, participant_state_view_state::SetUser<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         ParticipantStateViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3544,8 +2920,8 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
 impl<'a, S> ParticipantStateViewBuilder<'a, S>
 where
     S: participant_state_view_state::State,
-    S::User: participant_state_view_state::IsSet,
     S::Role: participant_state_view_state::IsSet,
+    S::User: participant_state_view_state::IsSet,
     S::Status: participant_state_view_state::IsSet,
 {
     /// Build the final struct
@@ -3568,7 +2944,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3600,101 +2976,101 @@ pub mod session_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type Resource;
-        type CreatedAt;
-        type NodeId;
         type User;
+        type Resource;
+        type NodeId;
+        type Uri;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type Resource = Unset;
-        type CreatedAt = Unset;
-        type NodeId = Unset;
         type User = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Resource = S::Resource;
-        type CreatedAt = S::CreatedAt;
-        type NodeId = S::NodeId;
-        type User = S::User;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type Uri = S::Uri;
-        type Resource = Set<members::resource>;
-        type CreatedAt = S::CreatedAt;
-        type NodeId = S::NodeId;
-        type User = S::User;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Uri = S::Uri;
-        type Resource = S::Resource;
-        type CreatedAt = Set<members::created_at>;
-        type NodeId = S::NodeId;
-        type User = S::User;
-    }
-    ///State transition - sets the `node_id` field to Set
-    pub struct SetNodeId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNodeId<S> {}
-    impl<S: State> State for SetNodeId<S> {
-        type Uri = S::Uri;
-        type Resource = S::Resource;
-        type CreatedAt = S::CreatedAt;
-        type NodeId = Set<members::node_id>;
-        type User = S::User;
+        type Resource = Unset;
+        type NodeId = Unset;
+        type Uri = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `user` field to Set
     pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUser<S> {}
     impl<S: State> State for SetUser<S> {
-        type Uri = S::Uri;
-        type Resource = S::Resource;
-        type CreatedAt = S::CreatedAt;
-        type NodeId = S::NodeId;
         type User = Set<members::user>;
+        type Resource = S::Resource;
+        type NodeId = S::NodeId;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResource<S> {}
+    impl<S: State> State for SetResource<S> {
+        type User = S::User;
+        type Resource = Set<members::resource>;
+        type NodeId = S::NodeId;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `node_id` field to Set
+    pub struct SetNodeId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNodeId<S> {}
+    impl<S: State> State for SetNodeId<S> {
+        type User = S::User;
+        type Resource = S::Resource;
+        type NodeId = Set<members::node_id>;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type User = S::User;
+        type Resource = S::Resource;
+        type NodeId = S::NodeId;
+        type Uri = Set<members::uri>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type User = S::User;
+        type Resource = S::Resource;
+        type NodeId = S::NodeId;
+        type Uri = S::Uri;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `resource` field
-        pub struct resource(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `node_id` field
-        pub struct node_id(());
         ///Marker type for the `user` field
         pub struct user(());
+        ///Marker type for the `resource` field
+        pub struct resource(());
+        ///Marker type for the `node_id` field
+        pub struct node_id(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SessionViewBuilder<'a, S: session_view_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<UriValue<'a>>,
+        Option<StrongRef<'a>>,
+        Option<AtUri<'a>>,
+        Option<ProfileViewBasic<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SessionView<'a> {
@@ -3708,9 +3084,9 @@ impl<'a> SessionViewBuilder<'a, session_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SessionViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3723,31 +3099,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> SessionViewBuilder<'a, session_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SessionViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: session_view_state::State> SessionViewBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
-    pub fn expires_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
-    pub fn maybe_expires_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -3761,31 +3131,25 @@ where
     /// Set the `nodeId` field (required)
     pub fn node_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SessionViewBuilder<'a, session_view_state::SetNodeId<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         SessionViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: session_view_state::State> SessionViewBuilder<'a, S> {
     /// Set the `relayUrl` field (optional)
-    pub fn relay_url(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn relay_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `relayUrl` field to an Option value (optional)
-    pub fn maybe_relay_url(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_relay_url(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -3799,13 +3163,13 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        value: impl Into<StrongRef<'a>>,
     ) -> SessionViewBuilder<'a, session_view_state::SetResource<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         SessionViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3818,13 +3182,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> SessionViewBuilder<'a, session_view_state::SetUri<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         SessionViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3837,13 +3201,13 @@ where
     /// Set the `user` field (required)
     pub fn user(
         mut self,
-        value: impl Into<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+        value: impl Into<ProfileViewBasic<'a>>,
     ) -> SessionViewBuilder<'a, session_view_state::SetUser<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         SessionViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3851,11 +3215,11 @@ where
 impl<'a, S> SessionViewBuilder<'a, S>
 where
     S: session_view_state::State,
-    S::Uri: session_view_state::IsSet,
-    S::Resource: session_view_state::IsSet,
-    S::CreatedAt: session_view_state::IsSet,
-    S::NodeId: session_view_state::IsSet,
     S::User: session_view_state::IsSet,
+    S::Resource: session_view_state::IsSet,
+    S::NodeId: session_view_state::IsSet,
+    S::Uri: session_view_state::IsSet,
+    S::CreatedAt: session_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SessionView<'a> {
@@ -3873,7 +3237,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

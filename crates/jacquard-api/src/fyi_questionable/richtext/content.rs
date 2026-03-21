@@ -5,16 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::fyi_questionable::richtext::blockquote::Blockquote;
+use crate::fyi_questionable::richtext::bsky_post::BskyPost;
+use crate::fyi_questionable::richtext::code::Code;
+use crate::fyi_questionable::richtext::header::Header;
+use crate::fyi_questionable::richtext::horizontal_rule::HorizontalRule;
+use crate::fyi_questionable::richtext::image::Image;
+use crate::fyi_questionable::richtext::list::List;
+use crate::fyi_questionable::richtext::math::Math;
+use crate::fyi_questionable::richtext::text::Text;
+use crate::fyi_questionable::richtext::website::Website;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Content<'a> {
     ///Array of content blocks
@@ -22,64 +37,51 @@ pub struct Content<'a> {
     pub items: Vec<ContentItemsItem<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ContentItemsItem<'a> {
     #[serde(rename = "fyi.questionable.richtext.text")]
-    Text(Box<crate::fyi_questionable::richtext::text::Text<'a>>),
+    Text(Box<Text<'a>>),
     #[serde(rename = "fyi.questionable.richtext.blockquote")]
-    Blockquote(Box<crate::fyi_questionable::richtext::blockquote::Blockquote<'a>>),
+    Blockquote(Box<Blockquote<'a>>),
     #[serde(rename = "fyi.questionable.richtext.bskyPost")]
-    BskyPost(Box<crate::fyi_questionable::richtext::bsky_post::BskyPost<'a>>),
+    BskyPost(Box<BskyPost<'a>>),
     #[serde(rename = "fyi.questionable.richtext.code")]
-    Code(Box<crate::fyi_questionable::richtext::code::Code<'a>>),
+    Code(Box<Code<'a>>),
     #[serde(rename = "fyi.questionable.richtext.header")]
-    Header(Box<crate::fyi_questionable::richtext::header::Header<'a>>),
+    Header(Box<Header<'a>>),
     #[serde(rename = "fyi.questionable.richtext.horizontalRule")]
-    HorizontalRule(
-        Box<crate::fyi_questionable::richtext::horizontal_rule::HorizontalRule<'a>>,
-    ),
+    HorizontalRule(Box<HorizontalRule<'a>>),
     #[serde(rename = "fyi.questionable.richtext.image")]
-    Image(Box<crate::fyi_questionable::richtext::image::Image<'a>>),
+    Image(Box<Image<'a>>),
     #[serde(rename = "fyi.questionable.richtext.math")]
-    Math(Box<crate::fyi_questionable::richtext::math::Math<'a>>),
+    Math(Box<Math<'a>>),
     #[serde(rename = "fyi.questionable.richtext.list")]
-    List(Box<crate::fyi_questionable::richtext::list::List<'a>>),
+    List(Box<List<'a>>),
     #[serde(rename = "fyi.questionable.richtext.website")]
-    Website(Box<crate::fyi_questionable::richtext::website::Website<'a>>),
+    Website(Box<Website<'a>>),
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Content<'a> {
+impl<'a> LexiconSchema for Content<'a> {
     fn nsid() -> &'static str {
         "fyi.questionable.richtext.content"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_fyi_questionable_richtext_content()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.items;
             #[allow(unused_comparisons)]
             if value.len() > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "items",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("items"),
                     max: 1000usize,
                     actual: value.len(),
                 });
@@ -123,9 +125,9 @@ pub mod content_state {
 
 /// Builder for constructing an instance of this type
 pub struct ContentBuilder<'a, S: content_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<Vec<ContentItemsItem<'a>>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<ContentItemsItem<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Content<'a> {
@@ -139,9 +141,9 @@ impl<'a> ContentBuilder<'a, content_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ContentBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -156,11 +158,11 @@ where
         mut self,
         value: impl Into<Vec<ContentItemsItem<'a>>>,
     ) -> ContentBuilder<'a, content_state::SetItems<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ContentBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -180,7 +182,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -192,65 +194,57 @@ where
     }
 }
 
-fn lexicon_doc_fyi_questionable_richtext_content() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.content"),
-        revision: None,
-        description: None,
+fn lexicon_doc_fyi_questionable_richtext_content() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("fyi.questionable.richtext.content"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("items")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("main"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("items")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "items",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("items"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Array of content blocks",
-                                    ),
+                                    CowStr::new_static("Array of content blocks"),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.text"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.blockquote"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.bskyPost"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.code"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.header"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.horizontalRule"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.image"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.math"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.text"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.list"),
-                                        ::jacquard_common::CowStr::new_static("fyi.questionable.richtext.website")
+                                        CowStr::new_static("fyi.questionable.richtext.text"),
+                                        CowStr::new_static("fyi.questionable.richtext.blockquote"),
+                                        CowStr::new_static("fyi.questionable.richtext.bskyPost"),
+                                        CowStr::new_static("fyi.questionable.richtext.code"),
+                                        CowStr::new_static("fyi.questionable.richtext.header"),
+                                        CowStr::new_static("fyi.questionable.richtext.horizontalRule"),
+                                        CowStr::new_static("fyi.questionable.richtext.image"),
+                                        CowStr::new_static("fyi.questionable.richtext.math"),
+                                        CowStr::new_static("fyi.questionable.richtext.text"),
+                                        CowStr::new_static("fyi.questionable.richtext.list"),
+                                        CowStr::new_static("fyi.questionable.richtext.website")
                                     ],
                                     closed: Some(false),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(1000usize),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

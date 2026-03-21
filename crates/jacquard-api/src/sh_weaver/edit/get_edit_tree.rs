@@ -5,40 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::edit::EditTreeView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetEditTree<'a> {
     #[serde(borrow)]
-    pub resource: jacquard_common::types::string::AtUri<'a>,
+    pub resource: AtUri<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetEditTreeOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::sh_weaver::edit::EditTreeView<'a>,
+    pub value: EditTreeView<'a>,
 }
 
-/// Response type for
-///sh.weaver.edit.getEditTree
+/// Response type for sh.weaver.edit.getEditTree
 pub struct GetEditTreeResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEditTreeResponse {
     const NSID: &'static str = "sh.weaver.edit.getEditTree";
@@ -53,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetEditTree<'a> {
     type Response = GetEditTreeResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.edit.getEditTree
+/// Endpoint type for sh.weaver.edit.getEditTree
 pub struct GetEditTreeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEditTreeRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.edit.getEditTree";
@@ -97,11 +86,9 @@ pub mod get_edit_tree_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetEditTreeBuilder<'a, S: get_edit_tree_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetEditTree<'a> {
@@ -115,9 +102,9 @@ impl<'a> GetEditTreeBuilder<'a, get_edit_tree_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetEditTreeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -130,13 +117,13 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetEditTreeBuilder<'a, get_edit_tree_state::SetResource<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetEditTreeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

@@ -5,47 +5,55 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A verified leaderboard entry stored in the mathr.app official repository
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Entry<'a> {
     ///Timestamp when the score was verified and added to the leaderboard
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///The highest level reached by the player
     pub level: i64,
     ///Success rate as a percentage (0-100)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub percentage: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub percentage: Option<i64>,
     ///URL to the player's avatar at the time of submission
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub player_avatar: core::option::Option<
-        jacquard_common::types::string::UriValue<'a>,
-    >,
+    pub player_avatar: Option<UriValue<'a>>,
     ///The DID of the player who achieved this score
     #[serde(borrow)]
-    pub player_did: jacquard_common::types::string::Did<'a>,
+    pub player_did: Did<'a>,
     ///The player's display name at the time of submission
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub player_display_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub player_display_name: Option<CowStr<'a>>,
     ///The player's handle at the time of submission
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub player_handle: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub player_handle: Option<CowStr<'a>>,
     ///Optional AT URI to the player's Bluesky post announcing the score
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub post_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub post_uri: Option<AtUri<'a>>,
     ///Total number of challenges attempted
     pub total_challenges: i64,
     ///Total number of correct answers
@@ -53,47 +61,36 @@ pub struct Entry<'a> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct EntryGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Entry<'a>,
 }
 
 impl<'a> Entry<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, EntryRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, EntryRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EntryRecord;
-impl jacquard_common::xrpc::XrpcResp for EntryRecord {
+impl XrpcResp for EntryRecord {
     const NSID: &'static str = "app.mathr.leaderboard.entry";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = EntryGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<EntryGetRecordOutput<'_>> for Entry<'_> {
@@ -103,36 +100,32 @@ impl From<EntryGetRecordOutput<'_>> for Entry<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Entry<'_> {
+impl Collection for Entry<'_> {
     const NSID: &'static str = "app.mathr.leaderboard.entry";
     type Record = EntryRecord;
 }
 
-impl jacquard_common::types::collection::Collection for EntryRecord {
+impl Collection for EntryRecord {
     const NSID: &'static str = "app.mathr.leaderboard.entry";
     type Record = EntryRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
+impl<'a> LexiconSchema for Entry<'a> {
     fn nsid() -> &'static str {
         "app.mathr.leaderboard.entry"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_mathr_leaderboard_entry()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.level;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("level"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -140,10 +133,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
         }
         if let Some(ref value) = self.percentage {
             if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "percentage",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("percentage"),
                     max: 100i64,
                     actual: *value,
                 });
@@ -151,10 +142,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
         }
         if let Some(ref value) = self.percentage {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "percentage",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("percentage"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -163,10 +152,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
         {
             let value = &self.total_challenges;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total_challenges",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("total_challenges"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -175,10 +162,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
         {
             let value = &self.total_successes;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total_successes",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("total_successes"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -198,104 +183,104 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TotalSuccesses;
-        type PlayerDid;
-        type Level;
-        type TotalChallenges;
         type CreatedAt;
+        type Level;
+        type PlayerDid;
+        type TotalSuccesses;
+        type TotalChallenges;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TotalSuccesses = Unset;
-        type PlayerDid = Unset;
-        type Level = Unset;
-        type TotalChallenges = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `total_successes` field to Set
-    pub struct SetTotalSuccesses<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalSuccesses<S> {}
-    impl<S: State> State for SetTotalSuccesses<S> {
-        type TotalSuccesses = Set<members::total_successes>;
-        type PlayerDid = S::PlayerDid;
-        type Level = S::Level;
-        type TotalChallenges = S::TotalChallenges;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `player_did` field to Set
-    pub struct SetPlayerDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayerDid<S> {}
-    impl<S: State> State for SetPlayerDid<S> {
-        type TotalSuccesses = S::TotalSuccesses;
-        type PlayerDid = Set<members::player_did>;
-        type Level = S::Level;
-        type TotalChallenges = S::TotalChallenges;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type TotalSuccesses = S::TotalSuccesses;
-        type PlayerDid = S::PlayerDid;
-        type Level = Set<members::level>;
-        type TotalChallenges = S::TotalChallenges;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `total_challenges` field to Set
-    pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
-    impl<S: State> State for SetTotalChallenges<S> {
-        type TotalSuccesses = S::TotalSuccesses;
-        type PlayerDid = S::PlayerDid;
-        type Level = S::Level;
-        type TotalChallenges = Set<members::total_challenges>;
-        type CreatedAt = S::CreatedAt;
+        type Level = Unset;
+        type PlayerDid = Unset;
+        type TotalSuccesses = Unset;
+        type TotalChallenges = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type TotalSuccesses = S::TotalSuccesses;
-        type PlayerDid = S::PlayerDid;
-        type Level = S::Level;
-        type TotalChallenges = S::TotalChallenges;
         type CreatedAt = Set<members::created_at>;
+        type Level = S::Level;
+        type PlayerDid = S::PlayerDid;
+        type TotalSuccesses = S::TotalSuccesses;
+        type TotalChallenges = S::TotalChallenges;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type CreatedAt = S::CreatedAt;
+        type Level = Set<members::level>;
+        type PlayerDid = S::PlayerDid;
+        type TotalSuccesses = S::TotalSuccesses;
+        type TotalChallenges = S::TotalChallenges;
+    }
+    ///State transition - sets the `player_did` field to Set
+    pub struct SetPlayerDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayerDid<S> {}
+    impl<S: State> State for SetPlayerDid<S> {
+        type CreatedAt = S::CreatedAt;
+        type Level = S::Level;
+        type PlayerDid = Set<members::player_did>;
+        type TotalSuccesses = S::TotalSuccesses;
+        type TotalChallenges = S::TotalChallenges;
+    }
+    ///State transition - sets the `total_successes` field to Set
+    pub struct SetTotalSuccesses<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalSuccesses<S> {}
+    impl<S: State> State for SetTotalSuccesses<S> {
+        type CreatedAt = S::CreatedAt;
+        type Level = S::Level;
+        type PlayerDid = S::PlayerDid;
+        type TotalSuccesses = Set<members::total_successes>;
+        type TotalChallenges = S::TotalChallenges;
+    }
+    ///State transition - sets the `total_challenges` field to Set
+    pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
+    impl<S: State> State for SetTotalChallenges<S> {
+        type CreatedAt = S::CreatedAt;
+        type Level = S::Level;
+        type PlayerDid = S::PlayerDid;
+        type TotalSuccesses = S::TotalSuccesses;
+        type TotalChallenges = Set<members::total_challenges>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `total_successes` field
-        pub struct total_successes(());
-        ///Marker type for the `player_did` field
-        pub struct player_did(());
-        ///Marker type for the `level` field
-        pub struct level(());
-        ///Marker type for the `total_challenges` field
-        pub struct total_challenges(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `level` field
+        pub struct level(());
+        ///Marker type for the `player_did` field
+        pub struct player_did(());
+        ///Marker type for the `total_successes` field
+        pub struct total_successes(());
+        ///Marker type for the `total_challenges` field
+        pub struct total_challenges(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EntryBuilder<'a, S: entry_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
+        Option<Datetime>,
+        Option<i64>,
+        Option<i64>,
+        Option<UriValue<'a>>,
+        Option<Did<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<AtUri<'a>>,
+        Option<i64>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Entry<'a> {
@@ -309,7 +294,7 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -322,7 +307,7 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -335,13 +320,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> EntryBuilder<'a, entry_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -356,11 +341,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> EntryBuilder<'a, entry_state::SetLevel<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -380,18 +365,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `playerAvatar` field (optional)
-    pub fn player_avatar(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn player_avatar(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `playerAvatar` field to an Option value (optional)
-    pub fn maybe_player_avatar(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_player_avatar(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -405,31 +384,25 @@ where
     /// Set the `playerDid` field (required)
     pub fn player_did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> EntryBuilder<'a, entry_state::SetPlayerDid<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `playerDisplayName` field (optional)
-    pub fn player_display_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn player_display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `playerDisplayName` field to an Option value (optional)
-    pub fn maybe_player_display_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_player_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -437,18 +410,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `playerHandle` field (optional)
-    pub fn player_handle(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn player_handle(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `playerHandle` field to an Option value (optional)
-    pub fn maybe_player_handle(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_player_handle(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -456,18 +423,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `postUri` field (optional)
-    pub fn post_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn post_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `postUri` field to an Option value (optional)
-    pub fn maybe_post_uri(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_post_uri(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -483,11 +444,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> EntryBuilder<'a, entry_state::SetTotalChallenges<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -502,11 +463,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> EntryBuilder<'a, entry_state::SetTotalSuccesses<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -514,11 +475,11 @@ where
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::TotalSuccesses: entry_state::IsSet,
-    S::PlayerDid: entry_state::IsSet,
-    S::Level: entry_state::IsSet,
-    S::TotalChallenges: entry_state::IsSet,
     S::CreatedAt: entry_state::IsSet,
+    S::Level: entry_state::IsSet,
+    S::PlayerDid: entry_state::IsSet,
+    S::TotalSuccesses: entry_state::IsSet,
+    S::TotalChallenges: entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
@@ -539,7 +500,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -560,232 +521,146 @@ where
     }
 }
 
-fn lexicon_doc_app_mathr_leaderboard_entry() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.mathr.leaderboard.entry"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_mathr_leaderboard_entry() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.mathr.leaderboard.entry"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A verified leaderboard entry stored in the mathr.app official repository",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("playerDid"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("level"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("totalSuccesses"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("totalChallenges"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("playerDid"),
+                                SmolStr::new_static("level"),
+                                SmolStr::new_static("totalSuccesses"),
+                                SmolStr::new_static("totalChallenges"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp when the score was verified and added to the leaderboard",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "level",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("level"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "percentage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("percentage"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
                                     maximum: Some(100i64),
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "playerAvatar",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("playerAvatar"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "URL to the player's avatar at the time of submission",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Uri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "playerDid",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("playerDid"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The DID of the player who achieved this score",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "playerDisplayName",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("playerDisplayName"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The player's display name at the time of submission",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "playerHandle",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("playerHandle"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The player's handle at the time of submission",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "postUri",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("postUri"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Optional AT URI to the player's Bluesky post announcing the score",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "totalChallenges",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("totalChallenges"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "totalSuccesses",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("totalSuccesses"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

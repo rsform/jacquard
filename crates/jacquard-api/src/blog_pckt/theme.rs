@@ -5,85 +5,80 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::blog_pckt::theme;
 /// Theme configuration for a blog publication
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Theme<'a> {
     ///Dark mode color palette
     #[serde(borrow)]
-    pub dark: crate::blog_pckt::theme::Palette<'a>,
+    pub dark: theme::Palette<'a>,
     ///Font family name (optional)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub font: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub font: Option<CowStr<'a>>,
     ///Light mode color palette
     #[serde(borrow)]
-    pub light: crate::blog_pckt::theme::Palette<'a>,
+    pub light: theme::Palette<'a>,
     ///Content background transparency percentage (optional)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub transparency: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transparency: Option<i64>,
 }
 
 /// Color palette with CSS hex values
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Palette<'a> {
     ///Accent color (hex value)
     #[serde(borrow)]
-    pub accent: jacquard_common::CowStr<'a>,
+    pub accent: CowStr<'a>,
     ///Background color (hex value)
     #[serde(borrow)]
-    pub background: jacquard_common::CowStr<'a>,
+    pub background: CowStr<'a>,
     ///Link color (hex value)
     #[serde(borrow)]
-    pub link: jacquard_common::CowStr<'a>,
+    pub link: CowStr<'a>,
     ///Surface hover color (hex value)
     #[serde(borrow)]
-    pub surface_hover: jacquard_common::CowStr<'a>,
+    pub surface_hover: CowStr<'a>,
     ///Primary text color (hex value)
     #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
+    pub text: CowStr<'a>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
+impl<'a> LexiconSchema for Theme<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.theme"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_blog_pckt_theme()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.font {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "font",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("font"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -91,10 +86,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
         }
         if let Some(ref value) = self.transparency {
             if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "transparency",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("transparency"),
                     max: 100i64,
                     actual: *value,
                 });
@@ -102,10 +95,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
         }
         if let Some(ref value) = self.transparency {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "transparency",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("transparency"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -115,27 +106,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
+impl<'a> LexiconSchema for Palette<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.theme"
     }
     fn def_name() -> &'static str {
         "palette"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_blog_pckt_theme()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.accent;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "accent",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("accent"),
                     max: 7usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -145,10 +132,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
             let value = &self.background;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "background",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("background"),
                     max: 7usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -158,10 +143,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
             let value = &self.link;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "link",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("link"),
                     max: 7usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -171,10 +154,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
             let value = &self.surface_hover;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "surface_hover",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("surface_hover"),
                     max: 7usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -184,10 +165,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
             let value = &self.text;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 7usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("text"),
                     max: 7usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -207,50 +186,50 @@ pub mod theme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Light;
         type Dark;
+        type Light;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Light = Unset;
         type Dark = Unset;
-    }
-    ///State transition - sets the `light` field to Set
-    pub struct SetLight<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLight<S> {}
-    impl<S: State> State for SetLight<S> {
-        type Light = Set<members::light>;
-        type Dark = S::Dark;
+        type Light = Unset;
     }
     ///State transition - sets the `dark` field to Set
     pub struct SetDark<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDark<S> {}
     impl<S: State> State for SetDark<S> {
-        type Light = S::Light;
         type Dark = Set<members::dark>;
+        type Light = S::Light;
+    }
+    ///State transition - sets the `light` field to Set
+    pub struct SetLight<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLight<S> {}
+    impl<S: State> State for SetLight<S> {
+        type Dark = S::Dark;
+        type Light = Set<members::light>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `light` field
-        pub struct light(());
         ///Marker type for the `dark` field
         pub struct dark(());
+        ///Marker type for the `light` field
+        pub struct light(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ThemeBuilder<'a, S: theme_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::blog_pckt::theme::Palette<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::blog_pckt::theme::Palette<'a>>,
-        ::core::option::Option<i64>,
+        Option<theme::Palette<'a>>,
+        Option<CowStr<'a>>,
+        Option<theme::Palette<'a>>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Theme<'a> {
@@ -264,9 +243,9 @@ impl<'a> ThemeBuilder<'a, theme_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ThemeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -279,28 +258,25 @@ where
     /// Set the `dark` field (required)
     pub fn dark(
         mut self,
-        value: impl Into<crate::blog_pckt::theme::Palette<'a>>,
+        value: impl Into<theme::Palette<'a>>,
     ) -> ThemeBuilder<'a, theme_state::SetDark<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ThemeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: theme_state::State> ThemeBuilder<'a, S> {
     /// Set the `font` field (optional)
-    pub fn font(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn font(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `font` field to an Option value (optional)
-    pub fn maybe_font(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_font(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -314,13 +290,13 @@ where
     /// Set the `light` field (required)
     pub fn light(
         mut self,
-        value: impl Into<crate::blog_pckt::theme::Palette<'a>>,
+        value: impl Into<theme::Palette<'a>>,
     ) -> ThemeBuilder<'a, theme_state::SetLight<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         ThemeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -341,8 +317,8 @@ impl<'a, S: theme_state::State> ThemeBuilder<'a, S> {
 impl<'a, S> ThemeBuilder<'a, S>
 where
     S: theme_state::State,
-    S::Light: theme_state::IsSet,
     S::Dark: theme_state::IsSet,
+    S::Light: theme_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Theme<'a> {
@@ -357,7 +333,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -372,219 +348,139 @@ where
     }
 }
 
-fn lexicon_doc_blog_pckt_theme() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("blog.pckt.theme"),
-        revision: None,
-        description: None,
+fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("blog.pckt.theme"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("main"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Theme configuration for a blog publication",
-                        ),
+                        CowStr::new_static("Theme configuration for a blog publication"),
                     ),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("light"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("dark")
-                        ],
+                        vec![SmolStr::new_static("light"), SmolStr::new_static("dark")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "dark",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#palette"),
+                            SmolStr::new_static("dark"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#palette"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "font",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("font"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Font family name (optional)",
-                                    ),
+                                    CowStr::new_static("Font family name (optional)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "light",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#palette"),
+                            SmolStr::new_static("light"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#palette"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "transparency",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("transparency"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(100i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("palette"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("palette"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Color palette with CSS hex values",
-                        ),
+                        CowStr::new_static("Color palette with CSS hex values"),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("link"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("text"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("accent"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("background"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("surfaceHover")
+                            SmolStr::new_static("link"), SmolStr::new_static("text"),
+                            SmolStr::new_static("accent"),
+                            SmolStr::new_static("background"),
+                            SmolStr::new_static("surfaceHover")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "accent",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("accent"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Accent color (hex value)",
-                                    ),
+                                    CowStr::new_static("Accent color (hex value)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(7usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "background",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("background"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Background color (hex value)",
-                                    ),
+                                    CowStr::new_static("Background color (hex value)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(7usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "link",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("link"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Link color (hex value)",
-                                    ),
+                                    CowStr::new_static("Link color (hex value)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(7usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "surfaceHover",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("surfaceHover"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Surface hover color (hex value)",
-                                    ),
+                                    CowStr::new_static("Surface hover color (hex value)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(7usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "text",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("text"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Primary text color (hex value)",
-                                    ),
+                                    CowStr::new_static("Primary text color (hex value)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(7usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

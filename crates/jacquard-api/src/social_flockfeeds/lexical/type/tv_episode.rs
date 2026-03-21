@@ -5,5007 +5,2939 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::social_flockfeeds::lexical::r#type::event;
+use crate::social_flockfeeds::lexical::r#type::image_object;
+use crate::social_flockfeeds::lexical::r#type::music_group;
+use crate::social_flockfeeds::lexical::r#type::offer;
+use crate::social_flockfeeds::lexical::r#type::organization;
+use crate::social_flockfeeds::lexical::r#type::person;
+use crate::social_flockfeeds::lexical::r#type::product;
+use crate::social_flockfeeds::lexical::r#type::tv_series;
 /// A TV episode which can be part of a series or season.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Embedded<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub about: core::option::Option<EmbeddedAbout<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub about: Option<EmbeddedAbout<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#abstract: core::option::Option<EmbeddedAbstract<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub r#abstract: Option<EmbeddedAbstract<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub access_mode: core::option::Option<EmbeddedAccessMode<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub access_mode: Option<EmbeddedAccessMode<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub access_mode_sufficient: core::option::Option<EmbeddedAccessModeSufficient<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub access_mode_sufficient: Option<EmbeddedAccessModeSufficient<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_api: core::option::Option<EmbeddedAccessibilityApi<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accessibility_api: Option<EmbeddedAccessibilityApi<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_control: core::option::Option<EmbeddedAccessibilityControl<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accessibility_control: Option<EmbeddedAccessibilityControl<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_feature: core::option::Option<EmbeddedAccessibilityFeature<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accessibility_feature: Option<EmbeddedAccessibilityFeature<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_hazard: core::option::Option<EmbeddedAccessibilityHazard<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accessibility_hazard: Option<EmbeddedAccessibilityHazard<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_summary: core::option::Option<EmbeddedAccessibilitySummary<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accessibility_summary: Option<EmbeddedAccessibilitySummary<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accountable_person: core::option::Option<EmbeddedAccountablePerson<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accountable_person: Option<EmbeddedAccountablePerson<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub acquire_license_page: core::option::Option<EmbeddedAcquireLicensePage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub acquire_license_page: Option<EmbeddedAcquireLicensePage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub actor: core::option::Option<EmbeddedActor<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub actor: Option<EmbeddedActor<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub actors: core::option::Option<EmbeddedActors<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub actors: Option<EmbeddedActors<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub additional_type: core::option::Option<EmbeddedAdditionalType<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub additional_type: Option<EmbeddedAdditionalType<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub aggregate_rating: core::option::Option<EmbeddedAggregateRating<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub aggregate_rating: Option<EmbeddedAggregateRating<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alternate_name: core::option::Option<EmbeddedAlternateName<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub alternate_name: Option<EmbeddedAlternateName<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alternative_headline: core::option::Option<EmbeddedAlternativeHeadline<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub alternative_headline: Option<EmbeddedAlternativeHeadline<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub archived_at: core::option::Option<EmbeddedArchivedAt<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub archived_at: Option<EmbeddedArchivedAt<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub assesses: core::option::Option<EmbeddedAssesses<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub assesses: Option<EmbeddedAssesses<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub associated_media: core::option::Option<EmbeddedAssociatedMedia<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub associated_media: Option<EmbeddedAssociatedMedia<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub audience: core::option::Option<EmbeddedAudience<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub audience: Option<EmbeddedAudience<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub audio: core::option::Option<EmbeddedAudio<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub audio: Option<EmbeddedAudio<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub author: core::option::Option<EmbeddedAuthor<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub author: Option<EmbeddedAuthor<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub award: core::option::Option<EmbeddedAward<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub award: Option<EmbeddedAward<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub awards: core::option::Option<EmbeddedAwards<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub awards: Option<EmbeddedAwards<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub character: core::option::Option<EmbeddedCharacter<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub character: Option<EmbeddedCharacter<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub citation: core::option::Option<EmbeddedCitation<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub citation: Option<EmbeddedCitation<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub comment: core::option::Option<EmbeddedComment<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub comment: Option<EmbeddedComment<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub comment_count: core::option::Option<EmbeddedCommentCount<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub comment_count: Option<EmbeddedCommentCount<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub conditions_of_access: core::option::Option<EmbeddedConditionsOfAccess<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub conditions_of_access: Option<EmbeddedConditionsOfAccess<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub content_location: core::option::Option<EmbeddedContentLocation<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub content_location: Option<EmbeddedContentLocation<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub content_rating: core::option::Option<EmbeddedContentRating<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub content_rating: Option<EmbeddedContentRating<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub content_reference_time: core::option::Option<EmbeddedContentReferenceTime<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub content_reference_time: Option<EmbeddedContentReferenceTime<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub contributor: core::option::Option<EmbeddedContributor<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub contributor: Option<EmbeddedContributor<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub copyright_holder: core::option::Option<EmbeddedCopyrightHolder<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub copyright_holder: Option<EmbeddedCopyrightHolder<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub copyright_notice: core::option::Option<EmbeddedCopyrightNotice<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub copyright_notice: Option<EmbeddedCopyrightNotice<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub copyright_year: core::option::Option<EmbeddedCopyrightYear<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub copyright_year: Option<EmbeddedCopyrightYear<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub correction: core::option::Option<EmbeddedCorrection<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub correction: Option<EmbeddedCorrection<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub country_of_origin: core::option::Option<EmbeddedCountryOfOrigin<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub country_of_origin: Option<EmbeddedCountryOfOrigin<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub creative_work_status: core::option::Option<EmbeddedCreativeWorkStatus<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub creative_work_status: Option<EmbeddedCreativeWorkStatus<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub creator: core::option::Option<EmbeddedCreator<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub creator: Option<EmbeddedCreator<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub credit_text: core::option::Option<EmbeddedCreditText<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub credit_text: Option<EmbeddedCreditText<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub date_created: core::option::Option<EmbeddedDateCreated<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub date_created: Option<EmbeddedDateCreated<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub date_modified: core::option::Option<EmbeddedDateModified<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub date_modified: Option<EmbeddedDateModified<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub date_published: core::option::Option<EmbeddedDatePublished<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub date_published: Option<EmbeddedDatePublished<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description: core::option::Option<EmbeddedDescription<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub description: Option<EmbeddedDescription<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub digital_source_type: core::option::Option<EmbeddedDigitalSourceType<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub digital_source_type: Option<EmbeddedDigitalSourceType<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub director: core::option::Option<EmbeddedDirector<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub director: Option<EmbeddedDirector<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub directors: core::option::Option<EmbeddedDirectors<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub directors: Option<EmbeddedDirectors<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub disambiguating_description: core::option::Option<
-        EmbeddedDisambiguatingDescription<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub discussion_url: core::option::Option<EmbeddedDiscussionUrl<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub discussion_url: Option<EmbeddedDiscussionUrl<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub duration: core::option::Option<EmbeddedDuration<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duration: Option<EmbeddedDuration<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub edit_eidr: core::option::Option<EmbeddedEditEidr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub edit_eidr: Option<EmbeddedEditEidr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub editor: core::option::Option<EmbeddedEditor<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub editor: Option<EmbeddedEditor<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub educational_alignment: core::option::Option<EmbeddedEducationalAlignment<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub educational_alignment: Option<EmbeddedEducationalAlignment<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub educational_level: core::option::Option<EmbeddedEducationalLevel<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub educational_level: Option<EmbeddedEducationalLevel<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub educational_use: core::option::Option<EmbeddedEducationalUse<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub educational_use: Option<EmbeddedEducationalUse<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub encoding: core::option::Option<EmbeddedEncoding<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub encoding: Option<EmbeddedEncoding<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub encoding_format: core::option::Option<EmbeddedEncodingFormat<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub encoding_format: Option<EmbeddedEncodingFormat<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub encodings: core::option::Option<EmbeddedEncodings<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub encodings: Option<EmbeddedEncodings<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub episode_number: core::option::Option<EmbeddedEpisodeNumber<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub episode_number: Option<EmbeddedEpisodeNumber<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub example_of_work: core::option::Option<EmbeddedExampleOfWork<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub example_of_work: Option<EmbeddedExampleOfWork<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub expires: core::option::Option<EmbeddedExpires<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub expires: Option<EmbeddedExpires<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub file_format: core::option::Option<EmbeddedFileFormat<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub file_format: Option<EmbeddedFileFormat<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub funder: core::option::Option<EmbeddedFunder<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub funder: Option<EmbeddedFunder<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub funding: core::option::Option<EmbeddedFunding<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub funding: Option<EmbeddedFunding<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub genre: core::option::Option<EmbeddedGenre<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub genre: Option<EmbeddedGenre<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_part: core::option::Option<EmbeddedHasPart<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_part: Option<EmbeddedHasPart<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub headline: core::option::Option<EmbeddedHeadline<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub headline: Option<EmbeddedHeadline<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub identifier: core::option::Option<EmbeddedIdentifier<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub identifier: Option<EmbeddedIdentifier<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub image: core::option::Option<EmbeddedImage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub image: Option<EmbeddedImage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub in_language: core::option::Option<EmbeddedInLanguage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub in_language: Option<EmbeddedInLanguage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub interaction_statistic: core::option::Option<EmbeddedInteractionStatistic<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub interaction_statistic: Option<EmbeddedInteractionStatistic<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub interactivity_type: core::option::Option<EmbeddedInteractivityType<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub interactivity_type: Option<EmbeddedInteractivityType<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub interpreted_as_claim: core::option::Option<EmbeddedInterpretedAsClaim<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub interpreted_as_claim: Option<EmbeddedInterpretedAsClaim<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub is_accessible_for_free: core::option::Option<EmbeddedIsAccessibleForFree<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_accessible_for_free: Option<EmbeddedIsAccessibleForFree<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub is_based_on: core::option::Option<EmbeddedIsBasedOn<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_based_on: Option<EmbeddedIsBasedOn<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub is_based_on_url: core::option::Option<EmbeddedIsBasedOnUrl<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_based_on_url: Option<EmbeddedIsBasedOnUrl<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub is_family_friendly: core::option::Option<EmbeddedIsFamilyFriendly<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_family_friendly: Option<EmbeddedIsFamilyFriendly<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub is_part_of: core::option::Option<EmbeddedIsPartOf<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_part_of: Option<EmbeddedIsPartOf<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub keywords: core::option::Option<EmbeddedKeywords<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub keywords: Option<EmbeddedKeywords<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub learning_resource_type: core::option::Option<EmbeddedLearningResourceType<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub learning_resource_type: Option<EmbeddedLearningResourceType<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub license: core::option::Option<EmbeddedLicense<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub license: Option<EmbeddedLicense<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub location_created: core::option::Option<EmbeddedLocationCreated<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub location_created: Option<EmbeddedLocationCreated<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub main_entity: core::option::Option<EmbeddedMainEntity<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub main_entity: Option<EmbeddedMainEntity<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub main_entity_of_page: core::option::Option<EmbeddedMainEntityOfPage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub maintainer: core::option::Option<EmbeddedMaintainer<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub maintainer: Option<EmbeddedMaintainer<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub material: core::option::Option<EmbeddedMaterial<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub material: Option<EmbeddedMaterial<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub material_extent: core::option::Option<EmbeddedMaterialExtent<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub material_extent: Option<EmbeddedMaterialExtent<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub mentions: core::option::Option<EmbeddedMentions<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub mentions: Option<EmbeddedMentions<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub music_by: core::option::Option<EmbeddedMusicBy<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub music_by: Option<EmbeddedMusicBy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub name: core::option::Option<EmbeddedName<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub name: Option<EmbeddedName<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub offers: core::option::Option<EmbeddedOffers<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub offers: Option<EmbeddedOffers<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub part_of_season: core::option::Option<EmbeddedPartOfSeason<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub part_of_season: Option<EmbeddedPartOfSeason<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub part_of_series: core::option::Option<EmbeddedPartOfSeries<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub part_of_series: Option<EmbeddedPartOfSeries<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub part_of_tv_series: core::option::Option<EmbeddedPartOfTvSeries<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub part_of_tv_series: Option<EmbeddedPartOfTvSeries<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub pattern: core::option::Option<EmbeddedPattern<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub pattern: Option<EmbeddedPattern<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub position: core::option::Option<EmbeddedPosition<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub position: Option<EmbeddedPosition<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub potential_action: core::option::Option<EmbeddedPotentialAction<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub potential_action: Option<EmbeddedPotentialAction<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub producer: core::option::Option<EmbeddedProducer<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub producer: Option<EmbeddedProducer<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub production_company: core::option::Option<EmbeddedProductionCompany<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub production_company: Option<EmbeddedProductionCompany<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub provider: core::option::Option<EmbeddedProvider<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub provider: Option<EmbeddedProvider<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub publication: core::option::Option<EmbeddedPublication<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub publication: Option<EmbeddedPublication<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub publisher: core::option::Option<EmbeddedPublisher<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub publisher: Option<EmbeddedPublisher<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub publisher_imprint: core::option::Option<EmbeddedPublisherImprint<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub publisher_imprint: Option<EmbeddedPublisherImprint<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub publishing_principles: core::option::Option<EmbeddedPublishingPrinciples<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub publishing_principles: Option<EmbeddedPublishingPrinciples<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub recorded_at: core::option::Option<EmbeddedRecordedAt<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub recorded_at: Option<EmbeddedRecordedAt<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub released_event: core::option::Option<EmbeddedReleasedEvent<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub released_event: Option<EmbeddedReleasedEvent<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub review: core::option::Option<EmbeddedReview<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub review: Option<EmbeddedReview<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub reviews: core::option::Option<EmbeddedReviews<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reviews: Option<EmbeddedReviews<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub same_as: core::option::Option<EmbeddedSameAs<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub same_as: Option<EmbeddedSameAs<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub schema_version: core::option::Option<EmbeddedSchemaVersion<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub schema_version: Option<EmbeddedSchemaVersion<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sd_date_published: core::option::Option<EmbeddedSdDatePublished<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sd_date_published: Option<EmbeddedSdDatePublished<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sd_license: core::option::Option<EmbeddedSdLicense<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sd_license: Option<EmbeddedSdLicense<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sd_publisher: core::option::Option<EmbeddedSdPublisher<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sd_publisher: Option<EmbeddedSdPublisher<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub size: core::option::Option<EmbeddedSize<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub size: Option<EmbeddedSize<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub source_organization: core::option::Option<EmbeddedSourceOrganization<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub source_organization: Option<EmbeddedSourceOrganization<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub spatial: core::option::Option<EmbeddedSpatial<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub spatial: Option<EmbeddedSpatial<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub spatial_coverage: core::option::Option<EmbeddedSpatialCoverage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub spatial_coverage: Option<EmbeddedSpatialCoverage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sponsor: core::option::Option<EmbeddedSponsor<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sponsor: Option<EmbeddedSponsor<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subject_of: core::option::Option<EmbeddedSubjectOf<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub subject_of: Option<EmbeddedSubjectOf<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subtitle_language: core::option::Option<EmbeddedSubtitleLanguage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub subtitle_language: Option<EmbeddedSubtitleLanguage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub teaches: core::option::Option<EmbeddedTeaches<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub teaches: Option<EmbeddedTeaches<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub temporal: core::option::Option<EmbeddedTemporal<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub temporal: Option<EmbeddedTemporal<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub temporal_coverage: core::option::Option<EmbeddedTemporalCoverage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub temporal_coverage: Option<EmbeddedTemporalCoverage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub text: core::option::Option<EmbeddedText<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub text: Option<EmbeddedText<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub thumbnail: core::option::Option<EmbeddedThumbnail<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub thumbnail: Option<EmbeddedThumbnail<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub thumbnail_url: core::option::Option<EmbeddedThumbnailUrl<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub thumbnail_url: Option<EmbeddedThumbnailUrl<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub time_required: core::option::Option<EmbeddedTimeRequired<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub time_required: Option<EmbeddedTimeRequired<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub title_eidr: core::option::Option<EmbeddedTitleEidr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub title_eidr: Option<EmbeddedTitleEidr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub trailer: core::option::Option<EmbeddedTrailer<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub trailer: Option<EmbeddedTrailer<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub translation_of_work: core::option::Option<EmbeddedTranslationOfWork<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub translation_of_work: Option<EmbeddedTranslationOfWork<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub translator: core::option::Option<EmbeddedTranslator<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub translator: Option<EmbeddedTranslator<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub typical_age_range: core::option::Option<EmbeddedTypicalAgeRange<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub typical_age_range: Option<EmbeddedTypicalAgeRange<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub url: core::option::Option<EmbeddedUrl<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub url: Option<EmbeddedUrl<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub usage_info: core::option::Option<EmbeddedUsageInfo<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub usage_info: Option<EmbeddedUsageInfo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub version: core::option::Option<EmbeddedVersion<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub version: Option<EmbeddedVersion<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub video: core::option::Option<EmbeddedVideo<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub video: Option<EmbeddedVideo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub word_count: core::option::Option<EmbeddedWordCount<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub word_count: Option<EmbeddedWordCount<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub work_example: core::option::Option<EmbeddedWorkExample<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub work_example: Option<EmbeddedWorkExample<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub work_translation: core::option::Option<EmbeddedWorkTranslation<'a>>,
+    pub work_translation: Option<EmbeddedWorkTranslation<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAbout<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAbstract<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAccessMode<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAccessModeSufficient<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAccessibilityApi<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAccessibilityControl<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAccessibilityFeature<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAccessibilityHazard<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAccessibilitySummary<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAccountablePerson<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAcquireLicensePage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedActor<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedActors<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAdditionalType<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAggregateRating<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAlternateName<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAlternativeHeadline<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedArchivedAt<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAssesses<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAssociatedMedia<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAudience<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAudio<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAuthor<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAward<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedAwards<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCharacter<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCitation<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedComment<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCommentCount<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedConditionsOfAccess<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContentLocation<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContentRating<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContentReferenceTime<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedContributor<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCopyrightHolder<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCopyrightNotice<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCopyrightYear<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCorrection<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCountryOfOrigin<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCreativeWorkStatus<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCreator<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedCreditText<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDateCreated<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDateModified<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDatePublished<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDescription<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDigitalSourceType<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDirector<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDirectors<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDisambiguatingDescription<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDiscussionUrl<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedDuration<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEditEidr<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEditor<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEducationalAlignment<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEducationalLevel<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEducationalUse<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEncoding<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEncodingFormat<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEncodings<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedEpisodeNumber<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedExampleOfWork<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedExpires<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFileFormat<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFunder<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedFunding<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedGenre<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHasPart<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedHeadline<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIdentifier<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedImage<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedInLanguage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedInteractionStatistic<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedInteractivityType<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedInterpretedAsClaim<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIsAccessibleForFree<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIsBasedOn<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::product::Embedded<'a>>,
-    ),
+    ProductEmbedded(Box<product::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIsBasedOnUrl<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::product::Embedded<'a>>,
-    ),
+    ProductEmbedded(Box<product::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIsFamilyFriendly<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedIsPartOf<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedKeywords<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLearningResourceType<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLicense<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedLocationCreated<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMainEntity<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMainEntityOfPage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMaintainer<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMaterial<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::product::Embedded<'a>>,
-    ),
+    ProductEmbedded(Box<product::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMaterialExtent<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMentions<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedMusicBy<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.MusicGroup#embedded")]
-    MusicGroupEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::music_group::Embedded<'a>>,
-    ),
+    MusicGroupEmbedded(Box<music_group::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedName<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedOffers<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<crate::social_flockfeeds::lexical::r#type::offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPartOfSeason<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPartOfSeries<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPartOfTvSeries<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.TVSeries#embedded")]
-    TvSeriesEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::tv_series::Embedded<'a>>,
-    ),
+    TvSeriesEmbedded(Box<tv_series::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPattern<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPosition<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPotentialAction<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedProducer<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedProductionCompany<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedProvider<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPublication<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPublisher<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPublisherImprint<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedPublishingPrinciples<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedRecordedAt<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<crate::social_flockfeeds::lexical::r#type::event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedReleasedEvent<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedReview<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedReviews<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSameAs<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSchemaVersion<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSdDatePublished<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSdLicense<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSdPublisher<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSize<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSourceOrganization<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSpatial<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSpatialCoverage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSponsor<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSubjectOf<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<crate::social_flockfeeds::lexical::r#type::event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedSubtitleLanguage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTeaches<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTemporal<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTemporalCoverage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedText<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedThumbnail<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedThumbnailUrl<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTimeRequired<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTitleEidr<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTrailer<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTranslationOfWork<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTranslator<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedTypicalAgeRange<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedUrl<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedUsageInfo<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedVersion<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedVideo<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedWordCount<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedWorkExample<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmbeddedWorkTranslation<'a> {}
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct TvEpisode<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub about: core::option::Option<TvEpisodeAbout<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub about: Option<TvEpisodeAbout<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#abstract: core::option::Option<TvEpisodeAbstract<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub r#abstract: Option<TvEpisodeAbstract<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub access_mode: core::option::Option<TvEpisodeAccessMode<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub access_mode: Option<TvEpisodeAccessMode<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub access_mode_sufficient: core::option::Option<TvEpisodeAccessModeSufficient<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub access_mode_sufficient: Option<TvEpisodeAccessModeSufficient<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_api: core::option::Option<TvEpisodeAccessibilityApi<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accessibility_api: Option<TvEpisodeAccessibilityApi<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_control: core::option::Option<TvEpisodeAccessibilityControl<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accessibility_control: Option<TvEpisodeAccessibilityControl<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_feature: core::option::Option<TvEpisodeAccessibilityFeature<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accessibility_feature: Option<TvEpisodeAccessibilityFeature<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_hazard: core::option::Option<TvEpisodeAccessibilityHazard<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accessibility_hazard: Option<TvEpisodeAccessibilityHazard<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_summary: core::option::Option<TvEpisodeAccessibilitySummary<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accessibility_summary: Option<TvEpisodeAccessibilitySummary<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub accountable_person: core::option::Option<TvEpisodeAccountablePerson<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accountable_person: Option<TvEpisodeAccountablePerson<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub acquire_license_page: core::option::Option<TvEpisodeAcquireLicensePage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub acquire_license_page: Option<TvEpisodeAcquireLicensePage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub actor: core::option::Option<TvEpisodeActor<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub actor: Option<TvEpisodeActor<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub actors: core::option::Option<TvEpisodeActors<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub actors: Option<TvEpisodeActors<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub additional_type: core::option::Option<TvEpisodeAdditionalType<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub additional_type: Option<TvEpisodeAdditionalType<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub aggregate_rating: core::option::Option<TvEpisodeAggregateRating<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub aggregate_rating: Option<TvEpisodeAggregateRating<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alternate_name: core::option::Option<TvEpisodeAlternateName<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub alternate_name: Option<TvEpisodeAlternateName<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alternative_headline: core::option::Option<TvEpisodeAlternativeHeadline<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub alternative_headline: Option<TvEpisodeAlternativeHeadline<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub archived_at: core::option::Option<TvEpisodeArchivedAt<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub archived_at: Option<TvEpisodeArchivedAt<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub assesses: core::option::Option<TvEpisodeAssesses<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub assesses: Option<TvEpisodeAssesses<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub associated_media: core::option::Option<TvEpisodeAssociatedMedia<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub associated_media: Option<TvEpisodeAssociatedMedia<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub audience: core::option::Option<TvEpisodeAudience<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub audience: Option<TvEpisodeAudience<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub audio: core::option::Option<TvEpisodeAudio<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub audio: Option<TvEpisodeAudio<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub author: core::option::Option<TvEpisodeAuthor<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub author: Option<TvEpisodeAuthor<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub award: core::option::Option<TvEpisodeAward<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub award: Option<TvEpisodeAward<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub awards: core::option::Option<TvEpisodeAwards<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub awards: Option<TvEpisodeAwards<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub character: core::option::Option<TvEpisodeCharacter<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub character: Option<TvEpisodeCharacter<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub citation: core::option::Option<TvEpisodeCitation<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub citation: Option<TvEpisodeCitation<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub comment: core::option::Option<TvEpisodeComment<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub comment: Option<TvEpisodeComment<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub comment_count: core::option::Option<TvEpisodeCommentCount<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub comment_count: Option<TvEpisodeCommentCount<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub conditions_of_access: core::option::Option<TvEpisodeConditionsOfAccess<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub conditions_of_access: Option<TvEpisodeConditionsOfAccess<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub content_location: core::option::Option<TvEpisodeContentLocation<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub content_location: Option<TvEpisodeContentLocation<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub content_rating: core::option::Option<TvEpisodeContentRating<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub content_rating: Option<TvEpisodeContentRating<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub content_reference_time: core::option::Option<TvEpisodeContentReferenceTime<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub content_reference_time: Option<TvEpisodeContentReferenceTime<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub contributor: core::option::Option<TvEpisodeContributor<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub contributor: Option<TvEpisodeContributor<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub copyright_holder: core::option::Option<TvEpisodeCopyrightHolder<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub copyright_holder: Option<TvEpisodeCopyrightHolder<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub copyright_notice: core::option::Option<TvEpisodeCopyrightNotice<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub copyright_notice: Option<TvEpisodeCopyrightNotice<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub copyright_year: core::option::Option<TvEpisodeCopyrightYear<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub copyright_year: Option<TvEpisodeCopyrightYear<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub correction: core::option::Option<TvEpisodeCorrection<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub correction: Option<TvEpisodeCorrection<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub country_of_origin: core::option::Option<TvEpisodeCountryOfOrigin<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub country_of_origin: Option<TvEpisodeCountryOfOrigin<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub creative_work_status: core::option::Option<TvEpisodeCreativeWorkStatus<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub creative_work_status: Option<TvEpisodeCreativeWorkStatus<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub creator: core::option::Option<TvEpisodeCreator<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub creator: Option<TvEpisodeCreator<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub credit_text: core::option::Option<TvEpisodeCreditText<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub credit_text: Option<TvEpisodeCreditText<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub date_created: core::option::Option<TvEpisodeDateCreated<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub date_created: Option<TvEpisodeDateCreated<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub date_modified: core::option::Option<TvEpisodeDateModified<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub date_modified: Option<TvEpisodeDateModified<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub date_published: core::option::Option<TvEpisodeDatePublished<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub date_published: Option<TvEpisodeDatePublished<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description: core::option::Option<TvEpisodeDescription<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub description: Option<TvEpisodeDescription<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub digital_source_type: core::option::Option<TvEpisodeDigitalSourceType<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub digital_source_type: Option<TvEpisodeDigitalSourceType<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub director: core::option::Option<TvEpisodeDirector<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub director: Option<TvEpisodeDirector<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub directors: core::option::Option<TvEpisodeDirectors<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub directors: Option<TvEpisodeDirectors<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub disambiguating_description: core::option::Option<
-        TvEpisodeDisambiguatingDescription<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub disambiguating_description: Option<TvEpisodeDisambiguatingDescription<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub discussion_url: core::option::Option<TvEpisodeDiscussionUrl<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub discussion_url: Option<TvEpisodeDiscussionUrl<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub duration: core::option::Option<TvEpisodeDuration<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duration: Option<TvEpisodeDuration<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub edit_eidr: core::option::Option<TvEpisodeEditEidr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub edit_eidr: Option<TvEpisodeEditEidr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub editor: core::option::Option<TvEpisodeEditor<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub editor: Option<TvEpisodeEditor<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub educational_alignment: core::option::Option<TvEpisodeEducationalAlignment<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub educational_alignment: Option<TvEpisodeEducationalAlignment<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub educational_level: core::option::Option<TvEpisodeEducationalLevel<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub educational_level: Option<TvEpisodeEducationalLevel<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub educational_use: core::option::Option<TvEpisodeEducationalUse<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub educational_use: Option<TvEpisodeEducationalUse<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub encoding: core::option::Option<TvEpisodeEncoding<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub encoding: Option<TvEpisodeEncoding<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub encoding_format: core::option::Option<TvEpisodeEncodingFormat<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub encoding_format: Option<TvEpisodeEncodingFormat<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub encodings: core::option::Option<TvEpisodeEncodings<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub encodings: Option<TvEpisodeEncodings<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub episode_number: core::option::Option<TvEpisodeEpisodeNumber<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub episode_number: Option<TvEpisodeEpisodeNumber<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub example_of_work: core::option::Option<TvEpisodeExampleOfWork<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub example_of_work: Option<TvEpisodeExampleOfWork<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub expires: core::option::Option<TvEpisodeExpires<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub expires: Option<TvEpisodeExpires<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub file_format: core::option::Option<TvEpisodeFileFormat<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub file_format: Option<TvEpisodeFileFormat<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub funder: core::option::Option<TvEpisodeFunder<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub funder: Option<TvEpisodeFunder<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub funding: core::option::Option<TvEpisodeFunding<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub funding: Option<TvEpisodeFunding<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub genre: core::option::Option<TvEpisodeGenre<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub genre: Option<TvEpisodeGenre<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub has_part: core::option::Option<TvEpisodeHasPart<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_part: Option<TvEpisodeHasPart<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub headline: core::option::Option<TvEpisodeHeadline<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub headline: Option<TvEpisodeHeadline<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub identifier: core::option::Option<TvEpisodeIdentifier<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub identifier: Option<TvEpisodeIdentifier<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub image: core::option::Option<TvEpisodeImage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub image: Option<TvEpisodeImage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub in_language: core::option::Option<TvEpisodeInLanguage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub in_language: Option<TvEpisodeInLanguage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub interaction_statistic: core::option::Option<TvEpisodeInteractionStatistic<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub interaction_statistic: Option<TvEpisodeInteractionStatistic<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub interactivity_type: core::option::Option<TvEpisodeInteractivityType<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub interactivity_type: Option<TvEpisodeInteractivityType<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub interpreted_as_claim: core::option::Option<TvEpisodeInterpretedAsClaim<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub interpreted_as_claim: Option<TvEpisodeInterpretedAsClaim<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub is_accessible_for_free: core::option::Option<TvEpisodeIsAccessibleForFree<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_accessible_for_free: Option<TvEpisodeIsAccessibleForFree<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub is_based_on: core::option::Option<TvEpisodeIsBasedOn<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_based_on: Option<TvEpisodeIsBasedOn<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub is_based_on_url: core::option::Option<TvEpisodeIsBasedOnUrl<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_based_on_url: Option<TvEpisodeIsBasedOnUrl<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub is_family_friendly: core::option::Option<TvEpisodeIsFamilyFriendly<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_family_friendly: Option<TvEpisodeIsFamilyFriendly<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub is_part_of: core::option::Option<TvEpisodeIsPartOf<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_part_of: Option<TvEpisodeIsPartOf<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub keywords: core::option::Option<TvEpisodeKeywords<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub keywords: Option<TvEpisodeKeywords<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub learning_resource_type: core::option::Option<TvEpisodeLearningResourceType<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub learning_resource_type: Option<TvEpisodeLearningResourceType<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub license: core::option::Option<TvEpisodeLicense<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub license: Option<TvEpisodeLicense<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub location_created: core::option::Option<TvEpisodeLocationCreated<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub location_created: Option<TvEpisodeLocationCreated<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub main_entity: core::option::Option<TvEpisodeMainEntity<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub main_entity: Option<TvEpisodeMainEntity<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub main_entity_of_page: core::option::Option<TvEpisodeMainEntityOfPage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub main_entity_of_page: Option<TvEpisodeMainEntityOfPage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub maintainer: core::option::Option<TvEpisodeMaintainer<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub maintainer: Option<TvEpisodeMaintainer<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub material: core::option::Option<TvEpisodeMaterial<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub material: Option<TvEpisodeMaterial<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub material_extent: core::option::Option<TvEpisodeMaterialExtent<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub material_extent: Option<TvEpisodeMaterialExtent<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub mentions: core::option::Option<TvEpisodeMentions<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub mentions: Option<TvEpisodeMentions<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub music_by: core::option::Option<TvEpisodeMusicBy<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub music_by: Option<TvEpisodeMusicBy<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub name: core::option::Option<TvEpisodeName<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub name: Option<TvEpisodeName<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub offers: core::option::Option<TvEpisodeOffers<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub offers: Option<TvEpisodeOffers<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub part_of_season: core::option::Option<TvEpisodePartOfSeason<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub part_of_season: Option<TvEpisodePartOfSeason<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub part_of_series: core::option::Option<TvEpisodePartOfSeries<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub part_of_series: Option<TvEpisodePartOfSeries<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub part_of_tv_series: core::option::Option<TvEpisodePartOfTvSeries<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub part_of_tv_series: Option<TvEpisodePartOfTvSeries<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub pattern: core::option::Option<TvEpisodePattern<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub pattern: Option<TvEpisodePattern<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub position: core::option::Option<TvEpisodePosition<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub position: Option<TvEpisodePosition<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub potential_action: core::option::Option<TvEpisodePotentialAction<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub potential_action: Option<TvEpisodePotentialAction<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub producer: core::option::Option<TvEpisodeProducer<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub producer: Option<TvEpisodeProducer<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub production_company: core::option::Option<TvEpisodeProductionCompany<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub production_company: Option<TvEpisodeProductionCompany<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub provider: core::option::Option<TvEpisodeProvider<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub provider: Option<TvEpisodeProvider<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub publication: core::option::Option<TvEpisodePublication<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub publication: Option<TvEpisodePublication<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub publisher: core::option::Option<TvEpisodePublisher<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub publisher: Option<TvEpisodePublisher<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub publisher_imprint: core::option::Option<TvEpisodePublisherImprint<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub publisher_imprint: Option<TvEpisodePublisherImprint<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub publishing_principles: core::option::Option<TvEpisodePublishingPrinciples<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub publishing_principles: Option<TvEpisodePublishingPrinciples<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub recorded_at: core::option::Option<TvEpisodeRecordedAt<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub recorded_at: Option<TvEpisodeRecordedAt<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub released_event: core::option::Option<TvEpisodeReleasedEvent<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub released_event: Option<TvEpisodeReleasedEvent<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub review: core::option::Option<TvEpisodeReview<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub review: Option<TvEpisodeReview<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub reviews: core::option::Option<TvEpisodeReviews<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reviews: Option<TvEpisodeReviews<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub same_as: core::option::Option<TvEpisodeSameAs<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub same_as: Option<TvEpisodeSameAs<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub schema_version: core::option::Option<TvEpisodeSchemaVersion<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub schema_version: Option<TvEpisodeSchemaVersion<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sd_date_published: core::option::Option<TvEpisodeSdDatePublished<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sd_date_published: Option<TvEpisodeSdDatePublished<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sd_license: core::option::Option<TvEpisodeSdLicense<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sd_license: Option<TvEpisodeSdLicense<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sd_publisher: core::option::Option<TvEpisodeSdPublisher<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sd_publisher: Option<TvEpisodeSdPublisher<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub size: core::option::Option<TvEpisodeSize<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub size: Option<TvEpisodeSize<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub source_organization: core::option::Option<TvEpisodeSourceOrganization<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub source_organization: Option<TvEpisodeSourceOrganization<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub spatial: core::option::Option<TvEpisodeSpatial<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub spatial: Option<TvEpisodeSpatial<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub spatial_coverage: core::option::Option<TvEpisodeSpatialCoverage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub spatial_coverage: Option<TvEpisodeSpatialCoverage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sponsor: core::option::Option<TvEpisodeSponsor<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sponsor: Option<TvEpisodeSponsor<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subject_of: core::option::Option<TvEpisodeSubjectOf<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub subject_of: Option<TvEpisodeSubjectOf<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subtitle_language: core::option::Option<TvEpisodeSubtitleLanguage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub subtitle_language: Option<TvEpisodeSubtitleLanguage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub teaches: core::option::Option<TvEpisodeTeaches<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub teaches: Option<TvEpisodeTeaches<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub temporal: core::option::Option<TvEpisodeTemporal<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub temporal: Option<TvEpisodeTemporal<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub temporal_coverage: core::option::Option<TvEpisodeTemporalCoverage<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub temporal_coverage: Option<TvEpisodeTemporalCoverage<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub text: core::option::Option<TvEpisodeText<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub text: Option<TvEpisodeText<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub thumbnail: core::option::Option<TvEpisodeThumbnail<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub thumbnail: Option<TvEpisodeThumbnail<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub thumbnail_url: core::option::Option<TvEpisodeThumbnailUrl<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub thumbnail_url: Option<TvEpisodeThumbnailUrl<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub time_required: core::option::Option<TvEpisodeTimeRequired<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub time_required: Option<TvEpisodeTimeRequired<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub title_eidr: core::option::Option<TvEpisodeTitleEidr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub title_eidr: Option<TvEpisodeTitleEidr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub trailer: core::option::Option<TvEpisodeTrailer<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub trailer: Option<TvEpisodeTrailer<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub translation_of_work: core::option::Option<TvEpisodeTranslationOfWork<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub translation_of_work: Option<TvEpisodeTranslationOfWork<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub translator: core::option::Option<TvEpisodeTranslator<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub translator: Option<TvEpisodeTranslator<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub typical_age_range: core::option::Option<TvEpisodeTypicalAgeRange<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub typical_age_range: Option<TvEpisodeTypicalAgeRange<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub url: core::option::Option<TvEpisodeUrl<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub url: Option<TvEpisodeUrl<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub usage_info: core::option::Option<TvEpisodeUsageInfo<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub usage_info: Option<TvEpisodeUsageInfo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub version: core::option::Option<TvEpisodeVersion<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub version: Option<TvEpisodeVersion<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub video: core::option::Option<TvEpisodeVideo<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub video: Option<TvEpisodeVideo<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub word_count: core::option::Option<TvEpisodeWordCount<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub word_count: Option<TvEpisodeWordCount<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub work_example: core::option::Option<TvEpisodeWorkExample<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub work_example: Option<TvEpisodeWorkExample<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub work_translation: core::option::Option<TvEpisodeWorkTranslation<'a>>,
+    pub work_translation: Option<TvEpisodeWorkTranslation<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAbout<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAbstract<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAccessMode<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAccessModeSufficient<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAccessibilityApi<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAccessibilityControl<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAccessibilityFeature<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAccessibilityHazard<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAccessibilitySummary<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAccountablePerson<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAcquireLicensePage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeActor<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeActors<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAdditionalType<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAggregateRating<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAlternateName<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAlternativeHeadline<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeArchivedAt<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAssesses<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAssociatedMedia<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAudience<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAudio<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAuthor<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAward<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeAwards<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeCharacter<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeCitation<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeComment<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeCommentCount<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeConditionsOfAccess<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeContentLocation<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeContentRating<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeContentReferenceTime<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeContributor<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeCopyrightHolder<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeCopyrightNotice<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeCopyrightYear<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeCorrection<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeCountryOfOrigin<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeCreativeWorkStatus<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeCreator<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeCreditText<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeDateCreated<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeDateModified<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeDatePublished<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeDescription<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeDigitalSourceType<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeDirector<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeDirectors<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeDisambiguatingDescription<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeDiscussionUrl<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeDuration<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeEditEidr<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeEditor<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeEducationalAlignment<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeEducationalLevel<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeEducationalUse<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeEncoding<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeEncodingFormat<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeEncodings<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeEpisodeNumber<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeExampleOfWork<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeExpires<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeFileFormat<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeFunder<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeFunding<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeGenre<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeHasPart<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeHeadline<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeIdentifier<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeImage<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeInLanguage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeInteractionStatistic<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeInteractivityType<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeInterpretedAsClaim<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeIsAccessibleForFree<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeIsBasedOn<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::product::Embedded<'a>>,
-    ),
+    ProductEmbedded(Box<product::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeIsBasedOnUrl<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::product::Embedded<'a>>,
-    ),
+    ProductEmbedded(Box<product::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeIsFamilyFriendly<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeIsPartOf<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeKeywords<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeLearningResourceType<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeLicense<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeLocationCreated<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeMainEntity<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeMainEntityOfPage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeMaintainer<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeMaterial<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::product::Embedded<'a>>,
-    ),
+    ProductEmbedded(Box<product::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeMaterialExtent<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeMentions<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeMusicBy<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.MusicGroup#embedded")]
-    MusicGroupEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::music_group::Embedded<'a>>,
-    ),
+    MusicGroupEmbedded(Box<music_group::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeName<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeOffers<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<crate::social_flockfeeds::lexical::r#type::offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodePartOfSeason<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodePartOfSeries<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodePartOfTvSeries<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.TVSeries#embedded")]
-    TvSeriesEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::tv_series::Embedded<'a>>,
-    ),
+    TvSeriesEmbedded(Box<tv_series::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodePattern<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodePosition<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodePotentialAction<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeProducer<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeProductionCompany<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeProvider<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodePublication<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodePublisher<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodePublisherImprint<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodePublishingPrinciples<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeRecordedAt<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<crate::social_flockfeeds::lexical::r#type::event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeReleasedEvent<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeReview<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeReviews<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeSameAs<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeSchemaVersion<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeSdDatePublished<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeSdLicense<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeSdPublisher<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeSize<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeSourceOrganization<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeSpatial<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeSpatialCoverage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeSponsor<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeSubjectOf<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<crate::social_flockfeeds::lexical::r#type::event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeSubtitleLanguage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeTeaches<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeTemporal<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeTemporalCoverage<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeText<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeThumbnail<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::image_object::Embedded<'a>>,
-    ),
+    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeThumbnailUrl<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeTimeRequired<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeTitleEidr<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeTrailer<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeTranslationOfWork<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeTranslator<'a> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(
-        Box<crate::social_flockfeeds::lexical::r#type::organization::Embedded<'a>>,
-    ),
+    OrganizationEmbedded(Box<organization::Embedded<'a>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<crate::social_flockfeeds::lexical::r#type::person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeTypicalAgeRange<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeUrl<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeUsageInfo<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeVersion<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeVideo<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeWordCount<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeWorkExample<'a> {}
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TvEpisodeWorkTranslation<'a> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct TvEpisodeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: TvEpisode<'a>,
 }
 
 impl<'a> TvEpisode<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, TvEpisodeRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, TvEpisodeRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Embedded<'a> {
+impl<'a> LexiconSchema for Embedded<'a> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.TVEpisode"
     }
     fn def_name() -> &'static str {
         "embedded"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_social_flockfeeds_lexical_type_TVEpisode()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TvEpisodeRecord;
-impl jacquard_common::xrpc::XrpcResp for TvEpisodeRecord {
+impl XrpcResp for TvEpisodeRecord {
     const NSID: &'static str = "social.flockfeeds.lexical.type.TVEpisode";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = TvEpisodeGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<TvEpisodeGetRecordOutput<'_>> for TvEpisode<'_> {
@@ -5015,3859 +2947,3008 @@ impl From<TvEpisodeGetRecordOutput<'_>> for TvEpisode<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for TvEpisode<'_> {
+impl Collection for TvEpisode<'_> {
     const NSID: &'static str = "social.flockfeeds.lexical.type.TVEpisode";
     type Record = TvEpisodeRecord;
 }
 
-impl jacquard_common::types::collection::Collection for TvEpisodeRecord {
+impl Collection for TvEpisodeRecord {
     const NSID: &'static str = "social.flockfeeds.lexical.type.TVEpisode";
     type Record = TvEpisodeRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for TvEpisode<'a> {
+impl<'a> LexiconSchema for TvEpisode<'a> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.TVEpisode"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_social_flockfeeds_lexical_type_TVEpisode()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "social.flockfeeds.lexical.type.TVEpisode",
-        ),
-        revision: None,
-        description: None,
+fn lexicon_doc_social_flockfeeds_lexical_type_TVEpisode() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("social.flockfeeds.lexical.type.TVEpisode"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("embedded"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("embedded"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A TV episode which can be part of a series or season.",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "about",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("about"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#aboutList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#aboutList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "abstract",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("abstract"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#abstractScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#abstractList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#abstractScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#abstractList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "accessMode",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("accessMode"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessModeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessModeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessModeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessModeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "accessModeSufficient",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("accessModeSufficient"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ItemList#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessModeSufficientList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.ItemList#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessModeSufficientList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "accessibilityAPI",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("accessibilityAPI"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityAPIScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityAPIList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityAPIScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityAPIList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "accessibilityControl",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("accessibilityControl"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityControlScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityControlList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityControlScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityControlList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "accessibilityFeature",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("accessibilityFeature"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityFeatureScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityFeatureList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityFeatureScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityFeatureList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "accessibilityHazard",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("accessibilityHazard"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityHazardScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityHazardList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityHazardScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityHazardList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "accessibilitySummary",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("accessibilitySummary"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilitySummaryScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilitySummaryList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilitySummaryScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilitySummaryList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "accountablePerson",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("accountablePerson"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accountablePersonList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accountablePersonList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "acquireLicensePage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("acquireLicensePage"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#acquireLicensePageScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#acquireLicensePageList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#acquireLicensePageScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#acquireLicensePageList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "actor",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("actor"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PerformingGroup#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#actorList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.PerformingGroup#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#actorList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "actors",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("actors"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#actorsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#actorsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "additionalType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("additionalType"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#additionalTypeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#additionalTypeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#additionalTypeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#additionalTypeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "aggregateRating",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("aggregateRating"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.AggregateRating#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#aggregateRatingList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.AggregateRating#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#aggregateRatingList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alternateName",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("alternateName"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternateNameScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternateNameList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternateNameScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternateNameList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alternativeHeadline",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("alternativeHeadline"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternativeHeadlineScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternativeHeadlineList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternativeHeadlineScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternativeHeadlineList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "archivedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("archivedAt"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.WebPage#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#archivedAtScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#archivedAtList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.WebPage#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#archivedAtScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#archivedAtList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "assesses",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("assesses"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#assessesScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#assessesList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#assessesScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#assessesList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "associatedMedia",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("associatedMedia"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MediaObject#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#associatedMediaList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.MediaObject#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#associatedMediaList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "audience",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("audience"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Audience#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#audienceList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Audience#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#audienceList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "audio",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("audio"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.AudioObject#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Clip#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MusicRecording#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#audioList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.AudioObject#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Clip#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.MusicRecording#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#audioList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "author",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("author"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#authorList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#authorList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "award",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("award"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "awards",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("awards"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardsScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardsScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "character",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("character"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#characterList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#characterList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "citation",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("citation"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#citationScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#citationList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#citationScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#citationList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "comment",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("comment"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Comment#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#commentList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Comment#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#commentList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "commentCount",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("commentCount"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#commentCountScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#commentCountList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#commentCountScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#commentCountList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "conditionsOfAccess",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("conditionsOfAccess"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#conditionsOfAccessScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#conditionsOfAccessList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#conditionsOfAccessScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#conditionsOfAccessList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "contentLocation",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("contentLocation"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentLocationList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentLocationList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "contentRating",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("contentRating"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Rating#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentRatingScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentRatingList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Rating#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentRatingScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentRatingList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "contentReferenceTime",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("contentReferenceTime"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentReferenceTimeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentReferenceTimeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentReferenceTimeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentReferenceTimeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "contributor",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("contributor"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contributorList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contributorList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "copyrightHolder",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("copyrightHolder"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightHolderList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightHolderList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "copyrightNotice",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("copyrightNotice"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightNoticeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightNoticeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightNoticeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightNoticeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "copyrightYear",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("copyrightYear"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightYearScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightYearList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightYearScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightYearList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "correction",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("correction"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CorrectionComment#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#correctionScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#correctionList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CorrectionComment#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#correctionScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#correctionList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "countryOfOrigin",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("countryOfOrigin"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Country#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#countryOfOriginList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Country#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#countryOfOriginList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "creativeWorkStatus",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("creativeWorkStatus"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creativeWorkStatusScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creativeWorkStatusList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creativeWorkStatusScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creativeWorkStatusList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "creator",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("creator"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creatorList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creatorList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "creditText",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("creditText"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creditTextScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creditTextList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creditTextScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creditTextList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "dateCreated",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("dateCreated"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateCreatedScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateCreatedList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateCreatedScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateCreatedList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "dateModified",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("dateModified"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateModifiedScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateModifiedList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateModifiedScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateModifiedList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "datePublished",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("datePublished"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#datePublishedScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#datePublishedList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#datePublishedScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#datePublishedList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "description",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("description"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.TextObject#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#descriptionScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#descriptionList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.TextObject#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#descriptionScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#descriptionList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "digitalSourceType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("digitalSourceType"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.IPTCDigitalSourceEnumeration#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#digitalSourceTypeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#digitalSourceTypeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.IPTCDigitalSourceEnumeration#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#digitalSourceTypeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#digitalSourceTypeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "director",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("director"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#directorList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#directorList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "directors",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("directors"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#directorsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#directorsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "disambiguatingDescription",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("disambiguatingDescription"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#disambiguatingDescriptionScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#disambiguatingDescriptionList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#disambiguatingDescriptionScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#disambiguatingDescriptionList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "discussionUrl",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("discussionUrl"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#discussionUrlScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#discussionUrlList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#discussionUrlScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#discussionUrlList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "duration",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("duration"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#durationScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#durationList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#durationScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#durationList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "editEIDR",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("editEIDR"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#editEIDRScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#editEIDRList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#editEIDRScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#editEIDRList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "editor",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("editor"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#editorList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#editorList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "educationalAlignment",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("educationalAlignment"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.AlignmentObject#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalAlignmentList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.AlignmentObject#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalAlignmentList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "educationalLevel",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("educationalLevel"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalLevelScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalLevelList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalLevelScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalLevelList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "educationalUse",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("educationalUse"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalUseScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalUseList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalUseScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalUseList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "encoding",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("encoding"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MediaObject#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.MediaObject#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "encodingFormat",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("encodingFormat"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingFormatScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingFormatList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingFormatScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingFormatList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "encodings",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("encodings"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MediaObject#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.MediaObject#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "episodeNumber",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("episodeNumber"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#episodeNumberScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#episodeNumberList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#episodeNumberScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#episodeNumberList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "exampleOfWork",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("exampleOfWork"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#exampleOfWorkList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#exampleOfWorkList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "expires",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("expires"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#expiresScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#expiresList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#expiresScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#expiresList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "fileFormat",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("fileFormat"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#fileFormatScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#fileFormatList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#fileFormatScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#fileFormatList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "funder",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("funder"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#funderList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#funderList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "funding",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("funding"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Grant#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#fundingList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Grant#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#fundingList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "genre",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("genre"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#genreScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#genreList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#genreScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#genreList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hasPart",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("hasPart"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#hasPartList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#hasPartList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "headline",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("headline"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#headlineScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#headlineList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#headlineScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#headlineList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "identifier",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("identifier"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PropertyValue#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#identifierScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#identifierList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.PropertyValue#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#identifierScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#identifierList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "image",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("image"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#imageScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#imageList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#imageScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#imageList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "inLanguage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("inLanguage"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Language#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#inLanguageScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#inLanguageList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Language#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#inLanguageScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#inLanguageList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "interactionStatistic",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("interactionStatistic"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.InteractionCounter#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interactionStatisticList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.InteractionCounter#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interactionStatisticList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "interactivityType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("interactivityType"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interactivityTypeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interactivityTypeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interactivityTypeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interactivityTypeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "interpretedAsClaim",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("interpretedAsClaim"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Claim#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interpretedAsClaimList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Claim#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interpretedAsClaimList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "isAccessibleForFree",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("isAccessibleForFree"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isAccessibleForFreeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isAccessibleForFreeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isAccessibleForFreeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isAccessibleForFreeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "isBasedOn",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("isBasedOn"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "isBasedOnUrl",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("isBasedOnUrl"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnUrlScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnUrlList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnUrlScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnUrlList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "isFamilyFriendly",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("isFamilyFriendly"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isFamilyFriendlyScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isFamilyFriendlyList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isFamilyFriendlyScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isFamilyFriendlyList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "isPartOf",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("isPartOf"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isPartOfScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isPartOfList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isPartOfScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isPartOfList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "keywords",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("keywords"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#keywordsScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#keywordsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#keywordsScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#keywordsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "learningResourceType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("learningResourceType"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#learningResourceTypeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#learningResourceTypeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#learningResourceTypeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#learningResourceTypeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "license",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("license"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#licenseScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#licenseList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#licenseScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#licenseList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "locationCreated",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("locationCreated"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#locationCreatedList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#locationCreatedList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mainEntity",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("mainEntity"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mainEntityList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mainEntityList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mainEntityOfPage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("mainEntityOfPage"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mainEntityOfPageScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mainEntityOfPageList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mainEntityOfPageScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mainEntityOfPageList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maintainer",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("maintainer"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#maintainerList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#maintainerList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "material",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("material"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "materialExtent",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("materialExtent"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialExtentScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialExtentList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialExtentScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialExtentList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mentions",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("mentions"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mentionsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mentionsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "musicBy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("musicBy"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MusicGroup#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#musicByList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.MusicGroup#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#musicByList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#nameScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#nameList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#nameScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#nameList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "offers",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("offers"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Demand#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Offer#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#offersList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Demand#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Offer#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#offersList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "partOfSeason",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("partOfSeason"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWorkSeason#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#partOfSeasonList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWorkSeason#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#partOfSeasonList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "partOfSeries",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("partOfSeries"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWorkSeries#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#partOfSeriesList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWorkSeries#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#partOfSeriesList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "partOfTVSeries",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("partOfTVSeries"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.TVSeries#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#partOfTVSeriesList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.TVSeries#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#partOfTVSeriesList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "pattern",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("pattern"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#patternScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#patternList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#patternScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#patternList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "position",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("position"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#positionScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#positionList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#positionScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#positionList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "potentialAction",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("potentialAction"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Action#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#potentialActionList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Action#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#potentialActionList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "producer",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("producer"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#producerList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#producerList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "productionCompany",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("productionCompany"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#productionCompanyList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#productionCompanyList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "provider",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("provider"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#providerList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#providerList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "publication",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("publication"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PublicationEvent#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publicationList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.PublicationEvent#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publicationList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "publisher",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("publisher"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publisherList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publisherList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "publisherImprint",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("publisherImprint"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publisherImprintList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publisherImprintList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "publishingPrinciples",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("publishingPrinciples"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publishingPrinciplesScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publishingPrinciplesList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publishingPrinciplesScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publishingPrinciplesList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "recordedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("recordedAt"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#recordedAtList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#recordedAtList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "releasedEvent",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("releasedEvent"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PublicationEvent#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#releasedEventList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.PublicationEvent#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#releasedEventList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "review",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("review"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#reviewList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#reviewList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "reviews",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("reviews"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#reviewsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#reviewsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sameAs",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("sameAs"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sameAsScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sameAsList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sameAsScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sameAsList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "schemaVersion",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("schemaVersion"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#schemaVersionScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#schemaVersionList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#schemaVersionScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#schemaVersionList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sdDatePublished",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("sdDatePublished"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdDatePublishedScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdDatePublishedList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdDatePublishedScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdDatePublishedList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sdLicense",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("sdLicense"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdLicenseScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdLicenseList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdLicenseScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdLicenseList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sdPublisher",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("sdPublisher"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdPublisherList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdPublisherList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "size",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("size"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.SizeSpecification#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sizeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sizeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.SizeSpecification#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sizeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sizeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sourceOrganization",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("sourceOrganization"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sourceOrganizationList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sourceOrganizationList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "spatial",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("spatial"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#spatialList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#spatialList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "spatialCoverage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("spatialCoverage"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#spatialCoverageList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#spatialCoverageList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sponsor",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("sponsor"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sponsorList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sponsorList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "subjectOf",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("subjectOf"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#subjectOfList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#subjectOfList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "subtitleLanguage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("subtitleLanguage"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Language#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#subtitleLanguageScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#subtitleLanguageList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Language#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#subtitleLanguageScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#subtitleLanguageList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "teaches",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("teaches"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#teachesScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#teachesList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#teachesScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#teachesList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "temporal",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("temporal"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "temporalCoverage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("temporalCoverage"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalCoverageScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalCoverageList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalCoverageScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalCoverageList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "text",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("text"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#textScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#textList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#textScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#textList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "thumbnail",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("thumbnail"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#thumbnailList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#thumbnailList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "thumbnailUrl",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("thumbnailUrl"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#thumbnailUrlScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#thumbnailUrlList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#thumbnailUrlScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#thumbnailUrlList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "timeRequired",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("timeRequired"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#timeRequiredScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#timeRequiredList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#timeRequiredScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#timeRequiredList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "titleEIDR",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("titleEIDR"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#titleEIDRScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#titleEIDRList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#titleEIDRScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#titleEIDRList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "trailer",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("trailer"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.VideoObject#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#trailerList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.VideoObject#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#trailerList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "translationOfWork",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("translationOfWork"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#translationOfWorkList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#translationOfWorkList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "translator",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("translator"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#translatorList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#translatorList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "typicalAgeRange",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("typicalAgeRange"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#typicalAgeRangeScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#typicalAgeRangeList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#typicalAgeRangeScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#typicalAgeRangeList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "url",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("url"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#urlScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#urlList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#urlScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#urlList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "usageInfo",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("usageInfo"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#usageInfoScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#usageInfoList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#usageInfoScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#usageInfoList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "version",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("version"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#versionScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#versionList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#versionScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#versionList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "video",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("video"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Clip#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.VideoObject#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#videoList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.Clip#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.type.VideoObject#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#videoList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "wordCount",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("wordCount"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#wordCountScalar"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#wordCountList")
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#wordCountScalar"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#wordCountList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "workExample",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("workExample"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#workExampleList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#workExampleList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "workTranslation",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("workTranslation"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                    ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#workTranslationList")
+                                    CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                    CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#workTranslationList")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         description: Some(
-                            ::jacquard_common::CowStr::new_static(
+                            CowStr::new_static(
                                 "A TV episode which can be part of a series or season.",
                             ),
                         ),
-                        required: None,
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "about",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("about"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#aboutList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#aboutList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "abstract",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("abstract"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#abstractScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#abstractList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#abstractScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#abstractList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "accessMode",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("accessMode"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessModeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessModeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessModeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessModeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "accessModeSufficient",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("accessModeSufficient"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ItemList#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessModeSufficientList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.ItemList#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessModeSufficientList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "accessibilityAPI",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("accessibilityAPI"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityAPIScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityAPIList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityAPIScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityAPIList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "accessibilityControl",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("accessibilityControl"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityControlScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityControlList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityControlScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityControlList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "accessibilityFeature",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("accessibilityFeature"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityFeatureScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityFeatureList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityFeatureScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityFeatureList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "accessibilityHazard",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("accessibilityHazard"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityHazardScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityHazardList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityHazardScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilityHazardList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "accessibilitySummary",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("accessibilitySummary"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilitySummaryScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilitySummaryList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilitySummaryScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accessibilitySummaryList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "accountablePerson",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("accountablePerson"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accountablePersonList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#accountablePersonList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "acquireLicensePage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("acquireLicensePage"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#acquireLicensePageScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#acquireLicensePageList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#acquireLicensePageScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#acquireLicensePageList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "actor",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("actor"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PerformingGroup#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#actorList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.PerformingGroup#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#actorList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "actors",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("actors"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#actorsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#actorsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "additionalType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("additionalType"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#additionalTypeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#additionalTypeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#additionalTypeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#additionalTypeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "aggregateRating",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("aggregateRating"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.AggregateRating#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#aggregateRatingList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.AggregateRating#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#aggregateRatingList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "alternateName",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("alternateName"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternateNameScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternateNameList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternateNameScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternateNameList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "alternativeHeadline",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("alternativeHeadline"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternativeHeadlineScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternativeHeadlineList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternativeHeadlineScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#alternativeHeadlineList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "archivedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("archivedAt"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.WebPage#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#archivedAtScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#archivedAtList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.WebPage#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#archivedAtScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#archivedAtList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "assesses",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("assesses"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#assessesScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#assessesList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#assessesScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#assessesList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "associatedMedia",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("associatedMedia"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MediaObject#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#associatedMediaList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.MediaObject#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#associatedMediaList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "audience",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("audience"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Audience#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#audienceList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Audience#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#audienceList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "audio",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("audio"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.AudioObject#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Clip#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MusicRecording#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#audioList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.AudioObject#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Clip#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.MusicRecording#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#audioList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "author",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("author"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#authorList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#authorList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "award",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("award"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "awards",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("awards"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardsScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardsScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#awardsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "character",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("character"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#characterList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#characterList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "citation",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("citation"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#citationScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#citationList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#citationScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#citationList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "comment",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("comment"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Comment#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#commentList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Comment#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#commentList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "commentCount",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("commentCount"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#commentCountScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#commentCountList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#commentCountScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#commentCountList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "conditionsOfAccess",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("conditionsOfAccess"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#conditionsOfAccessScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#conditionsOfAccessList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#conditionsOfAccessScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#conditionsOfAccessList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "contentLocation",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("contentLocation"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentLocationList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentLocationList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "contentRating",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("contentRating"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Rating#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentRatingScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentRatingList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Rating#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentRatingScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentRatingList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "contentReferenceTime",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("contentReferenceTime"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentReferenceTimeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentReferenceTimeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentReferenceTimeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contentReferenceTimeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "contributor",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("contributor"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contributorList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#contributorList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "copyrightHolder",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("copyrightHolder"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightHolderList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightHolderList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "copyrightNotice",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("copyrightNotice"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightNoticeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightNoticeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightNoticeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightNoticeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "copyrightYear",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("copyrightYear"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightYearScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightYearList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightYearScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#copyrightYearList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "correction",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("correction"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CorrectionComment#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#correctionScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#correctionList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CorrectionComment#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#correctionScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#correctionList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "countryOfOrigin",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("countryOfOrigin"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Country#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#countryOfOriginList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Country#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#countryOfOriginList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "creativeWorkStatus",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("creativeWorkStatus"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creativeWorkStatusScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creativeWorkStatusList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creativeWorkStatusScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creativeWorkStatusList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "creator",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("creator"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creatorList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creatorList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "creditText",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("creditText"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creditTextScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creditTextList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creditTextScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#creditTextList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "dateCreated",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("dateCreated"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateCreatedScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateCreatedList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateCreatedScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateCreatedList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "dateModified",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("dateModified"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateModifiedScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateModifiedList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateModifiedScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#dateModifiedList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "datePublished",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("datePublished"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#datePublishedScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#datePublishedList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#datePublishedScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#datePublishedList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "description",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("description"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.TextObject#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#descriptionScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#descriptionList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.TextObject#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#descriptionScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#descriptionList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "digitalSourceType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("digitalSourceType"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.IPTCDigitalSourceEnumeration#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#digitalSourceTypeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#digitalSourceTypeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.IPTCDigitalSourceEnumeration#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#digitalSourceTypeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#digitalSourceTypeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "director",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("director"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#directorList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#directorList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "directors",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("directors"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#directorsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#directorsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "disambiguatingDescription",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("disambiguatingDescription"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#disambiguatingDescriptionScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#disambiguatingDescriptionList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#disambiguatingDescriptionScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#disambiguatingDescriptionList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "discussionUrl",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("discussionUrl"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#discussionUrlScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#discussionUrlList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#discussionUrlScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#discussionUrlList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "duration",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("duration"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#durationScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#durationList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#durationScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#durationList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "editEIDR",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("editEIDR"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#editEIDRScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#editEIDRList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#editEIDRScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#editEIDRList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "editor",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("editor"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#editorList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#editorList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "educationalAlignment",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("educationalAlignment"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.AlignmentObject#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalAlignmentList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.AlignmentObject#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalAlignmentList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "educationalLevel",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("educationalLevel"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalLevelScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalLevelList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalLevelScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalLevelList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "educationalUse",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("educationalUse"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalUseScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalUseList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalUseScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#educationalUseList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "encoding",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("encoding"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MediaObject#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.MediaObject#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "encodingFormat",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("encodingFormat"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingFormatScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingFormatList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingFormatScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingFormatList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "encodings",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("encodings"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MediaObject#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.MediaObject#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#encodingsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "episodeNumber",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("episodeNumber"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#episodeNumberScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#episodeNumberList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#episodeNumberScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#episodeNumberList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "exampleOfWork",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("exampleOfWork"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#exampleOfWorkList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#exampleOfWorkList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "expires",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("expires"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#expiresScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#expiresList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#expiresScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#expiresList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "fileFormat",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("fileFormat"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#fileFormatScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#fileFormatList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#fileFormatScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#fileFormatList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "funder",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("funder"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#funderList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#funderList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "funding",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("funding"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Grant#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#fundingList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Grant#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#fundingList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "genre",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("genre"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#genreScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#genreList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#genreScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#genreList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "hasPart",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("hasPart"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#hasPartList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#hasPartList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "headline",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("headline"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#headlineScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#headlineList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#headlineScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#headlineList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "identifier",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("identifier"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PropertyValue#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#identifierScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#identifierList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.PropertyValue#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#identifierScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#identifierList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "image",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("image"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#imageScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#imageList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#imageScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#imageList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "inLanguage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("inLanguage"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Language#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#inLanguageScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#inLanguageList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Language#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#inLanguageScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#inLanguageList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "interactionStatistic",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("interactionStatistic"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.InteractionCounter#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interactionStatisticList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.InteractionCounter#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interactionStatisticList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "interactivityType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("interactivityType"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interactivityTypeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interactivityTypeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interactivityTypeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interactivityTypeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "interpretedAsClaim",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("interpretedAsClaim"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Claim#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interpretedAsClaimList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Claim#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#interpretedAsClaimList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "isAccessibleForFree",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("isAccessibleForFree"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isAccessibleForFreeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isAccessibleForFreeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isAccessibleForFreeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isAccessibleForFreeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "isBasedOn",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("isBasedOn"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "isBasedOnUrl",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("isBasedOnUrl"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnUrlScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnUrlList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnUrlScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isBasedOnUrlList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "isFamilyFriendly",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("isFamilyFriendly"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isFamilyFriendlyScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isFamilyFriendlyList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isFamilyFriendlyScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isFamilyFriendlyList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "isPartOf",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("isPartOf"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isPartOfScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isPartOfList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isPartOfScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#isPartOfList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "keywords",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("keywords"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#keywordsScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#keywordsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#keywordsScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#keywordsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "learningResourceType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("learningResourceType"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#learningResourceTypeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#learningResourceTypeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#learningResourceTypeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#learningResourceTypeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "license",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("license"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#licenseScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#licenseList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#licenseScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#licenseList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "locationCreated",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("locationCreated"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#locationCreatedList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#locationCreatedList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "mainEntity",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("mainEntity"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mainEntityList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mainEntityList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "mainEntityOfPage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("mainEntityOfPage"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mainEntityOfPageScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mainEntityOfPageList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mainEntityOfPageScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mainEntityOfPageList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "maintainer",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("maintainer"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#maintainerList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#maintainerList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "material",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("material"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Product#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "materialExtent",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("materialExtent"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialExtentScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialExtentList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialExtentScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#materialExtentList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "mentions",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("mentions"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mentionsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Thing#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#mentionsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "musicBy",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("musicBy"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.MusicGroup#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#musicByList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.MusicGroup#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#musicByList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("name"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#nameScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#nameList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#nameScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#nameList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "offers",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("offers"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Demand#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Offer#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#offersList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Demand#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Offer#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#offersList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "partOfSeason",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("partOfSeason"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWorkSeason#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#partOfSeasonList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWorkSeason#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#partOfSeasonList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "partOfSeries",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("partOfSeries"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWorkSeries#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#partOfSeriesList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWorkSeries#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#partOfSeriesList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "partOfTVSeries",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("partOfTVSeries"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.TVSeries#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#partOfTVSeriesList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.TVSeries#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#partOfTVSeriesList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "pattern",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("pattern"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#patternScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#patternList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#patternScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#patternList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "position",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("position"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#positionScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#positionList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#positionScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#positionList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "potentialAction",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("potentialAction"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Action#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#potentialActionList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Action#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#potentialActionList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "producer",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("producer"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#producerList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#producerList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "productionCompany",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("productionCompany"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#productionCompanyList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#productionCompanyList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "provider",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("provider"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#providerList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#providerList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "publication",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("publication"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PublicationEvent#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publicationList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.PublicationEvent#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publicationList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "publisher",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("publisher"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publisherList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publisherList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "publisherImprint",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("publisherImprint"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publisherImprintList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publisherImprintList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "publishingPrinciples",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("publishingPrinciples"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publishingPrinciplesScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publishingPrinciplesList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publishingPrinciplesScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#publishingPrinciplesList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "recordedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("recordedAt"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#recordedAtList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#recordedAtList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "releasedEvent",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("releasedEvent"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.PublicationEvent#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#releasedEventList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.PublicationEvent#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#releasedEventList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "review",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("review"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#reviewList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#reviewList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "reviews",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("reviews"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#reviewsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Review#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#reviewsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sameAs",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("sameAs"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sameAsScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sameAsList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sameAsScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sameAsList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "schemaVersion",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("schemaVersion"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#schemaVersionScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#schemaVersionList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#schemaVersionScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#schemaVersionList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sdDatePublished",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("sdDatePublished"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdDatePublishedScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdDatePublishedList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdDatePublishedScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdDatePublishedList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sdLicense",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("sdLicense"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdLicenseScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdLicenseList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdLicenseScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdLicenseList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sdPublisher",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("sdPublisher"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdPublisherList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sdPublisherList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "size",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("size"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.SizeSpecification#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sizeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sizeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.QuantitativeValue#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.SizeSpecification#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sizeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sizeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sourceOrganization",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("sourceOrganization"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sourceOrganizationList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sourceOrganizationList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "spatial",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("spatial"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#spatialList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#spatialList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "spatialCoverage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("spatialCoverage"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#spatialCoverageList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Place#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#spatialCoverageList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sponsor",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("sponsor"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sponsorList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#sponsorList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "subjectOf",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("subjectOf"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#subjectOfList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Event#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#subjectOfList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "subtitleLanguage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("subtitleLanguage"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Language#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#subtitleLanguageScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#subtitleLanguageList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Language#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#subtitleLanguageScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#subtitleLanguageList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "teaches",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("teaches"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#teachesScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#teachesList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.DefinedTerm#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#teachesScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#teachesList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "temporal",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("temporal"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "temporalCoverage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("temporalCoverage"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalCoverageScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalCoverageList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalCoverageScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#temporalCoverageList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "text",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("text"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#textScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#textList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#textScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#textList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "thumbnail",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("thumbnail"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#thumbnailList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.ImageObject#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#thumbnailList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "thumbnailUrl",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("thumbnailUrl"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#thumbnailUrlScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#thumbnailUrlList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#thumbnailUrlScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#thumbnailUrlList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "timeRequired",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("timeRequired"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#timeRequiredScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#timeRequiredList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#timeRequiredScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#timeRequiredList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "titleEIDR",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("titleEIDR"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#titleEIDRScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#titleEIDRList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#titleEIDRScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#titleEIDRList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "trailer",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("trailer"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.VideoObject#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#trailerList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.VideoObject#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#trailerList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "translationOfWork",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("translationOfWork"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#translationOfWorkList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#translationOfWorkList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "translator",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("translator"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#translatorList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Organization#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Person#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#translatorList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "typicalAgeRange",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("typicalAgeRange"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#typicalAgeRangeScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#typicalAgeRangeList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#typicalAgeRangeScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#typicalAgeRangeList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "url",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("url"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#urlScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#urlList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#urlScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#urlList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "usageInfo",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("usageInfo"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#usageInfoScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#usageInfoList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#usageInfoScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#usageInfoList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "version",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("version"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#versionScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#versionList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#versionScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#versionList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "video",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("video"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.Clip#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.VideoObject#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#videoList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.Clip#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.type.VideoObject#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#videoList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "wordCount",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("wordCount"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#wordCountScalar"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#wordCountList")
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#wordCountScalar"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#wordCountList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "workExample",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("workExample"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#workExampleList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#workExampleList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "workTranslation",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("workTranslation"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
-                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#workTranslationList")
+                                        CowStr::new_static("social.flockfeeds.lexical.type.CreativeWork#embedded"),
+                                        CowStr::new_static("social.flockfeeds.lexical.prop.tVEpisode#workTranslationList")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -8892,151 +5973,151 @@ pub mod tv_episode_state {
 
 /// Builder for constructing an instance of this type
 pub struct TvEpisodeBuilder<'a, S: tv_episode_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<TvEpisodeAbout<'a>>,
-        ::core::option::Option<TvEpisodeAbstract<'a>>,
-        ::core::option::Option<TvEpisodeAccessMode<'a>>,
-        ::core::option::Option<TvEpisodeAccessModeSufficient<'a>>,
-        ::core::option::Option<TvEpisodeAccessibilityApi<'a>>,
-        ::core::option::Option<TvEpisodeAccessibilityControl<'a>>,
-        ::core::option::Option<TvEpisodeAccessibilityFeature<'a>>,
-        ::core::option::Option<TvEpisodeAccessibilityHazard<'a>>,
-        ::core::option::Option<TvEpisodeAccessibilitySummary<'a>>,
-        ::core::option::Option<TvEpisodeAccountablePerson<'a>>,
-        ::core::option::Option<TvEpisodeAcquireLicensePage<'a>>,
-        ::core::option::Option<TvEpisodeActor<'a>>,
-        ::core::option::Option<TvEpisodeActors<'a>>,
-        ::core::option::Option<TvEpisodeAdditionalType<'a>>,
-        ::core::option::Option<TvEpisodeAggregateRating<'a>>,
-        ::core::option::Option<TvEpisodeAlternateName<'a>>,
-        ::core::option::Option<TvEpisodeAlternativeHeadline<'a>>,
-        ::core::option::Option<TvEpisodeArchivedAt<'a>>,
-        ::core::option::Option<TvEpisodeAssesses<'a>>,
-        ::core::option::Option<TvEpisodeAssociatedMedia<'a>>,
-        ::core::option::Option<TvEpisodeAudience<'a>>,
-        ::core::option::Option<TvEpisodeAudio<'a>>,
-        ::core::option::Option<TvEpisodeAuthor<'a>>,
-        ::core::option::Option<TvEpisodeAward<'a>>,
-        ::core::option::Option<TvEpisodeAwards<'a>>,
-        ::core::option::Option<TvEpisodeCharacter<'a>>,
-        ::core::option::Option<TvEpisodeCitation<'a>>,
-        ::core::option::Option<TvEpisodeComment<'a>>,
-        ::core::option::Option<TvEpisodeCommentCount<'a>>,
-        ::core::option::Option<TvEpisodeConditionsOfAccess<'a>>,
-        ::core::option::Option<TvEpisodeContentLocation<'a>>,
-        ::core::option::Option<TvEpisodeContentRating<'a>>,
-        ::core::option::Option<TvEpisodeContentReferenceTime<'a>>,
-        ::core::option::Option<TvEpisodeContributor<'a>>,
-        ::core::option::Option<TvEpisodeCopyrightHolder<'a>>,
-        ::core::option::Option<TvEpisodeCopyrightNotice<'a>>,
-        ::core::option::Option<TvEpisodeCopyrightYear<'a>>,
-        ::core::option::Option<TvEpisodeCorrection<'a>>,
-        ::core::option::Option<TvEpisodeCountryOfOrigin<'a>>,
-        ::core::option::Option<TvEpisodeCreativeWorkStatus<'a>>,
-        ::core::option::Option<TvEpisodeCreator<'a>>,
-        ::core::option::Option<TvEpisodeCreditText<'a>>,
-        ::core::option::Option<TvEpisodeDateCreated<'a>>,
-        ::core::option::Option<TvEpisodeDateModified<'a>>,
-        ::core::option::Option<TvEpisodeDatePublished<'a>>,
-        ::core::option::Option<TvEpisodeDescription<'a>>,
-        ::core::option::Option<TvEpisodeDigitalSourceType<'a>>,
-        ::core::option::Option<TvEpisodeDirector<'a>>,
-        ::core::option::Option<TvEpisodeDirectors<'a>>,
-        ::core::option::Option<TvEpisodeDisambiguatingDescription<'a>>,
-        ::core::option::Option<TvEpisodeDiscussionUrl<'a>>,
-        ::core::option::Option<TvEpisodeDuration<'a>>,
-        ::core::option::Option<TvEpisodeEditEidr<'a>>,
-        ::core::option::Option<TvEpisodeEditor<'a>>,
-        ::core::option::Option<TvEpisodeEducationalAlignment<'a>>,
-        ::core::option::Option<TvEpisodeEducationalLevel<'a>>,
-        ::core::option::Option<TvEpisodeEducationalUse<'a>>,
-        ::core::option::Option<TvEpisodeEncoding<'a>>,
-        ::core::option::Option<TvEpisodeEncodingFormat<'a>>,
-        ::core::option::Option<TvEpisodeEncodings<'a>>,
-        ::core::option::Option<TvEpisodeEpisodeNumber<'a>>,
-        ::core::option::Option<TvEpisodeExampleOfWork<'a>>,
-        ::core::option::Option<TvEpisodeExpires<'a>>,
-        ::core::option::Option<TvEpisodeFileFormat<'a>>,
-        ::core::option::Option<TvEpisodeFunder<'a>>,
-        ::core::option::Option<TvEpisodeFunding<'a>>,
-        ::core::option::Option<TvEpisodeGenre<'a>>,
-        ::core::option::Option<TvEpisodeHasPart<'a>>,
-        ::core::option::Option<TvEpisodeHeadline<'a>>,
-        ::core::option::Option<TvEpisodeIdentifier<'a>>,
-        ::core::option::Option<TvEpisodeImage<'a>>,
-        ::core::option::Option<TvEpisodeInLanguage<'a>>,
-        ::core::option::Option<TvEpisodeInteractionStatistic<'a>>,
-        ::core::option::Option<TvEpisodeInteractivityType<'a>>,
-        ::core::option::Option<TvEpisodeInterpretedAsClaim<'a>>,
-        ::core::option::Option<TvEpisodeIsAccessibleForFree<'a>>,
-        ::core::option::Option<TvEpisodeIsBasedOn<'a>>,
-        ::core::option::Option<TvEpisodeIsBasedOnUrl<'a>>,
-        ::core::option::Option<TvEpisodeIsFamilyFriendly<'a>>,
-        ::core::option::Option<TvEpisodeIsPartOf<'a>>,
-        ::core::option::Option<TvEpisodeKeywords<'a>>,
-        ::core::option::Option<TvEpisodeLearningResourceType<'a>>,
-        ::core::option::Option<TvEpisodeLicense<'a>>,
-        ::core::option::Option<TvEpisodeLocationCreated<'a>>,
-        ::core::option::Option<TvEpisodeMainEntity<'a>>,
-        ::core::option::Option<TvEpisodeMainEntityOfPage<'a>>,
-        ::core::option::Option<TvEpisodeMaintainer<'a>>,
-        ::core::option::Option<TvEpisodeMaterial<'a>>,
-        ::core::option::Option<TvEpisodeMaterialExtent<'a>>,
-        ::core::option::Option<TvEpisodeMentions<'a>>,
-        ::core::option::Option<TvEpisodeMusicBy<'a>>,
-        ::core::option::Option<TvEpisodeName<'a>>,
-        ::core::option::Option<TvEpisodeOffers<'a>>,
-        ::core::option::Option<TvEpisodePartOfSeason<'a>>,
-        ::core::option::Option<TvEpisodePartOfSeries<'a>>,
-        ::core::option::Option<TvEpisodePartOfTvSeries<'a>>,
-        ::core::option::Option<TvEpisodePattern<'a>>,
-        ::core::option::Option<TvEpisodePosition<'a>>,
-        ::core::option::Option<TvEpisodePotentialAction<'a>>,
-        ::core::option::Option<TvEpisodeProducer<'a>>,
-        ::core::option::Option<TvEpisodeProductionCompany<'a>>,
-        ::core::option::Option<TvEpisodeProvider<'a>>,
-        ::core::option::Option<TvEpisodePublication<'a>>,
-        ::core::option::Option<TvEpisodePublisher<'a>>,
-        ::core::option::Option<TvEpisodePublisherImprint<'a>>,
-        ::core::option::Option<TvEpisodePublishingPrinciples<'a>>,
-        ::core::option::Option<TvEpisodeRecordedAt<'a>>,
-        ::core::option::Option<TvEpisodeReleasedEvent<'a>>,
-        ::core::option::Option<TvEpisodeReview<'a>>,
-        ::core::option::Option<TvEpisodeReviews<'a>>,
-        ::core::option::Option<TvEpisodeSameAs<'a>>,
-        ::core::option::Option<TvEpisodeSchemaVersion<'a>>,
-        ::core::option::Option<TvEpisodeSdDatePublished<'a>>,
-        ::core::option::Option<TvEpisodeSdLicense<'a>>,
-        ::core::option::Option<TvEpisodeSdPublisher<'a>>,
-        ::core::option::Option<TvEpisodeSize<'a>>,
-        ::core::option::Option<TvEpisodeSourceOrganization<'a>>,
-        ::core::option::Option<TvEpisodeSpatial<'a>>,
-        ::core::option::Option<TvEpisodeSpatialCoverage<'a>>,
-        ::core::option::Option<TvEpisodeSponsor<'a>>,
-        ::core::option::Option<TvEpisodeSubjectOf<'a>>,
-        ::core::option::Option<TvEpisodeSubtitleLanguage<'a>>,
-        ::core::option::Option<TvEpisodeTeaches<'a>>,
-        ::core::option::Option<TvEpisodeTemporal<'a>>,
-        ::core::option::Option<TvEpisodeTemporalCoverage<'a>>,
-        ::core::option::Option<TvEpisodeText<'a>>,
-        ::core::option::Option<TvEpisodeThumbnail<'a>>,
-        ::core::option::Option<TvEpisodeThumbnailUrl<'a>>,
-        ::core::option::Option<TvEpisodeTimeRequired<'a>>,
-        ::core::option::Option<TvEpisodeTitleEidr<'a>>,
-        ::core::option::Option<TvEpisodeTrailer<'a>>,
-        ::core::option::Option<TvEpisodeTranslationOfWork<'a>>,
-        ::core::option::Option<TvEpisodeTranslator<'a>>,
-        ::core::option::Option<TvEpisodeTypicalAgeRange<'a>>,
-        ::core::option::Option<TvEpisodeUrl<'a>>,
-        ::core::option::Option<TvEpisodeUsageInfo<'a>>,
-        ::core::option::Option<TvEpisodeVersion<'a>>,
-        ::core::option::Option<TvEpisodeVideo<'a>>,
-        ::core::option::Option<TvEpisodeWordCount<'a>>,
-        ::core::option::Option<TvEpisodeWorkExample<'a>>,
-        ::core::option::Option<TvEpisodeWorkTranslation<'a>>,
+        Option<TvEpisodeAbout<'a>>,
+        Option<TvEpisodeAbstract<'a>>,
+        Option<TvEpisodeAccessMode<'a>>,
+        Option<TvEpisodeAccessModeSufficient<'a>>,
+        Option<TvEpisodeAccessibilityApi<'a>>,
+        Option<TvEpisodeAccessibilityControl<'a>>,
+        Option<TvEpisodeAccessibilityFeature<'a>>,
+        Option<TvEpisodeAccessibilityHazard<'a>>,
+        Option<TvEpisodeAccessibilitySummary<'a>>,
+        Option<TvEpisodeAccountablePerson<'a>>,
+        Option<TvEpisodeAcquireLicensePage<'a>>,
+        Option<TvEpisodeActor<'a>>,
+        Option<TvEpisodeActors<'a>>,
+        Option<TvEpisodeAdditionalType<'a>>,
+        Option<TvEpisodeAggregateRating<'a>>,
+        Option<TvEpisodeAlternateName<'a>>,
+        Option<TvEpisodeAlternativeHeadline<'a>>,
+        Option<TvEpisodeArchivedAt<'a>>,
+        Option<TvEpisodeAssesses<'a>>,
+        Option<TvEpisodeAssociatedMedia<'a>>,
+        Option<TvEpisodeAudience<'a>>,
+        Option<TvEpisodeAudio<'a>>,
+        Option<TvEpisodeAuthor<'a>>,
+        Option<TvEpisodeAward<'a>>,
+        Option<TvEpisodeAwards<'a>>,
+        Option<TvEpisodeCharacter<'a>>,
+        Option<TvEpisodeCitation<'a>>,
+        Option<TvEpisodeComment<'a>>,
+        Option<TvEpisodeCommentCount<'a>>,
+        Option<TvEpisodeConditionsOfAccess<'a>>,
+        Option<TvEpisodeContentLocation<'a>>,
+        Option<TvEpisodeContentRating<'a>>,
+        Option<TvEpisodeContentReferenceTime<'a>>,
+        Option<TvEpisodeContributor<'a>>,
+        Option<TvEpisodeCopyrightHolder<'a>>,
+        Option<TvEpisodeCopyrightNotice<'a>>,
+        Option<TvEpisodeCopyrightYear<'a>>,
+        Option<TvEpisodeCorrection<'a>>,
+        Option<TvEpisodeCountryOfOrigin<'a>>,
+        Option<TvEpisodeCreativeWorkStatus<'a>>,
+        Option<TvEpisodeCreator<'a>>,
+        Option<TvEpisodeCreditText<'a>>,
+        Option<TvEpisodeDateCreated<'a>>,
+        Option<TvEpisodeDateModified<'a>>,
+        Option<TvEpisodeDatePublished<'a>>,
+        Option<TvEpisodeDescription<'a>>,
+        Option<TvEpisodeDigitalSourceType<'a>>,
+        Option<TvEpisodeDirector<'a>>,
+        Option<TvEpisodeDirectors<'a>>,
+        Option<TvEpisodeDisambiguatingDescription<'a>>,
+        Option<TvEpisodeDiscussionUrl<'a>>,
+        Option<TvEpisodeDuration<'a>>,
+        Option<TvEpisodeEditEidr<'a>>,
+        Option<TvEpisodeEditor<'a>>,
+        Option<TvEpisodeEducationalAlignment<'a>>,
+        Option<TvEpisodeEducationalLevel<'a>>,
+        Option<TvEpisodeEducationalUse<'a>>,
+        Option<TvEpisodeEncoding<'a>>,
+        Option<TvEpisodeEncodingFormat<'a>>,
+        Option<TvEpisodeEncodings<'a>>,
+        Option<TvEpisodeEpisodeNumber<'a>>,
+        Option<TvEpisodeExampleOfWork<'a>>,
+        Option<TvEpisodeExpires<'a>>,
+        Option<TvEpisodeFileFormat<'a>>,
+        Option<TvEpisodeFunder<'a>>,
+        Option<TvEpisodeFunding<'a>>,
+        Option<TvEpisodeGenre<'a>>,
+        Option<TvEpisodeHasPart<'a>>,
+        Option<TvEpisodeHeadline<'a>>,
+        Option<TvEpisodeIdentifier<'a>>,
+        Option<TvEpisodeImage<'a>>,
+        Option<TvEpisodeInLanguage<'a>>,
+        Option<TvEpisodeInteractionStatistic<'a>>,
+        Option<TvEpisodeInteractivityType<'a>>,
+        Option<TvEpisodeInterpretedAsClaim<'a>>,
+        Option<TvEpisodeIsAccessibleForFree<'a>>,
+        Option<TvEpisodeIsBasedOn<'a>>,
+        Option<TvEpisodeIsBasedOnUrl<'a>>,
+        Option<TvEpisodeIsFamilyFriendly<'a>>,
+        Option<TvEpisodeIsPartOf<'a>>,
+        Option<TvEpisodeKeywords<'a>>,
+        Option<TvEpisodeLearningResourceType<'a>>,
+        Option<TvEpisodeLicense<'a>>,
+        Option<TvEpisodeLocationCreated<'a>>,
+        Option<TvEpisodeMainEntity<'a>>,
+        Option<TvEpisodeMainEntityOfPage<'a>>,
+        Option<TvEpisodeMaintainer<'a>>,
+        Option<TvEpisodeMaterial<'a>>,
+        Option<TvEpisodeMaterialExtent<'a>>,
+        Option<TvEpisodeMentions<'a>>,
+        Option<TvEpisodeMusicBy<'a>>,
+        Option<TvEpisodeName<'a>>,
+        Option<TvEpisodeOffers<'a>>,
+        Option<TvEpisodePartOfSeason<'a>>,
+        Option<TvEpisodePartOfSeries<'a>>,
+        Option<TvEpisodePartOfTvSeries<'a>>,
+        Option<TvEpisodePattern<'a>>,
+        Option<TvEpisodePosition<'a>>,
+        Option<TvEpisodePotentialAction<'a>>,
+        Option<TvEpisodeProducer<'a>>,
+        Option<TvEpisodeProductionCompany<'a>>,
+        Option<TvEpisodeProvider<'a>>,
+        Option<TvEpisodePublication<'a>>,
+        Option<TvEpisodePublisher<'a>>,
+        Option<TvEpisodePublisherImprint<'a>>,
+        Option<TvEpisodePublishingPrinciples<'a>>,
+        Option<TvEpisodeRecordedAt<'a>>,
+        Option<TvEpisodeReleasedEvent<'a>>,
+        Option<TvEpisodeReview<'a>>,
+        Option<TvEpisodeReviews<'a>>,
+        Option<TvEpisodeSameAs<'a>>,
+        Option<TvEpisodeSchemaVersion<'a>>,
+        Option<TvEpisodeSdDatePublished<'a>>,
+        Option<TvEpisodeSdLicense<'a>>,
+        Option<TvEpisodeSdPublisher<'a>>,
+        Option<TvEpisodeSize<'a>>,
+        Option<TvEpisodeSourceOrganization<'a>>,
+        Option<TvEpisodeSpatial<'a>>,
+        Option<TvEpisodeSpatialCoverage<'a>>,
+        Option<TvEpisodeSponsor<'a>>,
+        Option<TvEpisodeSubjectOf<'a>>,
+        Option<TvEpisodeSubtitleLanguage<'a>>,
+        Option<TvEpisodeTeaches<'a>>,
+        Option<TvEpisodeTemporal<'a>>,
+        Option<TvEpisodeTemporalCoverage<'a>>,
+        Option<TvEpisodeText<'a>>,
+        Option<TvEpisodeThumbnail<'a>>,
+        Option<TvEpisodeThumbnailUrl<'a>>,
+        Option<TvEpisodeTimeRequired<'a>>,
+        Option<TvEpisodeTitleEidr<'a>>,
+        Option<TvEpisodeTrailer<'a>>,
+        Option<TvEpisodeTranslationOfWork<'a>>,
+        Option<TvEpisodeTranslator<'a>>,
+        Option<TvEpisodeTypicalAgeRange<'a>>,
+        Option<TvEpisodeUrl<'a>>,
+        Option<TvEpisodeUsageInfo<'a>>,
+        Option<TvEpisodeVersion<'a>>,
+        Option<TvEpisodeVideo<'a>>,
+        Option<TvEpisodeWordCount<'a>>,
+        Option<TvEpisodeWorkExample<'a>>,
+        Option<TvEpisodeWorkTranslation<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> TvEpisode<'a> {
@@ -9050,7 +6131,7 @@ impl<'a> TvEpisodeBuilder<'a, tv_episode_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TvEpisodeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -9194,7 +6275,7 @@ impl<'a> TvEpisodeBuilder<'a, tv_episode_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -11663,10 +8744,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> TvEpisode<'a> {
         TvEpisode {
             about: self.__unsafe_private_named.0,

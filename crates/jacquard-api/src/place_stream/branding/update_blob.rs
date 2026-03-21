@@ -5,76 +5,69 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateBlob<'a> {
     ///DID of the broadcaster. If not provided, uses the server's default broadcaster.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub broadcaster: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub broadcaster: Option<Did<'a>>,
     ///Base64-encoded blob data
     #[serde(borrow)]
-    pub data: jacquard_common::CowStr<'a>,
+    pub data: CowStr<'a>,
     ///Image height in pixels (optional, for images only)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub height: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub height: Option<i64>,
     ///Branding asset key (mainLogo, favicon, siteTitle, etc.)
     #[serde(borrow)]
-    pub key: jacquard_common::CowStr<'a>,
+    pub key: CowStr<'a>,
     ///MIME type of the blob (e.g., image/png, text/plain)
     #[serde(borrow)]
-    pub mime_type: jacquard_common::CowStr<'a>,
+    pub mime_type: CowStr<'a>,
     ///Image width in pixels (optional, for images only)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub width: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub width: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateBlobOutput<'a> {
     pub success: bool,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UpdateBlobError<'a> {
     /// The authenticated DID is not authorized to modify branding
     #[serde(rename = "Unauthorized")]
-    Unauthorized(core::option::Option<jacquard_common::CowStr<'a>>),
+    Unauthorized(Option<CowStr<'a>>),
     /// The blob exceeds the maximum size limit
     #[serde(rename = "BlobTooLarge")]
-    BlobTooLarge(core::option::Option<jacquard_common::CowStr<'a>>),
+    BlobTooLarge(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for UpdateBlobError<'_> {
@@ -99,8 +92,7 @@ impl core::fmt::Display for UpdateBlobError<'_> {
     }
 }
 
-/// Response type for
-///place.stream.branding.updateBlob
+/// Response type for place.stream.branding.updateBlob
 pub struct UpdateBlobResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateBlobResponse {
     const NSID: &'static str = "place.stream.branding.updateBlob";
@@ -117,8 +109,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateBlob<'a> {
     type Response = UpdateBlobResponse;
 }
 
-/// Endpoint type for
-///place.stream.branding.updateBlob
+/// Endpoint type for place.stream.branding.updateBlob
 pub struct UpdateBlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateBlobRequest {
     const PATH: &'static str = "/xrpc/place.stream.branding.updateBlob";

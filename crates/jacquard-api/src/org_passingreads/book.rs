@@ -17,42 +17,54 @@ pub mod list_book_ids;
 pub mod list_dropped_books;
 pub mod registration;
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::{Did, AtUri, Datetime, UriValue};
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::community_lexicon::location::hthree::Hthree;
+use crate::org_passingreads::Actor;
+use crate::org_passingreads::AspectRatio;
+use crate::org_passingreads::book;
 /// A confirmed book event for display purposes. Omits cryptographic fields (bookPub, bookSig) and book reference since it's shown in context of a book.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ConfirmedEvent<'a> {
     ///The person who performed this event
     #[serde(borrow)]
-    pub actor: crate::org_passingreads::Actor<'a>,
+    pub actor: Actor<'a>,
     ///What event occurred
     #[serde(borrow)]
     pub event: ConfirmedEventEvent<'a>,
     ///Where this event occurred
     #[serde(borrow)]
-    pub location: crate::community_lexicon::location::hthree::Hthree<'a>,
+    pub location: Hthree<'a>,
     ///When this event occurred
-    pub occurred_at: jacquard_common::types::string::Datetime,
+    pub occurred_at: Datetime,
     ///The AT URI of this event record
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
 /// What event occurred
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConfirmedEventEvent<'a> {
     OrgPassingreadsBookCheckin,
     OrgPassingreadsBookDrop,
     OrgPassingreadsBookFind,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ConfirmedEventEvent<'a> {
@@ -72,7 +84,7 @@ impl<'a> From<&'a str> for ConfirmedEventEvent<'a> {
             "org.passingreads.book.checkin" => Self::OrgPassingreadsBookCheckin,
             "org.passingreads.book.drop" => Self::OrgPassingreadsBookDrop,
             "org.passingreads.book.find" => Self::OrgPassingreadsBookFind,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -83,7 +95,7 @@ impl<'a> From<String> for ConfirmedEventEvent<'a> {
             "org.passingreads.book.checkin" => Self::OrgPassingreadsBookCheckin,
             "org.passingreads.book.drop" => Self::OrgPassingreadsBookDrop,
             "org.passingreads.book.find" => Self::OrgPassingreadsBookFind,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -147,96 +159,79 @@ impl jacquard_common::IntoStatic for ConfirmedEventEvent<'_> {
 }
 
 /// A view of a book registration for API responses. Omits cryptographic fields (bookPub, bookSig) and the cover blob.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RegistrationView<'a> {
     ///Authors of this book, in order of credit
     #[serde(borrow)]
-    pub authors: Vec<jacquard_common::CowStr<'a>>,
+    pub authors: Vec<CowStr<'a>>,
     ///The book's ID (as defined on its QR Code)
     #[serde(borrow)]
-    pub book_id: jacquard_common::CowStr<'a>,
+    pub book_id: CowStr<'a>,
     ///When the book was registered
-    pub occurred_at: jacquard_common::types::string::Datetime,
+    pub occurred_at: Datetime,
     ///The book's Open Library Edition ID
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub publication_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub publication_id: Option<CowStr<'a>>,
     ///The person who registered the book
     #[serde(borrow)]
-    pub registered_by: crate::org_passingreads::Actor<'a>,
+    pub registered_by: Actor<'a>,
     ///The title of the book
     #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
+    pub title: CowStr<'a>,
 }
 
 /// A book with its current state, combining registration data with computed state information.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct StatefulBook<'a> {
     ///Aspect ratio of the cover image
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: core::option::Option<crate::org_passingreads::AspectRatio<'a>>,
+    pub aspect_ratio: Option<AspectRatio<'a>>,
     ///The CID of the book registration record
     #[serde(borrow)]
-    pub cid: jacquard_common::CowStr<'a>,
+    pub cid: CowStr<'a>,
     ///Resolved URL to the cover image (from the registration blob)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cover_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub cover_url: Option<UriValue<'a>>,
     ///The DID of the current holder of the book
     #[serde(borrow)]
-    pub current_holder: jacquard_common::types::string::Did<'a>,
+    pub current_holder: Did<'a>,
     ///The current location of the book (only present if state is 'org.passingreads.book.drop')
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub current_location: core::option::Option<
-        crate::community_lexicon::location::hthree::Hthree<'a>,
-    >,
+    pub current_location: Option<Hthree<'a>>,
     ///List of confirmed events for this book, in chronological order
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub events: core::option::Option<
-        Vec<crate::org_passingreads::book::ConfirmedEvent<'a>>,
-    >,
+    pub events: Option<Vec<book::ConfirmedEvent<'a>>>,
     ///The book registration data (without cryptographic fields)
     #[serde(borrow)]
-    pub registration: crate::org_passingreads::book::RegistrationView<'a>,
+    pub registration: book::RegistrationView<'a>,
     ///The current state of the book, derived from the latest event
     #[serde(borrow)]
     pub state: StatefulBookState<'a>,
     ///The AT URI of the book registration record
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
 /// The current state of the book, derived from the latest event
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum StatefulBookState<'a> {
     OrgPassingreadsBookCheckin,
     OrgPassingreadsBookDrop,
     OrgPassingreadsBookFind,
     OrgPassingreadsBookRegistration,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> StatefulBookState<'a> {
@@ -258,7 +253,7 @@ impl<'a> From<&'a str> for StatefulBookState<'a> {
             "org.passingreads.book.drop" => Self::OrgPassingreadsBookDrop,
             "org.passingreads.book.find" => Self::OrgPassingreadsBookFind,
             "org.passingreads.book.registration" => Self::OrgPassingreadsBookRegistration,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -270,7 +265,7 @@ impl<'a> From<String> for StatefulBookState<'a> {
             "org.passingreads.book.drop" => Self::OrgPassingreadsBookDrop,
             "org.passingreads.book.find" => Self::OrgPassingreadsBookFind,
             "org.passingreads.book.registration" => Self::OrgPassingreadsBookRegistration,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -336,53 +331,47 @@ impl jacquard_common::IntoStatic for StatefulBookState<'_> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ConfirmedEvent<'a> {
+impl<'a> LexiconSchema for ConfirmedEvent<'a> {
     fn nsid() -> &'static str {
         "org.passingreads.book.defs"
     }
     fn def_name() -> &'static str {
         "confirmedEvent"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_passingreads_book_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for RegistrationView<'a> {
+impl<'a> LexiconSchema for RegistrationView<'a> {
     fn nsid() -> &'static str {
         "org.passingreads.book.defs"
     }
     fn def_name() -> &'static str {
         "registrationView"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_passingreads_book_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for StatefulBook<'a> {
+impl<'a> LexiconSchema for StatefulBook<'a> {
     fn nsid() -> &'static str {
         "org.passingreads.book.defs"
     }
     fn def_name() -> &'static str {
         "statefulBook"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_passingreads_book_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -398,98 +387,98 @@ pub mod confirmed_event_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Location;
-        type Actor;
-        type Event;
         type OccurredAt;
         type Uri;
+        type Actor;
+        type Event;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Location = Unset;
-        type Actor = Unset;
-        type Event = Unset;
         type OccurredAt = Unset;
         type Uri = Unset;
+        type Actor = Unset;
+        type Event = Unset;
     }
     ///State transition - sets the `location` field to Set
     pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLocation<S> {}
     impl<S: State> State for SetLocation<S> {
         type Location = Set<members::location>;
+        type OccurredAt = S::OccurredAt;
+        type Uri = S::Uri;
         type Actor = S::Actor;
         type Event = S::Event;
-        type OccurredAt = S::OccurredAt;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
-        type Location = S::Location;
-        type Actor = Set<members::actor>;
-        type Event = S::Event;
-        type OccurredAt = S::OccurredAt;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `event` field to Set
-    pub struct SetEvent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvent<S> {}
-    impl<S: State> State for SetEvent<S> {
-        type Location = S::Location;
-        type Actor = S::Actor;
-        type Event = Set<members::event>;
-        type OccurredAt = S::OccurredAt;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `occurred_at` field to Set
     pub struct SetOccurredAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOccurredAt<S> {}
     impl<S: State> State for SetOccurredAt<S> {
         type Location = S::Location;
-        type Actor = S::Actor;
-        type Event = S::Event;
         type OccurredAt = Set<members::occurred_at>;
         type Uri = S::Uri;
+        type Actor = S::Actor;
+        type Event = S::Event;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type Location = S::Location;
-        type Actor = S::Actor;
-        type Event = S::Event;
         type OccurredAt = S::OccurredAt;
         type Uri = Set<members::uri>;
+        type Actor = S::Actor;
+        type Event = S::Event;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActor<S> {}
+    impl<S: State> State for SetActor<S> {
+        type Location = S::Location;
+        type OccurredAt = S::OccurredAt;
+        type Uri = S::Uri;
+        type Actor = Set<members::actor>;
+        type Event = S::Event;
+    }
+    ///State transition - sets the `event` field to Set
+    pub struct SetEvent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvent<S> {}
+    impl<S: State> State for SetEvent<S> {
+        type Location = S::Location;
+        type OccurredAt = S::OccurredAt;
+        type Uri = S::Uri;
+        type Actor = S::Actor;
+        type Event = Set<members::event>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `location` field
         pub struct location(());
-        ///Marker type for the `actor` field
-        pub struct actor(());
-        ///Marker type for the `event` field
-        pub struct event(());
         ///Marker type for the `occurred_at` field
         pub struct occurred_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `actor` field
+        pub struct actor(());
+        ///Marker type for the `event` field
+        pub struct event(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ConfirmedEventBuilder<'a, S: confirmed_event_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::org_passingreads::Actor<'a>>,
-        ::core::option::Option<ConfirmedEventEvent<'a>>,
-        ::core::option::Option<crate::community_lexicon::location::hthree::Hthree<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        Option<Actor<'a>>,
+        Option<ConfirmedEventEvent<'a>>,
+        Option<Hthree<'a>>,
+        Option<Datetime>,
+        Option<AtUri<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ConfirmedEvent<'a> {
@@ -503,9 +492,9 @@ impl<'a> ConfirmedEventBuilder<'a, confirmed_event_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfirmedEventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -518,13 +507,13 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<crate::org_passingreads::Actor<'a>>,
+        value: impl Into<Actor<'a>>,
     ) -> ConfirmedEventBuilder<'a, confirmed_event_state::SetActor<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ConfirmedEventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -539,11 +528,11 @@ where
         mut self,
         value: impl Into<ConfirmedEventEvent<'a>>,
     ) -> ConfirmedEventBuilder<'a, confirmed_event_state::SetEvent<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ConfirmedEventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -556,13 +545,13 @@ where
     /// Set the `location` field (required)
     pub fn location(
         mut self,
-        value: impl Into<crate::community_lexicon::location::hthree::Hthree<'a>>,
+        value: impl Into<Hthree<'a>>,
     ) -> ConfirmedEventBuilder<'a, confirmed_event_state::SetLocation<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         ConfirmedEventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -575,13 +564,13 @@ where
     /// Set the `occurredAt` field (required)
     pub fn occurred_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ConfirmedEventBuilder<'a, confirmed_event_state::SetOccurredAt<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         ConfirmedEventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -594,13 +583,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> ConfirmedEventBuilder<'a, confirmed_event_state::SetUri<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         ConfirmedEventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -609,10 +598,10 @@ impl<'a, S> ConfirmedEventBuilder<'a, S>
 where
     S: confirmed_event_state::State,
     S::Location: confirmed_event_state::IsSet,
-    S::Actor: confirmed_event_state::IsSet,
-    S::Event: confirmed_event_state::IsSet,
     S::OccurredAt: confirmed_event_state::IsSet,
     S::Uri: confirmed_event_state::IsSet,
+    S::Actor: confirmed_event_state::IsSet,
+    S::Event: confirmed_event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ConfirmedEvent<'a> {
@@ -628,7 +617,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -644,469 +633,294 @@ where
     }
 }
 
-fn lexicon_doc_org_passingreads_book_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.passingreads.book.defs"),
-        revision: None,
-        description: None,
+fn lexicon_doc_org_passingreads_book_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("org.passingreads.book.defs"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("confirmedEvent"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("confirmedEvent"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A confirmed book event for display purposes. Omits cryptographic fields (bookPub, bookSig) and book reference since it's shown in context of a book.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("actor"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("event"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("location"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("occurredAt")
+                            SmolStr::new_static("uri"), SmolStr::new_static("actor"),
+                            SmolStr::new_static("event"),
+                            SmolStr::new_static("location"),
+                            SmolStr::new_static("occurredAt")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "actor",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "org.passingreads.defs#actor",
-                                ),
+                            SmolStr::new_static("actor"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("org.passingreads.defs#actor"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "event",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("event"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static("What event occurred"),
+                                    CowStr::new_static("What event occurred"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "location",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("location"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "community.lexicon.location.hthree#main",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "occurredAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("occurredAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "When this event occurred",
-                                    ),
+                                    CowStr::new_static("When this event occurred"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The AT URI of this event record",
-                                    ),
+                                    CowStr::new_static("The AT URI of this event record"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "registrationView",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("registrationView"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A view of a book registration for API responses. Omits cryptographic fields (bookPub, bookSig) and the cover blob.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("registeredBy"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("bookId"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("authors"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("occurredAt")
+                            SmolStr::new_static("registeredBy"),
+                            SmolStr::new_static("bookId"), SmolStr::new_static("title"),
+                            SmolStr::new_static("authors"),
+                            SmolStr::new_static("occurredAt")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "authors",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("authors"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Authors of this book, in order of credit",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "bookId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("bookId"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The book's ID (as defined on its QR Code)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "occurredAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("occurredAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "When the book was registered",
-                                    ),
+                                    CowStr::new_static("When the book was registered"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "publicationId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("publicationId"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The book's Open Library Edition ID",
-                                    ),
+                                    CowStr::new_static("The book's Open Library Edition ID"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "registeredBy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "org.passingreads.defs#actor",
-                                ),
+                            SmolStr::new_static("registeredBy"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("org.passingreads.defs#actor"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "title",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("title"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The title of the book",
-                                    ),
+                                    CowStr::new_static("The title of the book"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("statefulBook"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("statefulBook"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A book with its current state, combining registration data with computed state information.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cid"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("registration"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("state"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("currentHolder")
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("registration"),
+                            SmolStr::new_static("state"),
+                            SmolStr::new_static("currentHolder")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "aspectRatio",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("aspectRatio"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "org.passingreads.defs#aspectRatio",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cid",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("cid"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The CID of the book registration record",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "coverUrl",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("coverUrl"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Resolved URL to the cover image (from the registration blob)",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "currentHolder",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("currentHolder"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The DID of the current holder of the book",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "currentLocation",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("currentLocation"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "community.lexicon.location.hthree#main",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "events",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("events"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "List of confirmed events for this book, in chronological order",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#confirmedEvent",
-                                    ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#confirmedEvent"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "registration",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#registrationView",
-                                ),
+                            SmolStr::new_static("registration"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#registrationView"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "state",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("state"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The current state of the book, derived from the latest event",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The AT URI of the book registration record",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1120,100 +934,100 @@ pub mod registration_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Authors;
         type OccurredAt;
+        type Title;
         type RegisteredBy;
         type BookId;
+        type Authors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Authors = Unset;
         type OccurredAt = Unset;
+        type Title = Unset;
         type RegisteredBy = Unset;
         type BookId = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Authors = S::Authors;
-        type OccurredAt = S::OccurredAt;
-        type RegisteredBy = S::RegisteredBy;
-        type BookId = S::BookId;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type Title = S::Title;
-        type Authors = Set<members::authors>;
-        type OccurredAt = S::OccurredAt;
-        type RegisteredBy = S::RegisteredBy;
-        type BookId = S::BookId;
+        type Authors = Unset;
     }
     ///State transition - sets the `occurred_at` field to Set
     pub struct SetOccurredAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOccurredAt<S> {}
     impl<S: State> State for SetOccurredAt<S> {
-        type Title = S::Title;
-        type Authors = S::Authors;
         type OccurredAt = Set<members::occurred_at>;
+        type Title = S::Title;
         type RegisteredBy = S::RegisteredBy;
         type BookId = S::BookId;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type OccurredAt = S::OccurredAt;
+        type Title = Set<members::title>;
+        type RegisteredBy = S::RegisteredBy;
+        type BookId = S::BookId;
+        type Authors = S::Authors;
     }
     ///State transition - sets the `registered_by` field to Set
     pub struct SetRegisteredBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRegisteredBy<S> {}
     impl<S: State> State for SetRegisteredBy<S> {
-        type Title = S::Title;
-        type Authors = S::Authors;
         type OccurredAt = S::OccurredAt;
+        type Title = S::Title;
         type RegisteredBy = Set<members::registered_by>;
         type BookId = S::BookId;
+        type Authors = S::Authors;
     }
     ///State transition - sets the `book_id` field to Set
     pub struct SetBookId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBookId<S> {}
     impl<S: State> State for SetBookId<S> {
-        type Title = S::Title;
-        type Authors = S::Authors;
         type OccurredAt = S::OccurredAt;
+        type Title = S::Title;
         type RegisteredBy = S::RegisteredBy;
         type BookId = Set<members::book_id>;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type OccurredAt = S::OccurredAt;
+        type Title = S::Title;
+        type RegisteredBy = S::RegisteredBy;
+        type BookId = S::BookId;
+        type Authors = Set<members::authors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `authors` field
-        pub struct authors(());
         ///Marker type for the `occurred_at` field
         pub struct occurred_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `registered_by` field
         pub struct registered_by(());
         ///Marker type for the `book_id` field
         pub struct book_id(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RegistrationViewBuilder<'a, S: registration_view_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::org_passingreads::Actor<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<Actor<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> RegistrationView<'a> {
@@ -1227,9 +1041,9 @@ impl<'a> RegistrationViewBuilder<'a, registration_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RegistrationViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1242,13 +1056,13 @@ where
     /// Set the `authors` field (required)
     pub fn authors(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> RegistrationViewBuilder<'a, registration_view_state::SetAuthors<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         RegistrationViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1261,13 +1075,13 @@ where
     /// Set the `bookId` field (required)
     pub fn book_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RegistrationViewBuilder<'a, registration_view_state::SetBookId<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         RegistrationViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1280,31 +1094,25 @@ where
     /// Set the `occurredAt` field (required)
     pub fn occurred_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> RegistrationViewBuilder<'a, registration_view_state::SetOccurredAt<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         RegistrationViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: registration_view_state::State> RegistrationViewBuilder<'a, S> {
     /// Set the `publicationId` field (optional)
-    pub fn publication_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn publication_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `publicationId` field to an Option value (optional)
-    pub fn maybe_publication_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_publication_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -1318,13 +1126,13 @@ where
     /// Set the `registeredBy` field (required)
     pub fn registered_by(
         mut self,
-        value: impl Into<crate::org_passingreads::Actor<'a>>,
+        value: impl Into<Actor<'a>>,
     ) -> RegistrationViewBuilder<'a, registration_view_state::SetRegisteredBy<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         RegistrationViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1337,13 +1145,13 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RegistrationViewBuilder<'a, registration_view_state::SetTitle<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         RegistrationViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1351,11 +1159,11 @@ where
 impl<'a, S> RegistrationViewBuilder<'a, S>
 where
     S: registration_view_state::State,
-    S::Title: registration_view_state::IsSet,
-    S::Authors: registration_view_state::IsSet,
     S::OccurredAt: registration_view_state::IsSet,
+    S::Title: registration_view_state::IsSet,
     S::RegisteredBy: registration_view_state::IsSet,
     S::BookId: registration_view_state::IsSet,
+    S::Authors: registration_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RegistrationView<'a> {
@@ -1372,7 +1180,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1399,83 +1207,83 @@ pub mod stateful_book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type State;
-        type CurrentHolder;
         type Uri;
         type Registration;
+        type State;
+        type CurrentHolder;
         type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type State = Unset;
-        type CurrentHolder = Unset;
         type Uri = Unset;
         type Registration = Unset;
+        type State = Unset;
+        type CurrentHolder = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `state` field to Set
-    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetState<S> {}
-    impl<S: State> State for SetState<S> {
-        type State = Set<members::state>;
-        type CurrentHolder = S::CurrentHolder;
-        type Uri = S::Uri;
-        type Registration = S::Registration;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `current_holder` field to Set
-    pub struct SetCurrentHolder<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrentHolder<S> {}
-    impl<S: State> State for SetCurrentHolder<S> {
-        type State = S::State;
-        type CurrentHolder = Set<members::current_holder>;
-        type Uri = S::Uri;
-        type Registration = S::Registration;
-        type Cid = S::Cid;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type State = S::State;
-        type CurrentHolder = S::CurrentHolder;
         type Uri = Set<members::uri>;
         type Registration = S::Registration;
+        type State = S::State;
+        type CurrentHolder = S::CurrentHolder;
         type Cid = S::Cid;
     }
     ///State transition - sets the `registration` field to Set
     pub struct SetRegistration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRegistration<S> {}
     impl<S: State> State for SetRegistration<S> {
-        type State = S::State;
-        type CurrentHolder = S::CurrentHolder;
         type Uri = S::Uri;
         type Registration = Set<members::registration>;
+        type State = S::State;
+        type CurrentHolder = S::CurrentHolder;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `state` field to Set
+    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetState<S> {}
+    impl<S: State> State for SetState<S> {
+        type Uri = S::Uri;
+        type Registration = S::Registration;
+        type State = Set<members::state>;
+        type CurrentHolder = S::CurrentHolder;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `current_holder` field to Set
+    pub struct SetCurrentHolder<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrentHolder<S> {}
+    impl<S: State> State for SetCurrentHolder<S> {
+        type Uri = S::Uri;
+        type Registration = S::Registration;
+        type State = S::State;
+        type CurrentHolder = Set<members::current_holder>;
         type Cid = S::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type State = S::State;
-        type CurrentHolder = S::CurrentHolder;
         type Uri = S::Uri;
         type Registration = S::Registration;
+        type State = S::State;
+        type CurrentHolder = S::CurrentHolder;
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `state` field
-        pub struct state(());
-        ///Marker type for the `current_holder` field
-        pub struct current_holder(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `registration` field
         pub struct registration(());
+        ///Marker type for the `state` field
+        pub struct state(());
+        ///Marker type for the `current_holder` field
+        pub struct current_holder(());
         ///Marker type for the `cid` field
         pub struct cid(());
     }
@@ -1483,19 +1291,19 @@ pub mod stateful_book_state {
 
 /// Builder for constructing an instance of this type
 pub struct StatefulBookBuilder<'a, S: stateful_book_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::org_passingreads::AspectRatio<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<crate::community_lexicon::location::hthree::Hthree<'a>>,
-        ::core::option::Option<Vec<crate::org_passingreads::book::ConfirmedEvent<'a>>>,
-        ::core::option::Option<crate::org_passingreads::book::RegistrationView<'a>>,
-        ::core::option::Option<StatefulBookState<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        Option<AspectRatio<'a>>,
+        Option<CowStr<'a>>,
+        Option<UriValue<'a>>,
+        Option<Did<'a>>,
+        Option<Hthree<'a>>,
+        Option<Vec<book::ConfirmedEvent<'a>>>,
+        Option<book::RegistrationView<'a>>,
+        Option<StatefulBookState<'a>>,
+        Option<AtUri<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> StatefulBook<'a> {
@@ -1509,7 +1317,7 @@ impl<'a> StatefulBookBuilder<'a, stateful_book_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StatefulBookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -1521,25 +1329,19 @@ impl<'a> StatefulBookBuilder<'a, stateful_book_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: stateful_book_state::State> StatefulBookBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(
-        mut self,
-        value: impl Into<Option<crate::org_passingreads::AspectRatio<'a>>>,
-    ) -> Self {
+    pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(
-        mut self,
-        value: Option<crate::org_passingreads::AspectRatio<'a>>,
-    ) -> Self {
+    pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -1553,31 +1355,25 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> StatefulBookBuilder<'a, stateful_book_state::SetCid<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         StatefulBookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: stateful_book_state::State> StatefulBookBuilder<'a, S> {
     /// Set the `coverUrl` field (optional)
-    pub fn cover_url(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn cover_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `coverUrl` field to an Option value (optional)
-    pub fn maybe_cover_url(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_cover_url(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -1591,31 +1387,25 @@ where
     /// Set the `currentHolder` field (required)
     pub fn current_holder(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> StatefulBookBuilder<'a, stateful_book_state::SetCurrentHolder<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         StatefulBookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: stateful_book_state::State> StatefulBookBuilder<'a, S> {
     /// Set the `currentLocation` field (optional)
-    pub fn current_location(
-        mut self,
-        value: impl Into<Option<crate::community_lexicon::location::hthree::Hthree<'a>>>,
-    ) -> Self {
+    pub fn current_location(mut self, value: impl Into<Option<Hthree<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `currentLocation` field to an Option value (optional)
-    pub fn maybe_current_location(
-        mut self,
-        value: Option<crate::community_lexicon::location::hthree::Hthree<'a>>,
-    ) -> Self {
+    pub fn maybe_current_location(mut self, value: Option<Hthree<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -1625,16 +1415,13 @@ impl<'a, S: stateful_book_state::State> StatefulBookBuilder<'a, S> {
     /// Set the `events` field (optional)
     pub fn events(
         mut self,
-        value: impl Into<Option<Vec<crate::org_passingreads::book::ConfirmedEvent<'a>>>>,
+        value: impl Into<Option<Vec<book::ConfirmedEvent<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `events` field to an Option value (optional)
-    pub fn maybe_events(
-        mut self,
-        value: Option<Vec<crate::org_passingreads::book::ConfirmedEvent<'a>>>,
-    ) -> Self {
+    pub fn maybe_events(mut self, value: Option<Vec<book::ConfirmedEvent<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -1648,13 +1435,13 @@ where
     /// Set the `registration` field (required)
     pub fn registration(
         mut self,
-        value: impl Into<crate::org_passingreads::book::RegistrationView<'a>>,
+        value: impl Into<book::RegistrationView<'a>>,
     ) -> StatefulBookBuilder<'a, stateful_book_state::SetRegistration<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         StatefulBookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1669,11 +1456,11 @@ where
         mut self,
         value: impl Into<StatefulBookState<'a>>,
     ) -> StatefulBookBuilder<'a, stateful_book_state::SetState<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         StatefulBookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1686,13 +1473,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> StatefulBookBuilder<'a, stateful_book_state::SetUri<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         StatefulBookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1700,10 +1487,10 @@ where
 impl<'a, S> StatefulBookBuilder<'a, S>
 where
     S: stateful_book_state::State,
-    S::State: stateful_book_state::IsSet,
-    S::CurrentHolder: stateful_book_state::IsSet,
     S::Uri: stateful_book_state::IsSet,
     S::Registration: stateful_book_state::IsSet,
+    S::State: stateful_book_state::IsSet,
+    S::CurrentHolder: stateful_book_state::IsSet,
     S::Cid: stateful_book_state::IsSet,
 {
     /// Build the final struct
@@ -1724,7 +1511,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

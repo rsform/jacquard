@@ -5,40 +5,26 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::OrgProfileDetailView;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfileOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub profile: core::option::Option<
-        crate::games_gamesgamesgamesgames::OrgProfileDetailView<'a>,
-    >,
+    pub profile: Option<OrgProfileDetailView<'a>>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct GetProfile;
-/// Response type for
-///games.gamesgamesgamesgames.org.getProfile
+/// Response type for games.gamesgamesgamesgames.org.getProfile
 pub struct GetProfileResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfileResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.org.getProfile";
@@ -53,8 +39,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetProfile {
     type Response = GetProfileResponse;
 }
 
-/// Endpoint type for
-///games.gamesgamesgamesgames.org.getProfile
+/// Endpoint type for games.gamesgamesgamesgames.org.getProfile
 pub struct GetProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfileRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.org.getProfile";

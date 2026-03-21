@@ -5,55 +5,47 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ToggleLike<'a> {
     ///AT URI of the game record to like/unlike.
     #[serde(borrow)]
-    pub subject: jacquard_common::types::string::AtUri<'a>,
+    pub subject: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ToggleLikeOutput<'a> {
     ///Whether the game was liked or unliked.
     #[serde(borrow)]
     pub action: ToggleLikeOutputAction<'a>,
     ///CID of the created like record. Present when action is 'liked'.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cid: Option<CowStr<'a>>,
     ///AT URI of the created like record. Present when action is 'liked'.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: Option<AtUri<'a>>,
 }
 
 /// Whether the game was liked or unliked.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ToggleLikeOutputAction<'a> {
     Liked,
     Unliked,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ToggleLikeOutputAction<'a> {
@@ -71,7 +63,7 @@ impl<'a> From<&'a str> for ToggleLikeOutputAction<'a> {
         match s {
             "liked" => Self::Liked,
             "unliked" => Self::Unliked,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -81,7 +73,7 @@ impl<'a> From<String> for ToggleLikeOutputAction<'a> {
         match s.as_str() {
             "liked" => Self::Liked,
             "unliked" => Self::Unliked,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -139,8 +131,7 @@ impl jacquard_common::IntoStatic for ToggleLikeOutputAction<'_> {
     }
 }
 
-/// Response type for
-///games.gamesgamesgamesgames.graph.toggleLike
+/// Response type for games.gamesgamesgamesgames.graph.toggleLike
 pub struct ToggleLikeResponse;
 impl jacquard_common::xrpc::XrpcResp for ToggleLikeResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.graph.toggleLike";
@@ -157,8 +148,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ToggleLike<'a> {
     type Response = ToggleLikeResponse;
 }
 
-/// Endpoint type for
-///games.gamesgamesgamesgames.graph.toggleLike
+/// Endpoint type for games.gamesgamesgamesgames.graph.toggleLike
 pub struct ToggleLikeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ToggleLikeRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.graph.toggleLike";
@@ -203,11 +193,9 @@ pub mod toggle_like_state {
 
 /// Builder for constructing an instance of this type
 pub struct ToggleLikeBuilder<'a, S: toggle_like_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ToggleLike<'a> {
@@ -221,9 +209,9 @@ impl<'a> ToggleLikeBuilder<'a, toggle_like_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ToggleLikeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -236,13 +224,13 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> ToggleLikeBuilder<'a, toggle_like_state::SetSubject<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ToggleLikeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -262,7 +250,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

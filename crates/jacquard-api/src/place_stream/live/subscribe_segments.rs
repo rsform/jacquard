@@ -5,36 +5,28 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::live::subscribe_segments;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeSegments<'a> {
     #[serde(borrow)]
-    pub streamer: jacquard_common::CowStr<'a>,
+    pub streamer: CowStr<'a>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SubscribeSegmentsMessage<'a> {
     #[serde(rename = "#segment")]
-    Segment(Box<crate::place_stream::live::subscribe_segments::Segment>),
+    Segment(Box<subscribe_segments::Segment>),
 }
 
 impl<'a> SubscribeSegmentsMessage<'a> {
@@ -61,7 +53,7 @@ impl<'a> SubscribeSegmentsMessage<'a> {
     }
 }
 
-pub type Segment = jacquard_common::deps::bytes::Bytes;
+pub type Segment = Bytes;
 ///Stream response type for
 ///place.stream.live.subscribeSegments
 pub struct SubscribeSegmentsStream;
@@ -120,9 +112,9 @@ pub mod subscribe_segments_state {
 
 /// Builder for constructing an instance of this type
 pub struct SubscribeSegmentsBuilder<'a, S: subscribe_segments_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SubscribeSegments<'a> {
@@ -136,9 +128,9 @@ impl<'a> SubscribeSegmentsBuilder<'a, subscribe_segments_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SubscribeSegmentsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -151,13 +143,13 @@ where
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SubscribeSegmentsBuilder<'a, subscribe_segments_state::SetStreamer<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SubscribeSegmentsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

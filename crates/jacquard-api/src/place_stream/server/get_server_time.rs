@@ -5,35 +5,25 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::Datetime;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetServerTime;
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetServerTimeOutput<'a> {
     ///Current server time in RFC3339 format
-    pub server_time: jacquard_common::types::string::Datetime,
+    pub server_time: Datetime,
 }
 
-/// Response type for
-///place.stream.server.getServerTime
+/// Response type for place.stream.server.getServerTime
 pub struct GetServerTimeResponse;
 impl jacquard_common::xrpc::XrpcResp for GetServerTimeResponse {
     const NSID: &'static str = "place.stream.server.getServerTime";
@@ -48,8 +38,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetServerTime {
     type Response = GetServerTimeResponse;
 }
 
-/// Endpoint type for
-///place.stream.server.getServerTime
+/// Endpoint type for place.stream.server.getServerTime
 pub struct GetServerTimeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetServerTimeRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.getServerTime";

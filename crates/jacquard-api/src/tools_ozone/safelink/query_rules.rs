@@ -5,59 +5,59 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::safelink::UrlRule;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryRules<'a> {
     ///Filter by action types
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub actions: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub actions: Option<Vec<CowStr<'a>>>,
     ///Filter by rule creator
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub created_by: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub created_by: Option<Did<'a>>,
     ///Cursor for pagination
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
-    ///Maximum number of results to return Defaults to `50`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cursor: Option<CowStr<'a>>,
+    ///Maximum number of results to return  Defaults to `50`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_query_rules_limit")]
-    pub limit: core::option::Option<i64>,
+    pub limit: Option<i64>,
     ///Filter by pattern type
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub pattern_type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub pattern_type: Option<CowStr<'a>>,
     ///Filter by reason type
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub reason: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub reason: Option<CowStr<'a>>,
     ///Sort direction
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort_direction: core::option::Option<QueryRulesSortDirection<'a>>,
+    pub sort_direction: Option<QueryRulesSortDirection<'a>>,
     ///Filter by specific URLs or domains
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub urls: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub urls: Option<Vec<CowStr<'a>>>,
 }
 
 /// Sort direction
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum QueryRulesSortDirection<'a> {
     Asc,
     Desc,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> QueryRulesSortDirection<'a> {
@@ -75,7 +75,7 @@ impl<'a> From<&'a str> for QueryRulesSortDirection<'a> {
         match s {
             "asc" => Self::Asc,
             "desc" => Self::Desc,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -85,7 +85,7 @@ impl<'a> From<String> for QueryRulesSortDirection<'a> {
         match s.as_str() {
             "asc" => Self::Asc,
             "desc" => Self::Desc,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -143,28 +143,20 @@ impl jacquard_common::IntoStatic for QueryRulesSortDirection<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryRulesOutput<'a> {
     ///Next cursor for pagination. Only present if there are more results.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub rules: Vec<crate::tools_ozone::safelink::UrlRule<'a>>,
+    pub rules: Vec<UrlRule<'a>>,
 }
 
-/// Response type for
-///tools.ozone.safelink.queryRules
+/// Response type for tools.ozone.safelink.queryRules
 pub struct QueryRulesResponse;
 impl jacquard_common::xrpc::XrpcResp for QueryRulesResponse {
     const NSID: &'static str = "tools.ozone.safelink.queryRules";
@@ -181,8 +173,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for QueryRules<'a> {
     type Response = QueryRulesResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.safelink.queryRules
+/// Endpoint type for tools.ozone.safelink.queryRules
 pub struct QueryRulesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QueryRulesRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.safelink.queryRules";
@@ -193,6 +184,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for QueryRulesRequest {
     type Response = QueryRulesResponse;
 }
 
-fn _default_query_rules_limit() -> core::option::Option<i64> {
+fn _default_query_rules_limit() -> Option<i64> {
     Some(50i64)
 }

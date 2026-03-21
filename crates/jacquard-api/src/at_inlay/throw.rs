@@ -5,47 +5,37 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Throw<'a> {
     ///Human-readable error message
     #[serde(borrow)]
-    pub message: jacquard_common::CowStr<'a>,
+    pub message: CowStr<'a>,
     ///Stack trace, if available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub stack: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub stack: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ThrowOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
+    pub value: Response<'a>,
 }
 
-/// Response type for
-///at.inlay.Throw
+/// Response type for at.inlay.Throw
 pub struct ThrowResponse;
 impl jacquard_common::xrpc::XrpcResp for ThrowResponse {
     const NSID: &'static str = "at.inlay.Throw";
@@ -62,8 +52,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Throw<'a> {
     type Response = ThrowResponse;
 }
 
-/// Endpoint type for
-///at.inlay.Throw
+/// Endpoint type for at.inlay.Throw
 pub struct ThrowRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ThrowRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Throw";

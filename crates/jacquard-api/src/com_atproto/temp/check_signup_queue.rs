@@ -5,39 +5,27 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CheckSignupQueueOutput<'a> {
     pub activated: bool,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub estimated_time_ms: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub place_in_queue: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub estimated_time_ms: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub place_in_queue: Option<i64>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct CheckSignupQueue;
-/// Response type for
-///com.atproto.temp.checkSignupQueue
+/// Response type for com.atproto.temp.checkSignupQueue
 pub struct CheckSignupQueueResponse;
 impl jacquard_common::xrpc::XrpcResp for CheckSignupQueueResponse {
     const NSID: &'static str = "com.atproto.temp.checkSignupQueue";
@@ -52,8 +40,7 @@ impl jacquard_common::xrpc::XrpcRequest for CheckSignupQueue {
     type Response = CheckSignupQueueResponse;
 }
 
-/// Endpoint type for
-///com.atproto.temp.checkSignupQueue
+/// Endpoint type for com.atproto.temp.checkSignupQueue
 pub struct CheckSignupQueueRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CheckSignupQueueRequest {
     const PATH: &'static str = "/xrpc/com.atproto.temp.checkSignupQueue";

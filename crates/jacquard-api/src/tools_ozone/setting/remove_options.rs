@@ -5,29 +5,29 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Nsid;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveOptions<'a> {
     #[serde(borrow)]
-    pub keys: Vec<jacquard_common::types::string::Nsid<'a>>,
+    pub keys: Vec<Nsid<'a>>,
     #[serde(borrow)]
     pub scope: RemoveOptionsScope<'a>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RemoveOptionsScope<'a> {
     Instance,
     Personal,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> RemoveOptionsScope<'a> {
@@ -45,7 +45,7 @@ impl<'a> From<&'a str> for RemoveOptionsScope<'a> {
         match s {
             "instance" => Self::Instance,
             "personal" => Self::Personal,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -55,7 +55,7 @@ impl<'a> From<String> for RemoveOptionsScope<'a> {
         match s.as_str() {
             "instance" => Self::Instance,
             "personal" => Self::Personal,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -111,21 +111,12 @@ impl jacquard_common::IntoStatic for RemoveOptionsScope<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveOptionsOutput<'a> {}
-/// Response type for
-///tools.ozone.setting.removeOptions
+/// Response type for tools.ozone.setting.removeOptions
 pub struct RemoveOptionsResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveOptionsResponse {
     const NSID: &'static str = "tools.ozone.setting.removeOptions";
@@ -142,8 +133,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveOptions<'a> {
     type Response = RemoveOptionsResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.setting.removeOptions
+/// Endpoint type for tools.ozone.setting.removeOptions
 pub struct RemoveOptionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveOptionsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.setting.removeOptions";
@@ -200,12 +190,9 @@ pub mod remove_options_state {
 
 /// Builder for constructing an instance of this type
 pub struct RemoveOptionsBuilder<'a, S: remove_options_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
-        ::core::option::Option<RemoveOptionsScope<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<Nsid<'a>>>, Option<RemoveOptionsScope<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> RemoveOptions<'a> {
@@ -219,9 +206,9 @@ impl<'a> RemoveOptionsBuilder<'a, remove_options_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RemoveOptionsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -234,13 +221,13 @@ where
     /// Set the `keys` field (required)
     pub fn keys(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::Nsid<'a>>>,
+        value: impl Into<Vec<Nsid<'a>>>,
     ) -> RemoveOptionsBuilder<'a, remove_options_state::SetKeys<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         RemoveOptionsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -255,11 +242,11 @@ where
         mut self,
         value: impl Into<RemoveOptionsScope<'a>>,
     ) -> RemoveOptionsBuilder<'a, remove_options_state::SetScope<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         RemoveOptionsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -281,7 +268,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

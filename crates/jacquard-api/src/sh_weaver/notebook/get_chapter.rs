@@ -5,66 +5,62 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::ChapterEntryView;
+use crate::sh_weaver::notebook::ChapterView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetChapter<'a> {
     #[serde(borrow)]
-    pub chapter: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub chapter: AtUri<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub entry_cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub entry_cursor: Option<CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_entry_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub entry_limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entry_limit: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetChapterOutput<'a> {
     #[serde(borrow)]
-    pub chapter: crate::sh_weaver::notebook::ChapterView<'a>,
+    pub chapter: ChapterView<'a>,
     #[serde(borrow)]
-    pub entries: Vec<crate::sh_weaver::notebook::ChapterEntryView<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub entries: Vec<ChapterEntryView<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub entry_cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub entry_cursor: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetChapterError<'a> {
     #[serde(rename = "ChapterNotFound")]
-    ChapterNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    ChapterNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetChapterError<'_> {
@@ -82,8 +78,7 @@ impl core::fmt::Display for GetChapterError<'_> {
     }
 }
 
-/// Response type for
-///sh.weaver.notebook.getChapter
+/// Response type for sh.weaver.notebook.getChapter
 pub struct GetChapterResponse;
 impl jacquard_common::xrpc::XrpcResp for GetChapterResponse {
     const NSID: &'static str = "sh.weaver.notebook.getChapter";
@@ -98,8 +93,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetChapter<'a> {
     type Response = GetChapterResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notebook.getChapter
+/// Endpoint type for sh.weaver.notebook.getChapter
 pub struct GetChapterRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetChapterRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getChapter";
@@ -108,7 +102,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetChapterRequest {
     type Response = GetChapterResponse;
 }
 
-fn _default_entry_limit() -> core::option::Option<i64> {
+fn _default_entry_limit() -> Option<i64> {
     Some(50i64)
 }
 
@@ -146,13 +140,9 @@ pub mod get_chapter_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetChapterBuilder<'a, S: get_chapter_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetChapter<'a> {
@@ -166,9 +156,9 @@ impl<'a> GetChapterBuilder<'a, get_chapter_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetChapterBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -181,31 +171,25 @@ where
     /// Set the `chapter` field (required)
     pub fn chapter(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetChapterBuilder<'a, get_chapter_state::SetChapter<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetChapterBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_chapter_state::State> GetChapterBuilder<'a, S> {
     /// Set the `entryCursor` field (optional)
-    pub fn entry_cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn entry_cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `entryCursor` field to an Option value (optional)
-    pub fn maybe_entry_cursor(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_entry_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }

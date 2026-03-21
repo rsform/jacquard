@@ -5,67 +5,60 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::MessageView;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct AddReaction<'a> {
     #[serde(borrow)]
-    pub convo_id: jacquard_common::CowStr<'a>,
+    pub convo_id: CowStr<'a>,
     #[serde(borrow)]
-    pub message_id: jacquard_common::CowStr<'a>,
+    pub message_id: CowStr<'a>,
     #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
+    pub value: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct AddReactionOutput<'a> {
     #[serde(borrow)]
-    pub message: crate::chat_bsky::convo::MessageView<'a>,
+    pub message: MessageView<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum AddReactionError<'a> {
     /// Indicates that the message has been deleted and reactions can no longer be added/removed.
     #[serde(rename = "ReactionMessageDeleted")]
-    ReactionMessageDeleted(core::option::Option<jacquard_common::CowStr<'a>>),
+    ReactionMessageDeleted(Option<CowStr<'a>>),
     /// Indicates that the message has the maximum number of reactions allowed for a single user, and the requested reaction wasn't yet present. If it was already present, the request will not fail since it is idempotent.
     #[serde(rename = "ReactionLimitReached")]
-    ReactionLimitReached(core::option::Option<jacquard_common::CowStr<'a>>),
+    ReactionLimitReached(Option<CowStr<'a>>),
     /// Indicates the value for the reaction is not acceptable. In general, this means it is not an emoji.
     #[serde(rename = "ReactionInvalidValue")]
-    ReactionInvalidValue(core::option::Option<jacquard_common::CowStr<'a>>),
+    ReactionInvalidValue(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for AddReactionError<'_> {
@@ -97,8 +90,7 @@ impl core::fmt::Display for AddReactionError<'_> {
     }
 }
 
-/// Response type for
-///chat.bsky.convo.addReaction
+/// Response type for chat.bsky.convo.addReaction
 pub struct AddReactionResponse;
 impl jacquard_common::xrpc::XrpcResp for AddReactionResponse {
     const NSID: &'static str = "chat.bsky.convo.addReaction";
@@ -115,8 +107,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for AddReaction<'a> {
     type Response = AddReactionResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.convo.addReaction
+/// Endpoint type for chat.bsky.convo.addReaction
 pub struct AddReactionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddReactionRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.addReaction";

@@ -5,57 +5,49 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DereferenceScope<'a> {
     #[serde(borrow)]
-    pub scope: jacquard_common::CowStr<'a>,
+    pub scope: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DereferenceScopeOutput<'a> {
     ///The full oauth permission scope
     #[serde(borrow)]
-    pub scope: jacquard_common::CowStr<'a>,
+    pub scope: CowStr<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DereferenceScopeError<'a> {
     /// An invalid scope reference was provided.
     #[serde(rename = "InvalidScopeReference")]
-    InvalidScopeReference(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidScopeReference(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for DereferenceScopeError<'_> {
@@ -73,8 +65,7 @@ impl core::fmt::Display for DereferenceScopeError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.temp.dereferenceScope
+/// Response type for com.atproto.temp.dereferenceScope
 pub struct DereferenceScopeResponse;
 impl jacquard_common::xrpc::XrpcResp for DereferenceScopeResponse {
     const NSID: &'static str = "com.atproto.temp.dereferenceScope";
@@ -89,8 +80,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DereferenceScope<'a> {
     type Response = DereferenceScopeResponse;
 }
 
-/// Endpoint type for
-///com.atproto.temp.dereferenceScope
+/// Endpoint type for com.atproto.temp.dereferenceScope
 pub struct DereferenceScopeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DereferenceScopeRequest {
     const PATH: &'static str = "/xrpc/com.atproto.temp.dereferenceScope";
@@ -133,9 +123,9 @@ pub mod dereference_scope_state {
 
 /// Builder for constructing an instance of this type
 pub struct DereferenceScopeBuilder<'a, S: dereference_scope_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> DereferenceScope<'a> {
@@ -149,9 +139,9 @@ impl<'a> DereferenceScopeBuilder<'a, dereference_scope_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DereferenceScopeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -164,13 +154,13 @@ where
     /// Set the `scope` field (required)
     pub fn scope(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> DereferenceScopeBuilder<'a, dereference_scope_state::SetScope<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         DereferenceScopeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

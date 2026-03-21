@@ -5,115 +5,103 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::embed::external::External;
+use crate::sh_weaver::embed::images::Images;
+use crate::sh_weaver::embed::records::Records;
+use crate::sh_weaver::embed::video::VideoRecord;
+use crate::sh_weaver::embed::external;
+use crate::sh_weaver::embed::images;
+use crate::sh_weaver::embed::records;
+use crate::sh_weaver::embed::video;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RecordWithMedia<'a> {
     #[serde(borrow)]
     pub media: RecordWithMediaMedia<'a>,
     #[serde(borrow)]
-    pub records: crate::sh_weaver::embed::records::Records<'a>,
+    pub records: Records<'a>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RecordWithMediaMedia<'a> {
     #[serde(rename = "sh.weaver.embed.images")]
-    Images(Box<crate::sh_weaver::embed::images::Images<'a>>),
+    Images(Box<Images<'a>>),
     #[serde(rename = "sh.weaver.embed.external")]
-    External(Box<crate::sh_weaver::embed::external::External<'a>>),
+    External(Box<External<'a>>),
     #[serde(rename = "sh.weaver.embed.video")]
-    Video(Box<crate::sh_weaver::embed::video::VideoRecord<'a>>),
+    Video(Box<VideoRecord<'a>>),
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct View<'a> {
     #[serde(borrow)]
     pub media: ViewMedia<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub records: core::option::Option<crate::sh_weaver::embed::records::View<'a>>,
+    pub records: Option<records::View<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ViewMedia<'a> {
     #[serde(rename = "sh.weaver.embed.images#view")]
-    ImagesView(Box<crate::sh_weaver::embed::images::View<'a>>),
+    ImagesView(Box<images::View<'a>>),
     #[serde(rename = "sh.weaver.embed.external#view")]
-    ExternalView(Box<crate::sh_weaver::embed::external::View<'a>>),
+    ExternalView(Box<external::View<'a>>),
     #[serde(rename = "sh.weaver.embed.video#view")]
-    VideoView(Box<crate::sh_weaver::embed::video::View<'a>>),
+    VideoView(Box<video::View<'a>>),
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for RecordWithMedia<'a> {
+impl<'a> LexiconSchema for RecordWithMedia<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.recordWithMedia"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_embed_recordWithMedia()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for View<'a> {
+impl<'a> LexiconSchema for View<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.recordWithMedia"
     }
     fn def_name() -> &'static str {
         "view"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_embed_recordWithMedia()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -128,48 +116,45 @@ pub mod record_with_media_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Records;
         type Media;
+        type Records;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Records = Unset;
         type Media = Unset;
-    }
-    ///State transition - sets the `records` field to Set
-    pub struct SetRecords<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecords<S> {}
-    impl<S: State> State for SetRecords<S> {
-        type Records = Set<members::records>;
-        type Media = S::Media;
+        type Records = Unset;
     }
     ///State transition - sets the `media` field to Set
     pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMedia<S> {}
     impl<S: State> State for SetMedia<S> {
-        type Records = S::Records;
         type Media = Set<members::media>;
+        type Records = S::Records;
+    }
+    ///State transition - sets the `records` field to Set
+    pub struct SetRecords<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecords<S> {}
+    impl<S: State> State for SetRecords<S> {
+        type Media = S::Media;
+        type Records = Set<members::records>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `records` field
-        pub struct records(());
         ///Marker type for the `media` field
         pub struct media(());
+        ///Marker type for the `records` field
+        pub struct records(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RecordWithMediaBuilder<'a, S: record_with_media_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<RecordWithMediaMedia<'a>>,
-        ::core::option::Option<crate::sh_weaver::embed::records::Records<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<RecordWithMediaMedia<'a>>, Option<Records<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> RecordWithMedia<'a> {
@@ -183,9 +168,9 @@ impl<'a> RecordWithMediaBuilder<'a, record_with_media_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RecordWithMediaBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -200,11 +185,11 @@ where
         mut self,
         value: impl Into<RecordWithMediaMedia<'a>>,
     ) -> RecordWithMediaBuilder<'a, record_with_media_state::SetMedia<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         RecordWithMediaBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -217,13 +202,13 @@ where
     /// Set the `records` field (required)
     pub fn records(
         mut self,
-        value: impl Into<crate::sh_weaver::embed::records::Records<'a>>,
+        value: impl Into<Records<'a>>,
     ) -> RecordWithMediaBuilder<'a, record_with_media_state::SetRecords<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         RecordWithMediaBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -231,8 +216,8 @@ where
 impl<'a, S> RecordWithMediaBuilder<'a, S>
 where
     S: record_with_media_state::State,
-    S::Records: record_with_media_state::IsSet,
     S::Media: record_with_media_state::IsSet,
+    S::Records: record_with_media_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RecordWithMedia<'a> {
@@ -245,7 +230,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -258,104 +243,85 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_embed_recordWithMedia() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("sh.weaver.embed.recordWithMedia"),
-        revision: None,
-        description: None,
+fn lexicon_doc_sh_weaver_embed_recordWithMedia() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("sh.weaver.embed.recordWithMedia"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("main"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("records"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("media")
+                            SmolStr::new_static("records"), SmolStr::new_static("media")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "media",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("media"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.images"),
-                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.external"),
-                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.video")
+                                    CowStr::new_static("sh.weaver.embed.images"),
+                                    CowStr::new_static("sh.weaver.embed.external"),
+                                    CowStr::new_static("sh.weaver.embed.video")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "records",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "sh.weaver.embed.records",
-                                ),
+                            SmolStr::new_static("records"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("sh.weaver.embed.records"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("view"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("view"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("record"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("media")
-                        ],
+                        vec![SmolStr::new_static("record"), SmolStr::new_static("media")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "media",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("media"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.images#view"),
-                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.external#view"),
-                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.video#view")
+                                    CowStr::new_static("sh.weaver.embed.images#view"),
+                                    CowStr::new_static("sh.weaver.embed.external#view"),
+                                    CowStr::new_static("sh.weaver.embed.video#view")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "records",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "sh.weaver.embed.records#view",
-                                ),
+                            SmolStr::new_static("records"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("sh.weaver.embed.records#view"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -405,12 +371,9 @@ pub mod view_state {
 
 /// Builder for constructing an instance of this type
 pub struct ViewBuilder<'a, S: view_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<ViewMedia<'a>>,
-        ::core::option::Option<crate::sh_weaver::embed::records::View<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<ViewMedia<'a>>, Option<records::View<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> View<'a> {
@@ -424,9 +387,9 @@ impl<'a> ViewBuilder<'a, view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -441,29 +404,23 @@ where
         mut self,
         value: impl Into<ViewMedia<'a>>,
     ) -> ViewBuilder<'a, view_state::SetMedia<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `records` field (optional)
-    pub fn records(
-        mut self,
-        value: impl Into<Option<crate::sh_weaver::embed::records::View<'a>>>,
-    ) -> Self {
+    pub fn records(mut self, value: impl Into<Option<records::View<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `records` field to an Option value (optional)
-    pub fn maybe_records(
-        mut self,
-        value: Option<crate::sh_weaver::embed::records::View<'a>>,
-    ) -> Self {
+    pub fn maybe_records(mut self, value: Option<records::View<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -486,7 +443,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

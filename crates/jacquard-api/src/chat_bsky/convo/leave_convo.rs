@@ -5,44 +5,32 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LeaveConvo<'a> {
     #[serde(borrow)]
-    pub convo_id: jacquard_common::CowStr<'a>,
+    pub convo_id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LeaveConvoOutput<'a> {
     #[serde(borrow)]
-    pub convo_id: jacquard_common::CowStr<'a>,
+    pub convo_id: CowStr<'a>,
     #[serde(borrow)]
-    pub rev: jacquard_common::CowStr<'a>,
+    pub rev: CowStr<'a>,
 }
 
-/// Response type for
-///chat.bsky.convo.leaveConvo
+/// Response type for chat.bsky.convo.leaveConvo
 pub struct LeaveConvoResponse;
 impl jacquard_common::xrpc::XrpcResp for LeaveConvoResponse {
     const NSID: &'static str = "chat.bsky.convo.leaveConvo";
@@ -59,8 +47,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for LeaveConvo<'a> {
     type Response = LeaveConvoResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.convo.leaveConvo
+/// Endpoint type for chat.bsky.convo.leaveConvo
 pub struct LeaveConvoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LeaveConvoRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.leaveConvo";

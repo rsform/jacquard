@@ -5,38 +5,25 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::communication::TemplateView;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListTemplatesOutput<'a> {
     #[serde(borrow)]
-    pub communication_templates: Vec<
-        crate::tools_ozone::communication::TemplateView<'a>,
-    >,
+    pub communication_templates: Vec<TemplateView<'a>>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct ListTemplates;
-/// Response type for
-///tools.ozone.communication.listTemplates
+/// Response type for tools.ozone.communication.listTemplates
 pub struct ListTemplatesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListTemplatesResponse {
     const NSID: &'static str = "tools.ozone.communication.listTemplates";
@@ -51,8 +38,7 @@ impl jacquard_common::xrpc::XrpcRequest for ListTemplates {
     type Response = ListTemplatesResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.communication.listTemplates
+/// Endpoint type for tools.ozone.communication.listTemplates
 pub struct ListTemplatesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListTemplatesRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.communication.listTemplates";

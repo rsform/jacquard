@@ -5,89 +5,75 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::graph::TagView;
+use crate::sh_weaver::notebook::EntryView;
+use crate::sh_weaver::notebook::NotebookView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTaggedResources<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     /// Defaults to `true`.
     #[serde(default = "_default_include_author_tags")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub include_author_tags: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_author_tags: Option<bool>,
     /// Defaults to `true`.
     #[serde(default = "_default_include_community_tags")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub include_community_tags: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_community_tags: Option<bool>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
     ///Defaults to `"all"`.
     #[serde(default = "_default_resource_type")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub resource_type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub resource_type: Option<CowStr<'a>>,
     ///Defaults to `"recent"`.
     #[serde(default = "_default_sort")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub sort: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub tag: jacquard_common::CowStr<'a>,
+    pub tag: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTaggedResourcesOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
     pub resources: Vec<GetTaggedResourcesOutputResourcesItem<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tag: core::option::Option<crate::sh_weaver::graph::TagView<'a>>,
+    pub tag: Option<TagView<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetTaggedResourcesOutputResourcesItem<'a> {
     #[serde(rename = "sh.weaver.notebook.defs#notebookView")]
-    NotebookView(Box<crate::sh_weaver::notebook::NotebookView<'a>>),
+    NotebookView(Box<NotebookView<'a>>),
     #[serde(rename = "sh.weaver.notebook.defs#entryView")]
-    EntryView(Box<crate::sh_weaver::notebook::EntryView<'a>>),
+    EntryView(Box<EntryView<'a>>),
 }
 
-/// Response type for
-///sh.weaver.graph.getTaggedResources
+/// Response type for sh.weaver.graph.getTaggedResources
 pub struct GetTaggedResourcesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTaggedResourcesResponse {
     const NSID: &'static str = "sh.weaver.graph.getTaggedResources";
@@ -102,8 +88,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetTaggedResources<'a> {
     type Response = GetTaggedResourcesResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.graph.getTaggedResources
+/// Endpoint type for sh.weaver.graph.getTaggedResources
 pub struct GetTaggedResourcesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedResourcesRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.graph.getTaggedResources";
@@ -112,24 +97,24 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedResourcesRequest {
     type Response = GetTaggedResourcesResponse;
 }
 
-fn _default_include_author_tags() -> core::option::Option<bool> {
+fn _default_include_author_tags() -> Option<bool> {
     Some(true)
 }
 
-fn _default_include_community_tags() -> core::option::Option<bool> {
+fn _default_include_community_tags() -> Option<bool> {
     Some(true)
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_resource_type() -> core::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("all"))
+fn _default_resource_type() -> Option<CowStr<'static>> {
+    Some(CowStr::from("all"))
 }
 
-fn _default_sort() -> core::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("recent"))
+fn _default_sort() -> Option<CowStr<'static>> {
+    Some(CowStr::from("recent"))
 }
 
 pub mod get_tagged_resources_state {
@@ -166,17 +151,17 @@ pub mod get_tagged_resources_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetTaggedResourcesBuilder<'a, S: get_tagged_resources_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<bool>,
+        Option<bool>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetTaggedResources<'a> {
@@ -190,24 +175,21 @@ impl<'a> GetTaggedResourcesBuilder<'a, get_tagged_resources_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetTaggedResourcesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -254,18 +236,12 @@ impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> 
 
 impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
     /// Set the `resourceType` field (optional)
-    pub fn resource_type(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn resource_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `resourceType` field to an Option value (optional)
-    pub fn maybe_resource_type(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_resource_type(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -273,15 +249,12 @@ impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> 
 
 impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -295,13 +268,13 @@ where
     /// Set the `tag` field (required)
     pub fn tag(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetTaggedResourcesBuilder<'a, get_tagged_resources_state::SetTag<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         GetTaggedResourcesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

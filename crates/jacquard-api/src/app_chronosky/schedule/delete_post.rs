@@ -5,59 +5,51 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DeletePost<'a> {
     ///Post ID to delete.
     #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
+    pub id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DeletePostOutput<'a> {
     ///Deletion success flag.
     pub success: bool,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeletePostError<'a> {
     #[serde(rename = "PostNotFound")]
-    PostNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    PostNotFound(Option<CowStr<'a>>),
     #[serde(rename = "PostNotPending")]
-    PostNotPending(core::option::Option<jacquard_common::CowStr<'a>>),
+    PostNotPending(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeletePostError<'_> {
@@ -82,8 +74,7 @@ impl core::fmt::Display for DeletePostError<'_> {
     }
 }
 
-/// Response type for
-///app.chronosky.schedule.deletePost
+/// Response type for app.chronosky.schedule.deletePost
 pub struct DeletePostResponse;
 impl jacquard_common::xrpc::XrpcResp for DeletePostResponse {
     const NSID: &'static str = "app.chronosky.schedule.deletePost";
@@ -100,8 +91,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeletePost<'a> {
     type Response = DeletePostResponse;
 }
 
-/// Endpoint type for
-///app.chronosky.schedule.deletePost
+/// Endpoint type for app.chronosky.schedule.deletePost
 pub struct DeletePostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeletePostRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.schedule.deletePost";

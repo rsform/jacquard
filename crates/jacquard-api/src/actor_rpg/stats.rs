@@ -5,1365 +5,1087 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::actor_rpg::stats;
 /// The six ability scores (1-30 per SRD)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Abilities<'a> {
     ///Charisma
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub cha: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cha: Option<i64>,
     ///Constitution
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub con: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub con: Option<i64>,
     ///Dexterity
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub dex: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dex: Option<i64>,
     ///Intelligence
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub int: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub int: Option<i64>,
     ///Strength
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub str: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub str: Option<i64>,
     ///Wisdom
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub wis: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub wis: Option<i64>,
 }
 
 /// An attack action
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Attack<'a> {
     ///Attack bonus (e.g., +5)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub bonus: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub bonus: Option<CowStr<'a>>,
     ///Damage dice (e.g., 1d8)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub damage: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub damage: Option<CowStr<'a>>,
     ///Damage bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub damage_bonus: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub damage_bonus: Option<i64>,
     ///Damage type
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub damage_type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub damage_type: Option<CowStr<'a>>,
     ///Attack name
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
 }
 
 /// Currency
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Coinage<'a> {
     ///Copper pieces
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub cp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cp: Option<i64>,
     ///Electrum pieces
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub ep: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ep: Option<i64>,
     ///Gold pieces
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub gp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gp: Option<i64>,
     ///Platinum pieces
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub pp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pp: Option<i64>,
     ///Silver pieces
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub sp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sp: Option<i64>,
 }
 
 /// Combat and defensive stats
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Combat<'a> {
     ///Armor Class
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub ac: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ac: Option<i64>,
     ///Hit dice (e.g., 5d10)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub hit_dice: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub hit_dice: Option<CowStr<'a>>,
     ///Hit dice expended
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub hit_dice_used: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hit_dice_used: Option<i64>,
     ///Initiative modifier
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub initiative: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub initiative: Option<i64>,
     ///Speed in feet
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub speed: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub speed: Option<i64>,
 }
 
 /// Status conditions and effects
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Conditions<'a> {
     ///Death saving throw progress
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub death_saves: core::option::Option<crate::actor_rpg::stats::DeathSaves<'a>>,
+    pub death_saves: Option<stats::DeathSaves<'a>>,
     ///Exhaustion level (0-6)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub exhaustion: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exhaustion: Option<i64>,
     ///Has inspiration
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub inspiration: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inspiration: Option<bool>,
 }
 
 /// A custom stat
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CustomStat<'a> {
     ///Category (optional)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub category: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub category: Option<CowStr<'a>>,
     ///Maximum (optional)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub max: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max: Option<i64>,
     ///Minimum (optional)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub min: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub min: Option<i64>,
     ///Stat name
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///Value
     pub value: i64,
 }
 
 /// User-defined custom stat system
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CustomStats<'a> {
     ///Custom stat entries
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub stats: core::option::Option<Vec<crate::actor_rpg::stats::CustomStat<'a>>>,
+    pub stats: Option<Vec<stats::CustomStat<'a>>>,
     ///System name
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub system_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub system_name: Option<CowStr<'a>>,
     ///Version
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub system_version: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub system_version: Option<CowStr<'a>>,
 }
 
 /// DCC ability scores (3-18 standard, can be modified by corruption/spellburn)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccAbilities<'a> {
     ///Agility
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub agi: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub agi: Option<i64>,
     ///Agility base (before spellburn)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub agi_base: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub agi_base: Option<i64>,
     ///Intelligence
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub int: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub int: Option<i64>,
     ///Luck (can be permanently burned)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub luk: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub luk: Option<i64>,
     ///Personality
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub per: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub per: Option<i64>,
     ///Stamina
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub sta: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sta: Option<i64>,
     ///Stamina base (before spellburn)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub sta_base: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sta_base: Option<i64>,
     ///Strength
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub str: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub str: Option<i64>,
     ///Strength base (before spellburn)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub str_base: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub str_base: Option<i64>,
 }
 
 /// A weapon attack (includes deed die for warriors)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccAttack<'a> {
     ///Attack modifier (e.g., +2, d16+2 for deed die)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub attack_mod: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub attack_mod: Option<CowStr<'a>>,
     ///Damage dice (e.g., 1d8+2, 1d6+d3)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub damage: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub damage: Option<CowStr<'a>>,
     ///Damage bonus (e.g., +2, +d3 for deed die)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub damage_bonus: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub damage_bonus: Option<CowStr<'a>>,
     ///Weapon name
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///Special properties (backstab, trained weapon, etc.)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: Option<CowStr<'a>>,
     ///Range (melee or distance)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub range: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub range: Option<CowStr<'a>>,
     ///Attack type (melee, ranged, etc.)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#type: Option<CowStr<'a>>,
 }
 
 /// Cleric spellcasting features
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccCleric<'a> {
     ///Deity or supernatural patron
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub deity: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub deity: Option<CowStr<'a>>,
     ///Current disapproval range (starts at 1, accumulates)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub disapproval_range: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disapproval_range: Option<i64>,
     ///Deity-specific disapproval table if any
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub disapproval_table: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub disapproval_table: Option<CowStr<'a>>,
     ///Holy symbol description
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub holy_symbol: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub holy_symbol: Option<CowStr<'a>>,
     ///Known cleric spells
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub known_spells: core::option::Option<
-        Vec<crate::actor_rpg::stats::DccClericSpell<'a>>,
-    >,
+    pub known_spells: Option<Vec<stats::DccClericSpell<'a>>>,
     ///Lay on hands die (e.g., d14, d16)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub lay_on_hands_die: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub lay_on_hands_die: Option<CowStr<'a>>,
     ///Highest spell level accessible
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub max_spell_level: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_spell_level: Option<i64>,
     ///Spell check modifier (PER mod + level)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub spell_check_mod: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub spell_check_mod: Option<i64>,
     ///Turn unholy die (e.g., d14, d16)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub turn_unholy_die: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub turn_unholy_die: Option<CowStr<'a>>,
     ///Serves a Chaotic deity (unholy instead of holy)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub unholy: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unholy: Option<bool>,
 }
 
 /// A cleric spell
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DccClericSpell<'a> {
     ///Spell level
     pub level: i64,
     ///Spell name
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///Additional spell notes
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: Option<CowStr<'a>>,
     ///Casting may cause additional disapproval
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub sinful: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sinful: Option<bool>,
 }
 
 /// DCC uses cp, sp, gp (10cp = 1sp, 10sp = 1gp)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccCoinage<'a> {
     ///Copper pieces
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub cp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cp: Option<i64>,
     ///Gold pieces
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub gp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gp: Option<i64>,
     ///Silver pieces
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub sp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sp: Option<i64>,
 }
 
 /// Combat statistics
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccCombat<'a> {
     ///Armor Class (10 + armor + AGI mod + shield)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub ac: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ac: Option<i64>,
     ///Primary action die (e.g., d20, d20+d14)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub action_die: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub action_die: Option<CowStr<'a>>,
     ///Base attack modifier (level-based for non-warriors)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub attack_mod: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attack_mod: Option<i64>,
     ///Critical hit die (e.g., d8, d12, d14)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub crit_die: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub crit_die: Option<CowStr<'a>>,
     ///Critical hit table (I, II, III, IV, V)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub crit_table: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub crit_table: Option<CowStr<'a>>,
     ///Fumble die (typically d4 for 0-level, varies by armor)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub fumble_die: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub fumble_die: Option<CowStr<'a>>,
     ///Initiative modifier (AGI mod)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub initiative: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub initiative: Option<i64>,
     ///Speed in feet (typically 30, Dwarves 20)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub speed: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub speed: Option<i64>,
 }
 
 /// A corruption effect from failed spell checks
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccCorruption<'a> {
     ///Description of the corruption
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub effect: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub effect: Option<CowStr<'a>>,
     ///Whether this corruption is permanent
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub permanent: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub permanent: Option<bool>,
     ///What spell caused this corruption
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub source: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub source: Option<CowStr<'a>>,
     ///Corruption severity (minor, major, greater)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#type: Option<CowStr<'a>>,
 }
 
 /// Equipment and inventory
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccEquipment<'a> {
     ///Armor worn (affects fumble die)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub armor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub armor: Option<CowStr<'a>>,
     ///Armor check penalty (affects skills)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub armor_check_penalty: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub armor_check_penalty: Option<i64>,
     ///Other equipment
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub gear: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub gear: Option<CowStr<'a>>,
     ///Shield (if any)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub shield: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub shield: Option<CowStr<'a>>,
     ///Trade goods from occupation
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub trade_goods: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub trade_goods: Option<CowStr<'a>>,
     ///Valuables and treasure
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub treasure: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub treasure: Option<CowStr<'a>>,
     ///Weapons carried
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub weapons: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub weapons: Option<CowStr<'a>>,
 }
 
 /// Halfling class features
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccHalfling<'a> {
     ///Can spend luck to aid nearby allies
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub good_luck_charm: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub good_luck_charm: Option<bool>,
     ///Infravision range in feet (30)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub infravision: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub infravision: Option<i64>,
     ///Total luck points spent helping allies
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub luck_spent_on_allies: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub luck_spent_on_allies: Option<i64>,
     ///Weapon type luck modifier applies to
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub lucky_weapon: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub lucky_weapon: Option<CowStr<'a>>,
     ///Bonus to sneak/hide when in natural environment
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub sneak_and_hide: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sneak_and_hide: Option<i64>,
     ///Can dual-wield without penalty
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub two_weapon_fighting: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub two_weapon_fighting: Option<bool>,
 }
 
 /// Hit points (0-level characters use 1d4 + STA mod)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccHp<'a> {
     ///Current HP
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub current: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub current: Option<i64>,
     ///Maximum HP
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub max: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max: Option<i64>,
 }
 
 /// DCC character identity and progression
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccIdentity<'a> {
     ///Alignment (Lawful, Neutral, Chaotic)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alignment: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub alignment: Option<CowStr<'a>>,
     ///Class (Warrior, Wizard, Cleric, Thief, Elf, Dwarf, Halfling)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub class: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub class: Option<CowStr<'a>>,
     ///Character level (0 for funnel characters)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub level: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub level: Option<i64>,
     ///0-level occupation (e.g., Blacksmith, Farmer)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub occupation: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub occupation: Option<CowStr<'a>>,
     ///Level title (e.g., Squire, Cutpurse, Acolyte)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: Option<CowStr<'a>>,
     ///Experience points
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub xp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub xp: Option<i64>,
 }
 
 /// Birth augur and luck mechanics
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccLuck<'a> {
     ///Birth augur name (e.g., Harsh Winter, The Bull, Fortunate Date)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub birth_augur: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub birth_augur: Option<CowStr<'a>>,
     ///What the luck modifier applies to
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub birth_augur_effect: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub birth_augur_effect: Option<CowStr<'a>>,
     ///Weapon type that luck applies to (Dwarves/Halflings)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub lucky_weapon: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub lucky_weapon: Option<CowStr<'a>>,
     ///Starting luck score (for tracking burned luck)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub starting_luck: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub starting_luck: Option<i64>,
 }
 
 /// DCC saving throws (3 saves, not 6)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccSaves<'a> {
     ///Fortitude save modifier
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub fort: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fort: Option<i64>,
     ///Reflex save modifier
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub r#ref: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub r#ref: Option<i64>,
     ///Willpower save modifier
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub will: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub will: Option<i64>,
 }
 
 /// Current spellburn (temporary ability score sacrifice)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccSpellburn<'a> {
     ///Agility points currently burned
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub agi_burned: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub agi_burned: Option<i64>,
     ///Points recovered per day
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub recovery_rate: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recovery_rate: Option<i64>,
     ///Stamina points currently burned
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub sta_burned: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sta_burned: Option<i64>,
     ///Strength points currently burned
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub str_burned: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub str_burned: Option<i64>,
 }
 
 /// Dungeon Crawl Classics RPG character sheet. Supports 0-level funnel characters through 10th level.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccStats<'a> {
     ///The six ability scores (STR, AGI, STA, INT, PER, LUK)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub abilities: core::option::Option<crate::actor_rpg::stats::DccAbilities<'a>>,
+    pub abilities: Option<stats::DccAbilities<'a>>,
     ///Notes about special abilities, class features, and racial traits
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub abilities_notes: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub abilities_notes: Option<CowStr<'a>>,
     ///Weapon attacks
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub attacks: core::option::Option<Vec<crate::actor_rpg::stats::DccAttack<'a>>>,
+    pub attacks: Option<Vec<stats::DccAttack<'a>>>,
     ///Cleric spellcasting (disapproval, turn unholy, lay on hands)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cleric: core::option::Option<crate::actor_rpg::stats::DccCleric<'a>>,
+    pub cleric: Option<stats::DccCleric<'a>>,
     ///Currency (cp, sp, gp)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub coinage: core::option::Option<crate::actor_rpg::stats::DccCoinage<'a>>,
+    pub coinage: Option<stats::DccCoinage<'a>>,
     ///Combat stats (AC, speed, action die, initiative, crit die/table)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub combat: core::option::Option<crate::actor_rpg::stats::DccCombat<'a>>,
+    pub combat: Option<stats::DccCombat<'a>>,
     ///Gear, treasure, and trade goods
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub equipment: core::option::Option<crate::actor_rpg::stats::DccEquipment<'a>>,
+    pub equipment: Option<stats::DccEquipment<'a>>,
     ///Halfling luck-sharing and dual wielding
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub halfling: core::option::Option<crate::actor_rpg::stats::DccHalfling<'a>>,
+    pub halfling: Option<stats::DccHalfling<'a>>,
     ///Hit points
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub hp: core::option::Option<crate::actor_rpg::stats::DccHp<'a>>,
+    pub hp: Option<stats::DccHp<'a>>,
     ///Character identity (occupation, class, level, alignment)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub identity: core::option::Option<crate::actor_rpg::stats::DccIdentity<'a>>,
+    pub identity: Option<stats::DccIdentity<'a>>,
     ///Languages known
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub languages: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub languages: Option<CowStr<'a>>,
     ///Birth augur and luck tracking
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub luck: core::option::Option<crate::actor_rpg::stats::DccLuck<'a>>,
+    pub luck: Option<stats::DccLuck<'a>>,
     ///Character notes, backstory, and special abilities
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: Option<CowStr<'a>>,
     ///Saving throws (Reflex, Fortitude, Willpower)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub saves: core::option::Option<crate::actor_rpg::stats::DccSaves<'a>>,
+    pub saves: Option<stats::DccSaves<'a>>,
     ///Thief skills and abilities
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub thief: core::option::Option<crate::actor_rpg::stats::DccThief<'a>>,
+    pub thief: Option<stats::DccThief<'a>>,
     ///Warrior/Dwarf class features (deed die, mighty deeds)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub warrior: core::option::Option<crate::actor_rpg::stats::DccWarrior<'a>>,
+    pub warrior: Option<stats::DccWarrior<'a>>,
     ///Wizard/Elf spellcasting (spellburn, corruption, mercurial magic)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub wizard: core::option::Option<crate::actor_rpg::stats::DccWizard<'a>>,
+    pub wizard: Option<stats::DccWizard<'a>>,
 }
 
 /// Thief class features and skills
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccThief<'a> {
     ///Alignment (affects some skill targets)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alignment: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub alignment: Option<CowStr<'a>>,
     ///Backstab damage die level (+1, +2, etc.)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub backstab: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub backstab: Option<i64>,
     ///Weapon type that luck applies to (one type only)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub lucky_weapon: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub lucky_weapon: Option<CowStr<'a>>,
     ///Thief skill modifiers
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub skills: core::option::Option<crate::actor_rpg::stats::DccThiefSkills<'a>>,
+    pub skills: Option<stats::DccThiefSkills<'a>>,
 }
 
 /// Thief skill bonuses (roll d20 + skill vs target)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccThiefSkills<'a> {
     ///Backstab attack bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub backstab: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub backstab: Option<i64>,
     ///Cast spell from scroll bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub cast_spell_from_scroll: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cast_spell_from_scroll: Option<i64>,
     ///Climb sheer surfaces bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub climb_sheer_surfaces: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub climb_sheer_surfaces: Option<i64>,
     ///Disable trap bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub disable_trap: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disable_trap: Option<i64>,
     ///Disguise self bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub disguise_self: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disguise_self: Option<i64>,
     ///Find trap bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub find_trap: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub find_trap: Option<i64>,
     ///Forge document bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub forge_document: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub forge_document: Option<i64>,
     ///Handle poison bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub handle_poison: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub handle_poison: Option<i64>,
     ///Hide in shadows bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub hide_in_shadows: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hide_in_shadows: Option<i64>,
     ///Pick lock bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub pick_lock: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pick_lock: Option<i64>,
     ///Pick pocket bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub pick_pocket: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pick_pocket: Option<i64>,
     ///Read languages bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub read_languages: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub read_languages: Option<i64>,
     ///Sneak silently bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub sneak_silently: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sneak_silently: Option<i64>,
 }
 
 /// Warrior and Dwarf class features
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccWarrior<'a> {
     ///Current deed die (d3, d4, d5, d6, d7, d8, d10+d3, etc.)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub deed_die: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub deed_die: Option<CowStr<'a>>,
     ///Infravision range in feet (Dwarves: 60)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub infravision: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub infravision: Option<i64>,
     ///Weapon type luck modifier applies to
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub lucky_weapon: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub lucky_weapon: Option<CowStr<'a>>,
     ///Signature mighty deeds of arms
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub mighty_deeds: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub mighty_deeds: Option<Vec<CowStr<'a>>>,
     ///Can use shield bash (Dwarves)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub shield_bash: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub shield_bash: Option<bool>,
     ///Can smell gold/gems (Dwarves)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub smell_gold: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub smell_gold: Option<bool>,
     ///Underground detection bonus (Dwarves: equal to level)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub underground_skills: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub underground_skills: Option<i64>,
 }
 
 /// Wizard and Elf spellcasting features
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DccWizard<'a> {
     ///Corruption effects suffered (structured)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub corruption: core::option::Option<
-        Vec<crate::actor_rpg::stats::DccCorruption<'a>>,
-    >,
+    pub corruption: Option<Vec<stats::DccCorruption<'a>>>,
     ///Corruption effects as free-form text
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub corruption_text: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub corruption_text: Option<CowStr<'a>>,
     ///Known spells with mercurial magic effects
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub known_spells: core::option::Option<
-        Vec<crate::actor_rpg::stats::DccWizardSpell<'a>>,
-    >,
+    pub known_spells: Option<Vec<stats::DccWizardSpell<'a>>>,
     ///Highest spell level accessible
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub max_spell_level: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_spell_level: Option<i64>,
     ///Supernatural patron (if any)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub patron: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub patron: Option<CowStr<'a>>,
     ///Patron bond description and effects
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub patron_bond: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub patron_bond: Option<CowStr<'a>>,
     ///Spell check modifier (INT mod + level)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub spell_check_mod: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub spell_check_mod: Option<i64>,
     ///Current spellburn status
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub spellburn: core::option::Option<crate::actor_rpg::stats::DccSpellburn<'a>>,
+    pub spellburn: Option<stats::DccSpellburn<'a>>,
 }
 
 /// A wizard spell with mercurial magic effect
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DccWizardSpell<'a> {
     ///Spell level
     pub level: i64,
     ///Spell is currently lost (must be re-learned)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub lost: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lost: Option<bool>,
     ///Unique mercurial magic effect (d100 roll result)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub mercurial_magic: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub mercurial_magic: Option<CowStr<'a>>,
     ///The d100 roll for mercurial magic
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub mercurial_roll: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mercurial_roll: Option<i64>,
     ///Spell name
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///Additional spell notes
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: Option<CowStr<'a>>,
 }
 
 /// Death saving throw successes and failures
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DeathSaves<'a> {
     ///Failures (0-3)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub failures: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub failures: Option<i64>,
     ///Successes (0-3)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub successes: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub successes: Option<i64>,
 }
 
 /// D&D 5e character sheet. All sub-objects are optional.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DndStats<'a> {
     ///The six ability scores (STR, DEX, CON, INT, WIS, CHA)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub abilities: core::option::Option<crate::actor_rpg::stats::Abilities<'a>>,
+    pub abilities: Option<stats::Abilities<'a>>,
     ///Attack actions
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub attacks: core::option::Option<Vec<crate::actor_rpg::stats::Attack<'a>>>,
+    pub attacks: Option<Vec<stats::Attack<'a>>>,
     ///Currency (cp, sp, ep, gp, pp)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub coinage: core::option::Option<crate::actor_rpg::stats::Coinage<'a>>,
+    pub coinage: Option<stats::Coinage<'a>>,
     ///Combat stats (AC, speed, initiative, hit dice)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub combat: core::option::Option<crate::actor_rpg::stats::Combat<'a>>,
+    pub combat: Option<stats::Combat<'a>>,
     ///Status conditions (inspiration, exhaustion, death saves)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub conditions: core::option::Option<crate::actor_rpg::stats::Conditions<'a>>,
+    pub conditions: Option<stats::Conditions<'a>>,
     ///Gear and inventory
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub equipment: core::option::Option<crate::actor_rpg::stats::Equipment<'a>>,
+    pub equipment: Option<stats::Equipment<'a>>,
     ///Class features, racial traits, and feats
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub features: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub features: Option<CowStr<'a>>,
     ///Hit points (current, max, temp)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub hp: core::option::Option<crate::actor_rpg::stats::Hp<'a>>,
+    pub hp: Option<stats::Hp<'a>>,
     ///Character identity (race, class, level, background)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub identity: core::option::Option<crate::actor_rpg::stats::Identity<'a>>,
+    pub identity: Option<stats::Identity<'a>>,
     ///Languages known
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub languages: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub languages: Option<CowStr<'a>>,
     ///Passive scores (Perception, Investigation, Insight)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub passives: core::option::Option<crate::actor_rpg::stats::Passives<'a>>,
+    pub passives: Option<stats::Passives<'a>>,
     ///Traits, ideals, bonds, flaws, backstory
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub personality: core::option::Option<crate::actor_rpg::stats::Personality<'a>>,
+    pub personality: Option<stats::Personality<'a>>,
     ///Armor, weapon, and tool proficiencies
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub proficiencies: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub proficiencies: Option<CowStr<'a>>,
     ///Saving throw modifiers
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub saves: core::option::Option<crate::actor_rpg::stats::Saves<'a>>,
+    pub saves: Option<stats::Saves<'a>>,
     ///Skill modifiers
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub skills: core::option::Option<crate::actor_rpg::stats::Skills<'a>>,
+    pub skills: Option<stats::Skills<'a>>,
     ///Spellcasting details (for casters)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub spellcasting: core::option::Option<crate::actor_rpg::stats::Spellcasting<'a>>,
+    pub spellcasting: Option<stats::Spellcasting<'a>>,
 }
 
 /// Gear and inventory
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Equipment<'a> {
     ///Armor
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub armor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub armor: Option<CowStr<'a>>,
     ///Other equipment
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub gear: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub gear: Option<CowStr<'a>>,
     ///Valuables and treasure
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub treasure: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub treasure: Option<CowStr<'a>>,
     ///Weapons
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub weapons: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub weapons: Option<CowStr<'a>>,
 }
 
 /// Hit point tracking
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Hp<'a> {
     ///Current HP
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub current: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub current: Option<i64>,
     ///Maximum HP
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub max: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max: Option<i64>,
     ///Temporary HP
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub temp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub temp: Option<i64>,
 }
 
 /// Character identity and progression
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Identity<'a> {
     ///Alignment (e.g., Lawful Good)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alignment: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub alignment: Option<CowStr<'a>>,
     ///Background (e.g., Soldier, Sage)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub background: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub background: Option<CowStr<'a>>,
     ///Class and subclass (e.g., Fighter (Champion))
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub class: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub class: Option<CowStr<'a>>,
     ///Character level
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub level: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub level: Option<i64>,
     ///Proficiency bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub proficiency: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub proficiency: Option<i64>,
     ///Race (e.g., Human, Elf, Dwarf)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub race: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub race: Option<CowStr<'a>>,
     ///Experience points
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub xp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub xp: Option<i64>,
 }
 
 /// A user's RPG character statistics. One record per user (rkey: self).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Stats<'a> {
     ///Timestamp when this record was created
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///User-defined custom stat system
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub custom: core::option::Option<crate::actor_rpg::stats::CustomStats<'a>>,
+    pub custom: Option<stats::CustomStats<'a>>,
     ///Dungeon Crawl Classics RPG character sheet
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub dcc: core::option::Option<crate::actor_rpg::stats::DccStats<'a>>,
+    pub dcc: Option<stats::DccStats<'a>>,
     ///Dungeons & Dragons 5th Edition character sheet
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub dnd: core::option::Option<crate::actor_rpg::stats::DndStats<'a>>,
+    pub dnd: Option<stats::DndStats<'a>>,
     ///Reverie House philosophical alignment
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub reverie: core::option::Option<crate::actor_rpg::stats::ReverieStats<'a>>,
+    pub reverie: Option<stats::ReverieStats<'a>>,
     ///RPG Maker MZ engine character parameters
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub rmmz: core::option::Option<crate::actor_rpg::stats::RmmzStats<'a>>,
+    pub rmmz: Option<stats::RmmzStats<'a>>,
     ///Timestamp when this record was last modified
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct StatsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Stats<'a>,
 }
 
 /// Passive scores (10 + skill modifier)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Passives<'a> {
     ///Passive Insight
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub insight: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub insight: Option<i64>,
     ///Passive Investigation
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub investigation: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub investigation: Option<i64>,
     ///Passive Perception
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub perception: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub perception: Option<i64>,
 }
 
 /// Personality and backstory
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Personality<'a> {
     ///Backstory
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub backstory: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub backstory: Option<CowStr<'a>>,
     ///Bonds
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub bonds: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub bonds: Option<CowStr<'a>>,
     ///Flaws
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub flaws: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub flaws: Option<CowStr<'a>>,
     ///Ideals
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub ideals: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub ideals: Option<CowStr<'a>>,
     ///Personality traits
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub traits: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub traits: Option<CowStr<'a>>,
 }
 
 /// Reverie House philosophical alignment
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ReverieStats<'a> {
     ///Authority (0-100)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub authority: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub authority: Option<i64>,
     ///Entropy (0-100)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub entropy: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entropy: Option<i64>,
     ///Liberty (0-100)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub liberty: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub liberty: Option<i64>,
     ///Oblivion (0-100)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub oblivion: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub oblivion: Option<i64>,
     ///Philosophical octant
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub octant: core::option::Option<ReverieStatsOctant<'a>>,
+    pub octant: Option<ReverieStatsOctant<'a>>,
     ///Receptive (0-100)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub receptive: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub receptive: Option<i64>,
     ///Skeptic (0-100)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub skeptic: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub skeptic: Option<i64>,
 }
 
 /// Philosophical octant
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReverieStatsOctant<'a> {
     Adaptive,
@@ -1377,7 +1099,7 @@ pub enum ReverieStatsOctant<'a> {
     Equilibrium,
     Singling,
     Confused,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ReverieStatsOctant<'a> {
@@ -1413,7 +1135,7 @@ impl<'a> From<&'a str> for ReverieStatsOctant<'a> {
             "equilibrium" => Self::Equilibrium,
             "singling" => Self::Singling,
             "confused" => Self::Confused,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -1432,7 +1154,7 @@ impl<'a> From<String> for ReverieStatsOctant<'a> {
             "equilibrium" => Self::Equilibrium,
             "singling" => Self::Singling,
             "confused" => Self::Confused,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -1498,281 +1220,234 @@ impl jacquard_common::IntoStatic for ReverieStatsOctant<'_> {
 }
 
 /// RPG Maker MZ character parameters
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RmmzStats<'a> {
     ///Agility
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub agi: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub agi: Option<i64>,
     ///Attack
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub atk: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub atk: Option<i64>,
     ///Class
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub class: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub class: Option<CowStr<'a>>,
     ///Critical %
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub cri: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cri: Option<i64>,
     ///Defense
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub def: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub def: Option<i64>,
     ///Evasion %
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub eva: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub eva: Option<i64>,
     ///Hit Rate %
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub hit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hit: Option<i64>,
     ///Current HP
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub hp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hp: Option<i64>,
     ///Level
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub level: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub level: Option<i64>,
     ///Luck
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub luk: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub luk: Option<i64>,
     ///Magic Attack
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub mat: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mat: Option<i64>,
     ///Max HP
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub max_hp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_hp: Option<i64>,
     ///Max MP
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub max_mp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_mp: Option<i64>,
     ///Max TP
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub max_tp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_tp: Option<i64>,
     ///Magic Defense
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub mdf: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mdf: Option<i64>,
     ///Current MP
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub mp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mp: Option<i64>,
     ///Current TP
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub tp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tp: Option<i64>,
     ///Experience
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub xp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub xp: Option<i64>,
 }
 
 /// Saving throw modifiers (actual values, not proficiency flags)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Saves<'a> {
     ///Charisma save modifier
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub cha: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cha: Option<i64>,
     ///Constitution save modifier
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub con: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub con: Option<i64>,
     ///Dexterity save modifier
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub dex: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dex: Option<i64>,
     ///Intelligence save modifier
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub int: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub int: Option<i64>,
     ///Strength save modifier
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub str: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub str: Option<i64>,
     ///Wisdom save modifier
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub wis: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub wis: Option<i64>,
 }
 
 /// Skill modifiers (actual values, not proficiency flags)
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Skills<'a> {
     ///Acrobatics (DEX)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub acrobatics: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub acrobatics: Option<i64>,
     ///Animal Handling (WIS)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub animal_handling: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub animal_handling: Option<i64>,
     ///Arcana (INT)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub arcana: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub arcana: Option<i64>,
     ///Athletics (STR)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub athletics: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub athletics: Option<i64>,
     ///Deception (CHA)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub deception: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deception: Option<i64>,
     ///History (INT)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub history: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub history: Option<i64>,
     ///Insight (WIS)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub insight: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub insight: Option<i64>,
     ///Intimidation (CHA)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub intimidation: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub intimidation: Option<i64>,
     ///Investigation (INT)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub investigation: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub investigation: Option<i64>,
     ///Medicine (WIS)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub medicine: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub medicine: Option<i64>,
     ///Nature (INT)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub nature: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub nature: Option<i64>,
     ///Perception (WIS)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub perception: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub perception: Option<i64>,
     ///Performance (CHA)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub performance: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub performance: Option<i64>,
     ///Persuasion (CHA)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub persuasion: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub persuasion: Option<i64>,
     ///Religion (INT)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub religion: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub religion: Option<i64>,
     ///Sleight of Hand (DEX)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub sleight_of_hand: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sleight_of_hand: Option<i64>,
     ///Stealth (DEX)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub stealth: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stealth: Option<i64>,
     ///Survival (WIS)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub survival: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub survival: Option<i64>,
 }
 
 /// Spells organized by level
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct SpellList<'a> {
     ///Cantrips (at-will)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cantrips: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub cantrips: Option<Vec<CowStr<'a>>>,
     ///1st-level spells
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub l1: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l1: Option<Vec<CowStr<'a>>>,
     ///2nd-level spells
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub l2: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l2: Option<Vec<CowStr<'a>>>,
     ///3rd-level spells
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub l3: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l3: Option<Vec<CowStr<'a>>>,
     ///4th-level spells
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub l4: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l4: Option<Vec<CowStr<'a>>>,
     ///5th-level spells
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub l5: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l5: Option<Vec<CowStr<'a>>>,
     ///6th-level spells
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub l6: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l6: Option<Vec<CowStr<'a>>>,
     ///7th-level spells
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub l7: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l7: Option<Vec<CowStr<'a>>>,
     ///8th-level spells
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub l8: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l8: Option<Vec<CowStr<'a>>>,
     ///9th-level spells
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub l9: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l9: Option<Vec<CowStr<'a>>>,
 }
 
 /// Spellcasting details
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Spellcasting<'a> {
     ///Spellcasting ability (INT, WIS, CHA)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub ability: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub ability: Option<CowStr<'a>>,
     ///Spell attack bonus
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub attack: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attack: Option<i64>,
     ///Spell save DC
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub dc: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dc: Option<i64>,
     ///Spell slots by level
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub slots: core::option::Option<Vec<crate::actor_rpg::stats::Spellslot<'a>>>,
+    pub slots: Option<Vec<stats::Spellslot<'a>>>,
     ///Known/prepared spells by level
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub spells: core::option::Option<crate::actor_rpg::stats::SpellList<'a>>,
+    pub spells: Option<stats::SpellList<'a>>,
 }
 
 /// Spell slot entry
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Spellslot<'a> {
     ///Spell level
@@ -1780,42 +1455,33 @@ pub struct Spellslot<'a> {
     ///Total slots
     pub total: i64,
     ///Slots used
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub used: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub used: Option<i64>,
 }
 
 impl<'a> Stats<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StatsRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, StatsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
+impl<'a> LexiconSchema for Abilities<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "abilities"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.cha {
             if *value > 30i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cha",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("cha"),
                     max: 30i64,
                     actual: *value,
                 });
@@ -1823,10 +1489,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
         }
         if let Some(ref value) = self.cha {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cha",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("cha"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -1834,10 +1498,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
         }
         if let Some(ref value) = self.con {
             if *value > 30i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "con",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("con"),
                     max: 30i64,
                     actual: *value,
                 });
@@ -1845,10 +1507,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
         }
         if let Some(ref value) = self.con {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "con",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("con"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -1856,10 +1516,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
         }
         if let Some(ref value) = self.dex {
             if *value > 30i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "dex",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("dex"),
                     max: 30i64,
                     actual: *value,
                 });
@@ -1867,10 +1525,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
         }
         if let Some(ref value) = self.dex {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "dex",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("dex"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -1878,10 +1534,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
         }
         if let Some(ref value) = self.int {
             if *value > 30i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "int",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("int"),
                     max: 30i64,
                     actual: *value,
                 });
@@ -1889,10 +1543,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
         }
         if let Some(ref value) = self.int {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "int",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("int"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -1900,10 +1552,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
         }
         if let Some(ref value) = self.str {
             if *value > 30i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "str",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("str"),
                     max: 30i64,
                     actual: *value,
                 });
@@ -1911,10 +1561,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
         }
         if let Some(ref value) = self.str {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "str",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("str"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -1922,10 +1570,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
         }
         if let Some(ref value) = self.wis {
             if *value > 30i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "wis",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("wis"),
                     max: 30i64,
                     actual: *value,
                 });
@@ -1933,10 +1579,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
         }
         if let Some(ref value) = self.wis {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "wis",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("wis"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -1946,26 +1590,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Attack<'a> {
+impl<'a> LexiconSchema for Attack<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "attack"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.bonus {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "bonus",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("bonus"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1974,10 +1614,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Attack<'a> {
         if let Some(ref value) = self.damage {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "damage",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("damage"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1986,10 +1624,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Attack<'a> {
         if let Some(ref value) = self.damage_type {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "damage_type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("damage_type"),
                     max: 30usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1999,10 +1635,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Attack<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2012,25 +1646,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Attack<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Coinage<'a> {
+impl<'a> LexiconSchema for Coinage<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "coinage"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.cp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("cp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -2038,10 +1668,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Coinage<'a> {
         }
         if let Some(ref value) = self.ep {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ep",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("ep"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -2049,10 +1677,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Coinage<'a> {
         }
         if let Some(ref value) = self.gp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "gp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("gp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -2060,10 +1686,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Coinage<'a> {
         }
         if let Some(ref value) = self.pp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "pp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("pp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -2071,10 +1695,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Coinage<'a> {
         }
         if let Some(ref value) = self.sp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("sp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -2084,25 +1706,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Coinage<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Combat<'a> {
+impl<'a> LexiconSchema for Combat<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "combat"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.ac {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ac",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("ac"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -2111,10 +1729,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Combat<'a> {
         if let Some(ref value) = self.hit_dice {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "hit_dice",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("hit_dice"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2122,10 +1738,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Combat<'a> {
         }
         if let Some(ref value) = self.hit_dice_used {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "hit_dice_used",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("hit_dice_used"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -2133,10 +1747,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Combat<'a> {
         }
         if let Some(ref value) = self.speed {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "speed",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("speed"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -2146,25 +1758,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Combat<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Conditions<'a> {
+impl<'a> LexiconSchema for Conditions<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "conditions"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.exhaustion {
             if *value > 6i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "exhaustion",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("exhaustion"),
                     max: 6i64,
                     actual: *value,
                 });
@@ -2172,10 +1780,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Conditions<'a> {
         }
         if let Some(ref value) = self.exhaustion {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "exhaustion",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("exhaustion"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -2185,26 +1791,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Conditions<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CustomStat<'a> {
+impl<'a> LexiconSchema for CustomStat<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "customStat"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.category {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "category",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("category"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2214,10 +1816,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CustomStat<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2227,26 +1827,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CustomStat<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CustomStats<'a> {
+impl<'a> LexiconSchema for CustomStats<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "customStats"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.system_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "system_name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("system_name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2255,10 +1851,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CustomStats<'a> {
         if let Some(ref value) = self.system_version {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "system_version",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("system_version"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2268,25 +1862,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CustomStats<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
+impl<'a> LexiconSchema for DccAbilities<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccAbilities"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.agi {
             if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "agi",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("agi"),
                     max: 24i64,
                     actual: *value,
                 });
@@ -2294,10 +1884,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.agi {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "agi",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("agi"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -2305,10 +1893,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.agi_base {
             if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "agi_base",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("agi_base"),
                     max: 24i64,
                     actual: *value,
                 });
@@ -2316,10 +1902,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.agi_base {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "agi_base",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("agi_base"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -2327,10 +1911,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.int {
             if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "int",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("int"),
                     max: 24i64,
                     actual: *value,
                 });
@@ -2338,10 +1920,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.int {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "int",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("int"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -2349,10 +1929,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.luk {
             if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "luk",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("luk"),
                     max: 24i64,
                     actual: *value,
                 });
@@ -2360,10 +1938,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.luk {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "luk",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("luk"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -2371,10 +1947,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.per {
             if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "per",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("per"),
                     max: 24i64,
                     actual: *value,
                 });
@@ -2382,10 +1956,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.per {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "per",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("per"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -2393,10 +1965,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.sta {
             if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sta",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("sta"),
                     max: 24i64,
                     actual: *value,
                 });
@@ -2404,10 +1974,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.sta {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sta",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("sta"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -2415,10 +1983,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.sta_base {
             if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sta_base",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("sta_base"),
                     max: 24i64,
                     actual: *value,
                 });
@@ -2426,10 +1992,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.sta_base {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sta_base",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("sta_base"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -2437,10 +2001,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.str {
             if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "str",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("str"),
                     max: 24i64,
                     actual: *value,
                 });
@@ -2448,10 +2010,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.str {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "str",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("str"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -2459,10 +2019,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.str_base {
             if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "str_base",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("str_base"),
                     max: 24i64,
                     actual: *value,
                 });
@@ -2470,10 +2028,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
         }
         if let Some(ref value) = self.str_base {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "str_base",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("str_base"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -2483,26 +2039,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAttack<'a> {
+impl<'a> LexiconSchema for DccAttack<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccAttack"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.attack_mod {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "attack_mod",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("attack_mod"),
                     max: 30usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2511,10 +2063,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAttack<'a> {
         if let Some(ref value) = self.damage {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "damage",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("damage"),
                     max: 30usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2523,10 +2073,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAttack<'a> {
         if let Some(ref value) = self.damage_bonus {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "damage_bonus",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("damage_bonus"),
                     max: 30usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2536,10 +2084,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAttack<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2548,10 +2094,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAttack<'a> {
         if let Some(ref value) = self.notes {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("notes"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2560,10 +2104,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAttack<'a> {
         if let Some(ref value) = self.range {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "range",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("range"),
                     max: 30usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2572,10 +2114,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAttack<'a> {
         if let Some(ref value) = self.r#type {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("type"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2585,26 +2125,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAttack<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
+impl<'a> LexiconSchema for DccCleric<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccCleric"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.deity {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "deity",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("deity"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2612,10 +2148,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
         }
         if let Some(ref value) = self.disapproval_range {
             if *value > 20i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "disapproval_range",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("disapproval_range"),
                     max: 20i64,
                     actual: *value,
                 });
@@ -2623,10 +2157,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
         }
         if let Some(ref value) = self.disapproval_range {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "disapproval_range",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("disapproval_range"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -2635,10 +2167,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
         if let Some(ref value) = self.disapproval_table {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "disapproval_table",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("disapproval_table"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2647,10 +2177,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
         if let Some(ref value) = self.holy_symbol {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "holy_symbol",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("holy_symbol"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2659,10 +2187,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
         if let Some(ref value) = self.known_spells {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "known_spells",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("known_spells"),
                     max: 50usize,
                     actual: value.len(),
                 });
@@ -2671,10 +2197,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
         if let Some(ref value) = self.lay_on_hands_die {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "lay_on_hands_die",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("lay_on_hands_die"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2682,10 +2206,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
         }
         if let Some(ref value) = self.max_spell_level {
             if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max_spell_level",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("max_spell_level"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -2693,10 +2215,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
         }
         if let Some(ref value) = self.max_spell_level {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max_spell_level",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("max_spell_level"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -2705,10 +2225,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
         if let Some(ref value) = self.turn_unholy_die {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "turn_unholy_die",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("turn_unholy_die"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2718,26 +2236,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccClericSpell<'a> {
+impl<'a> LexiconSchema for DccClericSpell<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccClericSpell"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.level;
             if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("level"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -2746,10 +2260,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccClericSpell<'a> {
         {
             let value = &self.level;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("level"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -2759,10 +2271,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccClericSpell<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2771,10 +2281,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccClericSpell<'a> {
         if let Some(ref value) = self.notes {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("notes"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2784,25 +2292,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccClericSpell<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCoinage<'a> {
+impl<'a> LexiconSchema for DccCoinage<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccCoinage"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.cp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("cp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -2810,10 +2314,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCoinage<'a> {
         }
         if let Some(ref value) = self.gp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "gp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("gp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -2821,10 +2323,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCoinage<'a> {
         }
         if let Some(ref value) = self.sp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("sp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -2834,25 +2334,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCoinage<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCombat<'a> {
+impl<'a> LexiconSchema for DccCombat<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccCombat"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.ac {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ac",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("ac"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -2861,10 +2357,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCombat<'a> {
         if let Some(ref value) = self.action_die {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "action_die",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("action_die"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2873,10 +2367,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCombat<'a> {
         if let Some(ref value) = self.crit_die {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "crit_die",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("crit_die"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2885,10 +2377,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCombat<'a> {
         if let Some(ref value) = self.crit_table {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "crit_table",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("crit_table"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2897,10 +2387,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCombat<'a> {
         if let Some(ref value) = self.fumble_die {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "fumble_die",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("fumble_die"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2908,10 +2396,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCombat<'a> {
         }
         if let Some(ref value) = self.speed {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "speed",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("speed"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -2921,26 +2407,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCombat<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCorruption<'a> {
+impl<'a> LexiconSchema for DccCorruption<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccCorruption"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.effect {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "effect",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("effect"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2949,10 +2431,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCorruption<'a> {
         if let Some(ref value) = self.source {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "source",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("source"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2961,10 +2441,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCorruption<'a> {
         if let Some(ref value) = self.r#type {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("type"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2974,26 +2452,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCorruption<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccEquipment<'a> {
+impl<'a> LexiconSchema for DccEquipment<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccEquipment"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.armor {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "armor",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("armor"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3001,10 +2475,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccEquipment<'a> {
         }
         if let Some(ref value) = self.armor_check_penalty {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "armor_check_penalty",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("armor_check_penalty"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -3013,10 +2485,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccEquipment<'a> {
         if let Some(ref value) = self.gear {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "gear",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("gear"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3025,10 +2495,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccEquipment<'a> {
         if let Some(ref value) = self.shield {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "shield",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("shield"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3037,10 +2505,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccEquipment<'a> {
         if let Some(ref value) = self.trade_goods {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "trade_goods",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("trade_goods"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3049,10 +2515,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccEquipment<'a> {
         if let Some(ref value) = self.treasure {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "treasure",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("treasure"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3061,10 +2525,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccEquipment<'a> {
         if let Some(ref value) = self.weapons {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "weapons",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("weapons"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3074,25 +2536,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccEquipment<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccHalfling<'a> {
+impl<'a> LexiconSchema for DccHalfling<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccHalfling"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.infravision {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "infravision",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("infravision"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -3100,10 +2558,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccHalfling<'a> {
         }
         if let Some(ref value) = self.luck_spent_on_allies {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "luck_spent_on_allies",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("luck_spent_on_allies"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -3112,10 +2568,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccHalfling<'a> {
         if let Some(ref value) = self.lucky_weapon {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "lucky_weapon",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("lucky_weapon"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3125,25 +2579,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccHalfling<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccHp<'a> {
+impl<'a> LexiconSchema for DccHp<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccHp"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.current {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "current",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("current"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -3151,10 +2601,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccHp<'a> {
         }
         if let Some(ref value) = self.max {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("max"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -3164,26 +2612,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccHp<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccIdentity<'a> {
+impl<'a> LexiconSchema for DccIdentity<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccIdentity"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.alignment {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "alignment",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("alignment"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3192,10 +2636,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccIdentity<'a> {
         if let Some(ref value) = self.class {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "class",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("class"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3203,10 +2645,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccIdentity<'a> {
         }
         if let Some(ref value) = self.level {
             if *value > 10i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("level"),
                     max: 10i64,
                     actual: *value,
                 });
@@ -3214,10 +2654,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccIdentity<'a> {
         }
         if let Some(ref value) = self.level {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("level"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -3226,10 +2664,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccIdentity<'a> {
         if let Some(ref value) = self.occupation {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "occupation",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("occupation"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3238,10 +2674,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccIdentity<'a> {
         if let Some(ref value) = self.title {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("title"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3249,10 +2683,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccIdentity<'a> {
         }
         if let Some(ref value) = self.xp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "xp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("xp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -3262,26 +2694,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccIdentity<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccLuck<'a> {
+impl<'a> LexiconSchema for DccLuck<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccLuck"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.birth_augur {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "birth_augur",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("birth_augur"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3290,10 +2718,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccLuck<'a> {
         if let Some(ref value) = self.birth_augur_effect {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "birth_augur_effect",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("birth_augur_effect"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3302,10 +2728,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccLuck<'a> {
         if let Some(ref value) = self.lucky_weapon {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "lucky_weapon",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("lucky_weapon"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3313,10 +2737,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccLuck<'a> {
         }
         if let Some(ref value) = self.starting_luck {
             if *value > 24i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "starting_luck",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("starting_luck"),
                     max: 24i64,
                     actual: *value,
                 });
@@ -3324,10 +2746,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccLuck<'a> {
         }
         if let Some(ref value) = self.starting_luck {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "starting_luck",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("starting_luck"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -3337,42 +2757,36 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccLuck<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccSaves<'a> {
+impl<'a> LexiconSchema for DccSaves<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccSaves"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccSpellburn<'a> {
+impl<'a> LexiconSchema for DccSpellburn<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccSpellburn"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.agi_burned {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "agi_burned",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("agi_burned"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -3380,10 +2794,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccSpellburn<'a> {
         }
         if let Some(ref value) = self.recovery_rate {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "recovery_rate",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("recovery_rate"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -3391,10 +2803,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccSpellburn<'a> {
         }
         if let Some(ref value) = self.sta_burned {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sta_burned",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("sta_burned"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -3402,10 +2812,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccSpellburn<'a> {
         }
         if let Some(ref value) = self.str_burned {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "str_burned",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("str_burned"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -3415,26 +2823,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccSpellburn<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccStats<'a> {
+impl<'a> LexiconSchema for DccStats<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccStats"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.abilities_notes {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "abilities_notes",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("abilities_notes"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3443,10 +2847,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccStats<'a> {
         if let Some(ref value) = self.attacks {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "attacks",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("attacks"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -3455,10 +2857,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccStats<'a> {
         if let Some(ref value) = self.languages {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "languages",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("languages"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3467,10 +2867,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccStats<'a> {
         if let Some(ref value) = self.notes {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("notes"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3480,26 +2878,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccStats<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccThief<'a> {
+impl<'a> LexiconSchema for DccThief<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccThief"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.alignment {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "alignment",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("alignment"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3507,10 +2901,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccThief<'a> {
         }
         if let Some(ref value) = self.backstab {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "backstab",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("backstab"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -3519,10 +2911,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccThief<'a> {
         if let Some(ref value) = self.lucky_weapon {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "lucky_weapon",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("lucky_weapon"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3532,43 +2922,37 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccThief<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccThiefSkills<'a> {
+impl<'a> LexiconSchema for DccThiefSkills<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccThiefSkills"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWarrior<'a> {
+impl<'a> LexiconSchema for DccWarrior<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccWarrior"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.deed_die {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "deed_die",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("deed_die"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3576,10 +2960,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWarrior<'a> {
         }
         if let Some(ref value) = self.infravision {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "infravision",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("infravision"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -3588,10 +2970,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWarrior<'a> {
         if let Some(ref value) = self.lucky_weapon {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "lucky_weapon",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("lucky_weapon"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3600,10 +2980,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWarrior<'a> {
         if let Some(ref value) = self.mighty_deeds {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mighty_deeds",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("mighty_deeds"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -3611,10 +2989,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWarrior<'a> {
         }
         if let Some(ref value) = self.underground_skills {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "underground_skills",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("underground_skills"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -3624,26 +3000,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWarrior<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizard<'a> {
+impl<'a> LexiconSchema for DccWizard<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccWizard"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.corruption {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "corruption",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("corruption"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -3652,10 +3024,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizard<'a> {
         if let Some(ref value) = self.corruption_text {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "corruption_text",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("corruption_text"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3664,10 +3034,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizard<'a> {
         if let Some(ref value) = self.known_spells {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "known_spells",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("known_spells"),
                     max: 50usize,
                     actual: value.len(),
                 });
@@ -3675,10 +3043,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizard<'a> {
         }
         if let Some(ref value) = self.max_spell_level {
             if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max_spell_level",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("max_spell_level"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -3686,10 +3052,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizard<'a> {
         }
         if let Some(ref value) = self.max_spell_level {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max_spell_level",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("max_spell_level"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -3698,10 +3062,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizard<'a> {
         if let Some(ref value) = self.patron {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "patron",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("patron"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3710,10 +3072,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizard<'a> {
         if let Some(ref value) = self.patron_bond {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "patron_bond",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("patron_bond"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3723,26 +3083,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizard<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizardSpell<'a> {
+impl<'a> LexiconSchema for DccWizardSpell<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccWizardSpell"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.level;
             if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("level"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -3751,10 +3107,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizardSpell<'a> {
         {
             let value = &self.level;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("level"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -3763,10 +3117,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizardSpell<'a> {
         if let Some(ref value) = self.mercurial_magic {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mercurial_magic",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("mercurial_magic"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3774,10 +3126,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizardSpell<'a> {
         }
         if let Some(ref value) = self.mercurial_roll {
             if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mercurial_roll",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("mercurial_roll"),
                     max: 100i64,
                     actual: *value,
                 });
@@ -3785,10 +3135,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizardSpell<'a> {
         }
         if let Some(ref value) = self.mercurial_roll {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mercurial_roll",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("mercurial_roll"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -3798,10 +3146,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizardSpell<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3810,10 +3156,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizardSpell<'a> {
         if let Some(ref value) = self.notes {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("notes"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3823,25 +3167,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizardSpell<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DeathSaves<'a> {
+impl<'a> LexiconSchema for DeathSaves<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "deathSaves"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.failures {
             if *value > 3i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "failures",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("failures"),
                     max: 3i64,
                     actual: *value,
                 });
@@ -3849,10 +3189,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DeathSaves<'a> {
         }
         if let Some(ref value) = self.failures {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "failures",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("failures"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -3860,10 +3198,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DeathSaves<'a> {
         }
         if let Some(ref value) = self.successes {
             if *value > 3i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "successes",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("successes"),
                     max: 3i64,
                     actual: *value,
                 });
@@ -3871,10 +3207,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DeathSaves<'a> {
         }
         if let Some(ref value) = self.successes {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "successes",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("successes"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -3884,26 +3218,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DeathSaves<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DndStats<'a> {
+impl<'a> LexiconSchema for DndStats<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dndStats"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.attacks {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "attacks",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("attacks"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -3912,10 +3242,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DndStats<'a> {
         if let Some(ref value) = self.features {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "features",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("features"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3924,10 +3252,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DndStats<'a> {
         if let Some(ref value) = self.languages {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "languages",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("languages"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3936,10 +3262,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DndStats<'a> {
         if let Some(ref value) = self.proficiencies {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "proficiencies",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("proficiencies"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3949,26 +3273,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DndStats<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Equipment<'a> {
+impl<'a> LexiconSchema for Equipment<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "equipment"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.armor {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "armor",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("armor"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3977,10 +3297,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Equipment<'a> {
         if let Some(ref value) = self.gear {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "gear",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("gear"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -3989,10 +3307,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Equipment<'a> {
         if let Some(ref value) = self.treasure {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "treasure",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("treasure"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -4001,10 +3317,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Equipment<'a> {
         if let Some(ref value) = self.weapons {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "weapons",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("weapons"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -4014,25 +3328,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Equipment<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Hp<'a> {
+impl<'a> LexiconSchema for Hp<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "hp"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.current {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "current",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("current"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4040,10 +3350,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Hp<'a> {
         }
         if let Some(ref value) = self.max {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("max"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -4051,10 +3359,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Hp<'a> {
         }
         if let Some(ref value) = self.temp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "temp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("temp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4064,26 +3370,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Hp<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
+impl<'a> LexiconSchema for Identity<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "identity"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.alignment {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "alignment",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("alignment"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -4092,10 +3394,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
         if let Some(ref value) = self.background {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "background",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("background"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -4104,10 +3404,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
         if let Some(ref value) = self.class {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "class",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("class"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -4115,10 +3413,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
         }
         if let Some(ref value) = self.level {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("level"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -4126,10 +3422,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
         }
         if let Some(ref value) = self.proficiency {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "proficiency",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("proficiency"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4138,10 +3432,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
         if let Some(ref value) = self.race {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "race",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("race"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -4149,10 +3441,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
         }
         if let Some(ref value) = self.xp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "xp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("xp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4163,13 +3453,14 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct StatsRecord;
-impl jacquard_common::xrpc::XrpcResp for StatsRecord {
+impl XrpcResp for StatsRecord {
     const NSID: &'static str = "actor.rpg.stats";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = StatsGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
@@ -4179,70 +3470,62 @@ impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Stats<'_> {
+impl Collection for Stats<'_> {
     const NSID: &'static str = "actor.rpg.stats";
     type Record = StatsRecord;
 }
 
-impl jacquard_common::types::collection::Collection for StatsRecord {
+impl Collection for StatsRecord {
     const NSID: &'static str = "actor.rpg.stats";
     type Record = StatsRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
+impl<'a> LexiconSchema for Stats<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Passives<'a> {
+impl<'a> LexiconSchema for Passives<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "passives"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Personality<'a> {
+impl<'a> LexiconSchema for Personality<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "personality"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.backstory {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "backstory",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("backstory"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -4251,10 +3534,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Personality<'a> {
         if let Some(ref value) = self.bonds {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "bonds",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("bonds"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -4263,10 +3544,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Personality<'a> {
         if let Some(ref value) = self.flaws {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "flaws",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("flaws"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -4275,10 +3554,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Personality<'a> {
         if let Some(ref value) = self.ideals {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ideals",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("ideals"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -4287,10 +3564,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Personality<'a> {
         if let Some(ref value) = self.traits {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "traits",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("traits"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -4300,25 +3575,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Personality<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
+impl<'a> LexiconSchema for ReverieStats<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "reverieStats"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.authority {
             if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "authority",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("authority"),
                     max: 100i64,
                     actual: *value,
                 });
@@ -4326,10 +3597,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
         }
         if let Some(ref value) = self.authority {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "authority",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("authority"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4337,10 +3606,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
         }
         if let Some(ref value) = self.entropy {
             if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "entropy",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("entropy"),
                     max: 100i64,
                     actual: *value,
                 });
@@ -4348,10 +3615,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
         }
         if let Some(ref value) = self.entropy {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "entropy",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("entropy"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4359,10 +3624,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
         }
         if let Some(ref value) = self.liberty {
             if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "liberty",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("liberty"),
                     max: 100i64,
                     actual: *value,
                 });
@@ -4370,10 +3633,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
         }
         if let Some(ref value) = self.liberty {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "liberty",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("liberty"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4381,10 +3642,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
         }
         if let Some(ref value) = self.oblivion {
             if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "oblivion",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("oblivion"),
                     max: 100i64,
                     actual: *value,
                 });
@@ -4392,10 +3651,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
         }
         if let Some(ref value) = self.oblivion {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "oblivion",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("oblivion"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4403,10 +3660,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
         }
         if let Some(ref value) = self.receptive {
             if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "receptive",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("receptive"),
                     max: 100i64,
                     actual: *value,
                 });
@@ -4414,10 +3669,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
         }
         if let Some(ref value) = self.receptive {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "receptive",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("receptive"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4425,10 +3678,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
         }
         if let Some(ref value) = self.skeptic {
             if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "skeptic",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("skeptic"),
                     max: 100i64,
                     actual: *value,
                 });
@@ -4436,10 +3687,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
         }
         if let Some(ref value) = self.skeptic {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "skeptic",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("skeptic"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4449,25 +3698,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
+impl<'a> LexiconSchema for RmmzStats<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "rmmzStats"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.agi {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "agi",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("agi"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -4475,10 +3720,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.atk {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "atk",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("atk"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -4487,10 +3730,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         if let Some(ref value) = self.class {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "class",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("class"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -4498,10 +3739,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.cri {
             if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cri",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("cri"),
                     max: 100i64,
                     actual: *value,
                 });
@@ -4509,10 +3748,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.cri {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cri",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("cri"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4520,10 +3757,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.def {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "def",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("def"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -4531,10 +3766,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.eva {
             if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "eva",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("eva"),
                     max: 100i64,
                     actual: *value,
                 });
@@ -4542,10 +3775,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.eva {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "eva",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("eva"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4553,10 +3784,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.hit {
             if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "hit",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("hit"),
                     max: 100i64,
                     actual: *value,
                 });
@@ -4564,10 +3793,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.hit {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "hit",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("hit"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4575,10 +3802,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.hp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "hp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("hp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4586,10 +3811,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.level {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("level"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -4597,10 +3820,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.luk {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "luk",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("luk"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -4608,10 +3829,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.mat {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mat",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("mat"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -4619,10 +3838,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.max_hp {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max_hp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("max_hp"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -4630,10 +3847,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.max_mp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max_mp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("max_mp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4641,10 +3856,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.max_tp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "max_tp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("max_tp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4652,10 +3865,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.mdf {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mdf",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("mdf"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -4663,10 +3874,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.mp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("mp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4674,10 +3883,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.tp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("tp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4685,10 +3892,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
         }
         if let Some(ref value) = self.xp {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "xp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("xp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4698,60 +3903,52 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Saves<'a> {
+impl<'a> LexiconSchema for Saves<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "saves"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Skills<'a> {
+impl<'a> LexiconSchema for Skills<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "skills"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
+impl<'a> LexiconSchema for SpellList<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "spellList"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.cantrips {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cantrips",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("cantrips"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -4760,10 +3957,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
         if let Some(ref value) = self.l1 {
             #[allow(unused_comparisons)]
             if value.len() > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l1",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("l1"),
                     max: 30usize,
                     actual: value.len(),
                 });
@@ -4772,10 +3967,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
         if let Some(ref value) = self.l2 {
             #[allow(unused_comparisons)]
             if value.len() > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l2",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("l2"),
                     max: 30usize,
                     actual: value.len(),
                 });
@@ -4784,10 +3977,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
         if let Some(ref value) = self.l3 {
             #[allow(unused_comparisons)]
             if value.len() > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l3",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("l3"),
                     max: 30usize,
                     actual: value.len(),
                 });
@@ -4796,10 +3987,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
         if let Some(ref value) = self.l4 {
             #[allow(unused_comparisons)]
             if value.len() > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l4",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("l4"),
                     max: 30usize,
                     actual: value.len(),
                 });
@@ -4808,10 +3997,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
         if let Some(ref value) = self.l5 {
             #[allow(unused_comparisons)]
             if value.len() > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l5",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("l5"),
                     max: 30usize,
                     actual: value.len(),
                 });
@@ -4820,10 +4007,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
         if let Some(ref value) = self.l6 {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l6",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("l6"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -4832,10 +4017,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
         if let Some(ref value) = self.l7 {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l7",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("l7"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -4844,10 +4027,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
         if let Some(ref value) = self.l8 {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l8",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("l8"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -4856,10 +4037,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
         if let Some(ref value) = self.l9 {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "l9",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("l9"),
                     max: 20usize,
                     actual: value.len(),
                 });
@@ -4869,26 +4048,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Spellcasting<'a> {
+impl<'a> LexiconSchema for Spellcasting<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "spellcasting"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.ability {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "ability",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("ability"),
                     max: 3usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -4896,10 +4071,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Spellcasting<'a> {
         }
         if let Some(ref value) = self.dc {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "dc",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("dc"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -4908,10 +4081,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Spellcasting<'a> {
         if let Some(ref value) = self.slots {
             #[allow(unused_comparisons)]
             if value.len() > 9usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "slots",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("slots"),
                     max: 9usize,
                     actual: value.len(),
                 });
@@ -4921,26 +4092,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Spellcasting<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Spellslot<'a> {
+impl<'a> LexiconSchema for Spellslot<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "spellslot"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.level;
             if *value > 9i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("level"),
                     max: 9i64,
                     actual: *value,
                 });
@@ -4949,10 +4116,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Spellslot<'a> {
         {
             let value = &self.level;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("level"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -4961,10 +4126,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Spellslot<'a> {
         {
             let value = &self.total;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("total"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4972,10 +4135,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Spellslot<'a> {
         }
         if let Some(ref value) = self.used {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "used",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("used"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -4985,4887 +4146,2875 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Spellslot<'a> {
     }
 }
 
-fn lexicon_doc_actor_rpg_stats() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("actor.rpg.stats"),
-        revision: None,
-        description: None,
+fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("actor.rpg.stats"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("abilities"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("abilities"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "The six ability scores (1-30 per SRD)",
-                        ),
+                        CowStr::new_static("The six ability scores (1-30 per SRD)"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cha",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("cha"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(30i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "con",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("con"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(30i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "dex",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("dex"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(30i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "int",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("int"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(30i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "str",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("str"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(30i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "wis",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("wis"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(30i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("attack"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("An attack action"),
-                    ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("attack"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("An attack action")),
+                    required: Some(vec![SmolStr::new_static("name")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "bonus",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("bonus"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Attack bonus (e.g., +5)",
-                                    ),
+                                    CowStr::new_static("Attack bonus (e.g., +5)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(20usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "damage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("damage"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Damage dice (e.g., 1d8)",
-                                    ),
+                                    CowStr::new_static("Damage dice (e.g., 1d8)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(20usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "damageBonus",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("damageBonus"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "damageType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Damage type"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("damageType"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Damage type")),
                                 max_length: Some(30usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Attack name"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Attack name")),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("coinage"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(::jacquard_common::CowStr::new_static("Currency")),
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("coinage"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Currency")),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cp"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("cp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("ep"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("ep"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("gp"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("gp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("pp"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("pp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("sp"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("sp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("combat"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Combat and defensive stats",
-                        ),
-                    ),
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("combat"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Combat and defensive stats")),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("ac"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("ac"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hitDice",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("hitDice"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Hit dice (e.g., 5d10)",
-                                    ),
+                                    CowStr::new_static("Hit dice (e.g., 5d10)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(20usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hitDiceUsed",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("hitDiceUsed"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "initiative",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("initiative"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "speed",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("speed"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("conditions"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("conditions"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Status conditions and effects",
-                        ),
+                        CowStr::new_static("Status conditions and effects"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "deathSaves",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#deathSaves"),
+                            SmolStr::new_static("deathSaves"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#deathSaves"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "exhaustion",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("exhaustion"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(6i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "inspiration",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("inspiration"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("customStat"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("A custom stat"),
-                    ),
+                SmolStr::new_static("customStat"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("A custom stat")),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
-                        ],
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("value")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "category",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("category"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static("Category (optional)"),
+                                    CowStr::new_static("Category (optional)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(50usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "max",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("max"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "min",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("min"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Stat name"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Stat name")),
                                 max_length: Some(50usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "value",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("value"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("customStats"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("customStats"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "User-defined custom stat system",
-                        ),
+                        CowStr::new_static("User-defined custom stat system"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "stats",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("stats"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static("Custom stat entries"),
+                                    CowStr::new_static("Custom stat entries"),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#customStat"),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#customStat"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "systemName",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("System name"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("systemName"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("System name")),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "systemVersion",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Version"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("systemVersion"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Version")),
                                 max_length: Some(50usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccAbilities"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccAbilities"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "DCC ability scores (3-18 standard, can be modified by corruption/spellburn)",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "agi",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("agi"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(24i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "agiBase",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("agiBase"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(24i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "int",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("int"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(24i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "luk",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("luk"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(24i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "per",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("per"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(24i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sta",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("sta"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(24i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "staBase",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("staBase"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(24i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "str",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("str"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(24i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "strBase",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("strBase"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(24i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccAttack"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccAttack"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A weapon attack (includes deed die for warriors)",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("name")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "attackMod",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("attackMod"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Attack modifier (e.g., +2, d16+2 for deed die)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(30usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "damage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("damage"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Damage dice (e.g., 1d8+2, 1d6+d3)",
-                                    ),
+                                    CowStr::new_static("Damage dice (e.g., 1d8+2, 1d6+d3)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(30usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "damageBonus",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("damageBonus"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Damage bonus (e.g., +2, +d3 for deed die)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(30usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Weapon name"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Weapon name")),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "notes",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("notes"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Special properties (backstab, trained weapon, etc.)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(200usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "range",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("range"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Range (melee or distance)",
-                                    ),
+                                    CowStr::new_static("Range (melee or distance)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(30usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Attack type (melee, ranged, etc.)",
-                                    ),
+                                    CowStr::new_static("Attack type (melee, ranged, etc.)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(20usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccCleric"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccCleric"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Cleric spellcasting features",
-                        ),
+                        CowStr::new_static("Cleric spellcasting features"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "deity",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("deity"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Deity or supernatural patron",
-                                    ),
+                                    CowStr::new_static("Deity or supernatural patron"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "disapprovalRange",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("disapprovalRange"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(20i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "disapprovalTable",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("disapprovalTable"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Deity-specific disapproval table if any",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "holySymbol",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("holySymbol"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Holy symbol description",
-                                    ),
+                                    CowStr::new_static("Holy symbol description"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "knownSpells",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("knownSpells"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static("Known cleric spells"),
+                                    CowStr::new_static("Known cleric spells"),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#dccClericSpell",
-                                    ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#dccClericSpell"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(50usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "layOnHandsDie",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("layOnHandsDie"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Lay on hands die (e.g., d14, d16)",
-                                    ),
+                                    CowStr::new_static("Lay on hands die (e.g., d14, d16)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(10usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maxSpellLevel",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("maxSpellLevel"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(5i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "spellCheckMod",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("spellCheckMod"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "turnUnholyDie",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("turnUnholyDie"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Turn unholy die (e.g., d14, d16)",
-                                    ),
+                                    CowStr::new_static("Turn unholy die (e.g., d14, d16)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(10usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "unholy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("unholy"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccClericSpell"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("A cleric spell"),
-                    ),
+                SmolStr::new_static("dccClericSpell"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("A cleric spell")),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("level")
-                        ],
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("level")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "level",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("level"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(5i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Spell name"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Spell name")),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "notes",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("notes"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Additional spell notes",
-                                    ),
+                                    CowStr::new_static("Additional spell notes"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sinful",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("sinful"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccCoinage"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccCoinage"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "DCC uses cp, sp, gp (10cp = 1sp, 10sp = 1gp)",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("cp"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("cp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("gp"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("gp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("sp"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("sp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccCombat"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Combat statistics"),
-                    ),
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("dccCombat"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Combat statistics")),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("ac"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("ac"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "actionDie",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("actionDie"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Primary action die (e.g., d20, d20+d14)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(20usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "attackMod",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("attackMod"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "critDie",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("critDie"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Critical hit die (e.g., d8, d12, d14)",
-                                    ),
+                                    CowStr::new_static("Critical hit die (e.g., d8, d12, d14)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(10usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "critTable",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("critTable"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Critical hit table (I, II, III, IV, V)",
-                                    ),
+                                    CowStr::new_static("Critical hit table (I, II, III, IV, V)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(20usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "fumbleDie",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("fumbleDie"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Fumble die (typically d4 for 0-level, varies by armor)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(10usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "initiative",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("initiative"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "speed",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("speed"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccCorruption"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccCorruption"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A corruption effect from failed spell checks",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "effect",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("effect"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Description of the corruption",
-                                    ),
+                                    CowStr::new_static("Description of the corruption"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "permanent",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("permanent"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "source",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("source"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "What spell caused this corruption",
-                                    ),
+                                    CowStr::new_static("What spell caused this corruption"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Corruption severity (minor, major, greater)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(20usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccEquipment"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Equipment and inventory"),
-                    ),
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("dccEquipment"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Equipment and inventory")),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "armor",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("armor"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Armor worn (affects fumble die)",
-                                    ),
+                                    CowStr::new_static("Armor worn (affects fumble die)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(200usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "armorCheckPenalty",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("armorCheckPenalty"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "gear",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Other equipment"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("gear"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Other equipment")),
                                 max_length: Some(2000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "shield",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Shield (if any)"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("shield"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Shield (if any)")),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "tradeGoods",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("tradeGoods"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Trade goods from occupation",
-                                    ),
+                                    CowStr::new_static("Trade goods from occupation"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "treasure",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("treasure"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Valuables and treasure",
-                                    ),
+                                    CowStr::new_static("Valuables and treasure"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(1000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "weapons",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Weapons carried"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("weapons"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Weapons carried")),
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccHalfling"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Halfling class features"),
-                    ),
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("dccHalfling"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Halfling class features")),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "goodLuckCharm",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("goodLuckCharm"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "infravision",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("infravision"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "luckSpentOnAllies",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("luckSpentOnAllies"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "luckyWeapon",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("luckyWeapon"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Weapon type luck modifier applies to",
-                                    ),
+                                    CowStr::new_static("Weapon type luck modifier applies to"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sneakAndHide",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("sneakAndHide"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "twoWeaponFighting",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("twoWeaponFighting"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccHp"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccHp"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Hit points (0-level characters use 1d4 + STA mod)",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "current",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("current"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "max",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("max"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccIdentity"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccIdentity"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "DCC character identity and progression",
-                        ),
+                        CowStr::new_static("DCC character identity and progression"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alignment",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("alignment"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Alignment (Lawful, Neutral, Chaotic)",
-                                    ),
+                                    CowStr::new_static("Alignment (Lawful, Neutral, Chaotic)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(20usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "class",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("class"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Class (Warrior, Wizard, Cleric, Thief, Elf, Dwarf, Halfling)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "level",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("level"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(10i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "occupation",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("occupation"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "0-level occupation (e.g., Blacksmith, Farmer)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "title",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("title"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Level title (e.g., Squire, Cutpurse, Acolyte)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("xp"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("xp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccLuck"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccLuck"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Birth augur and luck mechanics",
-                        ),
+                        CowStr::new_static("Birth augur and luck mechanics"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "birthAugur",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("birthAugur"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Birth augur name (e.g., Harsh Winter, The Bull, Fortunate Date)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "birthAugurEffect",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("birthAugurEffect"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "What the luck modifier applies to",
-                                    ),
+                                    CowStr::new_static("What the luck modifier applies to"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(200usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "luckyWeapon",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("luckyWeapon"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Weapon type that luck applies to (Dwarves/Halflings)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "startingLuck",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("startingLuck"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(24i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccSaves"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccSaves"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "DCC saving throws (3 saves, not 6)",
-                        ),
+                        CowStr::new_static("DCC saving throws (3 saves, not 6)"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "fort",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("fort"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "ref",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("ref"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "will",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("will"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccSpellburn"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccSpellburn"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Current spellburn (temporary ability score sacrifice)",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "agiBurned",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("agiBurned"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "recoveryRate",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("recoveryRate"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "staBurned",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("staBurned"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "strBurned",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("strBurned"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccStats"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccStats"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Dungeon Crawl Classics RPG character sheet. Supports 0-level funnel characters through 10th level.",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "abilities",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#dccAbilities",
-                                ),
+                            SmolStr::new_static("abilities"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dccAbilities"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "abilitiesNotes",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("abilitiesNotes"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Notes about special abilities, class features, and racial traits",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(1000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "attacks",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Weapon attacks"),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#dccAttack"),
+                            SmolStr::new_static("attacks"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static("Weapon attacks")),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#dccAttack"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(20usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cleric",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#dccCleric"),
+                            SmolStr::new_static("cleric"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dccCleric"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "coinage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#dccCoinage"),
+                            SmolStr::new_static("coinage"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dccCoinage"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "combat",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#dccCombat"),
+                            SmolStr::new_static("combat"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dccCombat"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "equipment",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#dccEquipment",
-                                ),
+                            SmolStr::new_static("equipment"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dccEquipment"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "halfling",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#dccHalfling"),
+                            SmolStr::new_static("halfling"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dccHalfling"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("hp"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#dccHp"),
+                            SmolStr::new_static("hp"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dccHp"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "identity",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#dccIdentity"),
+                            SmolStr::new_static("identity"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dccIdentity"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "languages",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Languages known"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("languages"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Languages known")),
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "luck",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#dccLuck"),
+                            SmolStr::new_static("luck"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dccLuck"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "notes",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("notes"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Character notes, backstory, and special abilities",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(5000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "saves",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#dccSaves"),
+                            SmolStr::new_static("saves"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dccSaves"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "thief",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#dccThief"),
+                            SmolStr::new_static("thief"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dccThief"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "warrior",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#dccWarrior"),
+                            SmolStr::new_static("warrior"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dccWarrior"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "wizard",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#dccWizard"),
+                            SmolStr::new_static("wizard"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dccWizard"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccThief"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccThief"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Thief class features and skills",
-                        ),
+                        CowStr::new_static("Thief class features and skills"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alignment",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("alignment"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Alignment (affects some skill targets)",
-                                    ),
+                                    CowStr::new_static("Alignment (affects some skill targets)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(20usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "backstab",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("backstab"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "luckyWeapon",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("luckyWeapon"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Weapon type that luck applies to (one type only)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "skills",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#dccThiefSkills",
-                                ),
+                            SmolStr::new_static("skills"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dccThiefSkills"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccThiefSkills"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccThiefSkills"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Thief skill bonuses (roll d20 + skill vs target)",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "backstab",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("backstab"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "castSpellFromScroll",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("castSpellFromScroll"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "climbSheerSurfaces",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("climbSheerSurfaces"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "disableTrap",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("disableTrap"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "disguiseSelf",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("disguiseSelf"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "findTrap",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("findTrap"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "forgeDocument",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("forgeDocument"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "handlePoison",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("handlePoison"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hideInShadows",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("hideInShadows"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "pickLock",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("pickLock"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "pickPocket",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("pickPocket"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "readLanguages",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("readLanguages"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sneakSilently",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("sneakSilently"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccWarrior"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccWarrior"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Warrior and Dwarf class features",
-                        ),
+                        CowStr::new_static("Warrior and Dwarf class features"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "deedDie",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("deedDie"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Current deed die (d3, d4, d5, d6, d7, d8, d10+d3, etc.)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(10usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "infravision",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("infravision"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "luckyWeapon",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("luckyWeapon"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Weapon type luck modifier applies to",
-                                    ),
+                                    CowStr::new_static("Weapon type luck modifier applies to"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mightyDeeds",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("mightyDeeds"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Signature mighty deeds of arms",
-                                    ),
+                                    CowStr::new_static("Signature mighty deeds of arms"),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                items: LexArrayItem::String(LexString {
                                     max_length: Some(200usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(20usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "shieldBash",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("shieldBash"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "smellGold",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("smellGold"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "undergroundSkills",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("undergroundSkills"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccWizard"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccWizard"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Wizard and Elf spellcasting features",
-                        ),
+                        CowStr::new_static("Wizard and Elf spellcasting features"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "corruption",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("corruption"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Corruption effects suffered (structured)",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#dccCorruption",
-                                    ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#dccCorruption"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(20usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "corruptionText",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("corruptionText"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Corruption effects as free-form text",
-                                    ),
+                                    CowStr::new_static("Corruption effects as free-form text"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(2000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "knownSpells",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("knownSpells"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Known spells with mercurial magic effects",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#dccWizardSpell",
-                                    ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#dccWizardSpell"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(50usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maxSpellLevel",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("maxSpellLevel"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(5i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "patron",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("patron"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Supernatural patron (if any)",
-                                    ),
+                                    CowStr::new_static("Supernatural patron (if any)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "patronBond",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("patronBond"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Patron bond description and effects",
-                                    ),
+                                    CowStr::new_static("Patron bond description and effects"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "spellCheckMod",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("spellCheckMod"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "spellburn",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#dccSpellburn",
-                                ),
+                            SmolStr::new_static("spellburn"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dccSpellburn"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dccWizardSpell"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dccWizardSpell"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A wizard spell with mercurial magic effect",
-                        ),
+                        CowStr::new_static("A wizard spell with mercurial magic effect"),
                     ),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("level")
-                        ],
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("level")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "level",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("level"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(5i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "lost",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("lost"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mercurialMagic",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("mercurialMagic"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Unique mercurial magic effect (d100 roll result)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mercurialRoll",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("mercurialRoll"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(100i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Spell name"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Spell name")),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "notes",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("notes"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Additional spell notes",
-                                    ),
+                                    CowStr::new_static("Additional spell notes"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("deathSaves"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("deathSaves"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Death saving throw successes and failures",
-                        ),
+                        CowStr::new_static("Death saving throw successes and failures"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "failures",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("failures"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(3i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "successes",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("successes"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(3i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("dndStats"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dndStats"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "D&D 5e character sheet. All sub-objects are optional.",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "abilities",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#abilities"),
+                            SmolStr::new_static("abilities"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#abilities"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "attacks",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Attack actions"),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#attack"),
+                            SmolStr::new_static("attacks"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static("Attack actions")),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#attack"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(20usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "coinage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#coinage"),
+                            SmolStr::new_static("coinage"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#coinage"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "combat",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#combat"),
+                            SmolStr::new_static("combat"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#combat"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "conditions",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#conditions"),
+                            SmolStr::new_static("conditions"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#conditions"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "equipment",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#equipment"),
+                            SmolStr::new_static("equipment"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#equipment"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "features",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("features"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Class features, racial traits, and feats",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(5000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("hp"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#hp"),
+                            SmolStr::new_static("hp"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#hp"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "identity",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#identity"),
+                            SmolStr::new_static("identity"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#identity"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "languages",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Languages known"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("languages"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Languages known")),
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "passives",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#passives"),
+                            SmolStr::new_static("passives"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#passives"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "personality",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#personality"),
+                            SmolStr::new_static("personality"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#personality"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "proficiencies",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("proficiencies"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Armor, weapon, and tool proficiencies",
-                                    ),
+                                    CowStr::new_static("Armor, weapon, and tool proficiencies"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(1000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "saves",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#saves"),
+                            SmolStr::new_static("saves"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#saves"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "skills",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#skills"),
+                            SmolStr::new_static("skills"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#skills"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "spellcasting",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#spellcasting",
-                                ),
+                            SmolStr::new_static("spellcasting"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#spellcasting"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("equipment"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Gear and inventory"),
-                    ),
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("equipment"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Gear and inventory")),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "armor",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Armor"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("armor"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Armor")),
                                 max_length: Some(200usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "gear",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Other equipment"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("gear"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Other equipment")),
                                 max_length: Some(2000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "treasure",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("treasure"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Valuables and treasure",
-                                    ),
+                                    CowStr::new_static("Valuables and treasure"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(1000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "weapons",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Weapons"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("weapons"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Weapons")),
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("hp"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Hit point tracking"),
-                    ),
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("hp"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Hit point tracking")),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "current",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("current"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "max",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("max"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "temp",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("temp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("identity"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("identity"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Character identity and progression",
-                        ),
+                        CowStr::new_static("Character identity and progression"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alignment",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("alignment"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Alignment (e.g., Lawful Good)",
-                                    ),
+                                    CowStr::new_static("Alignment (e.g., Lawful Good)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(50usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "background",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("background"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Background (e.g., Soldier, Sage)",
-                                    ),
+                                    CowStr::new_static("Background (e.g., Soldier, Sage)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "class",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("class"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Class and subclass (e.g., Fighter (Champion))",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "level",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("level"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "proficiency",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("proficiency"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "race",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("race"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Race (e.g., Human, Elf, Dwarf)",
-                                    ),
+                                    CowStr::new_static("Race (e.g., Human, Elf, Dwarf)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("xp"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("xp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A user's RPG character statistics. One record per user (rkey: self).",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
-                            ],
-                        ),
-                        nullable: None,
+                    key: Some(CowStr::new_static("literal:self")),
+                    record: LexRecordRecord::Object(LexObject {
+                        required: Some(vec![SmolStr::new_static("createdAt")]),
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Timestamp when this record was created",
-                                        ),
+                                        CowStr::new_static("Timestamp when this record was created"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "custom",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#customStats"),
+                                SmolStr::new_static("custom"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#customStats"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "dcc",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#dccStats"),
+                                SmolStr::new_static("dcc"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#dccStats"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "dnd",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#dndStats"),
+                                SmolStr::new_static("dnd"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#dndStats"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "reverie",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#reverieStats",
-                                    ),
+                                SmolStr::new_static("reverie"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#reverieStats"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "rmmz",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#rmmzStats"),
+                                SmolStr::new_static("rmmz"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#rmmzStats"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "updatedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("updatedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp when this record was last modified",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("passives"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("passives"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Passive scores (10 + skill modifier)",
-                        ),
+                        CowStr::new_static("Passive scores (10 + skill modifier)"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "insight",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("insight"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "investigation",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("investigation"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "perception",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("perception"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("personality"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Personality and backstory",
-                        ),
-                    ),
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("personality"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Personality and backstory")),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "backstory",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Backstory"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("backstory"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Backstory")),
                                 max_length: Some(5000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "bonds",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Bonds"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("bonds"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Bonds")),
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "flaws",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Flaws"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("flaws"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Flaws")),
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "ideals",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Ideals"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("ideals"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Ideals")),
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "traits",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Personality traits"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("traits"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Personality traits")),
                                 max_length: Some(1000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("reverieStats"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("reverieStats"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Reverie House philosophical alignment",
-                        ),
+                        CowStr::new_static("Reverie House philosophical alignment"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "authority",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("authority"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(100i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "entropy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("entropy"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(100i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "liberty",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("liberty"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(100i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "oblivion",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("oblivion"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(100i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "octant",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("octant"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Philosophical octant",
-                                    ),
+                                    CowStr::new_static("Philosophical octant"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "receptive",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("receptive"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(100i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "skeptic",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("skeptic"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(100i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("rmmzStats"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("rmmzStats"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "RPG Maker MZ character parameters",
-                        ),
+                        CowStr::new_static("RPG Maker MZ character parameters"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "agi",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("agi"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "atk",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("atk"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "class",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Class"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("class"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Class")),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("cri"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(100i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "def",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("def"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "eva",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("eva"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(100i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hit",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("hit"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(100i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("hp"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("hp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "level",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("level"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "luk",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("luk"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mat",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("mat"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maxHp",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("maxHp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maxMp",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("maxMp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maxTp",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("maxTp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mdf",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("mdf"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mp"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("mp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("tp"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("tp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("xp"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("xp"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("saves"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("saves"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Saving throw modifiers (actual values, not proficiency flags)",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cha",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("cha"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "con",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("con"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "dex",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("dex"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "int",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("int"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "str",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("str"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "wis",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("wis"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("skills"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("skills"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Skill modifiers (actual values, not proficiency flags)",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "acrobatics",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("acrobatics"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "animalHandling",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("animalHandling"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "arcana",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("arcana"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "athletics",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("athletics"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "deception",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("deception"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "history",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("history"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "insight",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("insight"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "intimidation",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("intimidation"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "investigation",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("investigation"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "medicine",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("medicine"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "nature",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("nature"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "perception",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("perception"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "performance",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("performance"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "persuasion",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("persuasion"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "religion",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("religion"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sleightOfHand",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("sleightOfHand"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "stealth",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("stealth"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "survival",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("survival"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("spellList"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Spells organized by level",
-                        ),
-                    ),
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("spellList"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Spells organized by level")),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cantrips",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Cantrips (at-will)"),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                            SmolStr::new_static("cantrips"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static("Cantrips (at-will)")),
+                                items: LexArrayItem::String(LexString {
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(20usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l1"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("1st-level spells"),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                            SmolStr::new_static("l1"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static("1st-level spells")),
+                                items: LexArrayItem::String(LexString {
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(30usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l2"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("2nd-level spells"),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                            SmolStr::new_static("l2"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static("2nd-level spells")),
+                                items: LexArrayItem::String(LexString {
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(30usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l3"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("3rd-level spells"),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                            SmolStr::new_static("l3"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static("3rd-level spells")),
+                                items: LexArrayItem::String(LexString {
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(30usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l4"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("4th-level spells"),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                            SmolStr::new_static("l4"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static("4th-level spells")),
+                                items: LexArrayItem::String(LexString {
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(30usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l5"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("5th-level spells"),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                            SmolStr::new_static("l5"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static("5th-level spells")),
+                                items: LexArrayItem::String(LexString {
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(30usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l6"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("6th-level spells"),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                            SmolStr::new_static("l6"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static("6th-level spells")),
+                                items: LexArrayItem::String(LexString {
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(20usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l7"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("7th-level spells"),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                            SmolStr::new_static("l7"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static("7th-level spells")),
+                                items: LexArrayItem::String(LexString {
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(20usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l8"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("8th-level spells"),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                            SmolStr::new_static("l8"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static("8th-level spells")),
+                                items: LexArrayItem::String(LexString {
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(20usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("l9"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("9th-level spells"),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                            SmolStr::new_static("l9"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static("9th-level spells")),
+                                items: LexArrayItem::String(LexString {
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(20usize),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("spellcasting"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Spellcasting details"),
-                    ),
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("spellcasting"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Spellcasting details")),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "ability",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("ability"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Spellcasting ability (INT, WIS, CHA)",
-                                    ),
+                                    CowStr::new_static("Spellcasting ability (INT, WIS, CHA)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(3usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "attack",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("attack"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("dc"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("dc"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "slots",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("slots"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Spell slots by level",
-                                    ),
+                                    CowStr::new_static("Spell slots by level"),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#spellslot"),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#spellslot"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(9usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "spells",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#spellList"),
+                            SmolStr::new_static("spells"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#spellList"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("spellslot"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Spell slot entry"),
-                    ),
+                SmolStr::new_static("spellslot"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Spell slot entry")),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("level"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("total")
-                        ],
+                        vec![SmolStr::new_static("level"), SmolStr::new_static("total")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "level",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("level"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
                                 maximum: Some(9i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "total",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("total"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "used",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("used"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -9915,15 +7064,15 @@ pub mod custom_stat_state {
 
 /// Builder for constructing an instance of this type
 pub struct CustomStatBuilder<'a, S: custom_stat_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CustomStat<'a> {
@@ -9937,24 +7086,21 @@ impl<'a> CustomStatBuilder<'a, custom_stat_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CustomStatBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: custom_stat_state::State> CustomStatBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
-    pub fn maybe_category(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -9994,13 +7140,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CustomStatBuilder<'a, custom_stat_state::SetName<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         CustomStatBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -10015,11 +7161,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CustomStatBuilder<'a, custom_stat_state::SetValue<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         CustomStatBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -10044,7 +7190,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10106,14 +7252,14 @@ pub mod dcc_cleric_spell_state {
 
 /// Builder for constructing an instance of this type
 pub struct DccClericSpellBuilder<'a, S: dcc_cleric_spell_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<bool>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<bool>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> DccClericSpell<'a> {
@@ -10127,9 +7273,9 @@ impl<'a> DccClericSpellBuilder<'a, dcc_cleric_spell_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DccClericSpellBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -10144,11 +7290,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> DccClericSpellBuilder<'a, dcc_cleric_spell_state::SetLevel<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         DccClericSpellBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -10161,28 +7307,25 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> DccClericSpellBuilder<'a, dcc_cleric_spell_state::SetName<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         DccClericSpellBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: dcc_cleric_spell_state::State> DccClericSpellBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
-    pub fn maybe_notes(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -10220,7 +7363,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10245,52 +7388,52 @@ pub mod dcc_wizard_spell_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
         type Name;
+        type Level;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type Level = Set<members::level>;
-        type Name = S::Name;
+        type Level = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Level = S::Level;
         type Name = Set<members::name>;
+        type Level = S::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type Name = S::Name;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `level` field
+        pub struct level(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DccWizardSpellBuilder<'a, S: dcc_wizard_spell_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<i64>,
+        Option<bool>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> DccWizardSpell<'a> {
@@ -10304,9 +7447,9 @@ impl<'a> DccWizardSpellBuilder<'a, dcc_wizard_spell_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DccWizardSpellBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -10321,11 +7464,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> DccWizardSpellBuilder<'a, dcc_wizard_spell_state::SetLevel<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         DccWizardSpellBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -10345,18 +7488,12 @@ impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
 
 impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
     /// Set the `mercurialMagic` field (optional)
-    pub fn mercurial_magic(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn mercurial_magic(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `mercurialMagic` field to an Option value (optional)
-    pub fn maybe_mercurial_magic(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_mercurial_magic(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -10383,28 +7520,25 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> DccWizardSpellBuilder<'a, dcc_wizard_spell_state::SetName<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         DccWizardSpellBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
-    pub fn maybe_notes(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -10413,8 +7547,8 @@ impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
 impl<'a, S> DccWizardSpellBuilder<'a, S>
 where
     S: dcc_wizard_spell_state::State,
-    S::Level: dcc_wizard_spell_state::IsSet,
     S::Name: dcc_wizard_spell_state::IsSet,
+    S::Level: dcc_wizard_spell_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DccWizardSpell<'a> {
@@ -10431,7 +7565,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10482,17 +7616,17 @@ pub mod stats_state {
 
 /// Builder for constructing an instance of this type
 pub struct StatsBuilder<'a, S: stats_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::actor_rpg::stats::CustomStats<'a>>,
-        ::core::option::Option<crate::actor_rpg::stats::DccStats<'a>>,
-        ::core::option::Option<crate::actor_rpg::stats::DndStats<'a>>,
-        ::core::option::Option<crate::actor_rpg::stats::ReverieStats<'a>>,
-        ::core::option::Option<crate::actor_rpg::stats::RmmzStats<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<Datetime>,
+        Option<stats::CustomStats<'a>>,
+        Option<stats::DccStats<'a>>,
+        Option<stats::DndStats<'a>>,
+        Option<stats::ReverieStats<'a>>,
+        Option<stats::RmmzStats<'a>>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Stats<'a> {
@@ -10506,9 +7640,9 @@ impl<'a> StatsBuilder<'a, stats_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -10521,31 +7655,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> StatsBuilder<'a, stats_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `custom` field (optional)
-    pub fn custom(
-        mut self,
-        value: impl Into<Option<crate::actor_rpg::stats::CustomStats<'a>>>,
-    ) -> Self {
+    pub fn custom(mut self, value: impl Into<Option<stats::CustomStats<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `custom` field to an Option value (optional)
-    pub fn maybe_custom(
-        mut self,
-        value: Option<crate::actor_rpg::stats::CustomStats<'a>>,
-    ) -> Self {
+    pub fn maybe_custom(mut self, value: Option<stats::CustomStats<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -10553,18 +7681,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `dcc` field (optional)
-    pub fn dcc(
-        mut self,
-        value: impl Into<Option<crate::actor_rpg::stats::DccStats<'a>>>,
-    ) -> Self {
+    pub fn dcc(mut self, value: impl Into<Option<stats::DccStats<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `dcc` field to an Option value (optional)
-    pub fn maybe_dcc(
-        mut self,
-        value: Option<crate::actor_rpg::stats::DccStats<'a>>,
-    ) -> Self {
+    pub fn maybe_dcc(mut self, value: Option<stats::DccStats<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -10572,18 +7694,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `dnd` field (optional)
-    pub fn dnd(
-        mut self,
-        value: impl Into<Option<crate::actor_rpg::stats::DndStats<'a>>>,
-    ) -> Self {
+    pub fn dnd(mut self, value: impl Into<Option<stats::DndStats<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `dnd` field to an Option value (optional)
-    pub fn maybe_dnd(
-        mut self,
-        value: Option<crate::actor_rpg::stats::DndStats<'a>>,
-    ) -> Self {
+    pub fn maybe_dnd(mut self, value: Option<stats::DndStats<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -10591,18 +7707,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `reverie` field (optional)
-    pub fn reverie(
-        mut self,
-        value: impl Into<Option<crate::actor_rpg::stats::ReverieStats<'a>>>,
-    ) -> Self {
+    pub fn reverie(mut self, value: impl Into<Option<stats::ReverieStats<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `reverie` field to an Option value (optional)
-    pub fn maybe_reverie(
-        mut self,
-        value: Option<crate::actor_rpg::stats::ReverieStats<'a>>,
-    ) -> Self {
+    pub fn maybe_reverie(mut self, value: Option<stats::ReverieStats<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -10610,18 +7720,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `rmmz` field (optional)
-    pub fn rmmz(
-        mut self,
-        value: impl Into<Option<crate::actor_rpg::stats::RmmzStats<'a>>>,
-    ) -> Self {
+    pub fn rmmz(mut self, value: impl Into<Option<stats::RmmzStats<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `rmmz` field to an Option value (optional)
-    pub fn maybe_rmmz(
-        mut self,
-        value: Option<crate::actor_rpg::stats::RmmzStats<'a>>,
-    ) -> Self {
+    pub fn maybe_rmmz(mut self, value: Option<stats::RmmzStats<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -10629,18 +7733,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
-    pub fn updated_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
-    pub fn maybe_updated_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -10667,7 +7765,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10695,49 +7793,45 @@ pub mod spellslot_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Total;
         type Level;
+        type Total;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Total = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `total` field to Set
-    pub struct SetTotal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotal<S> {}
-    impl<S: State> State for SetTotal<S> {
-        type Total = Set<members::total>;
-        type Level = S::Level;
+        type Total = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type Total = S::Total;
         type Level = Set<members::level>;
+        type Total = S::Total;
+    }
+    ///State transition - sets the `total` field to Set
+    pub struct SetTotal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotal<S> {}
+    impl<S: State> State for SetTotal<S> {
+        type Level = S::Level;
+        type Total = Set<members::total>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `total` field
-        pub struct total(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `total` field
+        pub struct total(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SpellslotBuilder<'a, S: spellslot_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<i64>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Spellslot<'a> {
@@ -10751,9 +7845,9 @@ impl<'a> SpellslotBuilder<'a, spellslot_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SpellslotBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -10768,11 +7862,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SpellslotBuilder<'a, spellslot_state::SetLevel<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SpellslotBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -10787,11 +7881,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SpellslotBuilder<'a, spellslot_state::SetTotal<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         SpellslotBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -10812,8 +7906,8 @@ impl<'a, S: spellslot_state::State> SpellslotBuilder<'a, S> {
 impl<'a, S> SpellslotBuilder<'a, S>
 where
     S: spellslot_state::State,
-    S::Total: spellslot_state::IsSet,
     S::Level: spellslot_state::IsSet,
+    S::Total: spellslot_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Spellslot<'a> {
@@ -10827,7 +7921,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

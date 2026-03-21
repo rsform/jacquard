@@ -5,48 +5,37 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::{AtUri, Cid, RecordKey, Rkey};
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::systems_timker::hawlt::note::Note;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PutNote<'a> {
     ///The note record to write.
     #[serde(borrow)]
-    pub record: crate::systems_timker::hawlt::note::Note<'a>,
+    pub record: Note<'a>,
     ///The record key (TID) for this note.
     #[serde(borrow)]
-    pub rkey: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub rkey: RecordKey<Rkey<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PutNoteOutput<'a> {
     #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub cid: Cid<'a>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-/// Response type for
-///systems.timker.hawlt.putNote
+/// Response type for systems.timker.hawlt.putNote
 pub struct PutNoteResponse;
 impl jacquard_common::xrpc::XrpcResp for PutNoteResponse {
     const NSID: &'static str = "systems.timker.hawlt.putNote";
@@ -63,8 +52,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PutNote<'a> {
     type Response = PutNoteResponse;
 }
 
-/// Endpoint type for
-///systems.timker.hawlt.putNote
+/// Endpoint type for systems.timker.hawlt.putNote
 pub struct PutNoteRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutNoteRequest {
     const PATH: &'static str = "/xrpc/systems.timker.hawlt.putNote";
@@ -121,16 +109,9 @@ pub mod put_note_state {
 
 /// Builder for constructing an instance of this type
 pub struct PutNoteBuilder<'a, S: put_note_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::systems_timker::hawlt::note::Note<'a>>,
-        ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Note<'a>>, Option<RecordKey<Rkey<'a>>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> PutNote<'a> {
@@ -144,9 +125,9 @@ impl<'a> PutNoteBuilder<'a, put_note_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PutNoteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -159,13 +140,13 @@ where
     /// Set the `record` field (required)
     pub fn record(
         mut self,
-        value: impl Into<crate::systems_timker::hawlt::note::Note<'a>>,
+        value: impl Into<Note<'a>>,
     ) -> PutNoteBuilder<'a, put_note_state::SetRecord<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PutNoteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -178,17 +159,13 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
+        value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> PutNoteBuilder<'a, put_note_state::SetRkey<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         PutNoteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -210,7 +187,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

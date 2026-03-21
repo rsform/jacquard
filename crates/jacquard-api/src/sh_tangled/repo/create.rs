@@ -5,34 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Create<'a> {
     ///Default branch to push to
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub default_branch: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub default_branch: Option<CowStr<'a>>,
     ///Rkey of the repository record
     #[serde(borrow)]
-    pub rkey: jacquard_common::CowStr<'a>,
+    pub rkey: CowStr<'a>,
     ///A source URL to clone from, populate this when forking or importing a repository.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub source: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub source: Option<CowStr<'a>>,
 }
 
-/// Response type for
-///sh.tangled.repo.create
+/// Response type for sh.tangled.repo.create
 pub struct CreateResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateResponse {
     const NSID: &'static str = "sh.tangled.repo.create";
@@ -49,8 +45,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Create<'a> {
     type Response = CreateResponse;
 }
 
-/// Endpoint type for
-///sh.tangled.repo.create
+/// Endpoint type for sh.tangled.repo.create
 pub struct CreateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.create";

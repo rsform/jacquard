@@ -20,248 +20,209 @@ pub mod list_commits;
 pub mod list_languages;
 pub mod list_tags;
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::Datetime;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::git::temp;
 /// blob metadata. This object doesn't include the blob content
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Blob<'a> {
     #[serde(borrow)]
-    pub last_commit: crate::sh_tangled::git::temp::Commit<'a>,
+    pub last_commit: temp::Commit<'a>,
     #[serde(borrow)]
-    pub mode: jacquard_common::CowStr<'a>,
+    pub mode: CowStr<'a>,
     ///The file name
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///File size in bytes
     pub size: i64,
     ///Submodule information if path is a submodule
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub submodule: core::option::Option<crate::sh_tangled::git::temp::Submodule<'a>>,
+    pub submodule: Option<temp::Submodule<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Branch<'a> {
     ///hydrated commit object
     #[serde(borrow)]
-    pub commit: crate::sh_tangled::git::temp::Commit<'a>,
+    pub commit: temp::Commit<'a>,
     ///branch name
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Commit<'a> {
     #[serde(borrow)]
-    pub author: crate::sh_tangled::git::temp::Signature<'a>,
+    pub author: temp::Signature<'a>,
     #[serde(borrow)]
-    pub committer: crate::sh_tangled::git::temp::Signature<'a>,
+    pub committer: temp::Signature<'a>,
     #[serde(borrow)]
-    pub hash: crate::sh_tangled::git::temp::Hash<'a>,
+    pub hash: temp::Hash<'a>,
     #[serde(borrow)]
-    pub message: jacquard_common::CowStr<'a>,
+    pub message: CowStr<'a>,
     #[serde(borrow)]
-    pub tree: crate::sh_tangled::git::temp::Hash<'a>,
+    pub tree: temp::Hash<'a>,
 }
 
-pub type Hash<'a> = jacquard_common::CowStr<'a>;
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+pub type Hash<'a> = CowStr<'a>;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Signature<'a> {
     ///Person email
     #[serde(borrow)]
-    pub email: jacquard_common::CowStr<'a>,
+    pub email: CowStr<'a>,
     ///Person name
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///Timestamp of the signature
-    pub when: jacquard_common::types::string::Datetime,
+    pub when: Datetime,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Submodule<'a> {
     ///Branch to track in the submodule
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub branch: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub branch: Option<CowStr<'a>>,
     ///Submodule name
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///Submodule repository URL
     #[serde(borrow)]
-    pub url: jacquard_common::CowStr<'a>,
+    pub url: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Tag<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: Option<CowStr<'a>>,
     ///tag name
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     #[serde(borrow)]
-    pub tagger: crate::sh_tangled::git::temp::Signature<'a>,
+    pub tagger: temp::Signature<'a>,
     #[serde(borrow)]
-    pub target: jacquard_common::types::value::Data<'a>,
+    pub target: Data<'a>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Blob<'a> {
+impl<'a> LexiconSchema for Blob<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.defs"
     }
     fn def_name() -> &'static str {
         "blob"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_temp_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Branch<'a> {
+impl<'a> LexiconSchema for Branch<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.defs"
     }
     fn def_name() -> &'static str {
         "branch"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_temp_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Commit<'a> {
+impl<'a> LexiconSchema for Commit<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.defs"
     }
     fn def_name() -> &'static str {
         "commit"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_temp_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Signature<'a> {
+impl<'a> LexiconSchema for Signature<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.defs"
     }
     fn def_name() -> &'static str {
         "signature"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_temp_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Submodule<'a> {
+impl<'a> LexiconSchema for Submodule<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.defs"
     }
     fn def_name() -> &'static str {
         "submodule"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_temp_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
+impl<'a> LexiconSchema for Tag<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.defs"
     }
     fn def_name() -> &'static str {
         "tag"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_temp_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -278,8 +239,8 @@ pub mod blob_state {
     pub trait State: sealed::Sealed {
         type Mode;
         type Size;
-        type Name;
         type LastCommit;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -287,8 +248,8 @@ pub mod blob_state {
     impl State for Empty {
         type Mode = Unset;
         type Size = Unset;
-        type Name = Unset;
         type LastCommit = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `mode` field to Set
     pub struct SetMode<S: State = Empty>(PhantomData<fn() -> S>);
@@ -296,8 +257,8 @@ pub mod blob_state {
     impl<S: State> State for SetMode<S> {
         type Mode = Set<members::mode>;
         type Size = S::Size;
-        type Name = S::Name;
         type LastCommit = S::LastCommit;
+        type Name = S::Name;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
@@ -305,17 +266,8 @@ pub mod blob_state {
     impl<S: State> State for SetSize<S> {
         type Mode = S::Mode;
         type Size = Set<members::size>;
+        type LastCommit = S::LastCommit;
         type Name = S::Name;
-        type LastCommit = S::LastCommit;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Mode = S::Mode;
-        type Size = S::Size;
-        type Name = Set<members::name>;
-        type LastCommit = S::LastCommit;
     }
     ///State transition - sets the `last_commit` field to Set
     pub struct SetLastCommit<S: State = Empty>(PhantomData<fn() -> S>);
@@ -323,8 +275,17 @@ pub mod blob_state {
     impl<S: State> State for SetLastCommit<S> {
         type Mode = S::Mode;
         type Size = S::Size;
-        type Name = S::Name;
         type LastCommit = Set<members::last_commit>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Mode = S::Mode;
+        type Size = S::Size;
+        type LastCommit = S::LastCommit;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -333,24 +294,24 @@ pub mod blob_state {
         pub struct mode(());
         ///Marker type for the `size` field
         pub struct size(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `last_commit` field
         pub struct last_commit(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BlobBuilder<'a, S: blob_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::sh_tangled::git::temp::Commit<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<crate::sh_tangled::git::temp::Submodule<'a>>,
+        Option<temp::Commit<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<temp::Submodule<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Blob<'a> {
@@ -364,9 +325,9 @@ impl<'a> BlobBuilder<'a, blob_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlobBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -379,13 +340,13 @@ where
     /// Set the `lastCommit` field (required)
     pub fn last_commit(
         mut self,
-        value: impl Into<crate::sh_tangled::git::temp::Commit<'a>>,
+        value: impl Into<temp::Commit<'a>>,
     ) -> BlobBuilder<'a, blob_state::SetLastCommit<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         BlobBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -398,13 +359,13 @@ where
     /// Set the `mode` field (required)
     pub fn mode(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> BlobBuilder<'a, blob_state::SetMode<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         BlobBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -417,13 +378,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> BlobBuilder<'a, blob_state::SetName<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         BlobBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -438,29 +399,23 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> BlobBuilder<'a, blob_state::SetSize<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         BlobBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: blob_state::State> BlobBuilder<'a, S> {
     /// Set the `submodule` field (optional)
-    pub fn submodule(
-        mut self,
-        value: impl Into<Option<crate::sh_tangled::git::temp::Submodule<'a>>>,
-    ) -> Self {
+    pub fn submodule(mut self, value: impl Into<Option<temp::Submodule<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `submodule` field to an Option value (optional)
-    pub fn maybe_submodule(
-        mut self,
-        value: Option<crate::sh_tangled::git::temp::Submodule<'a>>,
-    ) -> Self {
+    pub fn maybe_submodule(mut self, value: Option<temp::Submodule<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -471,8 +426,8 @@ where
     S: blob_state::State,
     S::Mode: blob_state::IsSet,
     S::Size: blob_state::IsSet,
-    S::Name: blob_state::IsSet,
     S::LastCommit: blob_state::IsSet,
+    S::Name: blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Blob<'a> {
@@ -488,10 +443,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Blob<'a> {
         Blob {
             last_commit: self.__unsafe_private_named.0.unwrap(),
@@ -504,475 +456,276 @@ where
     }
 }
 
-fn lexicon_doc_sh_tangled_git_temp_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("sh.tangled.git.temp.defs"),
-        revision: None,
-        description: None,
+fn lexicon_doc_sh_tangled_git_temp_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("sh.tangled.git.temp.defs"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("blob"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("blob"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "blob metadata. This object doesn't include the blob content",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mode"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("size"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("lastCommit")
+                            SmolStr::new_static("name"), SmolStr::new_static("mode"),
+                            SmolStr::new_static("size"),
+                            SmolStr::new_static("lastCommit")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "lastCommit",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#commit"),
+                            SmolStr::new_static("lastCommit"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#commit"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mode",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("mode"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("The file name")),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("The file name"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("size"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "size",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "submodule",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#submodule"),
+                            SmolStr::new_static("submodule"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#submodule"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("branch"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("branch"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("commit")],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("commit"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#commit"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("branch name")),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("commit"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("commit")
+                            SmolStr::new_static("hash"), SmolStr::new_static("author"),
+                            SmolStr::new_static("committer"),
+                            SmolStr::new_static("message"), SmolStr::new_static("tree")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "commit",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#commit"),
+                            SmolStr::new_static("author"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#signature"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("branch name"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("committer"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#signature"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("hash"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#hash"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("message"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("tree"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#hash"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("commit"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("hash"),
+                LexUserType::String(LexString { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("signature"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("hash"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("author"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("committer"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("message"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("tree")
+                            SmolStr::new_static("name"), SmolStr::new_static("email"),
+                            SmolStr::new_static("when")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "author",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#signature"),
+                            SmolStr::new_static("email"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Person email")),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "committer",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#signature"),
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Person name")),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hash",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#hash"),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "message",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "tree",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#hash"),
+                            SmolStr::new_static("when"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("Timestamp of the signature"),
+                                ),
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("hash"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: None,
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
-                    max_graphemes: None,
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
+                SmolStr::new_static("submodule"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("url")],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("branch"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("Branch to track in the submodule"),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Submodule name")),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("url"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("Submodule repository URL"),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("signature"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("tag"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("email"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("when")
+                            SmolStr::new_static("name"), SmolStr::new_static("tagger"),
+                            SmolStr::new_static("target")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "email",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Person email"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("message"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("tag name")),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Person name"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("tagger"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#signature"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "when",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Timestamp of the signature",
-                                    ),
-                                ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("target"),
+                            LexObjectProperty::Unknown(LexUnknown {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
-                }),
-            );
-            map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("submodule"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("url")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "branch",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Branch to track in the submodule",
-                                    ),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Submodule name"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "url",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Submodule repository URL",
-                                    ),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("tag"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("tagger"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("target")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "message",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("tag name"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "tagger",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#signature"),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "target",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
-                                description: None,
-                            }),
-                        );
-                        map
-                    },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1022,12 +775,9 @@ pub mod branch_state {
 
 /// Builder for constructing an instance of this type
 pub struct BranchBuilder<'a, S: branch_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::sh_tangled::git::temp::Commit<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<temp::Commit<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Branch<'a> {
@@ -1041,9 +791,9 @@ impl<'a> BranchBuilder<'a, branch_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BranchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1056,13 +806,13 @@ where
     /// Set the `commit` field (required)
     pub fn commit(
         mut self,
-        value: impl Into<crate::sh_tangled::git::temp::Commit<'a>>,
+        value: impl Into<temp::Commit<'a>>,
     ) -> BranchBuilder<'a, branch_state::SetCommit<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         BranchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1075,13 +825,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> BranchBuilder<'a, branch_state::SetName<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         BranchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1103,10 +853,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Branch<'a> {
         Branch {
             commit: self.__unsafe_private_named.0.unwrap(),
@@ -1127,9 +874,9 @@ pub mod commit_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Tree;
-        type Message;
         type Committer;
         type Author;
+        type Message;
         type Hash;
     }
     /// Empty state - all required fields are unset
@@ -1137,9 +884,9 @@ pub mod commit_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Tree = Unset;
-        type Message = Unset;
         type Committer = Unset;
         type Author = Unset;
+        type Message = Unset;
         type Hash = Unset;
     }
     ///State transition - sets the `tree` field to Set
@@ -1147,19 +894,9 @@ pub mod commit_state {
     impl<S: State> sealed::Sealed for SetTree<S> {}
     impl<S: State> State for SetTree<S> {
         type Tree = Set<members::tree>;
+        type Committer = S::Committer;
+        type Author = S::Author;
         type Message = S::Message;
-        type Committer = S::Committer;
-        type Author = S::Author;
-        type Hash = S::Hash;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Tree = S::Tree;
-        type Message = Set<members::message>;
-        type Committer = S::Committer;
-        type Author = S::Author;
         type Hash = S::Hash;
     }
     ///State transition - sets the `committer` field to Set
@@ -1167,9 +904,9 @@ pub mod commit_state {
     impl<S: State> sealed::Sealed for SetCommitter<S> {}
     impl<S: State> State for SetCommitter<S> {
         type Tree = S::Tree;
-        type Message = S::Message;
         type Committer = Set<members::committer>;
         type Author = S::Author;
+        type Message = S::Message;
         type Hash = S::Hash;
     }
     ///State transition - sets the `author` field to Set
@@ -1177,9 +914,19 @@ pub mod commit_state {
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
         type Tree = S::Tree;
-        type Message = S::Message;
         type Committer = S::Committer;
         type Author = Set<members::author>;
+        type Message = S::Message;
+        type Hash = S::Hash;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Tree = S::Tree;
+        type Committer = S::Committer;
+        type Author = S::Author;
+        type Message = Set<members::message>;
         type Hash = S::Hash;
     }
     ///State transition - sets the `hash` field to Set
@@ -1187,9 +934,9 @@ pub mod commit_state {
     impl<S: State> sealed::Sealed for SetHash<S> {}
     impl<S: State> State for SetHash<S> {
         type Tree = S::Tree;
-        type Message = S::Message;
         type Committer = S::Committer;
         type Author = S::Author;
+        type Message = S::Message;
         type Hash = Set<members::hash>;
     }
     /// Marker types for field names
@@ -1197,12 +944,12 @@ pub mod commit_state {
     pub mod members {
         ///Marker type for the `tree` field
         pub struct tree(());
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `committer` field
         pub struct committer(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `message` field
+        pub struct message(());
         ///Marker type for the `hash` field
         pub struct hash(());
     }
@@ -1210,15 +957,15 @@ pub mod commit_state {
 
 /// Builder for constructing an instance of this type
 pub struct CommitBuilder<'a, S: commit_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::sh_tangled::git::temp::Signature<'a>>,
-        ::core::option::Option<crate::sh_tangled::git::temp::Signature<'a>>,
-        ::core::option::Option<crate::sh_tangled::git::temp::Hash<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::sh_tangled::git::temp::Hash<'a>>,
+        Option<temp::Signature<'a>>,
+        Option<temp::Signature<'a>>,
+        Option<temp::Hash<'a>>,
+        Option<CowStr<'a>>,
+        Option<temp::Hash<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Commit<'a> {
@@ -1232,9 +979,9 @@ impl<'a> CommitBuilder<'a, commit_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CommitBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1247,13 +994,13 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<crate::sh_tangled::git::temp::Signature<'a>>,
+        value: impl Into<temp::Signature<'a>>,
     ) -> CommitBuilder<'a, commit_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CommitBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1266,13 +1013,13 @@ where
     /// Set the `committer` field (required)
     pub fn committer(
         mut self,
-        value: impl Into<crate::sh_tangled::git::temp::Signature<'a>>,
+        value: impl Into<temp::Signature<'a>>,
     ) -> CommitBuilder<'a, commit_state::SetCommitter<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CommitBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1285,13 +1032,13 @@ where
     /// Set the `hash` field (required)
     pub fn hash(
         mut self,
-        value: impl Into<crate::sh_tangled::git::temp::Hash<'a>>,
+        value: impl Into<temp::Hash<'a>>,
     ) -> CommitBuilder<'a, commit_state::SetHash<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         CommitBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1304,13 +1051,13 @@ where
     /// Set the `message` field (required)
     pub fn message(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CommitBuilder<'a, commit_state::SetMessage<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         CommitBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1323,13 +1070,13 @@ where
     /// Set the `tree` field (required)
     pub fn tree(
         mut self,
-        value: impl Into<crate::sh_tangled::git::temp::Hash<'a>>,
+        value: impl Into<temp::Hash<'a>>,
     ) -> CommitBuilder<'a, commit_state::SetTree<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         CommitBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1338,9 +1085,9 @@ impl<'a, S> CommitBuilder<'a, S>
 where
     S: commit_state::State,
     S::Tree: commit_state::IsSet,
-    S::Message: commit_state::IsSet,
     S::Committer: commit_state::IsSet,
     S::Author: commit_state::IsSet,
+    S::Message: commit_state::IsSet,
     S::Hash: commit_state::IsSet,
 {
     /// Build the final struct
@@ -1357,10 +1104,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Commit<'a> {
         Commit {
             author: self.__unsafe_private_named.0.unwrap(),
@@ -1384,62 +1128,58 @@ pub mod signature_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type When;
-        type Name;
         type Email;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type When = Unset;
-        type Name = Unset;
         type Email = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
         type When = Set<members::when>;
+        type Email = S::Email;
         type Name = S::Name;
-        type Email = S::Email;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type When = S::When;
-        type Name = Set<members::name>;
-        type Email = S::Email;
     }
     ///State transition - sets the `email` field to Set
     pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEmail<S> {}
     impl<S: State> State for SetEmail<S> {
         type When = S::When;
-        type Name = S::Name;
         type Email = Set<members::email>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type When = S::When;
+        type Email = S::Email;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `when` field
         pub struct when(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `email` field
         pub struct email(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SignatureBuilder<'a, S: signature_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Signature<'a> {
@@ -1453,9 +1193,9 @@ impl<'a> SignatureBuilder<'a, signature_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SignatureBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1468,13 +1208,13 @@ where
     /// Set the `email` field (required)
     pub fn email(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SignatureBuilder<'a, signature_state::SetEmail<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SignatureBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1487,13 +1227,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SignatureBuilder<'a, signature_state::SetName<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         SignatureBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1506,13 +1246,13 @@ where
     /// Set the `when` field (required)
     pub fn when(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> SignatureBuilder<'a, signature_state::SetWhen<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         SignatureBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1521,8 +1261,8 @@ impl<'a, S> SignatureBuilder<'a, S>
 where
     S: signature_state::State,
     S::When: signature_state::IsSet,
-    S::Name: signature_state::IsSet,
     S::Email: signature_state::IsSet,
+    S::Name: signature_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Signature<'a> {
@@ -1536,10 +1276,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Signature<'a> {
         Signature {
             email: self.__unsafe_private_named.0.unwrap(),
@@ -1560,49 +1297,49 @@ pub mod tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tagger;
         type Name;
+        type Tagger;
         type Target;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tagger = Unset;
         type Name = Unset;
+        type Tagger = Unset;
         type Target = Unset;
-    }
-    ///State transition - sets the `tagger` field to Set
-    pub struct SetTagger<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTagger<S> {}
-    impl<S: State> State for SetTagger<S> {
-        type Tagger = Set<members::tagger>;
-        type Name = S::Name;
-        type Target = S::Target;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Tagger = S::Tagger;
         type Name = Set<members::name>;
+        type Tagger = S::Tagger;
+        type Target = S::Target;
+    }
+    ///State transition - sets the `tagger` field to Set
+    pub struct SetTagger<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTagger<S> {}
+    impl<S: State> State for SetTagger<S> {
+        type Name = S::Name;
+        type Tagger = Set<members::tagger>;
         type Target = S::Target;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTarget<S> {}
     impl<S: State> State for SetTarget<S> {
-        type Tagger = S::Tagger;
         type Name = S::Name;
+        type Tagger = S::Tagger;
         type Target = Set<members::target>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tagger` field
-        pub struct tagger(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `tagger` field
+        pub struct tagger(());
         ///Marker type for the `target` field
         pub struct target(());
     }
@@ -1610,14 +1347,14 @@ pub mod tag_state {
 
 /// Builder for constructing an instance of this type
 pub struct TagBuilder<'a, S: tag_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::sh_tangled::git::temp::Signature<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<temp::Signature<'a>>,
+        Option<Data<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Tag<'a> {
@@ -1631,24 +1368,21 @@ impl<'a> TagBuilder<'a, tag_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TagBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
-    pub fn maybe_message(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -1662,13 +1396,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> TagBuilder<'a, tag_state::SetName<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         TagBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1681,13 +1415,13 @@ where
     /// Set the `tagger` field (required)
     pub fn tagger(
         mut self,
-        value: impl Into<crate::sh_tangled::git::temp::Signature<'a>>,
+        value: impl Into<temp::Signature<'a>>,
     ) -> TagBuilder<'a, tag_state::SetTagger<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         TagBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1700,13 +1434,13 @@ where
     /// Set the `target` field (required)
     pub fn target(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> TagBuilder<'a, tag_state::SetTarget<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         TagBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1714,8 +1448,8 @@ where
 impl<'a, S> TagBuilder<'a, S>
 where
     S: tag_state::State,
-    S::Tagger: tag_state::IsSet,
     S::Name: tag_state::IsSet,
+    S::Tagger: tag_state::IsSet,
     S::Target: tag_state::IsSet,
 {
     /// Build the final struct
@@ -1731,10 +1465,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Tag<'a> {
         Tag {
             message: self.__unsafe_private_named.0,

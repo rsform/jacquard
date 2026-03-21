@@ -5,25 +5,21 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RequestPhoneVerification<'a> {
     #[serde(borrow)]
-    pub phone_number: jacquard_common::CowStr<'a>,
+    pub phone_number: CowStr<'a>,
 }
 
-/// Response type for
-///com.atproto.temp.requestPhoneVerification
+/// Response type for com.atproto.temp.requestPhoneVerification
 pub struct RequestPhoneVerificationResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestPhoneVerificationResponse {
     const NSID: &'static str = "com.atproto.temp.requestPhoneVerification";
@@ -40,8 +36,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RequestPhoneVerification<'a> {
     type Response = RequestPhoneVerificationResponse;
 }
 
-/// Endpoint type for
-///com.atproto.temp.requestPhoneVerification
+/// Endpoint type for com.atproto.temp.requestPhoneVerification
 pub struct RequestPhoneVerificationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestPhoneVerificationRequest {
     const PATH: &'static str = "/xrpc/com.atproto.temp.requestPhoneVerification";

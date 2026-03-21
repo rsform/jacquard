@@ -5,72 +5,72 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A quiz league with quiz masters and teams
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct League<'a> {
     ///Name of the league
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///DIDs of quiz masters who can run quizzes for this league
     #[serde(borrow)]
-    pub quiz_masters: Vec<jacquard_common::types::string::Did<'a>>,
+    pub quiz_masters: Vec<Did<'a>>,
     ///Teams participating in this league
     #[serde(borrow)]
-    pub teams: Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub teams: Vec<StrongRef<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct LeagueGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: League<'a>,
 }
 
 impl<'a> League<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LeagueRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, LeagueRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LeagueRecord;
-impl jacquard_common::xrpc::XrpcResp for LeagueRecord {
+impl XrpcResp for LeagueRecord {
     const NSID: &'static str = "pub.quizzy.league";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = LeagueGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<LeagueGetRecordOutput<'_>> for League<'_> {
@@ -80,37 +80,33 @@ impl From<LeagueGetRecordOutput<'_>> for League<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for League<'_> {
+impl Collection for League<'_> {
     const NSID: &'static str = "pub.quizzy.league";
     type Record = LeagueRecord;
 }
 
-impl jacquard_common::types::collection::Collection for LeagueRecord {
+impl Collection for LeagueRecord {
     const NSID: &'static str = "pub.quizzy.league";
     type Record = LeagueRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for League<'a> {
+impl<'a> LexiconSchema for League<'a> {
     fn nsid() -> &'static str {
         "pub.quizzy.league"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_pub_quizzy_league()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -119,16 +115,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for League<'a> {
         {
             let value = &self.name;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("name"),
                         max: 100usize,
                         actual: count,
                     });
@@ -139,10 +129,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for League<'a> {
             let value = &self.quiz_masters;
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "quiz_masters",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("quiz_masters"),
                     max: 5usize,
                     actual: value.len(),
                 });
@@ -152,10 +140,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for League<'a> {
             let value = &self.quiz_masters;
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "quiz_masters",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("quiz_masters"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -165,10 +151,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for League<'a> {
             let value = &self.teams;
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "teams",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("teams"),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -189,62 +173,62 @@ pub mod league_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type QuizMasters;
-        type Name;
         type Teams;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type QuizMasters = Unset;
-        type Name = Unset;
         type Teams = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `quiz_masters` field to Set
     pub struct SetQuizMasters<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuizMasters<S> {}
     impl<S: State> State for SetQuizMasters<S> {
         type QuizMasters = Set<members::quiz_masters>;
+        type Teams = S::Teams;
         type Name = S::Name;
-        type Teams = S::Teams;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type QuizMasters = S::QuizMasters;
-        type Name = Set<members::name>;
-        type Teams = S::Teams;
     }
     ///State transition - sets the `teams` field to Set
     pub struct SetTeams<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTeams<S> {}
     impl<S: State> State for SetTeams<S> {
         type QuizMasters = S::QuizMasters;
-        type Name = S::Name;
         type Teams = Set<members::teams>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type QuizMasters = S::QuizMasters;
+        type Teams = S::Teams;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `quiz_masters` field
         pub struct quiz_masters(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `teams` field
         pub struct teams(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LeagueBuilder<'a, S: league_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
-        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        Option<CowStr<'a>>,
+        Option<Vec<Did<'a>>>,
+        Option<Vec<StrongRef<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> League<'a> {
@@ -258,9 +242,9 @@ impl<'a> LeagueBuilder<'a, league_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LeagueBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -273,13 +257,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> LeagueBuilder<'a, league_state::SetName<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         LeagueBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -292,13 +276,13 @@ where
     /// Set the `quizMasters` field (required)
     pub fn quiz_masters(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+        value: impl Into<Vec<Did<'a>>>,
     ) -> LeagueBuilder<'a, league_state::SetQuizMasters<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         LeagueBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -311,13 +295,13 @@ where
     /// Set the `teams` field (required)
     pub fn teams(
         mut self,
-        value: impl Into<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        value: impl Into<Vec<StrongRef<'a>>>,
     ) -> LeagueBuilder<'a, league_state::SetTeams<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         LeagueBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -326,8 +310,8 @@ impl<'a, S> LeagueBuilder<'a, S>
 where
     S: league_state::State,
     S::QuizMasters: league_state::IsSet,
-    S::Name: league_state::IsSet,
     S::Teams: league_state::IsSet,
+    S::Name: league_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> League<'a> {
@@ -341,7 +325,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -355,109 +339,83 @@ where
     }
 }
 
-fn lexicon_doc_pub_quizzy_league() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("pub.quizzy.league"),
-        revision: None,
-        description: None,
+fn lexicon_doc_pub_quizzy_league() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("pub.quizzy.league"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A quiz league with quiz masters and teams",
-                        ),
+                        CowStr::new_static("A quiz league with quiz masters and teams"),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("quizMasters"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("teams")
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("quizMasters"),
+                                SmolStr::new_static("teams")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static("Name of the league"),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("name"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(CowStr::new_static("Name of the league")),
                                     max_length: Some(1000usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(100usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "quizMasters",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("quizMasters"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "DIDs of quiz masters who can run quizzes for this league",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    items: LexArrayItem::String(LexString {
+                                        format: Some(LexStringFormat::Did),
+                                        ..Default::default()
                                     }),
                                     min_length: Some(1usize),
                                     max_length: Some(5usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "teams",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("teams"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Teams participating in this league",
-                                        ),
+                                        CowStr::new_static("Teams participating in this league"),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "com.atproto.repo.strongRef",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(100usize),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

@@ -5,45 +5,46 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteAccount<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
     #[serde(borrow)]
-    pub password: jacquard_common::CowStr<'a>,
+    pub password: CowStr<'a>,
     #[serde(borrow)]
-    pub token: jacquard_common::CowStr<'a>,
+    pub token: CowStr<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteAccountError<'a> {
     #[serde(rename = "ExpiredToken")]
-    ExpiredToken(core::option::Option<jacquard_common::CowStr<'a>>),
+    ExpiredToken(Option<CowStr<'a>>),
     #[serde(rename = "InvalidToken")]
-    InvalidToken(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidToken(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteAccountError<'_> {
@@ -68,8 +69,7 @@ impl core::fmt::Display for DeleteAccountError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.server.deleteAccount
+/// Response type for com.atproto.server.deleteAccount
 pub struct DeleteAccountResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteAccountResponse {
     const NSID: &'static str = "com.atproto.server.deleteAccount";
@@ -86,8 +86,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteAccount<'a> {
     type Response = DeleteAccountResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.deleteAccount
+/// Endpoint type for com.atproto.server.deleteAccount
 pub struct DeleteAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteAccountRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.deleteAccount";
@@ -109,62 +108,58 @@ pub mod delete_account_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Token;
-        type Password;
         type Did;
+        type Password;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Token = Unset;
-        type Password = Unset;
         type Did = Unset;
+        type Password = Unset;
     }
     ///State transition - sets the `token` field to Set
     pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetToken<S> {}
     impl<S: State> State for SetToken<S> {
         type Token = Set<members::token>;
+        type Did = S::Did;
         type Password = S::Password;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `password` field to Set
-    pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPassword<S> {}
-    impl<S: State> State for SetPassword<S> {
-        type Token = S::Token;
-        type Password = Set<members::password>;
-        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Token = S::Token;
-        type Password = S::Password;
         type Did = Set<members::did>;
+        type Password = S::Password;
+    }
+    ///State transition - sets the `password` field to Set
+    pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPassword<S> {}
+    impl<S: State> State for SetPassword<S> {
+        type Token = S::Token;
+        type Did = S::Did;
+        type Password = Set<members::password>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `token` field
         pub struct token(());
-        ///Marker type for the `password` field
-        pub struct password(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `password` field
+        pub struct password(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DeleteAccountBuilder<'a, S: delete_account_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> DeleteAccount<'a> {
@@ -178,9 +173,9 @@ impl<'a> DeleteAccountBuilder<'a, delete_account_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeleteAccountBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -193,13 +188,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> DeleteAccountBuilder<'a, delete_account_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         DeleteAccountBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -212,13 +207,13 @@ where
     /// Set the `password` field (required)
     pub fn password(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> DeleteAccountBuilder<'a, delete_account_state::SetPassword<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         DeleteAccountBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -231,13 +226,13 @@ where
     /// Set the `token` field (required)
     pub fn token(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> DeleteAccountBuilder<'a, delete_account_state::SetToken<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         DeleteAccountBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -246,8 +241,8 @@ impl<'a, S> DeleteAccountBuilder<'a, S>
 where
     S: delete_account_state::State,
     S::Token: delete_account_state::IsSet,
-    S::Password: delete_account_state::IsSet,
     S::Did: delete_account_state::IsSet,
+    S::Password: delete_account_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeleteAccount<'a> {
@@ -261,7 +256,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

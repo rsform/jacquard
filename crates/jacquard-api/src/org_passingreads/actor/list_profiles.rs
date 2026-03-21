@@ -5,36 +5,25 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::org_passingreads::actor::ProfileView;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListProfilesOutput<'a> {
     #[serde(borrow)]
-    pub profiles: Vec<crate::org_passingreads::actor::ProfileView<'a>>,
+    pub profiles: Vec<ProfileView<'a>>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct ListProfiles;
-/// Response type for
-///org.passingreads.actor.listProfiles
+/// Response type for org.passingreads.actor.listProfiles
 pub struct ListProfilesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListProfilesResponse {
     const NSID: &'static str = "org.passingreads.actor.listProfiles";
@@ -49,8 +38,7 @@ impl jacquard_common::xrpc::XrpcRequest for ListProfiles {
     type Response = ListProfilesResponse;
 }
 
-/// Endpoint type for
-///org.passingreads.actor.listProfiles
+/// Endpoint type for org.passingreads.actor.listProfiles
 pub struct ListProfilesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListProfilesRequest {
     const PATH: &'static str = "/xrpc/org.passingreads.actor.listProfiles";

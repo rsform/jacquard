@@ -5,39 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::ConvoView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetConvo<'a> {
     #[serde(borrow)]
-    pub convo_id: jacquard_common::CowStr<'a>,
+    pub convo_id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetConvoOutput<'a> {
     #[serde(borrow)]
-    pub convo: crate::chat_bsky::convo::ConvoView<'a>,
+    pub convo: ConvoView<'a>,
 }
 
-/// Response type for
-///chat.bsky.convo.getConvo
+/// Response type for chat.bsky.convo.getConvo
 pub struct GetConvoResponse;
 impl jacquard_common::xrpc::XrpcResp for GetConvoResponse {
     const NSID: &'static str = "chat.bsky.convo.getConvo";
@@ -52,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetConvo<'a> {
     type Response = GetConvoResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.convo.getConvo
+/// Endpoint type for chat.bsky.convo.getConvo
 pub struct GetConvoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetConvoRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.getConvo";
@@ -96,9 +86,9 @@ pub mod get_convo_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetConvoBuilder<'a, S: get_convo_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetConvo<'a> {
@@ -112,9 +102,9 @@ impl<'a> GetConvoBuilder<'a, get_convo_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetConvoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -127,13 +117,13 @@ where
     /// Set the `convoId` field (required)
     pub fn convo_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetConvoBuilder<'a, get_convo_state::SetConvoId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetConvoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

@@ -5,46 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_blebbit::authr::folder::FolderView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFolders<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    pub cursor: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFoldersOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub folders: core::option::Option<
-        Vec<crate::app_blebbit::authr::folder::FolderView<'a>>,
-    >,
+    pub folders: Option<Vec<FolderView<'a>>>,
 }
 
-/// Response type for
-///app.blebbit.authr.folder.getFolders
+/// Response type for app.blebbit.authr.folder.getFolders
 pub struct GetFoldersResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFoldersResponse {
     const NSID: &'static str = "app.blebbit.authr.folder.getFolders";
@@ -59,8 +47,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetFolders<'a> {
     type Response = GetFoldersResponse;
 }
 
-/// Endpoint type for
-///app.blebbit.authr.folder.getFolders
+/// Endpoint type for app.blebbit.authr.folder.getFolders
 pub struct GetFoldersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFoldersRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.folder.getFolders";
@@ -90,12 +77,9 @@ pub mod get_folders_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetFoldersBuilder<'a, S: get_folders_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetFolders<'a> {
@@ -109,24 +93,21 @@ impl<'a> GetFoldersBuilder<'a, get_folders_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetFoldersBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_folders_state::State> GetFoldersBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }

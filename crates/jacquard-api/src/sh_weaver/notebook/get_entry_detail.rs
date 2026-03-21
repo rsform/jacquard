@@ -5,67 +5,60 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::EntryView;
+use crate::sh_weaver::notebook::NotebookView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetEntryDetail<'a> {
     #[serde(borrow)]
-    pub entry: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub entry: AtUri<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub notebook_context: core::option::Option<
-        jacquard_common::types::string::AtUri<'a>,
-    >,
+    pub notebook_context: Option<AtUri<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetEntryDetailOutput<'a> {
     #[serde(borrow)]
-    pub entry: crate::sh_weaver::notebook::EntryView<'a>,
+    pub entry: EntryView<'a>,
     pub notebook_count: i64,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub notebooks: core::option::Option<
-        Vec<crate::sh_weaver::notebook::NotebookView<'a>>,
-    >,
+    pub notebooks: Option<Vec<NotebookView<'a>>>,
     #[serde(borrow)]
-    pub record: jacquard_common::types::value::Data<'a>,
+    pub record: Data<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetEntryDetailError<'a> {
     #[serde(rename = "EntryNotFound")]
-    EntryNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    EntryNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetEntryDetailError<'_> {
@@ -83,8 +76,7 @@ impl core::fmt::Display for GetEntryDetailError<'_> {
     }
 }
 
-/// Response type for
-///sh.weaver.notebook.getEntryDetail
+/// Response type for sh.weaver.notebook.getEntryDetail
 pub struct GetEntryDetailResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryDetailResponse {
     const NSID: &'static str = "sh.weaver.notebook.getEntryDetail";
@@ -99,8 +91,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntryDetail<'a> {
     type Response = GetEntryDetailResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notebook.getEntryDetail
+/// Endpoint type for sh.weaver.notebook.getEntryDetail
 pub struct GetEntryDetailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryDetailRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryDetail";
@@ -143,12 +134,9 @@ pub mod get_entry_detail_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetEntryDetailBuilder<'a, S: get_entry_detail_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>, Option<AtUri<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetEntryDetail<'a> {
@@ -162,9 +150,9 @@ impl<'a> GetEntryDetailBuilder<'a, get_entry_detail_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetEntryDetailBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -177,31 +165,25 @@ where
     /// Set the `entry` field (required)
     pub fn entry(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetEntryDetailBuilder<'a, get_entry_detail_state::SetEntry<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetEntryDetailBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_entry_detail_state::State> GetEntryDetailBuilder<'a, S> {
     /// Set the `notebookContext` field (optional)
-    pub fn notebook_context(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn notebook_context(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `notebookContext` field to an Option value (optional)
-    pub fn maybe_notebook_context(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_notebook_context(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }

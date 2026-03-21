@@ -5,39 +5,28 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::moderation::ModEventViewDetail;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetEvent {
     pub id: i64,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetEventOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::tools_ozone::moderation::ModEventViewDetail<'a>,
+    pub value: ModEventViewDetail<'a>,
 }
 
-/// Response type for
-///tools.ozone.moderation.getEvent
+/// Response type for tools.ozone.moderation.getEvent
 pub struct GetEventResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEventResponse {
     const NSID: &'static str = "tools.ozone.moderation.getEvent";
@@ -52,8 +41,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetEvent {
     type Response = GetEventResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.moderation.getEvent
+/// Endpoint type for tools.ozone.moderation.getEvent
 pub struct GetEventRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEventRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.getEvent";
@@ -96,8 +84,8 @@ pub mod get_event_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetEventBuilder<S: get_event_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>,),
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>,),
 }
 
 impl GetEvent {
@@ -111,7 +99,7 @@ impl GetEventBuilder<get_event_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetEventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
         }
     }
@@ -127,9 +115,9 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> GetEventBuilder<get_event_state::SetId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetEventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
         }
     }

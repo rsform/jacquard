@@ -5,55 +5,56 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{AtUri, UriValue};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::social_showcase::ItemImage;
+use crate::social_showcase::ItemView;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateItem<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub category: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub category: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub description: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub external_link: core::option::Option<
-        jacquard_common::types::string::UriValue<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub external_link: Option<UriValue<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub images: core::option::Option<Vec<crate::social_showcase::ItemImage<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub images: Option<Vec<ItemImage<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub metadata: core::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub metadata: Option<Data<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub tags: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: Option<CowStr<'a>>,
     ///The AT-URI of the item
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub uri: AtUri<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub visibility: core::option::Option<UpdateItemVisibility<'a>>,
+    pub visibility: Option<UpdateItemVisibility<'a>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UpdateItemVisibility<'a> {
     Public,
     Unlisted,
     Private,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> UpdateItemVisibility<'a> {
@@ -73,7 +74,7 @@ impl<'a> From<&'a str> for UpdateItemVisibility<'a> {
             "public" => Self::Public,
             "unlisted" => Self::Unlisted,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -84,7 +85,7 @@ impl<'a> From<String> for UpdateItemVisibility<'a> {
             "public" => Self::Public,
             "unlisted" => Self::Unlisted,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -143,25 +144,17 @@ impl jacquard_common::IntoStatic for UpdateItemVisibility<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateItemOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::social_showcase::ItemView<'a>,
+    pub value: ItemView<'a>,
 }
 
-/// Response type for
-///social.showcase.library.updateItem
+/// Response type for social.showcase.library.updateItem
 pub struct UpdateItemResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateItemResponse {
     const NSID: &'static str = "social.showcase.library.updateItem";
@@ -178,8 +171,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateItem<'a> {
     type Response = UpdateItemResponse;
 }
 
-/// Endpoint type for
-///social.showcase.library.updateItem
+/// Endpoint type for social.showcase.library.updateItem
 pub struct UpdateItemRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateItemRequest {
     const PATH: &'static str = "/xrpc/social.showcase.library.updateItem";
@@ -224,19 +216,19 @@ pub mod update_item_state {
 
 /// Builder for constructing an instance of this type
 pub struct UpdateItemBuilder<'a, S: update_item_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<Vec<crate::social_showcase::ItemImage<'a>>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<UpdateItemVisibility<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<UriValue<'a>>,
+        Option<Vec<ItemImage<'a>>>,
+        Option<Data<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<CowStr<'a>>,
+        Option<AtUri<'a>>,
+        Option<UpdateItemVisibility<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateItem<'a> {
@@ -250,7 +242,7 @@ impl<'a> UpdateItemBuilder<'a, update_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -262,22 +254,19 @@ impl<'a> UpdateItemBuilder<'a, update_item_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
-    pub fn maybe_category(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -285,18 +274,12 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
 
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -304,18 +287,12 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
 
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `externalLink` field (optional)
-    pub fn external_link(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn external_link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `externalLink` field to an Option value (optional)
-    pub fn maybe_external_link(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_external_link(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -323,18 +300,12 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
 
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `images` field (optional)
-    pub fn images(
-        mut self,
-        value: impl Into<Option<Vec<crate::social_showcase::ItemImage<'a>>>>,
-    ) -> Self {
+    pub fn images(mut self, value: impl Into<Option<Vec<ItemImage<'a>>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `images` field to an Option value (optional)
-    pub fn maybe_images(
-        mut self,
-        value: Option<Vec<crate::social_showcase::ItemImage<'a>>>,
-    ) -> Self {
+    pub fn maybe_images(mut self, value: Option<Vec<ItemImage<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -342,18 +313,12 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
 
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `metadata` field (optional)
-    pub fn metadata(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn metadata(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
-    pub fn maybe_metadata(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_metadata(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -361,18 +326,12 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
 
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -380,15 +339,12 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
 
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -402,13 +358,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> UpdateItemBuilder<'a, update_item_state::SetUri<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         UpdateItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -452,10 +408,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> UpdateItem<'a> {
         UpdateItem {
             category: self.__unsafe_private_named.0,

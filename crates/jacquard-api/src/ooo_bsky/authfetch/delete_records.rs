@@ -5,25 +5,22 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteRecords<'a> {
     ///The AT URIs of the records to delete.
     #[serde(borrow)]
-    pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
+    pub uris: Vec<AtUri<'a>>,
 }
 
-/// Response type for
-///ooo.bsky.authfetch.deleteRecords
+/// Response type for ooo.bsky.authfetch.deleteRecords
 pub struct DeleteRecordsResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteRecordsResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.deleteRecords";
@@ -40,8 +37,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteRecords<'a> {
     type Response = DeleteRecordsResponse;
 }
 
-/// Endpoint type for
-///ooo.bsky.authfetch.deleteRecords
+/// Endpoint type for ooo.bsky.authfetch.deleteRecords
 pub struct DeleteRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteRecordsRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.deleteRecords";
@@ -86,11 +82,9 @@ pub mod delete_records_state {
 
 /// Builder for constructing an instance of this type
 pub struct DeleteRecordsBuilder<'a, S: delete_records_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<AtUri<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> DeleteRecords<'a> {
@@ -104,9 +98,9 @@ impl<'a> DeleteRecordsBuilder<'a, delete_records_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeleteRecordsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -119,13 +113,13 @@ where
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<'a>>>,
     ) -> DeleteRecordsBuilder<'a, delete_records_state::SetUris<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         DeleteRecordsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -145,7 +139,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

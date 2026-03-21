@@ -30,56 +30,67 @@ pub mod search_actors_skeleton;
 pub mod search_posts_skeleton;
 pub mod search_starter_packs_skeleton;
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::{Did, AtUri, Datetime};
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::actor::ProfileViewBasic;
+use crate::app_bsky::feed::BlockedAuthor;
+use crate::app_bsky::feed::PostView;
 /// Object used to store age assurance data in stash.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct AgeAssuranceEvent<'a> {
     ///The unique identifier for this instance of the age assurance flow, in UUID format.
     #[serde(borrow)]
-    pub attempt_id: jacquard_common::CowStr<'a>,
+    pub attempt_id: CowStr<'a>,
     ///The IP address used when completing the AA flow.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub complete_ip: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub complete_ip: Option<CowStr<'a>>,
     ///The user agent used when completing the AA flow.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub complete_ua: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub complete_ua: Option<CowStr<'a>>,
     ///The date and time of this write operation.
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///The email used for AA.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub email: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub email: Option<CowStr<'a>>,
     ///The IP address used when initiating the AA flow.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub init_ip: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub init_ip: Option<CowStr<'a>>,
     ///The user agent used when initiating the AA flow.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub init_ua: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub init_ua: Option<CowStr<'a>>,
     ///The status of the age assurance process.
     #[serde(borrow)]
     pub status: AgeAssuranceEventStatus<'a>,
 }
 
 /// The status of the age assurance process.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AgeAssuranceEventStatus<'a> {
     Unknown,
     Pending,
     Assured,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> AgeAssuranceEventStatus<'a> {
@@ -99,7 +110,7 @@ impl<'a> From<&'a str> for AgeAssuranceEventStatus<'a> {
             "unknown" => Self::Unknown,
             "pending" => Self::Pending,
             "assured" => Self::Assured,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -110,7 +121,7 @@ impl<'a> From<String> for AgeAssuranceEventStatus<'a> {
             "unknown" => Self::Unknown,
             "pending" => Self::Pending,
             "assured" => Self::Assured,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -170,37 +181,28 @@ impl jacquard_common::IntoStatic for AgeAssuranceEventStatus<'_> {
 }
 
 /// The computed state of the age assurance process, returned to the user in question on certain authenticated requests.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct AgeAssuranceState<'a> {
     ///The timestamp when this state was last updated.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub last_initiated_at: core::option::Option<
-        jacquard_common::types::string::Datetime,
-    >,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_initiated_at: Option<Datetime>,
     ///The status of the age assurance process.
     #[serde(borrow)]
     pub status: AgeAssuranceStateStatus<'a>,
 }
 
 /// The status of the age assurance process.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AgeAssuranceStateStatus<'a> {
     Unknown,
     Pending,
     Assured,
     Blocked,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> AgeAssuranceStateStatus<'a> {
@@ -222,7 +224,7 @@ impl<'a> From<&'a str> for AgeAssuranceStateStatus<'a> {
             "pending" => Self::Pending,
             "assured" => Self::Assured,
             "blocked" => Self::Blocked,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -234,7 +236,7 @@ impl<'a> From<String> for AgeAssuranceStateStatus<'a> {
             "pending" => Self::Pending,
             "assured" => Self::Assured,
             "blocked" => Self::Blocked,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -294,88 +296,61 @@ impl jacquard_common::IntoStatic for AgeAssuranceStateStatus<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonSearchActor<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonSearchPost<'a> {
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonSearchStarterPack<'a> {
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonTrend<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub category: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub category: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub dids: Vec<jacquard_common::types::string::Did<'a>>,
+    pub dids: Vec<Did<'a>>,
     #[serde(borrow)]
-    pub display_name: jacquard_common::CowStr<'a>,
+    pub display_name: CowStr<'a>,
     #[serde(borrow)]
-    pub link: jacquard_common::CowStr<'a>,
+    pub link: CowStr<'a>,
     pub post_count: i64,
-    pub started_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub started_at: Datetime,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: core::option::Option<SkeletonTrendStatus<'a>>,
+    pub status: Option<SkeletonTrendStatus<'a>>,
     #[serde(borrow)]
-    pub topic: jacquard_common::CowStr<'a>,
+    pub topic: CowStr<'a>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SkeletonTrendStatus<'a> {
     Hot,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> SkeletonTrendStatus<'a> {
@@ -391,7 +366,7 @@ impl<'a> From<&'a str> for SkeletonTrendStatus<'a> {
     fn from(s: &'a str) -> Self {
         match s {
             "hot" => Self::Hot,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -400,7 +375,7 @@ impl<'a> From<String> for SkeletonTrendStatus<'a> {
     fn from(s: String) -> Self {
         match s.as_str() {
             "hot" => Self::Hot,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -455,58 +430,28 @@ impl jacquard_common::IntoStatic for SkeletonTrendStatus<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItemBlocked<'a> {
     #[serde(borrow)]
-    pub author: crate::app_bsky::feed::BlockedAuthor<'a>,
+    pub author: BlockedAuthor<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItemNoUnauthenticated<'a> {}
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItemNotFound<'a> {}
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItemPost<'a> {
     ///The threadgate created by the author indicates this post as a reply to be hidden for everyone consuming the thread.
@@ -520,43 +465,37 @@ pub struct ThreadItemPost<'a> {
     ///This post is part of a contiguous thread by the OP from the thread root. Many different OP threads can happen in the same thread.
     pub op_thread: bool,
     #[serde(borrow)]
-    pub post: crate::app_bsky::feed::PostView<'a>,
+    pub post: PostView<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct TrendView<'a> {
     #[serde(borrow)]
-    pub actors: Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub actors: Vec<ProfileViewBasic<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub category: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub category: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub display_name: jacquard_common::CowStr<'a>,
+    pub display_name: CowStr<'a>,
     #[serde(borrow)]
-    pub link: jacquard_common::CowStr<'a>,
+    pub link: CowStr<'a>,
     pub post_count: i64,
-    pub started_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub started_at: Datetime,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: core::option::Option<TrendViewStatus<'a>>,
+    pub status: Option<TrendViewStatus<'a>>,
     #[serde(borrow)]
-    pub topic: jacquard_common::CowStr<'a>,
+    pub topic: CowStr<'a>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TrendViewStatus<'a> {
     Hot,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> TrendViewStatus<'a> {
@@ -572,7 +511,7 @@ impl<'a> From<&'a str> for TrendViewStatus<'a> {
     fn from(s: &'a str) -> Self {
         match s {
             "hot" => Self::Hot,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -581,7 +520,7 @@ impl<'a> From<String> for TrendViewStatus<'a> {
     fn from(s: String) -> Self {
         match s.as_str() {
             "hot" => Self::Hot,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -636,231 +575,199 @@ impl jacquard_common::IntoStatic for TrendViewStatus<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct TrendingTopic<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub description: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub link: jacquard_common::CowStr<'a>,
+    pub link: CowStr<'a>,
     #[serde(borrow)]
-    pub topic: jacquard_common::CowStr<'a>,
+    pub topic: CowStr<'a>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for AgeAssuranceEvent<'a> {
+impl<'a> LexiconSchema for AgeAssuranceEvent<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.defs"
     }
     fn def_name() -> &'static str {
         "ageAssuranceEvent"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for AgeAssuranceState<'a> {
+impl<'a> LexiconSchema for AgeAssuranceState<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.defs"
     }
     fn def_name() -> &'static str {
         "ageAssuranceState"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for SkeletonSearchActor<'a> {
+impl<'a> LexiconSchema for SkeletonSearchActor<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.defs"
     }
     fn def_name() -> &'static str {
         "skeletonSearchActor"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for SkeletonSearchPost<'a> {
+impl<'a> LexiconSchema for SkeletonSearchPost<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.defs"
     }
     fn def_name() -> &'static str {
         "skeletonSearchPost"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for SkeletonSearchStarterPack<'a> {
+impl<'a> LexiconSchema for SkeletonSearchStarterPack<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.defs"
     }
     fn def_name() -> &'static str {
         "skeletonSearchStarterPack"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for SkeletonTrend<'a> {
+impl<'a> LexiconSchema for SkeletonTrend<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.defs"
     }
     fn def_name() -> &'static str {
         "skeletonTrend"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ThreadItemBlocked<'a> {
+impl<'a> LexiconSchema for ThreadItemBlocked<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.defs"
     }
     fn def_name() -> &'static str {
         "threadItemBlocked"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ThreadItemNoUnauthenticated<'a> {
+impl<'a> LexiconSchema for ThreadItemNoUnauthenticated<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.defs"
     }
     fn def_name() -> &'static str {
         "threadItemNoUnauthenticated"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ThreadItemNotFound<'a> {
+impl<'a> LexiconSchema for ThreadItemNotFound<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.defs"
     }
     fn def_name() -> &'static str {
         "threadItemNotFound"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ThreadItemPost<'a> {
+impl<'a> LexiconSchema for ThreadItemPost<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.defs"
     }
     fn def_name() -> &'static str {
         "threadItemPost"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for TrendView<'a> {
+impl<'a> LexiconSchema for TrendView<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.defs"
     }
     fn def_name() -> &'static str {
         "trendView"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for TrendingTopic<'a> {
+impl<'a> LexiconSchema for TrendingTopic<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.defs"
     }
     fn def_name() -> &'static str {
         "trendingTopic"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -875,68 +782,68 @@ pub mod age_assurance_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Status;
         type AttemptId;
         type CreatedAt;
-        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Status = Unset;
         type AttemptId = Unset;
         type CreatedAt = Unset;
-        type Status = Unset;
-    }
-    ///State transition - sets the `attempt_id` field to Set
-    pub struct SetAttemptId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAttemptId<S> {}
-    impl<S: State> State for SetAttemptId<S> {
-        type AttemptId = Set<members::attempt_id>;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type AttemptId = S::AttemptId;
-        type CreatedAt = Set<members::created_at>;
-        type Status = S::Status;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
+        type Status = Set<members::status>;
         type AttemptId = S::AttemptId;
         type CreatedAt = S::CreatedAt;
-        type Status = Set<members::status>;
+    }
+    ///State transition - sets the `attempt_id` field to Set
+    pub struct SetAttemptId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAttemptId<S> {}
+    impl<S: State> State for SetAttemptId<S> {
+        type Status = S::Status;
+        type AttemptId = Set<members::attempt_id>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Status = S::Status;
+        type AttemptId = S::AttemptId;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `status` field
+        pub struct status(());
         ///Marker type for the `attempt_id` field
         pub struct attempt_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `status` field
-        pub struct status(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AgeAssuranceEventBuilder<'a, S: age_assurance_event_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<AgeAssuranceEventStatus<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<AgeAssuranceEventStatus<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> AgeAssuranceEvent<'a> {
@@ -950,9 +857,9 @@ impl<'a> AgeAssuranceEventBuilder<'a, age_assurance_event_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AgeAssuranceEventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -965,31 +872,25 @@ where
     /// Set the `attemptId` field (required)
     pub fn attempt_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> AgeAssuranceEventBuilder<'a, age_assurance_event_state::SetAttemptId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         AgeAssuranceEventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
     /// Set the `completeIp` field (optional)
-    pub fn complete_ip(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn complete_ip(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `completeIp` field to an Option value (optional)
-    pub fn maybe_complete_ip(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_complete_ip(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -997,18 +898,12 @@ impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
 
 impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
     /// Set the `completeUa` field (optional)
-    pub fn complete_ua(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn complete_ua(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `completeUa` field to an Option value (optional)
-    pub fn maybe_complete_ua(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_complete_ua(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -1022,28 +917,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> AgeAssuranceEventBuilder<'a, age_assurance_event_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         AgeAssuranceEventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
     /// Set the `email` field (optional)
-    pub fn email(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn email(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
-    pub fn maybe_email(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_email(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -1051,15 +943,12 @@ impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
 
 impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
     /// Set the `initIp` field (optional)
-    pub fn init_ip(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn init_ip(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `initIp` field to an Option value (optional)
-    pub fn maybe_init_ip(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_init_ip(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -1067,15 +956,12 @@ impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
 
 impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
     /// Set the `initUa` field (optional)
-    pub fn init_ua(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn init_ua(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `initUa` field to an Option value (optional)
-    pub fn maybe_init_ua(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_init_ua(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -1091,11 +977,11 @@ where
         mut self,
         value: impl Into<AgeAssuranceEventStatus<'a>>,
     ) -> AgeAssuranceEventBuilder<'a, age_assurance_event_state::SetStatus<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         AgeAssuranceEventBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1103,9 +989,9 @@ where
 impl<'a, S> AgeAssuranceEventBuilder<'a, S>
 where
     S: age_assurance_event_state::State,
+    S::Status: age_assurance_event_state::IsSet,
     S::AttemptId: age_assurance_event_state::IsSet,
     S::CreatedAt: age_assurance_event_state::IsSet,
-    S::Status: age_assurance_event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AgeAssuranceEvent<'a> {
@@ -1124,7 +1010,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1143,944 +1029,486 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_unspecced_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.bsky.unspecced.defs"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_bsky_unspecced_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.bsky.unspecced.defs"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "ageAssuranceEvent",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("ageAssuranceEvent"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Object used to store age assurance data in stash.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("status"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("attemptId")
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("status"),
+                            SmolStr::new_static("attemptId")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "attemptId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("attemptId"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The unique identifier for this instance of the age assurance flow, in UUID format.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "completeIp",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("completeIp"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The IP address used when completing the AA flow.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "completeUa",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("completeUa"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The user agent used when completing the AA flow.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "createdAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("createdAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The date and time of this write operation.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "email",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("email"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The email used for AA.",
-                                    ),
+                                    CowStr::new_static("The email used for AA."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "initIp",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("initIp"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The IP address used when initiating the AA flow.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "initUa",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("initUa"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The user agent used when initiating the AA flow.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "status",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("status"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The status of the age assurance process.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "ageAssuranceState",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("ageAssuranceState"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "The computed state of the age assurance process, returned to the user in question on certain authenticated requests.",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("status")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("status")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "lastInitiatedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("lastInitiatedAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The timestamp when this state was last updated.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "status",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("status"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The status of the age assurance process.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "skeletonSearchActor",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("skeletonSearchActor"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "did",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("did"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "skeletonSearchPost",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("skeletonSearchPost"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "skeletonSearchStarterPack",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("skeletonSearchStarterPack"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("skeletonTrend"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("skeletonTrend"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("topic"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("displayName"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("link"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("startedAt"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("postCount"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("dids")
+                            SmolStr::new_static("topic"),
+                            SmolStr::new_static("displayName"),
+                            SmolStr::new_static("link"),
+                            SmolStr::new_static("startedAt"),
+                            SmolStr::new_static("postCount"), SmolStr::new_static("dids")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "category",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("category"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "dids",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                            SmolStr::new_static("dids"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::String(LexString {
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "displayName",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("displayName"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("link"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("postCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "link",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("startedAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "postCount",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
+                            SmolStr::new_static("status"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "startedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "status",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "topic",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("topic"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "threadItemBlocked",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("author")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("threadItemBlocked"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("author")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "author",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("author"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "app.bsky.feed.defs#blockedAuthor",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "threadItemNoUnauthenticated",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("threadItemNoUnauthenticated"),
+                LexUserType::Object(LexObject {
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "threadItemNotFound",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("threadItemNotFound"),
+                LexUserType::Object(LexObject {
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("threadItemPost"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("threadItemPost"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("post"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("moreParents"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("moreReplies"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("opThread"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("hiddenByThreadgate"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mutedByViewer")
+                            SmolStr::new_static("post"),
+                            SmolStr::new_static("moreParents"),
+                            SmolStr::new_static("moreReplies"),
+                            SmolStr::new_static("opThread"),
+                            SmolStr::new_static("hiddenByThreadgate"),
+                            SmolStr::new_static("mutedByViewer")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hiddenByThreadgate",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("hiddenByThreadgate"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "moreParents",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("moreParents"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "moreReplies",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("moreReplies"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mutedByViewer",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("mutedByViewer"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "opThread",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("opThread"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "post",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "app.bsky.feed.defs#postView",
-                                ),
+                            SmolStr::new_static("post"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("app.bsky.feed.defs#postView"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("trendView"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("trendView"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("topic"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("displayName"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("link"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("startedAt"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("postCount"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("actors")
+                            SmolStr::new_static("topic"),
+                            SmolStr::new_static("displayName"),
+                            SmolStr::new_static("link"),
+                            SmolStr::new_static("startedAt"),
+                            SmolStr::new_static("postCount"),
+                            SmolStr::new_static("actors")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "actors",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("actors"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "app.bsky.actor.defs#profileViewBasic",
                                     ),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "category",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("category"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("displayName"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("link"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("postCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "displayName",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("startedAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "link",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("status"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "postCount",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "startedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "status",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "topic",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("topic"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("trendingTopic"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("trendingTopic"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("topic"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("link")
-                        ],
+                        vec![SmolStr::new_static("topic"), SmolStr::new_static("link")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "description",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("description"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "displayName",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("displayName"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "link",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("link"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "topic",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("topic"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -2118,11 +1546,9 @@ pub mod skeleton_search_actor_state {
 
 /// Builder for constructing an instance of this type
 pub struct SkeletonSearchActorBuilder<'a, S: skeleton_search_actor_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SkeletonSearchActor<'a> {
@@ -2136,9 +1562,9 @@ impl<'a> SkeletonSearchActorBuilder<'a, skeleton_search_actor_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SkeletonSearchActorBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2151,13 +1577,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> SkeletonSearchActorBuilder<'a, skeleton_search_actor_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SkeletonSearchActorBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2177,7 +1603,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2223,11 +1649,9 @@ pub mod skeleton_search_post_state {
 
 /// Builder for constructing an instance of this type
 pub struct SkeletonSearchPostBuilder<'a, S: skeleton_search_post_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SkeletonSearchPost<'a> {
@@ -2241,9 +1665,9 @@ impl<'a> SkeletonSearchPostBuilder<'a, skeleton_search_post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SkeletonSearchPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2256,13 +1680,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> SkeletonSearchPostBuilder<'a, skeleton_search_post_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SkeletonSearchPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2282,7 +1706,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2331,11 +1755,9 @@ pub struct SkeletonSearchStarterPackBuilder<
     'a,
     S: skeleton_search_starter_pack_state::State,
 > {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SkeletonSearchStarterPack<'a> {
@@ -2354,9 +1776,9 @@ impl<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SkeletonSearchStarterPackBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2369,16 +1791,16 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> SkeletonSearchStarterPackBuilder<
         'a,
         skeleton_search_starter_pack_state::SetUri<S>,
     > {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SkeletonSearchStarterPackBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2398,7 +1820,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2420,122 +1842,122 @@ pub mod skeleton_trend_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DisplayName;
-        type PostCount;
-        type Link;
-        type Topic;
         type StartedAt;
+        type DisplayName;
         type Dids;
+        type Topic;
+        type Link;
+        type PostCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DisplayName = Unset;
-        type PostCount = Unset;
-        type Link = Unset;
-        type Topic = Unset;
         type StartedAt = Unset;
+        type DisplayName = Unset;
         type Dids = Unset;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type DisplayName = Set<members::display_name>;
-        type PostCount = S::PostCount;
-        type Link = S::Link;
-        type Topic = S::Topic;
-        type StartedAt = S::StartedAt;
-        type Dids = S::Dids;
-    }
-    ///State transition - sets the `post_count` field to Set
-    pub struct SetPostCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPostCount<S> {}
-    impl<S: State> State for SetPostCount<S> {
-        type DisplayName = S::DisplayName;
-        type PostCount = Set<members::post_count>;
-        type Link = S::Link;
-        type Topic = S::Topic;
-        type StartedAt = S::StartedAt;
-        type Dids = S::Dids;
-    }
-    ///State transition - sets the `link` field to Set
-    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLink<S> {}
-    impl<S: State> State for SetLink<S> {
-        type DisplayName = S::DisplayName;
-        type PostCount = S::PostCount;
-        type Link = Set<members::link>;
-        type Topic = S::Topic;
-        type StartedAt = S::StartedAt;
-        type Dids = S::Dids;
-    }
-    ///State transition - sets the `topic` field to Set
-    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTopic<S> {}
-    impl<S: State> State for SetTopic<S> {
-        type DisplayName = S::DisplayName;
-        type PostCount = S::PostCount;
-        type Link = S::Link;
-        type Topic = Set<members::topic>;
-        type StartedAt = S::StartedAt;
-        type Dids = S::Dids;
+        type Topic = Unset;
+        type Link = Unset;
+        type PostCount = Unset;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartedAt<S> {}
     impl<S: State> State for SetStartedAt<S> {
-        type DisplayName = S::DisplayName;
-        type PostCount = S::PostCount;
-        type Link = S::Link;
-        type Topic = S::Topic;
         type StartedAt = Set<members::started_at>;
+        type DisplayName = S::DisplayName;
         type Dids = S::Dids;
+        type Topic = S::Topic;
+        type Link = S::Link;
+        type PostCount = S::PostCount;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type StartedAt = S::StartedAt;
+        type DisplayName = Set<members::display_name>;
+        type Dids = S::Dids;
+        type Topic = S::Topic;
+        type Link = S::Link;
+        type PostCount = S::PostCount;
     }
     ///State transition - sets the `dids` field to Set
     pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDids<S> {}
     impl<S: State> State for SetDids<S> {
-        type DisplayName = S::DisplayName;
-        type PostCount = S::PostCount;
-        type Link = S::Link;
-        type Topic = S::Topic;
         type StartedAt = S::StartedAt;
+        type DisplayName = S::DisplayName;
         type Dids = Set<members::dids>;
+        type Topic = S::Topic;
+        type Link = S::Link;
+        type PostCount = S::PostCount;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTopic<S> {}
+    impl<S: State> State for SetTopic<S> {
+        type StartedAt = S::StartedAt;
+        type DisplayName = S::DisplayName;
+        type Dids = S::Dids;
+        type Topic = Set<members::topic>;
+        type Link = S::Link;
+        type PostCount = S::PostCount;
+    }
+    ///State transition - sets the `link` field to Set
+    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLink<S> {}
+    impl<S: State> State for SetLink<S> {
+        type StartedAt = S::StartedAt;
+        type DisplayName = S::DisplayName;
+        type Dids = S::Dids;
+        type Topic = S::Topic;
+        type Link = Set<members::link>;
+        type PostCount = S::PostCount;
+    }
+    ///State transition - sets the `post_count` field to Set
+    pub struct SetPostCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostCount<S> {}
+    impl<S: State> State for SetPostCount<S> {
+        type StartedAt = S::StartedAt;
+        type DisplayName = S::DisplayName;
+        type Dids = S::Dids;
+        type Topic = S::Topic;
+        type Link = S::Link;
+        type PostCount = Set<members::post_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
-        ///Marker type for the `post_count` field
-        pub struct post_count(());
-        ///Marker type for the `link` field
-        pub struct link(());
-        ///Marker type for the `topic` field
-        pub struct topic(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
         ///Marker type for the `dids` field
         pub struct dids(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
+        ///Marker type for the `link` field
+        pub struct link(());
+        ///Marker type for the `post_count` field
+        pub struct post_count(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SkeletonTrendBuilder<'a, S: skeleton_trend_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<SkeletonTrendStatus<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Vec<Did<'a>>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<Datetime>,
+        Option<SkeletonTrendStatus<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SkeletonTrend<'a> {
@@ -2549,24 +1971,21 @@ impl<'a> SkeletonTrendBuilder<'a, skeleton_trend_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SkeletonTrendBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: skeleton_trend_state::State> SkeletonTrendBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
-    pub fn maybe_category(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -2580,13 +1999,13 @@ where
     /// Set the `dids` field (required)
     pub fn dids(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+        value: impl Into<Vec<Did<'a>>>,
     ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetDids<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         SkeletonTrendBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2599,13 +2018,13 @@ where
     /// Set the `displayName` field (required)
     pub fn display_name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetDisplayName<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         SkeletonTrendBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2618,13 +2037,13 @@ where
     /// Set the `link` field (required)
     pub fn link(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetLink<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         SkeletonTrendBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2639,11 +2058,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetPostCount<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         SkeletonTrendBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2656,13 +2075,13 @@ where
     /// Set the `startedAt` field (required)
     pub fn started_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetStartedAt<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         SkeletonTrendBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2688,13 +2107,13 @@ where
     /// Set the `topic` field (required)
     pub fn topic(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetTopic<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         SkeletonTrendBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2702,12 +2121,12 @@ where
 impl<'a, S> SkeletonTrendBuilder<'a, S>
 where
     S: skeleton_trend_state::State,
-    S::DisplayName: skeleton_trend_state::IsSet,
-    S::PostCount: skeleton_trend_state::IsSet,
-    S::Link: skeleton_trend_state::IsSet,
-    S::Topic: skeleton_trend_state::IsSet,
     S::StartedAt: skeleton_trend_state::IsSet,
+    S::DisplayName: skeleton_trend_state::IsSet,
     S::Dids: skeleton_trend_state::IsSet,
+    S::Topic: skeleton_trend_state::IsSet,
+    S::Link: skeleton_trend_state::IsSet,
+    S::PostCount: skeleton_trend_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SkeletonTrend<'a> {
@@ -2726,7 +2145,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2779,11 +2198,9 @@ pub mod thread_item_blocked_state {
 
 /// Builder for constructing an instance of this type
 pub struct ThreadItemBlockedBuilder<'a, S: thread_item_blocked_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::app_bsky::feed::BlockedAuthor<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<BlockedAuthor<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ThreadItemBlocked<'a> {
@@ -2797,9 +2214,9 @@ impl<'a> ThreadItemBlockedBuilder<'a, thread_item_blocked_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ThreadItemBlockedBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2812,13 +2229,13 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<crate::app_bsky::feed::BlockedAuthor<'a>>,
+        value: impl Into<BlockedAuthor<'a>>,
     ) -> ThreadItemBlockedBuilder<'a, thread_item_blocked_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ThreadItemBlockedBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2838,7 +2255,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2860,120 +2277,120 @@ pub mod thread_item_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MutedByViewer;
-        type MoreReplies;
         type MoreParents;
         type Post;
-        type HiddenByThreadgate;
         type OpThread;
+        type HiddenByThreadgate;
+        type MutedByViewer;
+        type MoreReplies;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MutedByViewer = Unset;
-        type MoreReplies = Unset;
         type MoreParents = Unset;
         type Post = Unset;
-        type HiddenByThreadgate = Unset;
         type OpThread = Unset;
-    }
-    ///State transition - sets the `muted_by_viewer` field to Set
-    pub struct SetMutedByViewer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMutedByViewer<S> {}
-    impl<S: State> State for SetMutedByViewer<S> {
-        type MutedByViewer = Set<members::muted_by_viewer>;
-        type MoreReplies = S::MoreReplies;
-        type MoreParents = S::MoreParents;
-        type Post = S::Post;
-        type HiddenByThreadgate = S::HiddenByThreadgate;
-        type OpThread = S::OpThread;
-    }
-    ///State transition - sets the `more_replies` field to Set
-    pub struct SetMoreReplies<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMoreReplies<S> {}
-    impl<S: State> State for SetMoreReplies<S> {
-        type MutedByViewer = S::MutedByViewer;
-        type MoreReplies = Set<members::more_replies>;
-        type MoreParents = S::MoreParents;
-        type Post = S::Post;
-        type HiddenByThreadgate = S::HiddenByThreadgate;
-        type OpThread = S::OpThread;
+        type HiddenByThreadgate = Unset;
+        type MutedByViewer = Unset;
+        type MoreReplies = Unset;
     }
     ///State transition - sets the `more_parents` field to Set
     pub struct SetMoreParents<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMoreParents<S> {}
     impl<S: State> State for SetMoreParents<S> {
-        type MutedByViewer = S::MutedByViewer;
-        type MoreReplies = S::MoreReplies;
         type MoreParents = Set<members::more_parents>;
         type Post = S::Post;
-        type HiddenByThreadgate = S::HiddenByThreadgate;
         type OpThread = S::OpThread;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+        type MutedByViewer = S::MutedByViewer;
+        type MoreReplies = S::MoreReplies;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPost<S> {}
     impl<S: State> State for SetPost<S> {
-        type MutedByViewer = S::MutedByViewer;
-        type MoreReplies = S::MoreReplies;
         type MoreParents = S::MoreParents;
         type Post = Set<members::post>;
-        type HiddenByThreadgate = S::HiddenByThreadgate;
         type OpThread = S::OpThread;
-    }
-    ///State transition - sets the `hidden_by_threadgate` field to Set
-    pub struct SetHiddenByThreadgate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHiddenByThreadgate<S> {}
-    impl<S: State> State for SetHiddenByThreadgate<S> {
+        type HiddenByThreadgate = S::HiddenByThreadgate;
         type MutedByViewer = S::MutedByViewer;
         type MoreReplies = S::MoreReplies;
-        type MoreParents = S::MoreParents;
-        type Post = S::Post;
-        type HiddenByThreadgate = Set<members::hidden_by_threadgate>;
-        type OpThread = S::OpThread;
     }
     ///State transition - sets the `op_thread` field to Set
     pub struct SetOpThread<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOpThread<S> {}
     impl<S: State> State for SetOpThread<S> {
-        type MutedByViewer = S::MutedByViewer;
-        type MoreReplies = S::MoreReplies;
         type MoreParents = S::MoreParents;
         type Post = S::Post;
-        type HiddenByThreadgate = S::HiddenByThreadgate;
         type OpThread = Set<members::op_thread>;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+        type MutedByViewer = S::MutedByViewer;
+        type MoreReplies = S::MoreReplies;
+    }
+    ///State transition - sets the `hidden_by_threadgate` field to Set
+    pub struct SetHiddenByThreadgate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHiddenByThreadgate<S> {}
+    impl<S: State> State for SetHiddenByThreadgate<S> {
+        type MoreParents = S::MoreParents;
+        type Post = S::Post;
+        type OpThread = S::OpThread;
+        type HiddenByThreadgate = Set<members::hidden_by_threadgate>;
+        type MutedByViewer = S::MutedByViewer;
+        type MoreReplies = S::MoreReplies;
+    }
+    ///State transition - sets the `muted_by_viewer` field to Set
+    pub struct SetMutedByViewer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMutedByViewer<S> {}
+    impl<S: State> State for SetMutedByViewer<S> {
+        type MoreParents = S::MoreParents;
+        type Post = S::Post;
+        type OpThread = S::OpThread;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+        type MutedByViewer = Set<members::muted_by_viewer>;
+        type MoreReplies = S::MoreReplies;
+    }
+    ///State transition - sets the `more_replies` field to Set
+    pub struct SetMoreReplies<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMoreReplies<S> {}
+    impl<S: State> State for SetMoreReplies<S> {
+        type MoreParents = S::MoreParents;
+        type Post = S::Post;
+        type OpThread = S::OpThread;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+        type MutedByViewer = S::MutedByViewer;
+        type MoreReplies = Set<members::more_replies>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `muted_by_viewer` field
-        pub struct muted_by_viewer(());
-        ///Marker type for the `more_replies` field
-        pub struct more_replies(());
         ///Marker type for the `more_parents` field
         pub struct more_parents(());
         ///Marker type for the `post` field
         pub struct post(());
-        ///Marker type for the `hidden_by_threadgate` field
-        pub struct hidden_by_threadgate(());
         ///Marker type for the `op_thread` field
         pub struct op_thread(());
+        ///Marker type for the `hidden_by_threadgate` field
+        pub struct hidden_by_threadgate(());
+        ///Marker type for the `muted_by_viewer` field
+        pub struct muted_by_viewer(());
+        ///Marker type for the `more_replies` field
+        pub struct more_replies(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ThreadItemPostBuilder<'a, S: thread_item_post_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<bool>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<crate::app_bsky::feed::PostView<'a>>,
+        Option<bool>,
+        Option<bool>,
+        Option<i64>,
+        Option<bool>,
+        Option<bool>,
+        Option<PostView<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ThreadItemPost<'a> {
@@ -2987,9 +2404,9 @@ impl<'a> ThreadItemPostBuilder<'a, thread_item_post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ThreadItemPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3004,11 +2421,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetHiddenByThreadgate<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ThreadItemPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3023,11 +2440,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetMoreParents<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ThreadItemPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3042,11 +2459,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetMoreReplies<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         ThreadItemPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3061,11 +2478,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetMutedByViewer<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         ThreadItemPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3080,11 +2497,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetOpThread<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         ThreadItemPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3097,13 +2514,13 @@ where
     /// Set the `post` field (required)
     pub fn post(
         mut self,
-        value: impl Into<crate::app_bsky::feed::PostView<'a>>,
+        value: impl Into<PostView<'a>>,
     ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetPost<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         ThreadItemPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3111,12 +2528,12 @@ where
 impl<'a, S> ThreadItemPostBuilder<'a, S>
 where
     S: thread_item_post_state::State,
-    S::MutedByViewer: thread_item_post_state::IsSet,
-    S::MoreReplies: thread_item_post_state::IsSet,
     S::MoreParents: thread_item_post_state::IsSet,
     S::Post: thread_item_post_state::IsSet,
-    S::HiddenByThreadgate: thread_item_post_state::IsSet,
     S::OpThread: thread_item_post_state::IsSet,
+    S::HiddenByThreadgate: thread_item_post_state::IsSet,
+    S::MutedByViewer: thread_item_post_state::IsSet,
+    S::MoreReplies: thread_item_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ThreadItemPost<'a> {
@@ -3133,7 +2550,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3160,122 +2577,122 @@ pub mod trend_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Actors;
-        type Topic;
-        type StartedAt;
         type PostCount;
+        type Topic;
         type DisplayName;
+        type Actors;
         type Link;
+        type StartedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Actors = Unset;
-        type Topic = Unset;
-        type StartedAt = Unset;
         type PostCount = Unset;
+        type Topic = Unset;
         type DisplayName = Unset;
+        type Actors = Unset;
         type Link = Unset;
-    }
-    ///State transition - sets the `actors` field to Set
-    pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActors<S> {}
-    impl<S: State> State for SetActors<S> {
-        type Actors = Set<members::actors>;
-        type Topic = S::Topic;
-        type StartedAt = S::StartedAt;
-        type PostCount = S::PostCount;
-        type DisplayName = S::DisplayName;
-        type Link = S::Link;
-    }
-    ///State transition - sets the `topic` field to Set
-    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTopic<S> {}
-    impl<S: State> State for SetTopic<S> {
-        type Actors = S::Actors;
-        type Topic = Set<members::topic>;
-        type StartedAt = S::StartedAt;
-        type PostCount = S::PostCount;
-        type DisplayName = S::DisplayName;
-        type Link = S::Link;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type Actors = S::Actors;
-        type Topic = S::Topic;
-        type StartedAt = Set<members::started_at>;
-        type PostCount = S::PostCount;
-        type DisplayName = S::DisplayName;
-        type Link = S::Link;
+        type StartedAt = Unset;
     }
     ///State transition - sets the `post_count` field to Set
     pub struct SetPostCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPostCount<S> {}
     impl<S: State> State for SetPostCount<S> {
-        type Actors = S::Actors;
-        type Topic = S::Topic;
-        type StartedAt = S::StartedAt;
         type PostCount = Set<members::post_count>;
+        type Topic = S::Topic;
         type DisplayName = S::DisplayName;
+        type Actors = S::Actors;
         type Link = S::Link;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTopic<S> {}
+    impl<S: State> State for SetTopic<S> {
+        type PostCount = S::PostCount;
+        type Topic = Set<members::topic>;
+        type DisplayName = S::DisplayName;
+        type Actors = S::Actors;
+        type Link = S::Link;
+        type StartedAt = S::StartedAt;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
-        type Actors = S::Actors;
-        type Topic = S::Topic;
-        type StartedAt = S::StartedAt;
         type PostCount = S::PostCount;
+        type Topic = S::Topic;
         type DisplayName = Set<members::display_name>;
+        type Actors = S::Actors;
         type Link = S::Link;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `actors` field to Set
+    pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActors<S> {}
+    impl<S: State> State for SetActors<S> {
+        type PostCount = S::PostCount;
+        type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
+        type Actors = Set<members::actors>;
+        type Link = S::Link;
+        type StartedAt = S::StartedAt;
     }
     ///State transition - sets the `link` field to Set
     pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLink<S> {}
     impl<S: State> State for SetLink<S> {
-        type Actors = S::Actors;
-        type Topic = S::Topic;
-        type StartedAt = S::StartedAt;
         type PostCount = S::PostCount;
+        type Topic = S::Topic;
         type DisplayName = S::DisplayName;
+        type Actors = S::Actors;
         type Link = Set<members::link>;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type PostCount = S::PostCount;
+        type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
+        type Actors = S::Actors;
+        type Link = S::Link;
+        type StartedAt = Set<members::started_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `actors` field
-        pub struct actors(());
-        ///Marker type for the `topic` field
-        pub struct topic(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
         ///Marker type for the `post_count` field
         pub struct post_count(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
+        ///Marker type for the `actors` field
+        pub struct actors(());
         ///Marker type for the `link` field
         pub struct link(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TrendViewBuilder<'a, S: trend_view_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<TrendViewStatus<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<Vec<ProfileViewBasic<'a>>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<Datetime>,
+        Option<TrendViewStatus<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> TrendView<'a> {
@@ -3289,9 +2706,9 @@ impl<'a> TrendViewBuilder<'a, trend_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TrendViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3304,28 +2721,25 @@ where
     /// Set the `actors` field (required)
     pub fn actors(
         mut self,
-        value: impl Into<Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>>,
+        value: impl Into<Vec<ProfileViewBasic<'a>>>,
     ) -> TrendViewBuilder<'a, trend_view_state::SetActors<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         TrendViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: trend_view_state::State> TrendViewBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
-    pub fn maybe_category(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -3339,13 +2753,13 @@ where
     /// Set the `displayName` field (required)
     pub fn display_name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> TrendViewBuilder<'a, trend_view_state::SetDisplayName<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         TrendViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3358,13 +2772,13 @@ where
     /// Set the `link` field (required)
     pub fn link(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> TrendViewBuilder<'a, trend_view_state::SetLink<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         TrendViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3379,11 +2793,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> TrendViewBuilder<'a, trend_view_state::SetPostCount<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         TrendViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3396,13 +2810,13 @@ where
     /// Set the `startedAt` field (required)
     pub fn started_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> TrendViewBuilder<'a, trend_view_state::SetStartedAt<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         TrendViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3428,13 +2842,13 @@ where
     /// Set the `topic` field (required)
     pub fn topic(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> TrendViewBuilder<'a, trend_view_state::SetTopic<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         TrendViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3442,12 +2856,12 @@ where
 impl<'a, S> TrendViewBuilder<'a, S>
 where
     S: trend_view_state::State,
-    S::Actors: trend_view_state::IsSet,
-    S::Topic: trend_view_state::IsSet,
-    S::StartedAt: trend_view_state::IsSet,
     S::PostCount: trend_view_state::IsSet,
+    S::Topic: trend_view_state::IsSet,
     S::DisplayName: trend_view_state::IsSet,
+    S::Actors: trend_view_state::IsSet,
     S::Link: trend_view_state::IsSet,
+    S::StartedAt: trend_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TrendView<'a> {
@@ -3466,7 +2880,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

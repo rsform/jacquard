@@ -5,49 +5,40 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::fm_teal::alpha::actor::MiniProfileView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchActors<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     ///(min: 1, max: 25)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
     #[serde(borrow)]
-    pub q: jacquard_common::CowStr<'a>,
+    pub q: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchActorsOutput<'a> {
     #[serde(borrow)]
-    pub actors: Vec<crate::fm_teal::alpha::actor::MiniProfileView<'a>>,
+    pub actors: Vec<MiniProfileView<'a>>,
     ///Cursor for pagination
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
 }
 
-/// Response type for
-///fm.teal.alpha.actor.searchActors
+/// Response type for fm.teal.alpha.actor.searchActors
 pub struct SearchActorsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchActorsResponse {
     const NSID: &'static str = "fm.teal.alpha.actor.searchActors";
@@ -62,8 +53,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SearchActors<'a> {
     type Response = SearchActorsResponse;
 }
 
-/// Endpoint type for
-///fm.teal.alpha.actor.searchActors
+/// Endpoint type for fm.teal.alpha.actor.searchActors
 pub struct SearchActorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsRequest {
     const PATH: &'static str = "/xrpc/fm.teal.alpha.actor.searchActors";
@@ -106,13 +96,9 @@ pub mod search_actors_state {
 
 /// Builder for constructing an instance of this type
 pub struct SearchActorsBuilder<'a, S: search_actors_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SearchActors<'a> {
@@ -126,24 +112,21 @@ impl<'a> SearchActorsBuilder<'a, search_actors_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SearchActorsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: search_actors_state::State> SearchActorsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -170,13 +153,13 @@ where
     /// Set the `q` field (required)
     pub fn q(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SearchActorsBuilder<'a, search_actors_state::SetQ<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         SearchActorsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

@@ -5,53 +5,46 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::buzz_bookhive::Activity;
+use crate::buzz_bookhive::Profile;
+use crate::buzz_bookhive::UserBook;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfile<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub did: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub handle: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub handle: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfileOutput<'a> {
     ///The user's activity
     #[serde(borrow)]
-    pub activity: Vec<crate::buzz_bookhive::Activity<'a>>,
+    pub activity: Vec<Activity<'a>>,
     ///All books in the user's library
     #[serde(borrow)]
-    pub books: Vec<crate::buzz_bookhive::UserBook<'a>>,
+    pub books: Vec<UserBook<'a>>,
     ///The user's friend activity
     #[serde(borrow)]
-    pub friend_activity: Vec<crate::buzz_bookhive::UserBook<'a>>,
+    pub friend_activity: Vec<UserBook<'a>>,
     ///The user's profile
     #[serde(borrow)]
-    pub profile: crate::buzz_bookhive::Profile<'a>,
+    pub profile: Profile<'a>,
 }
 
-/// Response type for
-///buzz.bookhive.getProfile
+/// Response type for buzz.bookhive.getProfile
 pub struct GetProfileResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfileResponse {
     const NSID: &'static str = "buzz.bookhive.getProfile";
@@ -66,8 +59,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfile<'a> {
     type Response = GetProfileResponse;
 }
 
-/// Endpoint type for
-///buzz.bookhive.getProfile
+/// Endpoint type for buzz.bookhive.getProfile
 pub struct GetProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfileRequest {
     const PATH: &'static str = "/xrpc/buzz.bookhive.getProfile";
@@ -97,12 +89,9 @@ pub mod get_profile_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetProfileBuilder<'a, S: get_profile_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetProfile<'a> {
@@ -116,21 +105,21 @@ impl<'a> GetProfileBuilder<'a, get_profile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetProfileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_profile_state::State> GetProfileBuilder<'a, S> {
     /// Set the `did` field (optional)
-    pub fn did(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn did(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
-    pub fn maybe_did(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_did(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -138,15 +127,12 @@ impl<'a, S: get_profile_state::State> GetProfileBuilder<'a, S> {
 
 impl<'a, S: get_profile_state::State> GetProfileBuilder<'a, S> {
     /// Set the `handle` field (optional)
-    pub fn handle(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn handle(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `handle` field to an Option value (optional)
-    pub fn maybe_handle(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_handle(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }

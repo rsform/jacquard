@@ -5,57 +5,51 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::win_tomo_x::pushat::NotifyBody;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PushNotify<'a> {
     #[serde(borrow)]
-    pub body: crate::win_tomo_x::pushat::NotifyBody<'a>,
+    pub body: NotifyBody<'a>,
     ///The DID of the target user to whom the notification will be sent.
     #[serde(borrow)]
-    pub target: jacquard_common::types::string::Did<'a>,
+    pub target: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct PushNotifyOutput<'a> {}
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum PushNotifyError<'a> {
     #[serde(rename = "ServiceNotAllowedError")]
-    ServiceNotAllowedError(core::option::Option<jacquard_common::CowStr<'a>>),
+    ServiceNotAllowedError(Option<CowStr<'a>>),
     #[serde(rename = "DeviceNotFoundError")]
-    DeviceNotFoundError(core::option::Option<jacquard_common::CowStr<'a>>),
+    DeviceNotFoundError(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for PushNotifyError<'_> {
@@ -80,8 +74,7 @@ impl core::fmt::Display for PushNotifyError<'_> {
     }
 }
 
-/// Response type for
-///win.tomo-x.pushat.pushNotify
+/// Response type for win.tomo-x.pushat.pushNotify
 pub struct PushNotifyResponse;
 impl jacquard_common::xrpc::XrpcResp for PushNotifyResponse {
     const NSID: &'static str = "win.tomo-x.pushat.pushNotify";
@@ -98,8 +91,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PushNotify<'a> {
     type Response = PushNotifyResponse;
 }
 
-/// Endpoint type for
-///win.tomo-x.pushat.pushNotify
+/// Endpoint type for win.tomo-x.pushat.pushNotify
 pub struct PushNotifyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PushNotifyRequest {
     const PATH: &'static str = "/xrpc/win.tomo-x.pushat.pushNotify";
@@ -120,48 +112,45 @@ pub mod push_notify_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Target;
         type Body;
+        type Target;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Target = Unset;
         type Body = Unset;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTarget<S> {}
-    impl<S: State> State for SetTarget<S> {
-        type Target = Set<members::target>;
-        type Body = S::Body;
+        type Target = Unset;
     }
     ///State transition - sets the `body` field to Set
     pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBody<S> {}
     impl<S: State> State for SetBody<S> {
-        type Target = S::Target;
         type Body = Set<members::body>;
+        type Target = S::Target;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTarget<S> {}
+    impl<S: State> State for SetTarget<S> {
+        type Body = S::Body;
+        type Target = Set<members::target>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `target` field
-        pub struct target(());
         ///Marker type for the `body` field
         pub struct body(());
+        ///Marker type for the `target` field
+        pub struct target(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PushNotifyBuilder<'a, S: push_notify_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::win_tomo_x::pushat::NotifyBody<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<NotifyBody<'a>>, Option<Did<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> PushNotify<'a> {
@@ -175,9 +164,9 @@ impl<'a> PushNotifyBuilder<'a, push_notify_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PushNotifyBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -190,13 +179,13 @@ where
     /// Set the `body` field (required)
     pub fn body(
         mut self,
-        value: impl Into<crate::win_tomo_x::pushat::NotifyBody<'a>>,
+        value: impl Into<NotifyBody<'a>>,
     ) -> PushNotifyBuilder<'a, push_notify_state::SetBody<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PushNotifyBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -209,13 +198,13 @@ where
     /// Set the `target` field (required)
     pub fn target(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> PushNotifyBuilder<'a, push_notify_state::SetTarget<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         PushNotifyBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -223,8 +212,8 @@ where
 impl<'a, S> PushNotifyBuilder<'a, S>
 where
     S: push_notify_state::State,
-    S::Target: push_notify_state::IsSet,
     S::Body: push_notify_state::IsSet,
+    S::Target: push_notify_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PushNotify<'a> {
@@ -237,7 +226,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -5,52 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::shout::ShoutView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveShoutParams<'a> {
     #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
+    pub id: CowStr<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveShoutOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::shout::ShoutView<'a>,
+    pub value: ShoutView<'a>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct RemoveShout;
-/// Response type for
-///app.rocksky.shout.removeShout
+/// Response type for app.rocksky.shout.removeShout
 pub struct RemoveShoutResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveShoutResponse {
     const NSID: &'static str = "app.rocksky.shout.removeShout";
@@ -67,8 +49,7 @@ impl jacquard_common::xrpc::XrpcRequest for RemoveShout {
     type Response = RemoveShoutResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.shout.removeShout
+/// Endpoint type for app.rocksky.shout.removeShout
 pub struct RemoveShoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveShoutRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.removeShout";
@@ -113,9 +94,9 @@ pub mod remove_shout_params_state {
 
 /// Builder for constructing an instance of this type
 pub struct RemoveShoutParamsBuilder<'a, S: remove_shout_params_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> RemoveShoutParams<'a> {
@@ -129,9 +110,9 @@ impl<'a> RemoveShoutParamsBuilder<'a, remove_shout_params_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RemoveShoutParamsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -144,13 +125,13 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RemoveShoutParamsBuilder<'a, remove_shout_params_state::SetId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         RemoveShoutParamsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

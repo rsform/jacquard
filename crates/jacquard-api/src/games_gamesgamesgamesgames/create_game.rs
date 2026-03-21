@@ -5,128 +5,110 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::AgeRating;
+use crate::games_gamesgamesgamesgames::AlternativeName;
+use crate::games_gamesgamesgamesgames::ApplicationType;
+use crate::games_gamesgamesgamesgames::ExternalVideo;
+use crate::games_gamesgamesgamesgames::Genre;
+use crate::games_gamesgamesgamesgames::LanguageSupport;
+use crate::games_gamesgamesgamesgames::MediaItem;
+use crate::games_gamesgamesgamesgames::Mode;
+use crate::games_gamesgamesgamesgames::MultiplayerMode;
+use crate::games_gamesgamesgamesgames::PlayerPerspective;
+use crate::games_gamesgamesgamesgames::Release;
+use crate::games_gamesgamesgamesgames::Theme;
+use crate::games_gamesgamesgamesgames::TimeToBeat;
+use crate::games_gamesgamesgamesgames::Website;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateGame<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub age_ratings: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub age_ratings: Option<Vec<AgeRating<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub alternative_names: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub alternative_names: Option<Vec<AlternativeName<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub application_type: core::option::Option<
-        crate::games_gamesgamesgamesgames::ApplicationType<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub application_type: Option<ApplicationType<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub engines: core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub engines: Option<Vec<AtUri<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub genres: core::option::Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub genres: Option<Vec<Genre<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub keywords: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub keywords: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub language_supports: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub language_supports: Option<Vec<LanguageSupport<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub media: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub media: Option<Vec<MediaItem<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub modes: core::option::Option<Vec<crate::games_gamesgamesgamesgames::Mode<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub modes: Option<Vec<Mode<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub multiplayer_modes: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>,
-    >,
+    pub multiplayer_modes: Option<Vec<MultiplayerMode<'a>>>,
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub name: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub parent: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub parent: Option<AtUri<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub player_perspectives: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub player_perspectives: Option<Vec<PlayerPerspective<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub releases: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::Release<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub should_publish: core::option::Option<bool>,
+    pub releases: Option<Vec<Release<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub should_publish: Option<bool>,
     ///URL-friendly identifier for the game.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub slug: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub slug: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub storyline: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub storyline: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub summary: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub summary: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub themes: core::option::Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub themes: Option<Vec<Theme<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub time_to_beat: core::option::Option<
-        crate::games_gamesgamesgamesgames::TimeToBeat<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub time_to_beat: Option<TimeToBeat<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub videos: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub videos: Option<Vec<ExternalVideo<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub websites: core::option::Option<
-        Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
-    >,
+    pub websites: Option<Vec<Website<'a>>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateGameOutput<'a> {
     #[serde(borrow)]
-    pub cid: jacquard_common::CowStr<'a>,
+    pub cid: CowStr<'a>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-/// Response type for
-///games.gamesgamesgamesgames.createGame
+/// Response type for games.gamesgamesgamesgames.createGame
 pub struct CreateGameResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateGameResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.createGame";
@@ -143,8 +125,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateGame<'a> {
     type Response = CreateGameResponse;
 }
 
-/// Endpoint type for
-///games.gamesgamesgamesgames.createGame
+/// Endpoint type for games.gamesgamesgamesgames.createGame
 pub struct CreateGameRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateGameRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.createGame";

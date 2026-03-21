@@ -5,60 +5,72 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::label::SelfLabels;
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::org_okazu_diary::material::Tag;
 /// A diary entry to record a self-gratification activity.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Entry<'a> {
     ///User-defined date and time associated with the activity, typically the datetime of the climax of the activity or simply of the record creation. The string format must satisfy all the requirements of the `datetime` format from the Lexicon language, except the requirement of whole seconds precision, but the datetime must at least specify up to the day (e.g. valid: `4545-07-21Z`, `1919-04-05T04:05+09:00`, invalid: `1919Z`). This is a subset of ISO 8601-1:2019 datetime format, but not RFC 3339 (whose time format requires whole seconds precision).
     #[serde(borrow)]
-    pub datetime: jacquard_common::CowStr<'a>,
-    ///If `true`, indicates that there may have been unrecorded activities since the last entry, so that the data in the meantime are not reliable for statistical purposes. Defaults to `false`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub datetime: CowStr<'a>,
+    ///If `true`, indicates that there may have been unrecorded activities since the last entry, so that the data in the meantime are not reliable for statistical purposes.  Defaults to `false`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_entry_had_hiatus")]
-    pub had_hiatus: core::option::Option<bool>,
+    pub had_hiatus: Option<bool>,
     ///Self-label values for this post. Effectively content warnings for the note and tags.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub labels: core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: Option<SelfLabels<'a>>,
     ///Remarks on the activity.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub note: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub note: Option<CowStr<'a>>,
     ///References to `org.okazu-diary.material.external` records associated with the activity. Leave the array empty if it is known that there is no applicable material. Omit the property if the materials are uncertain. Although this property uses a `strongRef` to make a reference to an external repository reliable to some extent, it is recommended that you copy the record to your own repository if you want to reference a record from another repository.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subjects: core::option::Option<
-        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    >,
+    pub subjects: Option<Vec<StrongRef<'a>>>,
     ///User-specified tags for the activity.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tags: core::option::Option<Vec<crate::org_okazu_diary::material::Tag<'a>>>,
+    pub tags: Option<Vec<Tag<'a>>>,
     ///Reference to another `org.okazu-diary.feed.entry` record or an `org.okazu-diary.material.collectionItem` record from this entry is derived.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub via: core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub via: Option<StrongRef<'a>>,
     ///Indicates the intended audience of the entry. A `public` entry (default) is fully public. An `unlisted` entry should not be listed in public profile feeds.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub visibility: core::option::Option<EntryVisibility<'a>>,
+    pub visibility: Option<EntryVisibility<'a>>,
 }
 
 /// Indicates the intended audience of the entry. A `public` entry (default) is fully public. An `unlisted` entry should not be listed in public profile feeds.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EntryVisibility<'a> {
     Public,
     Unlisted,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> EntryVisibility<'a> {
@@ -76,7 +88,7 @@ impl<'a> From<&'a str> for EntryVisibility<'a> {
         match s {
             "public" => Self::Public,
             "unlisted" => Self::Unlisted,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -86,7 +98,7 @@ impl<'a> From<String> for EntryVisibility<'a> {
         match s.as_str() {
             "public" => Self::Public,
             "unlisted" => Self::Unlisted,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -143,47 +155,36 @@ impl jacquard_common::IntoStatic for EntryVisibility<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct EntryGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Entry<'a>,
 }
 
 impl<'a> Entry<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, EntryRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, EntryRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EntryRecord;
-impl jacquard_common::xrpc::XrpcResp for EntryRecord {
+impl XrpcResp for EntryRecord {
     const NSID: &'static str = "org.okazu-diary.feed.entry";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = EntryGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<EntryGetRecordOutput<'_>> for Entry<'_> {
@@ -193,36 +194,32 @@ impl From<EntryGetRecordOutput<'_>> for Entry<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Entry<'_> {
+impl Collection for Entry<'_> {
     const NSID: &'static str = "org.okazu-diary.feed.entry";
     type Record = EntryRecord;
 }
 
-impl jacquard_common::types::collection::Collection for EntryRecord {
+impl Collection for EntryRecord {
     const NSID: &'static str = "org.okazu-diary.feed.entry";
     type Record = EntryRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
+impl<'a> LexiconSchema for Entry<'a> {
     fn nsid() -> &'static str {
         "org.okazu-diary.feed.entry"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_okazu_diary_feed_entry()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.note {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "note",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("note"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -230,16 +227,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
         }
         if let Some(ref value) = self.note {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "note",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("note"),
                         max: 500usize,
                         actual: count,
                     });
@@ -249,10 +240,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
         if let Some(ref value) = self.subjects {
             #[allow(unused_comparisons)]
             if value.len() > 16usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "subjects",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("subjects"),
                     max: 16usize,
                     actual: value.len(),
                 });
@@ -261,10 +250,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
         if let Some(ref value) = self.tags {
             #[allow(unused_comparisons)]
             if value.len() > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("tags"),
                     max: 64usize,
                     actual: value.len(),
                 });
@@ -274,7 +261,7 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
     }
 }
 
-fn _default_entry_had_hiatus() -> core::option::Option<bool> {
+fn _default_entry_had_hiatus() -> Option<bool> {
     Some(false)
 }
 
@@ -312,18 +299,18 @@ pub mod entry_state {
 
 /// Builder for constructing an instance of this type
 pub struct EntryBuilder<'a, S: entry_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        ::core::option::Option<Vec<crate::org_okazu_diary::material::Tag<'a>>>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<EntryVisibility<'a>>,
+        Option<CowStr<'a>>,
+        Option<bool>,
+        Option<SelfLabels<'a>>,
+        Option<CowStr<'a>>,
+        Option<Vec<StrongRef<'a>>>,
+        Option<Vec<Tag<'a>>>,
+        Option<StrongRef<'a>>,
+        Option<EntryVisibility<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Entry<'a> {
@@ -337,9 +324,9 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -352,13 +339,13 @@ where
     /// Set the `datetime` field (required)
     pub fn datetime(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> EntryBuilder<'a, entry_state::SetDatetime<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -378,18 +365,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(
-        mut self,
-        value: impl Into<Option<crate::com_atproto::label::SelfLabels<'a>>>,
-    ) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(
-        mut self,
-        value: Option<crate::com_atproto::label::SelfLabels<'a>>,
-    ) -> Self {
+    pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -397,15 +378,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
-    pub fn maybe_note(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -413,20 +391,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `subjects` field (optional)
-    pub fn subjects(
-        mut self,
-        value: impl Into<
-            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        >,
-    ) -> Self {
+    pub fn subjects(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `subjects` field to an Option value (optional)
-    pub fn maybe_subjects(
-        mut self,
-        value: Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> Self {
+    pub fn maybe_subjects(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -434,18 +404,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<crate::org_okazu_diary::material::Tag<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<Tag<'a>>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<crate::org_okazu_diary::material::Tag<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<Tag<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -453,18 +417,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `via` field (optional)
-    pub fn via(
-        mut self,
-        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> Self {
+    pub fn via(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `via` field to an Option value (optional)
-    pub fn maybe_via(
-        mut self,
-        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ) -> Self {
+    pub fn maybe_via(mut self, value: Option<StrongRef<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -505,7 +463,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -524,182 +482,131 @@ where
     }
 }
 
-fn lexicon_doc_org_okazu_diary_feed_entry() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.okazu-diary.feed.entry"),
-        revision: None,
-        description: None,
+fn lexicon_doc_org_okazu_diary_feed_entry() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("org.okazu-diary.feed.entry"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A diary entry to record a self-gratification activity.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("datetime")
-                            ],
-                        ),
-                        nullable: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
+                        required: Some(vec![SmolStr::new_static("datetime")]),
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "datetime",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("datetime"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "User-defined date and time associated with the activity, typically the datetime of the climax of the activity or simply of the record creation. The string format must satisfy all the requirements of the `datetime` format from the Lexicon language, except the requirement of whole seconds precision, but the datetime must at least specify up to the day (e.g. valid: `4545-07-21Z`, `1919-04-05T04:05+09:00`, invalid: `1919Z`). This is a subset of ISO 8601-1:2019 datetime format, but not RFC 3339 (whose time format requires whole seconds precision).",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "hadHiatus",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
+                                SmolStr::new_static("hadHiatus"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "labels",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                SmolStr::new_static("labels"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Self-label values for this post. Effectively content warnings for the note and tags.",
                                         ),
                                     ),
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("com.atproto.label.defs#selfLabels")
+                                        CowStr::new_static("com.atproto.label.defs#selfLabels")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "note",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("note"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Remarks on the activity.",
-                                        ),
+                                        CowStr::new_static("Remarks on the activity."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(5000usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(500usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "subjects",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("subjects"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "References to `org.okazu-diary.material.external` records associated with the activity. Leave the array empty if it is known that there is no applicable material. Omit the property if the materials are uncertain. Although this property uses a `strongRef` to make a reference to an external repository reliable to some extent, it is recommended that you copy the record to your own repository if you want to reference a record from another repository.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "com.atproto.repo.strongRef",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(16usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "tags",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("tags"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "User-specified tags for the activity.",
-                                        ),
+                                        CowStr::new_static("User-specified tags for the activity."),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static(
                                             "org.okazu-diary.material.defs#tag",
                                         ),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(64usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "via",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "com.atproto.repo.strongRef",
-                                    ),
+                                SmolStr::new_static("via"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "visibility",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("visibility"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Indicates the intended audience of the entry. A `public` entry (default) is fully public. An `unlisted` entry should not be listed in public profile feeds.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

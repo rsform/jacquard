@@ -5,68 +5,58 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{AtUri, Datetime};
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPost<'a> {
     ///If the specified uri is password-protected, please provide the password. If no password is specified, the non-protected content will be returned.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub password: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub password: Option<CowStr<'a>>,
     ///Skyblur post at-uri. It shoud be uk.skyblur.post collection.
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub additional: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub additional: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub encrypt_cid: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub encrypt_cid: Option<CowStr<'a>>,
     ///Error code for restricted content. e.g. AuthRequired, NotFollower, NotFollowing, NotMutual
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub error_code: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub error_code: Option<CowStr<'a>>,
     ///Description of the error code.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub error_description: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub error_description: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub text: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub visibility: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub visibility: Option<CowStr<'a>>,
 }
 
-/// Response type for
-///uk.skyblur.post.getPost
+/// Response type for uk.skyblur.post.getPost
 pub struct GetPostResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPostResponse {
     const NSID: &'static str = "uk.skyblur.post.getPost";
@@ -83,8 +73,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPost<'a> {
     type Response = GetPostResponse;
 }
 
-/// Endpoint type for
-///uk.skyblur.post.getPost
+/// Endpoint type for uk.skyblur.post.getPost
 pub struct GetPostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostRequest {
     const PATH: &'static str = "/xrpc/uk.skyblur.post.getPost";
@@ -129,12 +118,9 @@ pub mod get_post_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetPostBuilder<'a, S: get_post_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetPost<'a> {
@@ -148,24 +134,21 @@ impl<'a> GetPostBuilder<'a, get_post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_post_state::State> GetPostBuilder<'a, S> {
     /// Set the `password` field (optional)
-    pub fn password(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn password(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `password` field to an Option value (optional)
-    pub fn maybe_password(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_password(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -179,13 +162,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetPostBuilder<'a, get_post_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -206,7 +189,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

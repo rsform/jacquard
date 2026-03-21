@@ -5,104 +5,105 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::deps::bytes::Bytes;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::io_sound::credit::Credit;
+use crate::io_sound::sequence;
 /// A sequence of timed events. Full documentation at https://github.com/soundio/sequence/.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Sequence<'a> {
     ///Strong reference to a Bluesky post. Useful to keep track of comments off-platform.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub bsky_post_ref: core::option::Option<
-        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    >,
+    pub bsky_post_ref: Option<StrongRef<'a>>,
     ///Attribution for composers, arrangers, etc
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub credits: core::option::Option<Vec<crate::io_sound::credit::Credit<'a>>>,
+    pub credits: Option<Vec<Credit<'a>>>,
     ///Serialised and binary encoded array of events of the form `[beat, type, data...]`, where `data` parameters depend on `type` and the byte layout of the serialised data conforms to the Sequence spec at https://github.com/soundio/sequence.
     #[serde(with = "jacquard_common::serde_bytes_helper")]
-    pub events: jacquard_common::deps::bytes::Bytes,
+    pub events: Bytes,
     ///Identifies this sequence for playback by a "sequence" event.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub id: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<i64>,
     ///Name of the sequence
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: Option<CowStr<'a>>,
     ///Timestamp of the time of publication.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub published_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub published_at: Option<Datetime>,
     ///A collection of sequences that may be played back by "sequence" events.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sequences: core::option::Option<Vec<crate::io_sound::sequence::Sequence<'a>>>,
+    pub sequences: Option<Vec<sequence::Sequence<'a>>>,
     ///Array of strings used to tag the sequence.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: Option<Vec<CowStr<'a>>>,
     ///Timestamp of the time of last edit.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<Datetime>,
     ///Canonical location of this sequence. May be an `at://` URI or an `https://` URL to a JSON endpoint.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub url: Option<UriValue<'a>>,
     ///Version number for the byte array encoding of the events field.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub version: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version: Option<i64>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SequenceGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Sequence<'a>,
 }
 
 impl<'a> Sequence<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SequenceRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, SequenceRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SequenceRecord;
-impl jacquard_common::xrpc::XrpcResp for SequenceRecord {
+impl XrpcResp for SequenceRecord {
     const NSID: &'static str = "io.sound.sequence";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = SequenceGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<SequenceGetRecordOutput<'_>> for Sequence<'_> {
@@ -112,36 +113,32 @@ impl From<SequenceGetRecordOutput<'_>> for Sequence<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Sequence<'_> {
+impl Collection for Sequence<'_> {
     const NSID: &'static str = "io.sound.sequence";
     type Record = SequenceRecord;
 }
 
-impl jacquard_common::types::collection::Collection for SequenceRecord {
+impl Collection for SequenceRecord {
     const NSID: &'static str = "io.sound.sequence";
     type Record = SequenceRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Sequence<'a> {
+impl<'a> LexiconSchema for Sequence<'a> {
     fn nsid() -> &'static str {
         "io.sound.sequence"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_io_sound_sequence()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.credits {
             #[allow(unused_comparisons)]
             if value.len() > 60usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "credits",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("credits"),
                     max: 60usize,
                     actual: value.len(),
                 });
@@ -149,10 +146,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Sequence<'a> {
         }
         if let Some(ref value) = self.id {
             if *value > 65535i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("id"),
                     max: 65535i64,
                     actual: *value,
                 });
@@ -161,10 +156,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Sequence<'a> {
         if let Some(ref value) = self.name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1280usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 1280usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -172,16 +165,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Sequence<'a> {
         }
         if let Some(ref value) = self.name {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 640usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("name"),
                         max: 640usize,
                         actual: count,
                     });
@@ -226,21 +213,21 @@ pub mod sequence_state {
 
 /// Builder for constructing an instance of this type
 pub struct SequenceBuilder<'a, S: sequence_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<Vec<crate::io_sound::credit::Credit<'a>>>,
-        ::core::option::Option<jacquard_common::deps::bytes::Bytes>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<Vec<crate::io_sound::sequence::Sequence<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<i64>,
+        Option<StrongRef<'a>>,
+        Option<Vec<Credit<'a>>>,
+        Option<Bytes>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<Vec<sequence::Sequence<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Datetime>,
+        Option<UriValue<'a>>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Sequence<'a> {
@@ -254,7 +241,7 @@ impl<'a> SequenceBuilder<'a, sequence_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SequenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -268,25 +255,19 @@ impl<'a> SequenceBuilder<'a, sequence_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `bskyPostRef` field (optional)
-    pub fn bsky_post_ref(
-        mut self,
-        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> Self {
+    pub fn bsky_post_ref(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `bskyPostRef` field to an Option value (optional)
-    pub fn maybe_bsky_post_ref(
-        mut self,
-        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ) -> Self {
+    pub fn maybe_bsky_post_ref(mut self, value: Option<StrongRef<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -294,18 +275,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `credits` field (optional)
-    pub fn credits(
-        mut self,
-        value: impl Into<Option<Vec<crate::io_sound::credit::Credit<'a>>>>,
-    ) -> Self {
+    pub fn credits(mut self, value: impl Into<Option<Vec<Credit<'a>>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `credits` field to an Option value (optional)
-    pub fn maybe_credits(
-        mut self,
-        value: Option<Vec<crate::io_sound::credit::Credit<'a>>>,
-    ) -> Self {
+    pub fn maybe_credits(mut self, value: Option<Vec<Credit<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -319,13 +294,13 @@ where
     /// Set the `events` field (required)
     pub fn events(
         mut self,
-        value: impl Into<jacquard_common::deps::bytes::Bytes>,
+        value: impl Into<Bytes>,
     ) -> SequenceBuilder<'a, sequence_state::SetEvents<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         SequenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -345,15 +320,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -361,18 +333,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `publishedAt` field (optional)
-    pub fn published_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `publishedAt` field to an Option value (optional)
-    pub fn maybe_published_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_published_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -382,7 +348,7 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `sequences` field (optional)
     pub fn sequences(
         mut self,
-        value: impl Into<Option<Vec<crate::io_sound::sequence::Sequence<'a>>>>,
+        value: impl Into<Option<Vec<sequence::Sequence<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
@@ -390,7 +356,7 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `sequences` field to an Option value (optional)
     pub fn maybe_sequences(
         mut self,
-        value: Option<Vec<crate::io_sound::sequence::Sequence<'a>>>,
+        value: Option<Vec<sequence::Sequence<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.6 = value;
         self
@@ -399,18 +365,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -418,18 +378,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
-    pub fn updated_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
-    pub fn maybe_updated_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -437,18 +391,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -492,7 +440,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -514,243 +462,156 @@ where
     }
 }
 
-fn lexicon_doc_io_sound_sequence() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("io.sound.sequence"),
-        revision: None,
-        description: None,
+fn lexicon_doc_io_sound_sequence() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("io.sound.sequence"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A sequence of timed events. Full documentation at https://github.com/soundio/sequence/.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("events")
-                            ],
-                        ),
-                        nullable: None,
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
+                        required: Some(vec![SmolStr::new_static("events")]),
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "bskyPostRef",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "com.atproto.repo.strongRef",
-                                    ),
+                                SmolStr::new_static("bskyPostRef"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "credits",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("credits"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Attribution for composers, arrangers, etc",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "io.sound.credit",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("io.sound.credit"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(60usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "events",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
-                                    description: None,
+                                SmolStr::new_static("events"),
+                                LexObjectProperty::Bytes(LexBytes {
                                     max_length: Some(524288usize),
-                                    min_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "id",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
+                                SmolStr::new_static("id"),
+                                LexObjectProperty::Integer(LexInteger {
                                     maximum: Some(65535i64),
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("name"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Name of the sequence",
-                                        ),
+                                        CowStr::new_static("Name of the sequence"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(1280usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(640usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "publishedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("publishedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Timestamp of the time of publication.",
-                                        ),
+                                        CowStr::new_static("Timestamp of the time of publication."),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sequences",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("sequences"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "A collection of sequences that may be played back by \"sequence\" events.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "io.sound.sequence",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("io.sound.sequence"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "tags",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("tags"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Array of strings used to tag the sequence.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
+                                    items: LexArrayItem::String(LexString {
                                         max_length: Some(1280usize),
-                                        min_graphemes: None,
                                         max_graphemes: Some(128usize),
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "updatedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("updatedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Timestamp of the time of last edit.",
-                                        ),
+                                        CowStr::new_static("Timestamp of the time of last edit."),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "url",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("url"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Canonical location of this sequence. May be an `at://` URI or an `https://` URL to a JSON endpoint.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Uri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "version",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("version"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

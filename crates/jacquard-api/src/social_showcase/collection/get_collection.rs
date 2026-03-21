@@ -5,40 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::social_showcase::CollectionView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetCollection<'a> {
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetCollectionOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::social_showcase::CollectionView<'a>,
+    pub value: CollectionView<'a>,
 }
 
-/// Response type for
-///social.showcase.collection.getCollection
+/// Response type for social.showcase.collection.getCollection
 pub struct GetCollectionResponse;
 impl jacquard_common::xrpc::XrpcResp for GetCollectionResponse {
     const NSID: &'static str = "social.showcase.collection.getCollection";
@@ -53,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetCollection<'a> {
     type Response = GetCollectionResponse;
 }
 
-/// Endpoint type for
-///social.showcase.collection.getCollection
+/// Endpoint type for social.showcase.collection.getCollection
 pub struct GetCollectionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetCollectionRequest {
     const PATH: &'static str = "/xrpc/social.showcase.collection.getCollection";
@@ -97,11 +86,9 @@ pub mod get_collection_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetCollectionBuilder<'a, S: get_collection_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetCollection<'a> {
@@ -115,9 +102,9 @@ impl<'a> GetCollectionBuilder<'a, get_collection_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetCollectionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -130,13 +117,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetCollectionBuilder<'a, get_collection_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetCollectionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

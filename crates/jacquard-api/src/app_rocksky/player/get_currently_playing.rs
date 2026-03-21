@@ -5,44 +5,35 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::player::CurrentlyPlayingViewDetailed;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetCurrentlyPlaying<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub actor: core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub actor: Option<AtIdentifier<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub player_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub player_id: Option<CowStr<'a>>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetCurrentlyPlayingOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::player::CurrentlyPlayingViewDetailed<'a>,
+    pub value: CurrentlyPlayingViewDetailed<'a>,
 }
 
-/// Response type for
-///app.rocksky.player.getCurrentlyPlaying
+/// Response type for app.rocksky.player.getCurrentlyPlaying
 pub struct GetCurrentlyPlayingResponse;
 impl jacquard_common::xrpc::XrpcResp for GetCurrentlyPlayingResponse {
     const NSID: &'static str = "app.rocksky.player.getCurrentlyPlaying";
@@ -57,8 +48,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetCurrentlyPlaying<'a> {
     type Response = GetCurrentlyPlayingResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.player.getCurrentlyPlaying
+/// Endpoint type for app.rocksky.player.getCurrentlyPlaying
 pub struct GetCurrentlyPlayingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetCurrentlyPlayingRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.player.getCurrentlyPlaying";
@@ -88,12 +78,9 @@ pub mod get_currently_playing_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetCurrentlyPlayingBuilder<'a, S: get_currently_playing_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetCurrentlyPlaying<'a> {
@@ -107,27 +94,21 @@ impl<'a> GetCurrentlyPlayingBuilder<'a, get_currently_playing_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetCurrentlyPlayingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S> {
     /// Set the `actor` field (optional)
-    pub fn actor(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::ident::AtIdentifier<'a>>>,
-    ) -> Self {
+    pub fn actor(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `actor` field to an Option value (optional)
-    pub fn maybe_actor(
-        mut self,
-        value: Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ) -> Self {
+    pub fn maybe_actor(mut self, value: Option<AtIdentifier<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -135,18 +116,12 @@ impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S
 
 impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S> {
     /// Set the `playerId` field (optional)
-    pub fn player_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn player_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `playerId` field to an Option value (optional)
-    pub fn maybe_player_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_player_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }

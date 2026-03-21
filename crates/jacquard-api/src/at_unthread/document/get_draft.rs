@@ -5,55 +5,48 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+use crate::at_unthread::document::put_draft::DraftView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetDraft<'a> {
     #[serde(borrow)]
-    pub tid: jacquard_common::CowStr<'a>,
+    pub tid: CowStr<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetDraftOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::at_unthread::document::put_draft::DraftView<'a>,
+    pub value: DraftView<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetDraftError<'a> {
     #[serde(rename = "DraftNotFound")]
-    DraftNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    DraftNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetDraftError<'_> {
@@ -71,8 +64,7 @@ impl core::fmt::Display for GetDraftError<'_> {
     }
 }
 
-/// Response type for
-///at.unthread.document.getDraft
+/// Response type for at.unthread.document.getDraft
 pub struct GetDraftResponse;
 impl jacquard_common::xrpc::XrpcResp for GetDraftResponse {
     const NSID: &'static str = "at.unthread.document.getDraft";
@@ -87,8 +79,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetDraft<'a> {
     type Response = GetDraftResponse;
 }
 
-/// Endpoint type for
-///at.unthread.document.getDraft
+/// Endpoint type for at.unthread.document.getDraft
 pub struct GetDraftRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetDraftRequest {
     const PATH: &'static str = "/xrpc/at.unthread.document.getDraft";
@@ -131,9 +122,9 @@ pub mod get_draft_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetDraftBuilder<'a, S: get_draft_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetDraft<'a> {
@@ -147,9 +138,9 @@ impl<'a> GetDraftBuilder<'a, get_draft_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetDraftBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -162,13 +153,13 @@ where
     /// Set the `tid` field (required)
     pub fn tid(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetDraftBuilder<'a, get_draft_state::SetTid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetDraftBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

@@ -7,17 +7,12 @@
 
 pub mod create_report;
 
+use jacquard_common::CowStr;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 /// Appeal a previously taken moderation action
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonAppeal;
 impl core::fmt::Display for ReasonAppeal {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -26,16 +21,8 @@ impl core::fmt::Display for ReasonAppeal {
 }
 
 /// Misleading identity, affiliation, or content. Prefer new lexicon definition `tools.ozone.report.defs#reasonMisleadingOther`.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonMisleading;
 impl core::fmt::Display for ReasonMisleading {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -44,16 +31,8 @@ impl core::fmt::Display for ReasonMisleading {
 }
 
 /// Reports not falling under another report category. Prefer new lexicon definition `tools.ozone.report.defs#reasonOther`.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonOther;
 impl core::fmt::Display for ReasonOther {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -62,16 +41,8 @@ impl core::fmt::Display for ReasonOther {
 }
 
 /// Rude, harassing, explicit, or otherwise unwelcoming behavior. Prefer new lexicon definition `tools.ozone.report.defs#reasonHarassmentOther`.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonRude;
 impl core::fmt::Display for ReasonRude {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -80,16 +51,8 @@ impl core::fmt::Display for ReasonRude {
 }
 
 /// Unwanted or mislabeled sexual content. Prefer new lexicon definition `tools.ozone.report.defs#reasonSexualUnlabeled`.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonSexual;
 impl core::fmt::Display for ReasonSexual {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -98,22 +61,15 @@ impl core::fmt::Display for ReasonSexual {
 }
 
 /// Spam: frequent unwanted promotion, replies, mentions. Prefer new lexicon definition `tools.ozone.report.defs#reasonMisleadingSpam`.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonSpam;
 impl core::fmt::Display for ReasonSpam {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonSpam")
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReasonType<'a> {
@@ -164,7 +120,7 @@ pub enum ReasonType<'a> {
     ToolsOzoneReportDefsReasonSelfHarmStunts,
     ToolsOzoneReportDefsReasonSelfHarmSubstances,
     ToolsOzoneReportDefsReasonSelfHarmOther,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ReasonType<'a> {
@@ -460,7 +416,7 @@ impl<'a> From<&'a str> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonSelfHarmOther" => {
                 Self::ToolsOzoneReportDefsReasonSelfHarmOther
             }
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -609,7 +565,7 @@ impl<'a> From<String> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonSelfHarmOther" => {
                 Self::ToolsOzoneReportDefsReasonSelfHarmOther
             }
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -799,16 +755,8 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
 }
 
 /// Direct violation of server rules, laws, terms of service. Prefer new lexicon definition `tools.ozone.report.defs#reasonRuleOther`.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonViolation;
 impl core::fmt::Display for ReasonViolation {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -817,12 +765,13 @@ impl core::fmt::Display for ReasonViolation {
 }
 
 /// Tag describing a type of subject that might be reported.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SubjectType<'a> {
     Account,
     Record,
     Chat,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> SubjectType<'a> {
@@ -842,7 +791,7 @@ impl<'a> From<&'a str> for SubjectType<'a> {
             "account" => Self::Account,
             "record" => Self::Record,
             "chat" => Self::Chat,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -853,7 +802,7 @@ impl<'a> From<String> for SubjectType<'a> {
             "account" => Self::Account,
             "record" => Self::Record,
             "chat" => Self::Chat,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }

@@ -5,91 +5,70 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::admin::RepoBlobRef;
+use crate::com_atproto::admin::RepoRef;
+use crate::com_atproto::admin::StatusAttr;
+use crate::com_atproto::repo::strong_ref::StrongRef;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateSubjectStatus<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub deactivated: core::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    pub deactivated: Option<StatusAttr<'a>>,
     #[serde(borrow)]
     pub subject: UpdateSubjectStatusSubject<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub takedown: core::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    pub takedown: Option<StatusAttr<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UpdateSubjectStatusSubject<'a> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
-    RepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
+    RepoRef(Box<RepoRef<'a>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
-    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
+    StrongRef(Box<StrongRef<'a>>),
     #[serde(rename = "com.atproto.admin.defs#repoBlobRef")]
-    RepoBlobRef(Box<crate::com_atproto::admin::RepoBlobRef<'a>>),
+    RepoBlobRef(Box<RepoBlobRef<'a>>),
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateSubjectStatusOutput<'a> {
     #[serde(borrow)]
     pub subject: UpdateSubjectStatusOutputSubject<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub takedown: core::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    pub takedown: Option<StatusAttr<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UpdateSubjectStatusOutputSubject<'a> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
-    RepoRef(Box<crate::com_atproto::admin::RepoRef<'a>>),
+    RepoRef(Box<RepoRef<'a>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
-    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
+    StrongRef(Box<StrongRef<'a>>),
     #[serde(rename = "com.atproto.admin.defs#repoBlobRef")]
-    RepoBlobRef(Box<crate::com_atproto::admin::RepoBlobRef<'a>>),
+    RepoBlobRef(Box<RepoBlobRef<'a>>),
 }
 
-/// Response type for
-///com.atproto.admin.updateSubjectStatus
+/// Response type for com.atproto.admin.updateSubjectStatus
 pub struct UpdateSubjectStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateSubjectStatusResponse {
     const NSID: &'static str = "com.atproto.admin.updateSubjectStatus";
@@ -106,8 +85,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateSubjectStatus<'a> {
     type Response = UpdateSubjectStatusResponse;
 }
 
-/// Endpoint type for
-///com.atproto.admin.updateSubjectStatus
+/// Endpoint type for com.atproto.admin.updateSubjectStatus
 pub struct UpdateSubjectStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateSubjectStatusRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.updateSubjectStatus";
@@ -152,13 +130,13 @@ pub mod update_subject_status_state {
 
 /// Builder for constructing an instance of this type
 pub struct UpdateSubjectStatusBuilder<'a, S: update_subject_status_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
-        ::core::option::Option<UpdateSubjectStatusSubject<'a>>,
-        ::core::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+        Option<StatusAttr<'a>>,
+        Option<UpdateSubjectStatusSubject<'a>>,
+        Option<StatusAttr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateSubjectStatus<'a> {
@@ -172,27 +150,21 @@ impl<'a> UpdateSubjectStatusBuilder<'a, update_subject_status_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateSubjectStatusBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: update_subject_status_state::State> UpdateSubjectStatusBuilder<'a, S> {
     /// Set the `deactivated` field (optional)
-    pub fn deactivated(
-        mut self,
-        value: impl Into<Option<crate::com_atproto::admin::StatusAttr<'a>>>,
-    ) -> Self {
+    pub fn deactivated(mut self, value: impl Into<Option<StatusAttr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `deactivated` field to an Option value (optional)
-    pub fn maybe_deactivated(
-        mut self,
-        value: Option<crate::com_atproto::admin::StatusAttr<'a>>,
-    ) -> Self {
+    pub fn maybe_deactivated(mut self, value: Option<StatusAttr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -208,29 +180,23 @@ where
         mut self,
         value: impl Into<UpdateSubjectStatusSubject<'a>>,
     ) -> UpdateSubjectStatusBuilder<'a, update_subject_status_state::SetSubject<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         UpdateSubjectStatusBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: update_subject_status_state::State> UpdateSubjectStatusBuilder<'a, S> {
     /// Set the `takedown` field (optional)
-    pub fn takedown(
-        mut self,
-        value: impl Into<Option<crate::com_atproto::admin::StatusAttr<'a>>>,
-    ) -> Self {
+    pub fn takedown(mut self, value: impl Into<Option<StatusAttr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `takedown` field to an Option value (optional)
-    pub fn maybe_takedown(
-        mut self,
-        value: Option<crate::com_atproto::admin::StatusAttr<'a>>,
-    ) -> Self {
+    pub fn maybe_takedown(mut self, value: Option<StatusAttr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -253,7 +219,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -5,74 +5,68 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateBlock<'a> {
     ///Optional reason for the block.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub reason: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub reason: Option<CowStr<'a>>,
     ///The DID of the streamer whose chat this block applies to.
     #[serde(borrow)]
-    pub streamer: jacquard_common::types::string::Did<'a>,
+    pub streamer: Did<'a>,
     ///The DID of the user being blocked from chat.
     #[serde(borrow)]
-    pub subject: jacquard_common::types::string::Did<'a>,
+    pub subject: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateBlockOutput<'a> {
     ///The CID of the created block record.
     #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub cid: Cid<'a>,
     ///The AT-URI of the created block record.
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateBlockError<'a> {
     /// The request lacks valid authentication credentials.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(core::option::Option<jacquard_common::CowStr<'a>>),
+    Unauthorized(Option<CowStr<'a>>),
     /// The caller does not have permission to create blocks for this streamer.
     #[serde(rename = "Forbidden")]
-    Forbidden(core::option::Option<jacquard_common::CowStr<'a>>),
+    Forbidden(Option<CowStr<'a>>),
     /// The streamer's OAuth session could not be found or is invalid.
     #[serde(rename = "SessionNotFound")]
-    SessionNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    SessionNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for CreateBlockError<'_> {
@@ -104,8 +98,7 @@ impl core::fmt::Display for CreateBlockError<'_> {
     }
 }
 
-/// Response type for
-///place.stream.moderation.createBlock
+/// Response type for place.stream.moderation.createBlock
 pub struct CreateBlockResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateBlockResponse {
     const NSID: &'static str = "place.stream.moderation.createBlock";
@@ -122,8 +115,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateBlock<'a> {
     type Response = CreateBlockResponse;
 }
 
-/// Endpoint type for
-///place.stream.moderation.createBlock
+/// Endpoint type for place.stream.moderation.createBlock
 pub struct CreateBlockRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateBlockRequest {
     const PATH: &'static str = "/xrpc/place.stream.moderation.createBlock";
@@ -144,49 +136,45 @@ pub mod create_block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type Subject;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Streamer = Set<members::streamer>;
-        type Subject = S::Subject;
+        type Streamer = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Streamer = S::Streamer;
         type Subject = Set<members::subject>;
+        type Streamer = S::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type Subject = S::Subject;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CreateBlockBuilder<'a, S: create_block_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<Did<'a>>, Option<Did<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CreateBlock<'a> {
@@ -200,24 +188,21 @@ impl<'a> CreateBlockBuilder<'a, create_block_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateBlockBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: create_block_state::State> CreateBlockBuilder<'a, S> {
     /// Set the `reason` field (optional)
-    pub fn reason(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `reason` field to an Option value (optional)
-    pub fn maybe_reason(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_reason(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -231,13 +216,13 @@ where
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> CreateBlockBuilder<'a, create_block_state::SetStreamer<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CreateBlockBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -250,13 +235,13 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> CreateBlockBuilder<'a, create_block_state::SetSubject<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         CreateBlockBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -264,8 +249,8 @@ where
 impl<'a, S> CreateBlockBuilder<'a, S>
 where
     S: create_block_state::State,
-    S::Streamer: create_block_state::IsSet,
     S::Subject: create_block_state::IsSet,
+    S::Streamer: create_block_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateBlock<'a> {
@@ -279,7 +264,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

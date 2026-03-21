@@ -5,66 +5,48 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
+use crate::com_shinolabs::pinksea::app_view_defs::OekakiTombstone;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetOekaki<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub did: AtIdentifier<'a>,
     #[serde(borrow)]
-    pub rkey: jacquard_common::CowStr<'a>,
+    pub rkey: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetOekakiOutput<'a> {
     #[serde(borrow)]
-    pub children: Vec<crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki<'a>>,
+    pub children: Vec<HydratedOekaki<'a>>,
     #[serde(borrow)]
     pub parent: GetOekakiOutputParent<'a>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetOekakiOutputParent<'a> {
     #[serde(rename = "com.shinolabs.pinksea.appViewDefs#hydratedOekaki")]
-    AppViewDefsHydratedOekaki(
-        Box<crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki<'a>>,
-    ),
+    AppViewDefsHydratedOekaki(Box<HydratedOekaki<'a>>),
     #[serde(rename = "com.shinolabs.pinksea.appViewDefs#oekakiTombstone")]
-    AppViewDefsOekakiTombstone(
-        Box<crate::com_shinolabs::pinksea::app_view_defs::OekakiTombstone<'a>>,
-    ),
+    AppViewDefsOekakiTombstone(Box<OekakiTombstone<'a>>),
 }
 
-/// Response type for
-///com.shinolabs.pinksea.getOekaki
+/// Response type for com.shinolabs.pinksea.getOekaki
 pub struct GetOekakiResponse;
 impl jacquard_common::xrpc::XrpcResp for GetOekakiResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getOekaki";
@@ -79,8 +61,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetOekaki<'a> {
     type Response = GetOekakiResponse;
 }
 
-/// Endpoint type for
-///com.shinolabs.pinksea.getOekaki
+/// Endpoint type for com.shinolabs.pinksea.getOekaki
 pub struct GetOekakiRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetOekakiRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getOekaki";
@@ -135,12 +116,9 @@ pub mod get_oekaki_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetOekakiBuilder<'a, S: get_oekaki_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetOekaki<'a> {
@@ -154,9 +132,9 @@ impl<'a> GetOekakiBuilder<'a, get_oekaki_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetOekakiBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -169,13 +147,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> GetOekakiBuilder<'a, get_oekaki_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetOekakiBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -188,13 +166,13 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetOekakiBuilder<'a, get_oekaki_state::SetRkey<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetOekakiBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

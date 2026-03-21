@@ -5,107 +5,97 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::{Datetime, Language};
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::embed::external::ExternalRecord;
+use crate::app_bsky::embed::images::Images;
+use crate::app_bsky::embed::record::Record;
+use crate::app_bsky::embed::record_with_media::RecordWithMedia;
+use crate::app_bsky::embed::video::Video;
+use crate::app_bsky::feed::threadgate::FollowerRule;
+use crate::app_bsky::feed::threadgate::FollowingRule;
+use crate::app_bsky::feed::threadgate::ListRule;
+use crate::app_bsky::feed::threadgate::MentionRule;
+use crate::app_bsky::richtext::facet::Facet;
+use crate::com_atproto::label::SelfLabels;
+use crate::app_chronosky::schedule::list_posts;
 /// Image embed view with CID references. Similar to app.bsky.embed.images#view but includes cid on each image.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ImageView<'a> {
     ///List of image views with CID references.
     #[serde(borrow)]
-    pub images: Vec<crate::app_chronosky::schedule::list_posts::ImageViewImage<'a>>,
+    pub images: Vec<list_posts::ImageViewImage<'a>>,
 }
 
 /// Image view with CID for referencing in updatePost. Extends app.bsky.embed.images#viewImage with cid field.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ImageViewImage<'a> {
     ///Alt text for the image.
     #[serde(borrow)]
-    pub alt: jacquard_common::CowStr<'a>,
+    pub alt: CowStr<'a>,
     ///CID of the image blob. Use this value with updatePost#imagesEmbed to reference this image without re-uploading.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cid: Option<CowStr<'a>>,
     ///Full-size URL for the image.
     #[serde(borrow)]
-    pub fullsize: jacquard_common::CowStr<'a>,
+    pub fullsize: CowStr<'a>,
     ///Thumbnail URL for the image.
     #[serde(borrow)]
-    pub thumb: jacquard_common::CowStr<'a>,
+    pub thumb: CowStr<'a>,
 }
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListPosts<'a> {
     ///Defaults to `20`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
     ///Defaults to `1`. Min: 1.
     #[serde(default = "_default_page")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub page: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub page: Option<i64>,
     ///(max length: 20)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListPostsOutput<'a> {
     #[serde(borrow)]
-    pub pagination: crate::app_chronosky::schedule::list_posts::Pagination<'a>,
+    pub pagination: list_posts::Pagination<'a>,
     #[serde(borrow)]
-    pub posts: Vec<crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>>,
+    pub posts: Vec<list_posts::ScheduledPost<'a>>,
 }
 
 /// Pagination information.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Pagination<'a> {
     ///Posts per page.
@@ -119,181 +109,152 @@ pub struct Pagination<'a> {
 }
 
 /// Scheduled post object with AT Protocol standard fields.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ScheduledPost<'a> {
     ///AT Protocol record key. Present after successful execution.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub at_rkey: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub at_rkey: Option<CowStr<'a>>,
     ///AT Protocol post URI (at://did:plc:.../app.bsky.feed.post/...). Present after successful execution.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub at_uri: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub at_uri: Option<CowStr<'a>>,
     ///Child posts in thread. Only present for parent posts with children.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub children: core::option::Option<
-        Vec<crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>>,
-    >,
+    pub children: Option<Vec<list_posts::ScheduledPost<'a>>>,
     ///Post creation datetime (ISO 8601).
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///Embedded content such as images, external links, or quoted posts. For image embeds, returned as #imageView with thumb/fullsize URLs and CID references.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub embed: core::option::Option<ScheduledPostEmbed<'a>>,
+    pub embed: Option<ScheduledPostEmbed<'a>>,
     ///Error message if execution failed. Present only when status is FAILED.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub error_msg: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub error_msg: Option<CowStr<'a>>,
     ///Execution completion datetime (ISO 8601). Present only when status is COMPLETED or FAILED.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub executed_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub executed_at: Option<Datetime>,
     ///Rich text facets for mentions, links, and hashtags (app.bsky.richtext.facet).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub facets: core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: Option<Vec<Facet<'a>>>,
     ///Post ID.
     #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
+    pub id: CowStr<'a>,
     ///Self-applied content labels for content warnings (AT Protocol standard).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub labels: core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: Option<SelfLabels<'a>>,
     ///Language codes for post content (app.bsky.feed.post#langs). ISO 639-1 or 639-3 codes.
-    pub langs: Vec<jacquard_common::types::string::Language>,
+    pub langs: Vec<Language>,
     ///Parent post ID for thread posts. Null for root posts.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub parent_post_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub parent_post_id: Option<CowStr<'a>>,
     ///CID for postgate record. Present after successful execution with postgate settings.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub postgate_cid: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub postgate_cid: Option<CowStr<'a>>,
     ///Whether to disable quote posts and embeds for this post (app.bsky.feed.postgate).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub postgate_disable_embedding: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub postgate_disable_embedding: Option<bool>,
     ///AT Protocol URI for postgate record. Present after successful execution with postgate settings.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub postgate_uri: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub postgate_uri: Option<CowStr<'a>>,
     ///Number of execution retry attempts.
     pub retry_count: i64,
     ///Scheduled publication datetime (ISO 8601).
-    pub scheduled_at: jacquard_common::types::string::Datetime,
+    pub scheduled_at: Datetime,
     ///Post status.
     #[serde(borrow)]
-    pub status: jacquard_common::CowStr<'a>,
+    pub status: CowStr<'a>,
     ///Post content text (app.bsky.feed.post#text). May be empty if embeds are present.
     #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
+    pub text: CowStr<'a>,
     ///Thread depth level (0 for root post, 1 for direct reply, etc.).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub thread_depth: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub thread_depth: Option<i64>,
     ///Position in thread (0-indexed). 0 for parent post, 1+ for children.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub thread_position: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub thread_position: Option<i64>,
     ///CID for threadgate record. Present after successful execution with threadgate rules.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub threadgate_cid: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub threadgate_cid: Option<CowStr<'a>>,
     ///Reply restriction rules (app.bsky.feed.threadgate). Defines who can reply to this post.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub threadgate_rules: core::option::Option<
-        Vec<ScheduledPostThreadgateRulesItem<'a>>,
-    >,
+    pub threadgate_rules: Option<Vec<ScheduledPostThreadgateRulesItem<'a>>>,
     ///AT Protocol URI for threadgate record. Present after successful execution with threadgate rules.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub threadgate_uri: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub threadgate_uri: Option<CowStr<'a>>,
     ///Post last update datetime (ISO 8601).
-    pub updated_at: jacquard_common::types::string::Datetime,
+    pub updated_at: Datetime,
     ///User ID who created this post.
     #[serde(borrow)]
-    pub user_id: jacquard_common::CowStr<'a>,
+    pub user_id: CowStr<'a>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ScheduledPostEmbed<'a> {
     #[serde(rename = "app.bsky.embed.images")]
-    Images(Box<crate::app_bsky::embed::images::Images<'a>>),
+    Images(Box<Images<'a>>),
     #[serde(rename = "app.chronosky.schedule.listPosts#imageView")]
-    ImageView(Box<crate::app_chronosky::schedule::list_posts::ImageView<'a>>),
+    ImageView(Box<list_posts::ImageView<'a>>),
     #[serde(rename = "app.bsky.embed.external")]
-    External(Box<crate::app_bsky::embed::external::ExternalRecord<'a>>),
+    External(Box<ExternalRecord<'a>>),
     #[serde(rename = "app.bsky.embed.record")]
-    Record(Box<crate::app_bsky::embed::record::Record<'a>>),
+    Record(Box<Record<'a>>),
     #[serde(rename = "app.bsky.embed.video")]
-    Video(Box<crate::app_bsky::embed::video::Video<'a>>),
+    Video(Box<Video<'a>>),
     #[serde(rename = "app.bsky.embed.recordWithMedia")]
-    RecordWithMedia(Box<crate::app_bsky::embed::record_with_media::RecordWithMedia<'a>>),
+    RecordWithMedia(Box<RecordWithMedia<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ScheduledPostThreadgateRulesItem<'a> {
     #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
-    ThreadgateMentionRule(Box<crate::app_bsky::feed::threadgate::MentionRule<'a>>),
+    ThreadgateMentionRule(Box<MentionRule<'a>>),
     #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
-    ThreadgateFollowerRule(Box<crate::app_bsky::feed::threadgate::FollowerRule<'a>>),
+    ThreadgateFollowerRule(Box<FollowerRule<'a>>),
     #[serde(rename = "app.bsky.feed.threadgate#followingRule")]
-    ThreadgateFollowingRule(Box<crate::app_bsky::feed::threadgate::FollowingRule<'a>>),
+    ThreadgateFollowingRule(Box<FollowingRule<'a>>),
     #[serde(rename = "app.bsky.feed.threadgate#listRule")]
-    ThreadgateListRule(Box<crate::app_bsky::feed::threadgate::ListRule<'a>>),
+    ThreadgateListRule(Box<ListRule<'a>>),
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ImageView<'a> {
+impl<'a> LexiconSchema for ImageView<'a> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.listPosts"
     }
     fn def_name() -> &'static str {
         "imageView"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_chronosky_schedule_listPosts()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.images;
             #[allow(unused_comparisons)]
             if value.len() > 4usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "images",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("images"),
                     max: 4usize,
                     actual: value.len(),
                 });
@@ -303,26 +264,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ImageView<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ImageViewImage<'a> {
+impl<'a> LexiconSchema for ImageViewImage<'a> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.listPosts"
     }
     fn def_name() -> &'static str {
         "imageViewImage"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_chronosky_schedule_listPosts()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.cid {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cid",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("cid"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -332,8 +289,7 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ImageViewImage<'a> {
     }
 }
 
-/// Response type for
-///app.chronosky.schedule.listPosts
+/// Response type for app.chronosky.schedule.listPosts
 pub struct ListPostsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListPostsResponse {
     const NSID: &'static str = "app.chronosky.schedule.listPosts";
@@ -348,8 +304,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListPosts<'a> {
     type Response = ListPostsResponse;
 }
 
-/// Endpoint type for
-///app.chronosky.schedule.listPosts
+/// Endpoint type for app.chronosky.schedule.listPosts
 pub struct ListPostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListPostsRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.schedule.listPosts";
@@ -358,26 +313,22 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListPostsRequest {
     type Response = ListPostsResponse;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Pagination<'a> {
+impl<'a> LexiconSchema for Pagination<'a> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.listPosts"
     }
     fn def_name() -> &'static str {
         "pagination"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_chronosky_schedule_listPosts()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.limit;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "limit",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("limit"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -386,10 +337,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Pagination<'a> {
         {
             let value = &self.page;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "page",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("page"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -398,10 +347,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Pagination<'a> {
         {
             let value = &self.total;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("total"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -410,10 +357,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Pagination<'a> {
         {
             let value = &self.total_pages;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total_pages",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("total_pages"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -423,26 +368,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Pagination<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
+impl<'a> LexiconSchema for ScheduledPost<'a> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.listPosts"
     }
     fn def_name() -> &'static str {
         "scheduledPost"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_chronosky_schedule_listPosts()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.at_rkey {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "at_rkey",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("at_rkey"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -451,10 +392,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
         if let Some(ref value) = self.at_uri {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "at_uri",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("at_uri"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -463,10 +402,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
         if let Some(ref value) = self.error_msg {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "error_msg",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("error_msg"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -476,10 +413,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
             let value = &self.id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("id"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -489,10 +424,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
             let value = &self.langs;
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "langs",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("langs"),
                     max: 3usize,
                     actual: value.len(),
                 });
@@ -501,10 +434,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
         if let Some(ref value) = self.parent_post_id {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "parent_post_id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("parent_post_id"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -513,10 +444,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
         if let Some(ref value) = self.postgate_cid {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "postgate_cid",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("postgate_cid"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -525,10 +454,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
         if let Some(ref value) = self.postgate_uri {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "postgate_uri",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("postgate_uri"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -537,10 +464,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
         {
             let value = &self.retry_count;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "retry_count",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("retry_count"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -550,10 +475,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
             let value = &self.status;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "status",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("status"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -563,10 +486,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
             let value = &self.text;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("text"),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -575,16 +496,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
         {
             let value = &self.text;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "text",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("text"),
                         max: 300usize,
                         actual: count,
                     });
@@ -593,10 +508,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
         }
         if let Some(ref value) = self.thread_depth {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "thread_depth",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("thread_depth"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -604,10 +517,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
         }
         if let Some(ref value) = self.thread_position {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "thread_position",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("thread_position"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -616,10 +527,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
         if let Some(ref value) = self.threadgate_cid {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "threadgate_cid",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("threadgate_cid"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -628,10 +537,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
         if let Some(ref value) = self.threadgate_rules {
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "threadgate_rules",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("threadgate_rules"),
                     max: 5usize,
                     actual: value.len(),
                 });
@@ -640,10 +547,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
         if let Some(ref value) = self.threadgate_uri {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "threadgate_uri",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("threadgate_uri"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -653,10 +558,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledPost<'a> {
             let value = &self.user_id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "user_id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("user_id"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -700,13 +603,9 @@ pub mod image_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct ImageViewBuilder<'a, S: image_view_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<
-            Vec<crate::app_chronosky::schedule::list_posts::ImageViewImage<'a>>,
-        >,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<list_posts::ImageViewImage<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ImageView<'a> {
@@ -720,9 +619,9 @@ impl<'a> ImageViewBuilder<'a, image_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImageViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -735,15 +634,13 @@ where
     /// Set the `images` field (required)
     pub fn images(
         mut self,
-        value: impl Into<
-            Vec<crate::app_chronosky::schedule::list_posts::ImageViewImage<'a>>,
-        >,
+        value: impl Into<Vec<list_posts::ImageViewImage<'a>>>,
     ) -> ImageViewBuilder<'a, image_view_state::SetImages<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ImageViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -763,7 +660,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -775,854 +672,539 @@ where
     }
 }
 
-fn lexicon_doc_app_chronosky_schedule_listPosts() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.chronosky.schedule.listPosts"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_chronosky_schedule_listPosts() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.chronosky.schedule.listPosts"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("imageView"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("imageView"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Image embed view with CID references. Similar to app.bsky.embed.images#view but includes cid on each image.",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("images")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("images")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "images",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("images"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "List of image views with CID references.",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#imageViewImage",
-                                    ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#imageViewImage"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(4usize),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("imageViewImage"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("imageViewImage"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Image view with CID for referencing in updatePost. Extends app.bsky.embed.images#viewImage with cid field.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("thumb"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("fullsize"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("alt")
+                            SmolStr::new_static("thumb"),
+                            SmolStr::new_static("fullsize"), SmolStr::new_static("alt")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "alt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("alt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Alt text for the image.",
-                                    ),
+                                    CowStr::new_static("Alt text for the image."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cid",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("cid"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "CID of the image blob. Use this value with updatePost#imagesEmbed to reference this image without re-uploading.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(200usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "fullsize",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("fullsize"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Full-size URL for the image.",
-                                    ),
+                                    CowStr::new_static("Full-size URL for the image."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "thumb",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("thumb"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Thumbnail URL for the image.",
-                                    ),
+                                    CowStr::new_static("Thumbnail URL for the image."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
-                    description: None,
+                SmolStr::new_static("main"),
+                LexUserType::XrpcQuery(LexXrpcQuery {
                     parameters: Some(
-                        ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
-                            description: None,
-                            required: None,
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::alloc::collections::BTreeMap::new();
+                                let mut map = BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                        "limit",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                        "page",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
+                                    SmolStr::new_static("page"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                        "status",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    SmolStr::new_static("status"),
+                                    LexXrpcParametersProperty::String(LexString {
                                         description: Some(
-                                            ::jacquard_common::CowStr::new_static(
-                                                "Filter by post status.",
-                                            ),
+                                            CowStr::new_static("Filter by post status."),
                                         ),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
                                         max_length: Some(20usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                        ..Default::default()
                                     }),
                                 );
                                 map
                             },
+                            ..Default::default()
                         }),
                     ),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("pagination"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Pagination information."),
-                    ),
+                SmolStr::new_static("pagination"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Pagination information.")),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("page"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("limit"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("total"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("totalPages")
+                            SmolStr::new_static("page"), SmolStr::new_static("limit"),
+                            SmolStr::new_static("total"),
+                            SmolStr::new_static("totalPages")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "limit",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("limit"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "page",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("page"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "total",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("total"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "totalPages",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("totalPages"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("scheduledPost"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("scheduledPost"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Scheduled post object with AT Protocol standard fields.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("userId"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("text"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("scheduledAt"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("status"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("retryCount"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("langs")
+                            SmolStr::new_static("id"), SmolStr::new_static("userId"),
+                            SmolStr::new_static("text"),
+                            SmolStr::new_static("scheduledAt"),
+                            SmolStr::new_static("status"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("updatedAt"),
+                            SmolStr::new_static("retryCount"),
+                            SmolStr::new_static("langs")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "atRkey",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("atRkey"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "AT Protocol record key. Present after successful execution.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "atUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("atUri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "AT Protocol post URI (at://did:plc:.../app.bsky.feed.post/...). Present after successful execution.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "children",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("children"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Child posts in thread. Only present for parent posts with children.",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#scheduledPost",
-                                    ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#scheduledPost"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "createdAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("createdAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Post creation datetime (ISO 8601).",
-                                    ),
+                                    CowStr::new_static("Post creation datetime (ISO 8601)."),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
+                                format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "embed",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                            SmolStr::new_static("embed"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Embedded content such as images, external links, or quoted posts. For image embeds, returned as #imageView with thumb/fullsize URLs and CID references.",
                                     ),
                                 ),
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.images"),
-                                    ::jacquard_common::CowStr::new_static("#imageView"),
-                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.external"),
-                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.record"),
-                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.video"),
-                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.recordWithMedia")
+                                    CowStr::new_static("app.bsky.embed.images"),
+                                    CowStr::new_static("#imageView"),
+                                    CowStr::new_static("app.bsky.embed.external"),
+                                    CowStr::new_static("app.bsky.embed.record"),
+                                    CowStr::new_static("app.bsky.embed.video"),
+                                    CowStr::new_static("app.bsky.embed.recordWithMedia")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "errorMsg",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("errorMsg"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Error message if execution failed. Present only when status is FAILED.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(2000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "executedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("executedAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Execution completion datetime (ISO 8601). Present only when status is COMPLETED or FAILED.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
+                                format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "facets",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("facets"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Rich text facets for mentions, links, and hashtags (app.bsky.richtext.facet).",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "app.bsky.richtext.facet",
-                                    ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("app.bsky.richtext.facet"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Post ID."),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("id"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Post ID.")),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "labels",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("labels"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "com.atproto.label.defs#selfLabels",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "langs",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("langs"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Language codes for post content (app.bsky.feed.post#langs). ISO 639-1 or 639-3 codes.",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Language,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                items: LexArrayItem::String(LexString {
+                                    format: Some(LexStringFormat::Language),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(3usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "parentPostId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("parentPostId"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Parent post ID for thread posts. Null for root posts.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "postgateCid",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("postgateCid"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "CID for postgate record. Present after successful execution with postgate settings.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "postgateDisableEmbedding",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("postgateDisableEmbedding"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "postgateUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("postgateUri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "AT Protocol URI for postgate record. Present after successful execution with postgate settings.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "retryCount",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("retryCount"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "scheduledAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("scheduledAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Scheduled publication datetime (ISO 8601).",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
+                                format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "status",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Post status."),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("status"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Post status.")),
                                 max_length: Some(20usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "text",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("text"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Post content text (app.bsky.feed.post#text). May be empty if embeds are present.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(3000usize),
-                                min_graphemes: None,
                                 max_graphemes: Some(300usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "threadDepth",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("threadDepth"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "threadPosition",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("threadPosition"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "threadgateCid",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("threadgateCid"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "CID for threadgate record. Present after successful execution with threadgate rules.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "threadgateRules",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("threadgateRules"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Reply restriction rules (app.bsky.feed.threadgate). Defines who can reply to this post.",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("app.bsky.feed.threadgate#mentionRule"),
-                                        ::jacquard_common::CowStr::new_static("app.bsky.feed.threadgate#followerRule"),
-                                        ::jacquard_common::CowStr::new_static("app.bsky.feed.threadgate#followingRule"),
-                                        ::jacquard_common::CowStr::new_static("app.bsky.feed.threadgate#listRule")
+                                        CowStr::new_static("app.bsky.feed.threadgate#mentionRule"),
+                                        CowStr::new_static("app.bsky.feed.threadgate#followerRule"),
+                                        CowStr::new_static("app.bsky.feed.threadgate#followingRule"),
+                                        CowStr::new_static("app.bsky.feed.threadgate#listRule")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(5usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "threadgateUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("threadgateUri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "AT Protocol URI for threadgate record. Present after successful execution with threadgate rules.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "updatedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("updatedAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Post last update datetime (ISO 8601).",
-                                    ),
+                                    CowStr::new_static("Post last update datetime (ISO 8601)."),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
+                                format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "userId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("userId"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "User ID who created this post.",
-                                    ),
+                                    CowStr::new_static("User ID who created this post."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(200usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(20i64)
 }
 
-fn _default_page() -> core::option::Option<i64> {
+fn _default_page() -> Option<i64> {
     Some(1i64)
 }
 
@@ -1647,13 +1229,9 @@ pub mod list_posts_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListPostsBuilder<'a, S: list_posts_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<i64>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ListPosts<'a> {
@@ -1667,9 +1245,9 @@ impl<'a> ListPostsBuilder<'a, list_posts_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListPostsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1702,15 +1280,12 @@ impl<'a, S: list_posts_state::State> ListPostsBuilder<'a, S> {
 
 impl<'a, S: list_posts_state::State> ListPostsBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn status(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -1806,14 +1381,9 @@ pub mod pagination_state {
 
 /// Builder for constructing an instance of this type
 pub struct PaginationBuilder<'a, S: pagination_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<i64>, Option<i64>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Pagination<'a> {
@@ -1827,9 +1397,9 @@ impl<'a> PaginationBuilder<'a, pagination_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PaginationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1844,11 +1414,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PaginationBuilder<'a, pagination_state::SetLimit<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PaginationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1863,11 +1433,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PaginationBuilder<'a, pagination_state::SetPage<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         PaginationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1882,11 +1452,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PaginationBuilder<'a, pagination_state::SetTotal<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         PaginationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1901,11 +1471,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PaginationBuilder<'a, pagination_state::SetTotalPages<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         PaginationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1931,7 +1501,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1956,214 +1526,212 @@ pub mod scheduled_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
-        type Text;
-        type UpdatedAt;
-        type Id;
-        type UserId;
         type Langs;
-        type ScheduledAt;
-        type RetryCount;
+        type Status;
         type CreatedAt;
+        type UserId;
+        type UpdatedAt;
+        type ScheduledAt;
+        type Text;
+        type Id;
+        type RetryCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
-        type Text = Unset;
-        type UpdatedAt = Unset;
-        type Id = Unset;
-        type UserId = Unset;
         type Langs = Unset;
-        type ScheduledAt = Unset;
-        type RetryCount = Unset;
+        type Status = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type Text = S::Text;
-        type UpdatedAt = S::UpdatedAt;
-        type Id = S::Id;
-        type UserId = S::UserId;
-        type Langs = S::Langs;
-        type ScheduledAt = S::ScheduledAt;
-        type RetryCount = S::RetryCount;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Status = S::Status;
-        type Text = Set<members::text>;
-        type UpdatedAt = S::UpdatedAt;
-        type Id = S::Id;
-        type UserId = S::UserId;
-        type Langs = S::Langs;
-        type ScheduledAt = S::ScheduledAt;
-        type RetryCount = S::RetryCount;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type Status = S::Status;
-        type Text = S::Text;
-        type UpdatedAt = Set<members::updated_at>;
-        type Id = S::Id;
-        type UserId = S::UserId;
-        type Langs = S::Langs;
-        type ScheduledAt = S::ScheduledAt;
-        type RetryCount = S::RetryCount;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Status = S::Status;
-        type Text = S::Text;
-        type UpdatedAt = S::UpdatedAt;
-        type Id = Set<members::id>;
-        type UserId = S::UserId;
-        type Langs = S::Langs;
-        type ScheduledAt = S::ScheduledAt;
-        type RetryCount = S::RetryCount;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `user_id` field to Set
-    pub struct SetUserId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserId<S> {}
-    impl<S: State> State for SetUserId<S> {
-        type Status = S::Status;
-        type Text = S::Text;
-        type UpdatedAt = S::UpdatedAt;
-        type Id = S::Id;
-        type UserId = Set<members::user_id>;
-        type Langs = S::Langs;
-        type ScheduledAt = S::ScheduledAt;
-        type RetryCount = S::RetryCount;
-        type CreatedAt = S::CreatedAt;
+        type UserId = Unset;
+        type UpdatedAt = Unset;
+        type ScheduledAt = Unset;
+        type Text = Unset;
+        type Id = Unset;
+        type RetryCount = Unset;
     }
     ///State transition - sets the `langs` field to Set
     pub struct SetLangs<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLangs<S> {}
     impl<S: State> State for SetLangs<S> {
-        type Status = S::Status;
-        type Text = S::Text;
-        type UpdatedAt = S::UpdatedAt;
-        type Id = S::Id;
-        type UserId = S::UserId;
         type Langs = Set<members::langs>;
-        type ScheduledAt = S::ScheduledAt;
-        type RetryCount = S::RetryCount;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `scheduled_at` field to Set
-    pub struct SetScheduledAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScheduledAt<S> {}
-    impl<S: State> State for SetScheduledAt<S> {
         type Status = S::Status;
-        type Text = S::Text;
-        type UpdatedAt = S::UpdatedAt;
-        type Id = S::Id;
-        type UserId = S::UserId;
-        type Langs = S::Langs;
-        type ScheduledAt = Set<members::scheduled_at>;
-        type RetryCount = S::RetryCount;
         type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `retry_count` field to Set
-    pub struct SetRetryCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRetryCount<S> {}
-    impl<S: State> State for SetRetryCount<S> {
-        type Status = S::Status;
-        type Text = S::Text;
-        type UpdatedAt = S::UpdatedAt;
-        type Id = S::Id;
         type UserId = S::UserId;
-        type Langs = S::Langs;
+        type UpdatedAt = S::UpdatedAt;
         type ScheduledAt = S::ScheduledAt;
-        type RetryCount = Set<members::retry_count>;
+        type Text = S::Text;
+        type Id = S::Id;
+        type RetryCount = S::RetryCount;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Langs = S::Langs;
+        type Status = Set<members::status>;
         type CreatedAt = S::CreatedAt;
+        type UserId = S::UserId;
+        type UpdatedAt = S::UpdatedAt;
+        type ScheduledAt = S::ScheduledAt;
+        type Text = S::Text;
+        type Id = S::Id;
+        type RetryCount = S::RetryCount;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Status = S::Status;
-        type Text = S::Text;
-        type UpdatedAt = S::UpdatedAt;
-        type Id = S::Id;
-        type UserId = S::UserId;
         type Langs = S::Langs;
-        type ScheduledAt = S::ScheduledAt;
-        type RetryCount = S::RetryCount;
+        type Status = S::Status;
         type CreatedAt = Set<members::created_at>;
+        type UserId = S::UserId;
+        type UpdatedAt = S::UpdatedAt;
+        type ScheduledAt = S::ScheduledAt;
+        type Text = S::Text;
+        type Id = S::Id;
+        type RetryCount = S::RetryCount;
+    }
+    ///State transition - sets the `user_id` field to Set
+    pub struct SetUserId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserId<S> {}
+    impl<S: State> State for SetUserId<S> {
+        type Langs = S::Langs;
+        type Status = S::Status;
+        type CreatedAt = S::CreatedAt;
+        type UserId = Set<members::user_id>;
+        type UpdatedAt = S::UpdatedAt;
+        type ScheduledAt = S::ScheduledAt;
+        type Text = S::Text;
+        type Id = S::Id;
+        type RetryCount = S::RetryCount;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Langs = S::Langs;
+        type Status = S::Status;
+        type CreatedAt = S::CreatedAt;
+        type UserId = S::UserId;
+        type UpdatedAt = Set<members::updated_at>;
+        type ScheduledAt = S::ScheduledAt;
+        type Text = S::Text;
+        type Id = S::Id;
+        type RetryCount = S::RetryCount;
+    }
+    ///State transition - sets the `scheduled_at` field to Set
+    pub struct SetScheduledAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScheduledAt<S> {}
+    impl<S: State> State for SetScheduledAt<S> {
+        type Langs = S::Langs;
+        type Status = S::Status;
+        type CreatedAt = S::CreatedAt;
+        type UserId = S::UserId;
+        type UpdatedAt = S::UpdatedAt;
+        type ScheduledAt = Set<members::scheduled_at>;
+        type Text = S::Text;
+        type Id = S::Id;
+        type RetryCount = S::RetryCount;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Langs = S::Langs;
+        type Status = S::Status;
+        type CreatedAt = S::CreatedAt;
+        type UserId = S::UserId;
+        type UpdatedAt = S::UpdatedAt;
+        type ScheduledAt = S::ScheduledAt;
+        type Text = Set<members::text>;
+        type Id = S::Id;
+        type RetryCount = S::RetryCount;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Langs = S::Langs;
+        type Status = S::Status;
+        type CreatedAt = S::CreatedAt;
+        type UserId = S::UserId;
+        type UpdatedAt = S::UpdatedAt;
+        type ScheduledAt = S::ScheduledAt;
+        type Text = S::Text;
+        type Id = Set<members::id>;
+        type RetryCount = S::RetryCount;
+    }
+    ///State transition - sets the `retry_count` field to Set
+    pub struct SetRetryCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRetryCount<S> {}
+    impl<S: State> State for SetRetryCount<S> {
+        type Langs = S::Langs;
+        type Status = S::Status;
+        type CreatedAt = S::CreatedAt;
+        type UserId = S::UserId;
+        type UpdatedAt = S::UpdatedAt;
+        type ScheduledAt = S::ScheduledAt;
+        type Text = S::Text;
+        type Id = S::Id;
+        type RetryCount = Set<members::retry_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `text` field
-        pub struct text(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `user_id` field
-        pub struct user_id(());
         ///Marker type for the `langs` field
         pub struct langs(());
-        ///Marker type for the `scheduled_at` field
-        pub struct scheduled_at(());
-        ///Marker type for the `retry_count` field
-        pub struct retry_count(());
+        ///Marker type for the `status` field
+        pub struct status(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `user_id` field
+        pub struct user_id(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+        ///Marker type for the `scheduled_at` field
+        pub struct scheduled_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `retry_count` field
+        pub struct retry_count(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ScheduledPostBuilder<'a, S: scheduled_post_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<
-            Vec<crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>>,
-        >,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<ScheduledPostEmbed<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
-        ::core::option::Option<Vec<jacquard_common::types::string::Language>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<ScheduledPostThreadgateRulesItem<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Vec<list_posts::ScheduledPost<'a>>>,
+        Option<Datetime>,
+        Option<ScheduledPostEmbed<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<Vec<Facet<'a>>>,
+        Option<CowStr<'a>>,
+        Option<SelfLabels<'a>>,
+        Option<Vec<Language>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<bool>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<Vec<ScheduledPostThreadgateRulesItem<'a>>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ScheduledPost<'a> {
@@ -2177,7 +1745,7 @@ impl<'a> ScheduledPostBuilder<'a, scheduled_post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ScheduledPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -2206,22 +1774,19 @@ impl<'a> ScheduledPostBuilder<'a, scheduled_post_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `atRkey` field (optional)
-    pub fn at_rkey(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn at_rkey(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `atRkey` field to an Option value (optional)
-    pub fn maybe_at_rkey(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_at_rkey(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -2229,15 +1794,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `atUri` field (optional)
-    pub fn at_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn at_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `atUri` field to an Option value (optional)
-    pub fn maybe_at_uri(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_at_uri(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -2247,9 +1809,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `children` field (optional)
     pub fn children(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>>>,
-        >,
+        value: impl Into<Option<Vec<list_posts::ScheduledPost<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -2257,7 +1817,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `children` field to an Option value (optional)
     pub fn maybe_children(
         mut self,
-        value: Option<Vec<crate::app_chronosky::schedule::list_posts::ScheduledPost<'a>>>,
+        value: Option<Vec<list_posts::ScheduledPost<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
@@ -2272,13 +1832,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2298,18 +1858,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `errorMsg` field (optional)
-    pub fn error_msg(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn error_msg(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `errorMsg` field to an Option value (optional)
-    pub fn maybe_error_msg(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_error_msg(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -2317,18 +1871,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `executedAt` field (optional)
-    pub fn executed_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn executed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `executedAt` field to an Option value (optional)
-    pub fn maybe_executed_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_executed_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -2336,18 +1884,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `facets` field (optional)
-    pub fn facets(
-        mut self,
-        value: impl Into<Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>>,
-    ) -> Self {
+    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
-    pub fn maybe_facets(
-        mut self,
-        value: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    ) -> Self {
+    pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -2361,31 +1903,25 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetId<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(
-        mut self,
-        value: impl Into<Option<crate::com_atproto::label::SelfLabels<'a>>>,
-    ) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(
-        mut self,
-        value: Option<crate::com_atproto::label::SelfLabels<'a>>,
-    ) -> Self {
+    pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -2399,31 +1935,25 @@ where
     /// Set the `langs` field (required)
     pub fn langs(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::Language>>,
+        value: impl Into<Vec<Language>>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetLangs<S>> {
-        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.10 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `parentPostId` field (optional)
-    pub fn parent_post_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn parent_post_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `parentPostId` field to an Option value (optional)
-    pub fn maybe_parent_post_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_parent_post_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.11 = value;
         self
     }
@@ -2431,18 +1961,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `postgateCid` field (optional)
-    pub fn postgate_cid(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn postgate_cid(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `postgateCid` field to an Option value (optional)
-    pub fn maybe_postgate_cid(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_postgate_cid(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.12 = value;
         self
     }
@@ -2463,18 +1987,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `postgateUri` field (optional)
-    pub fn postgate_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn postgate_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.14 = value.into();
         self
     }
     /// Set the `postgateUri` field to an Option value (optional)
-    pub fn maybe_postgate_uri(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_postgate_uri(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.14 = value;
         self
     }
@@ -2490,11 +2008,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetRetryCount<S>> {
-        self.__unsafe_private_named.15 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.15 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2507,13 +2025,13 @@ where
     /// Set the `scheduledAt` field (required)
     pub fn scheduled_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetScheduledAt<S>> {
-        self.__unsafe_private_named.16 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.16 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2526,13 +2044,13 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetStatus<S>> {
-        self.__unsafe_private_named.17 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.17 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2545,13 +2063,13 @@ where
     /// Set the `text` field (required)
     pub fn text(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetText<S>> {
-        self.__unsafe_private_named.18 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.18 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2584,18 +2102,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `threadgateCid` field (optional)
-    pub fn threadgate_cid(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn threadgate_cid(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.21 = value.into();
         self
     }
     /// Set the `threadgateCid` field to an Option value (optional)
-    pub fn maybe_threadgate_cid(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_threadgate_cid(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.21 = value;
         self
     }
@@ -2622,18 +2134,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `threadgateUri` field (optional)
-    pub fn threadgate_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn threadgate_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.23 = value.into();
         self
     }
     /// Set the `threadgateUri` field to an Option value (optional)
-    pub fn maybe_threadgate_uri(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_threadgate_uri(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.23 = value;
         self
     }
@@ -2647,13 +2153,13 @@ where
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.24 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.24 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2666,13 +2172,13 @@ where
     /// Set the `userId` field (required)
     pub fn user_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetUserId<S>> {
-        self.__unsafe_private_named.25 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.25 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2680,15 +2186,15 @@ where
 impl<'a, S> ScheduledPostBuilder<'a, S>
 where
     S: scheduled_post_state::State,
-    S::Status: scheduled_post_state::IsSet,
-    S::Text: scheduled_post_state::IsSet,
-    S::UpdatedAt: scheduled_post_state::IsSet,
-    S::Id: scheduled_post_state::IsSet,
-    S::UserId: scheduled_post_state::IsSet,
     S::Langs: scheduled_post_state::IsSet,
-    S::ScheduledAt: scheduled_post_state::IsSet,
-    S::RetryCount: scheduled_post_state::IsSet,
+    S::Status: scheduled_post_state::IsSet,
     S::CreatedAt: scheduled_post_state::IsSet,
+    S::UserId: scheduled_post_state::IsSet,
+    S::UpdatedAt: scheduled_post_state::IsSet,
+    S::ScheduledAt: scheduled_post_state::IsSet,
+    S::Text: scheduled_post_state::IsSet,
+    S::Id: scheduled_post_state::IsSet,
+    S::RetryCount: scheduled_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScheduledPost<'a> {
@@ -2725,7 +2231,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

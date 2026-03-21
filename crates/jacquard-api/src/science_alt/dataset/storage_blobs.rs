@@ -5,70 +5,65 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::science_alt::dataset::entry::ShardChecksum;
+use crate::science_alt::dataset::storage_blobs;
 /// A single PDS blob shard with optional integrity checksum
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct BlobEntry<'a> {
     ///Blob reference to a WebDataset tar archive
     #[serde(borrow)]
-    pub blob: jacquard_common::types::blob::BlobRef<'a>,
+    pub blob: BlobRef<'a>,
     ///Content hash for integrity verification (optional since PDS blobs have built-in CID integrity)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub checksum: core::option::Option<
-        crate::science_alt::dataset::entry::ShardChecksum<'a>,
-    >,
+    pub checksum: Option<ShardChecksum<'a>>,
 }
 
 /// Storage via ATProto PDS blobs for WebDataset tar archives. Used in science.alt.dataset.entry storage union for maximum decentralization.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct StorageBlobs<'a> {
     ///Array of blob entries for WebDataset tar files
     #[serde(borrow)]
-    pub blobs: Vec<crate::science_alt::dataset::storage_blobs::BlobEntry<'a>>,
+    pub blobs: Vec<storage_blobs::BlobEntry<'a>>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for BlobEntry<'a> {
+impl<'a> LexiconSchema for BlobEntry<'a> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageBlobs"
     }
     fn def_name() -> &'static str {
         "blobEntry"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_science_alt_dataset_storageBlobs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.blob;
             {
                 let size = value.blob().size;
                 if size > 52428800usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
+                    return Err(ConstraintError::BlobTooLarge {
+                        path: ValidationPath::from_field("blob"),
                         max: 52428800usize,
                         actual: size,
                     });
@@ -94,10 +89,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for BlobEntry<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "blob",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("blob"),
                         accepted: vec!["application/x-tar".to_string()],
                         actual: mime.to_string(),
                     });
@@ -108,27 +101,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for BlobEntry<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for StorageBlobs<'a> {
+impl<'a> LexiconSchema for StorageBlobs<'a> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageBlobs"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_science_alt_dataset_storageBlobs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.blobs;
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "blobs",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("blobs"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -172,12 +161,9 @@ pub mod blob_entry_state {
 
 /// Builder for constructing an instance of this type
 pub struct BlobEntryBuilder<'a, S: blob_entry_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<crate::science_alt::dataset::entry::ShardChecksum<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<BlobRef<'a>>, Option<ShardChecksum<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> BlobEntry<'a> {
@@ -191,9 +177,9 @@ impl<'a> BlobEntryBuilder<'a, blob_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlobEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -206,31 +192,25 @@ where
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
-        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+        value: impl Into<BlobRef<'a>>,
     ) -> BlobEntryBuilder<'a, blob_entry_state::SetBlob<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         BlobEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: blob_entry_state::State> BlobEntryBuilder<'a, S> {
     /// Set the `checksum` field (optional)
-    pub fn checksum(
-        mut self,
-        value: impl Into<Option<crate::science_alt::dataset::entry::ShardChecksum<'a>>>,
-    ) -> Self {
+    pub fn checksum(mut self, value: impl Into<Option<ShardChecksum<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `checksum` field to an Option value (optional)
-    pub fn maybe_checksum(
-        mut self,
-        value: Option<crate::science_alt::dataset::entry::ShardChecksum<'a>>,
-    ) -> Self {
+    pub fn maybe_checksum(mut self, value: Option<ShardChecksum<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -252,7 +232,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -265,99 +245,82 @@ where
     }
 }
 
-fn lexicon_doc_science_alt_dataset_storageBlobs() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("science.alt.dataset.storageBlobs"),
-        revision: None,
-        description: None,
+fn lexicon_doc_science_alt_dataset_storageBlobs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("science.alt.dataset.storageBlobs"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("blobEntry"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("blobEntry"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A single PDS blob shard with optional integrity checksum",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("blob")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("blob")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "blob",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                description: None,
-                                accept: None,
-                                max_size: None,
-                            }),
+                            SmolStr::new_static("blob"),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "checksum",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("checksum"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "science.alt.dataset.entry#shardChecksum",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("main"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Storage via ATProto PDS blobs for WebDataset tar archives. Used in science.alt.dataset.entry storage union for maximum decentralization.",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("blobs")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("blobs")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "blobs",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("blobs"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Array of blob entries for WebDataset tar files",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#blobEntry"),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#blobEntry"),
+                                    ..Default::default()
                                 }),
                                 min_length: Some(1usize),
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -395,13 +358,9 @@ pub mod storage_blobs_state {
 
 /// Builder for constructing an instance of this type
 pub struct StorageBlobsBuilder<'a, S: storage_blobs_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<
-            Vec<crate::science_alt::dataset::storage_blobs::BlobEntry<'a>>,
-        >,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<storage_blobs::BlobEntry<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> StorageBlobs<'a> {
@@ -415,9 +374,9 @@ impl<'a> StorageBlobsBuilder<'a, storage_blobs_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StorageBlobsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -430,13 +389,13 @@ where
     /// Set the `blobs` field (required)
     pub fn blobs(
         mut self,
-        value: impl Into<Vec<crate::science_alt::dataset::storage_blobs::BlobEntry<'a>>>,
+        value: impl Into<Vec<storage_blobs::BlobEntry<'a>>>,
     ) -> StorageBlobsBuilder<'a, storage_blobs_state::SetBlobs<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         StorageBlobsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -456,7 +415,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

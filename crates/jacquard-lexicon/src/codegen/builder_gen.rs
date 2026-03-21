@@ -72,6 +72,8 @@ pub(crate) struct BuilderGenContext<'a, 'c> {
     pub schema: BuilderSchema<'a>,
     /// Whether the struct has a lifetime parameter
     pub has_lifetime: bool,
+    /// Resolved imports for the current file.
+    pub resolved: &'a crate::codegen::prettify::ResolvedImports,
 }
 
 impl<'a, 'c> BuilderGenContext<'a, 'c> {
@@ -82,6 +84,7 @@ impl<'a, 'c> BuilderGenContext<'a, 'c> {
         type_name: &'a str,
         object: &'a LexObject<'static>,
         has_lifetime: bool,
+        resolved: &'a crate::codegen::prettify::ResolvedImports,
     ) -> Self {
         Self {
             codegen,
@@ -89,6 +92,7 @@ impl<'a, 'c> BuilderGenContext<'a, 'c> {
             type_name,
             schema: BuilderSchema::Object(object),
             has_lifetime,
+            resolved,
         }
     }
 
@@ -99,6 +103,7 @@ impl<'a, 'c> BuilderGenContext<'a, 'c> {
         type_name: &'a str,
         parameters: &'a LexXrpcParameters<'static>,
         has_lifetime: bool,
+        resolved: &'a crate::codegen::prettify::ResolvedImports,
     ) -> Self {
         Self {
             codegen,
@@ -106,6 +111,7 @@ impl<'a, 'c> BuilderGenContext<'a, 'c> {
             type_name,
             schema: BuilderSchema::Parameters(parameters),
             has_lifetime,
+            resolved,
         }
     }
 
@@ -128,6 +134,7 @@ impl<'a, 'c> BuilderGenContext<'a, 'c> {
             self.type_name,
             &self.schema,
             self.has_lifetime,
+            self.resolved,
         );
 
         // Generate setters
@@ -138,6 +145,7 @@ impl<'a, 'c> BuilderGenContext<'a, 'c> {
             &self.schema,
             &required_fields,
             self.has_lifetime,
+            self.resolved,
         );
 
         // Generate build method
@@ -146,6 +154,7 @@ impl<'a, 'c> BuilderGenContext<'a, 'c> {
             &self.schema,
             &required_fields,
             self.has_lifetime,
+            self.resolved,
         );
 
         quote! {

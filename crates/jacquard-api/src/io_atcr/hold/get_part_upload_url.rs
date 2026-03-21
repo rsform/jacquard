@@ -5,70 +5,65 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::UriValue;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPartUploadUrl<'a> {
     ///Part sequence number (1-indexed)
     pub part_number: i64,
     ///Upload session ID from initiateUpload
     #[serde(borrow)]
-    pub upload_id: jacquard_common::CowStr<'a>,
+    pub upload_id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPartUploadUrlOutput<'a> {
     ///Additional headers required for the request (e.g., content-type)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub headers: core::option::Option<jacquard_common::types::value::Data<'a>>,
-    ///HTTP method to use (usually PUT) Defaults to `"PUT"`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub headers: Option<Data<'a>>,
+    ///HTTP method to use (usually PUT)  Defaults to `"PUT"`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_get_part_upload_url_output_method")]
     #[serde(borrow)]
-    pub method: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub method: Option<CowStr<'a>>,
     ///URL to PUT the part data to
     #[serde(borrow)]
-    pub url: jacquard_common::types::string::UriValue<'a>,
+    pub url: UriValue<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetPartUploadUrlError<'a> {
     #[serde(rename = "InvalidUploadId")]
-    InvalidUploadId(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidUploadId(Option<CowStr<'a>>),
     #[serde(rename = "InvalidPartNumber")]
-    InvalidPartNumber(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidPartNumber(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetPartUploadUrlError<'_> {
@@ -93,8 +88,7 @@ impl core::fmt::Display for GetPartUploadUrlError<'_> {
     }
 }
 
-/// Response type for
-///io.atcr.hold.getPartUploadUrl
+/// Response type for io.atcr.hold.getPartUploadUrl
 pub struct GetPartUploadUrlResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPartUploadUrlResponse {
     const NSID: &'static str = "io.atcr.hold.getPartUploadUrl";
@@ -111,8 +105,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPartUploadUrl<'a> {
     type Response = GetPartUploadUrlResponse;
 }
 
-/// Endpoint type for
-///io.atcr.hold.getPartUploadUrl
+/// Endpoint type for io.atcr.hold.getPartUploadUrl
 pub struct GetPartUploadUrlRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPartUploadUrlRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.getPartUploadUrl";
@@ -133,48 +126,45 @@ pub mod get_part_upload_url_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PartNumber;
         type UploadId;
+        type PartNumber;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PartNumber = Unset;
         type UploadId = Unset;
-    }
-    ///State transition - sets the `part_number` field to Set
-    pub struct SetPartNumber<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPartNumber<S> {}
-    impl<S: State> State for SetPartNumber<S> {
-        type PartNumber = Set<members::part_number>;
-        type UploadId = S::UploadId;
+        type PartNumber = Unset;
     }
     ///State transition - sets the `upload_id` field to Set
     pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUploadId<S> {}
     impl<S: State> State for SetUploadId<S> {
-        type PartNumber = S::PartNumber;
         type UploadId = Set<members::upload_id>;
+        type PartNumber = S::PartNumber;
+    }
+    ///State transition - sets the `part_number` field to Set
+    pub struct SetPartNumber<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPartNumber<S> {}
+    impl<S: State> State for SetPartNumber<S> {
+        type UploadId = S::UploadId;
+        type PartNumber = Set<members::part_number>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `part_number` field
-        pub struct part_number(());
         ///Marker type for the `upload_id` field
         pub struct upload_id(());
+        ///Marker type for the `part_number` field
+        pub struct part_number(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetPartUploadUrlBuilder<'a, S: get_part_upload_url_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetPartUploadUrl<'a> {
@@ -188,9 +178,9 @@ impl<'a> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetPartUploadUrlBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -205,11 +195,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::SetPartNumber<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetPartUploadUrlBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -222,13 +212,13 @@ where
     /// Set the `uploadId` field (required)
     pub fn upload_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::SetUploadId<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetPartUploadUrlBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -236,8 +226,8 @@ where
 impl<'a, S> GetPartUploadUrlBuilder<'a, S>
 where
     S: get_part_upload_url_state::State,
-    S::PartNumber: get_part_upload_url_state::IsSet,
     S::UploadId: get_part_upload_url_state::IsSet,
+    S::PartNumber: get_part_upload_url_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetPartUploadUrl<'a> {
@@ -250,10 +240,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> GetPartUploadUrl<'a> {
         GetPartUploadUrl {
             part_number: self.__unsafe_private_named.0.unwrap(),
@@ -263,8 +250,6 @@ where
     }
 }
 
-fn _default_get_part_upload_url_output_method() -> core::option::Option<
-    jacquard_common::CowStr<'static>,
-> {
-    Some(jacquard_common::CowStr::from("PUT"))
+fn _default_get_part_upload_url_output_method() -> Option<CowStr<'static>> {
+    Some(CowStr::from("PUT"))
 }

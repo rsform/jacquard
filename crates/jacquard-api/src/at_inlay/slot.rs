@@ -5,43 +5,33 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Slot<'a> {
     ///Key into the host's stash map
     #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
+    pub id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SlotOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
+    pub value: Response<'a>,
 }
 
-/// Response type for
-///at.inlay.Slot
+/// Response type for at.inlay.Slot
 pub struct SlotResponse;
 impl jacquard_common::xrpc::XrpcResp for SlotResponse {
     const NSID: &'static str = "at.inlay.Slot";
@@ -58,8 +48,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Slot<'a> {
     type Response = SlotResponse;
 }
 
-/// Endpoint type for
-///at.inlay.Slot
+/// Endpoint type for at.inlay.Slot
 pub struct SlotRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SlotRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Slot";

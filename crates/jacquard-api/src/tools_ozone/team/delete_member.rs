@@ -5,43 +5,44 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteMember<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteMemberError<'a> {
     /// The member being deleted does not exist
     #[serde(rename = "MemberNotFound")]
-    MemberNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    MemberNotFound(Option<CowStr<'a>>),
     /// You can not delete yourself from the team
     #[serde(rename = "CannotDeleteSelf")]
-    CannotDeleteSelf(core::option::Option<jacquard_common::CowStr<'a>>),
+    CannotDeleteSelf(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteMemberError<'_> {
@@ -66,8 +67,7 @@ impl core::fmt::Display for DeleteMemberError<'_> {
     }
 }
 
-/// Response type for
-///tools.ozone.team.deleteMember
+/// Response type for tools.ozone.team.deleteMember
 pub struct DeleteMemberResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteMemberResponse {
     const NSID: &'static str = "tools.ozone.team.deleteMember";
@@ -84,8 +84,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteMember<'a> {
     type Response = DeleteMemberResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.team.deleteMember
+/// Endpoint type for tools.ozone.team.deleteMember
 pub struct DeleteMemberRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteMemberRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.team.deleteMember";
@@ -130,11 +129,9 @@ pub mod delete_member_state {
 
 /// Builder for constructing an instance of this type
 pub struct DeleteMemberBuilder<'a, S: delete_member_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> DeleteMember<'a> {
@@ -148,9 +145,9 @@ impl<'a> DeleteMemberBuilder<'a, delete_member_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeleteMemberBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -163,13 +160,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> DeleteMemberBuilder<'a, delete_member_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         DeleteMemberBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -189,7 +186,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -5,39 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::collab::SessionView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetResourceSessions<'a> {
     #[serde(borrow)]
-    pub resource: jacquard_common::types::string::AtUri<'a>,
+    pub resource: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetResourceSessionsOutput<'a> {
     #[serde(borrow)]
-    pub sessions: Vec<crate::sh_weaver::collab::SessionView<'a>>,
+    pub sessions: Vec<SessionView<'a>>,
 }
 
-/// Response type for
-///sh.weaver.collab.getResourceSessions
+/// Response type for sh.weaver.collab.getResourceSessions
 pub struct GetResourceSessionsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetResourceSessionsResponse {
     const NSID: &'static str = "sh.weaver.collab.getResourceSessions";
@@ -52,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetResourceSessions<'a> {
     type Response = GetResourceSessionsResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.collab.getResourceSessions
+/// Endpoint type for sh.weaver.collab.getResourceSessions
 pub struct GetResourceSessionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetResourceSessionsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.collab.getResourceSessions";
@@ -96,11 +86,9 @@ pub mod get_resource_sessions_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetResourceSessionsBuilder<'a, S: get_resource_sessions_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetResourceSessions<'a> {
@@ -114,9 +102,9 @@ impl<'a> GetResourceSessionsBuilder<'a, get_resource_sessions_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetResourceSessionsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -129,13 +117,13 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetResourceSessionsBuilder<'a, get_resource_sessions_state::SetResource<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetResourceSessionsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

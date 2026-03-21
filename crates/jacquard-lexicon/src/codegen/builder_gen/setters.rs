@@ -19,6 +19,7 @@ pub fn generate_setters(
     schema: &BuilderSchema,
     required_fields: &[RequiredField],
     has_lifetime: bool,
+    resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
     let builder_name = format_ident!("{}Builder", type_name);
     let state_mod_name = format_ident!("{}_state", type_name.to_snake_case());
@@ -44,6 +45,7 @@ pub fn generate_setters(
                 schema,
                 has_lifetime,
                 index,
+                resolved,
             );
             setters.push(setter);
         } else {
@@ -58,6 +60,7 @@ pub fn generate_setters(
                 schema,
                 has_lifetime,
                 index,
+                resolved,
             );
             setters.push(setter);
         }
@@ -79,14 +82,17 @@ fn generate_required_setter(
     schema: &BuilderSchema,
     has_lifetime: bool,
     index: usize,
+    resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
+    let phantom = resolved.phantom_data();
     let field_snake = make_ident(&field_name.to_snake_case());
     let field_pascal = format_ident!("{}", field_name.to_pascal_case());
     let transition_type = format_ident!("Set{}", field_name.to_pascal_case());
     let index = syn::Index::from(index);
 
     // Get the Rust type for this field
-    let rust_type = get_field_rust_type(codegen, nsid, type_name, field_name, schema);
+    let rust_type = get_field_rust_type(codegen, nsid, type_name, field_name, schema, resolved);
+    let option_some = resolved.option_some();
 
     let lifetime_param = if has_lifetime {
         quote! { 'a, }
@@ -95,7 +101,7 @@ fn generate_required_setter(
     };
 
     let phantom_lifetime = if has_lifetime {
-        quote! { _phantom: ::core::marker::PhantomData, }
+        quote! { _phantom: #phantom, }
     } else {
         quote! {}
     };
@@ -113,9 +119,9 @@ fn generate_required_setter(
                 mut self,
                 value: impl Into<#rust_type>,
             ) -> #builder_name<#lifetime_param #state_mod_name::#transition_type<S>> {
-                self.__unsafe_private_named.#index = ::core::option::Option::Some(value.into());
+                self.__unsafe_private_named.#index = #option_some(value.into());
                 #builder_name {
-                    _phantom_state: ::core::marker::PhantomData,
+                    _phantom_state: #phantom,
                     __unsafe_private_named: self.__unsafe_private_named,
                     #phantom_lifetime
                 }
@@ -135,13 +141,14 @@ fn generate_optional_setter(
     schema: &BuilderSchema,
     has_lifetime: bool,
     index: usize,
+    resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
     let field_snake = make_ident(&field_name.to_snake_case());
     let maybe_field_snake = format_ident!("maybe_{}", field_name.to_snake_case());
     let index = syn::Index::from(index);
 
     // Get the Rust type for this field
-    let rust_type = get_field_rust_type(codegen, nsid, type_name, field_name, schema);
+    let rust_type = get_field_rust_type(codegen, nsid, type_name, field_name, schema, resolved);
 
     let lifetime_param = if has_lifetime {
         quote! { 'a, }
@@ -179,18 +186,18 @@ fn get_field_rust_type(
     type_name: &str,
     field_name: &SmolStr,
     schema: &BuilderSchema,
+    resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
-    let resolved = codegen.default_resolved_imports();
     match schema {
         BuilderSchema::Object(obj) => {
             let field_type = &obj.properties[field_name];
             codegen
-                .property_to_rust_type(nsid, type_name, field_name, field_type, &resolved)
+                .property_to_rust_type(nsid, type_name, field_name, field_type, resolved)
                 .unwrap_or_else(|_| quote! { () })
         }
         BuilderSchema::Parameters(params) => {
             let field_type = &params.properties[field_name];
-            super::builder_struct::get_params_rust_type(codegen, field_type, &resolved)
+            super::builder_struct::get_params_rust_type(codegen, field_type, resolved)
         }
     }
 }

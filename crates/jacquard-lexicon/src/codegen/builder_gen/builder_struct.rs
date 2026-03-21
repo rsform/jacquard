@@ -14,13 +14,14 @@ pub fn generate_builder_struct(
     type_name: &str,
     schema: &BuilderSchema,
     has_lifetime: bool,
+    resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
     let builder_name = format_ident!("{}Builder", type_name);
     let state_mod_name = format_ident!("{}_state", type_name.to_snake_case());
     let type_ident = format_ident!("{}", type_name);
 
     // Generate field declarations
-    let field_decls = generate_field_declarations(codegen, nsid, type_name, schema);
+    let field_decls = generate_field_declarations(codegen, nsid, type_name, schema, resolved);
 
     // Generate lifetime generic if needed
     let lifetime_generic = if has_lifetime {
@@ -35,9 +36,10 @@ pub fn generate_builder_struct(
         quote! {}
     };
 
+    let phantom = resolved.phantom_data();
     let phantom_field = if has_lifetime {
         quote! {
-            _phantom: ::core::marker::PhantomData<&'a ()>,
+            _phantom: #phantom<&'a ()>,
         }
     } else {
         quote! {}
@@ -57,7 +59,7 @@ pub fn generate_builder_struct(
 
     // Generate Builder::new() constructor
     let builder_constructor =
-        generate_builder_constructor(&builder_name, schema, has_lifetime, &state_mod_name);
+        generate_builder_constructor(&builder_name, schema, has_lifetime, &state_mod_name, resolved);
 
     quote! {
         /// Builder for constructing an instance of this type
@@ -78,8 +80,8 @@ fn generate_field_declarations(
     nsid: &str,
     type_name: &str,
     schema: &BuilderSchema,
+    resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
-    let resolved = codegen.default_resolved_imports();
     let property_names = schema.property_names();
     let field_types: Vec<_> = property_names
         .iter()
@@ -98,16 +100,20 @@ fn generate_field_declarations(
                 }
             };
 
-            quote! { ::core::option::Option<#rust_type>, }
+            {
+                let opt = resolved.option_type(rust_type);
+                quote! { #opt, }
+            }
         })
         .collect();
 
+    let phantom = resolved.phantom_data();
     if field_types.is_empty() {
         // No fields - empty tuple
         quote! {}
     } else {
         quote! {
-            _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+            _phantom_state: #phantom<fn() -> S>,
             __unsafe_private_named: ( #(#field_types)* ),
         }
     }
@@ -149,7 +155,9 @@ fn generate_builder_constructor(
     schema: &BuilderSchema,
     has_lifetime: bool,
     state_mod_name: &syn::Ident,
+    resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
+    let phantom = resolved.phantom_data();
     let lifetime_param = if has_lifetime {
         quote! { 'a, }
     } else {
@@ -165,7 +173,7 @@ fn generate_builder_constructor(
     } else {
         (
             quote! {
-                _phantom_state: ::core::marker::PhantomData,
+                _phantom_state: #phantom,
             },
             quote! {
                 __unsafe_private_named: ( #(#none_values)* ),
@@ -175,7 +183,7 @@ fn generate_builder_constructor(
 
     let phantom_lifetime = if has_lifetime {
         quote! {
-            _phantom: ::core::marker::PhantomData,
+            _phantom: #phantom,
         }
     } else {
         quote! {}

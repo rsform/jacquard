@@ -5,31 +5,22 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLikes<'a> {
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLikesOutput<'a> {
     ///Total number of likes on this game.
@@ -38,8 +29,7 @@ pub struct GetLikesOutput<'a> {
     pub liked: bool,
 }
 
-/// Response type for
-///games.gamesgamesgamesgames.graph.getLikes
+/// Response type for games.gamesgamesgamesgames.graph.getLikes
 pub struct GetLikesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLikesResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.graph.getLikes";
@@ -54,8 +44,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetLikes<'a> {
     type Response = GetLikesResponse;
 }
 
-/// Endpoint type for
-///games.gamesgamesgamesgames.graph.getLikes
+/// Endpoint type for games.gamesgamesgamesgames.graph.getLikes
 pub struct GetLikesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLikesRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.graph.getLikes";
@@ -98,11 +87,9 @@ pub mod get_likes_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetLikesBuilder<'a, S: get_likes_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetLikes<'a> {
@@ -116,9 +103,9 @@ impl<'a> GetLikesBuilder<'a, get_likes_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetLikesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -131,13 +118,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetLikesBuilder<'a, get_likes_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetLikesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

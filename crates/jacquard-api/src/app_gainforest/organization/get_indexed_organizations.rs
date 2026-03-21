@@ -5,35 +5,25 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetIndexedOrganizations;
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetIndexedOrganizationsOutput<'a> {
     #[serde(borrow)]
-    pub organizations: Vec<jacquard_common::types::value::Data<'a>>,
+    pub organizations: Vec<Data<'a>>,
 }
 
-/// Response type for
-///app.gainforest.organization.getIndexedOrganizations
+/// Response type for app.gainforest.organization.getIndexedOrganizations
 pub struct GetIndexedOrganizationsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetIndexedOrganizationsResponse {
     const NSID: &'static str = "app.gainforest.organization.getIndexedOrganizations";
@@ -48,8 +38,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetIndexedOrganizations {
     type Response = GetIndexedOrganizationsResponse;
 }
 
-/// Endpoint type for
-///app.gainforest.organization.getIndexedOrganizations
+/// Endpoint type for app.gainforest.organization.getIndexedOrganizations
 pub struct GetIndexedOrganizationsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetIndexedOrganizationsRequest {
     const PATH: &'static str = "/xrpc/app.gainforest.organization.getIndexedOrganizations";

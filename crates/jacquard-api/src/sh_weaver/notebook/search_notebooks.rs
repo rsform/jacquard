@@ -5,63 +5,55 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::NotebookView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchNotebooks<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub author: core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub author: Option<AtIdentifier<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     ///Defaults to `25`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
     #[serde(borrow)]
-    pub q: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub q: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub rating: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub rating: Option<Vec<CowStr<'a>>>,
     ///Defaults to `"relevance"`.
     #[serde(default = "_default_sort")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sort: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: Option<Vec<CowStr<'a>>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchNotebooksOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub notebooks: Vec<crate::sh_weaver::notebook::NotebookView<'a>>,
+    pub notebooks: Vec<NotebookView<'a>>,
 }
 
-/// Response type for
-///sh.weaver.notebook.searchNotebooks
+/// Response type for sh.weaver.notebook.searchNotebooks
 pub struct SearchNotebooksResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchNotebooksResponse {
     const NSID: &'static str = "sh.weaver.notebook.searchNotebooks";
@@ -76,8 +68,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SearchNotebooks<'a> {
     type Response = SearchNotebooksResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notebook.searchNotebooks
+/// Endpoint type for sh.weaver.notebook.searchNotebooks
 pub struct SearchNotebooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchNotebooksRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.searchNotebooks";
@@ -86,12 +77,12 @@ impl jacquard_common::xrpc::XrpcEndpoint for SearchNotebooksRequest {
     type Response = SearchNotebooksResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(25i64)
 }
 
-fn _default_sort() -> core::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("relevance"))
+fn _default_sort() -> Option<CowStr<'static>> {
+    Some(CowStr::from("relevance"))
 }
 
 pub mod search_notebooks_state {
@@ -128,17 +119,17 @@ pub mod search_notebooks_state {
 
 /// Builder for constructing an instance of this type
 pub struct SearchNotebooksBuilder<'a, S: search_notebooks_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        Option<AtIdentifier<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<CowStr<'a>>,
+        Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SearchNotebooks<'a> {
@@ -152,27 +143,21 @@ impl<'a> SearchNotebooksBuilder<'a, search_notebooks_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SearchNotebooksBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
     /// Set the `author` field (optional)
-    pub fn author(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::ident::AtIdentifier<'a>>>,
-    ) -> Self {
+    pub fn author(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
-    pub fn maybe_author(
-        mut self,
-        value: Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ) -> Self {
+    pub fn maybe_author(mut self, value: Option<AtIdentifier<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -180,15 +165,12 @@ impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
 
 impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -215,31 +197,25 @@ where
     /// Set the `q` field (required)
     pub fn q(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SearchNotebooksBuilder<'a, search_notebooks_state::SetQ<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         SearchNotebooksBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
     /// Set the `rating` field (optional)
-    pub fn rating(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn rating(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `rating` field to an Option value (optional)
-    pub fn maybe_rating(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_rating(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -247,15 +223,12 @@ impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
 
 impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -263,18 +236,12 @@ impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
 
 impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }

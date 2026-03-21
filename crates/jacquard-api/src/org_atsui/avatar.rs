@@ -5,42 +5,44 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Avatar<'a> {
     ///DID of the blob owner. Used to resolve blob URLs.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub did: Option<Did<'a>>,
     ///Pull the avatar up by half its own height, overlapping the element above.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub lift: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lift: Option<bool>,
     ///Size token.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub size: core::option::Option<AvatarSize<'a>>,
+    pub size: Option<AvatarSize<'a>>,
     ///Blob ref for the image.
     #[serde(borrow)]
-    pub src: jacquard_common::types::value::Data<'a>,
+    pub src: Data<'a>,
 }
 
 /// Size token.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AvatarSize<'a> {
     Xsmall,
     Small,
     Medium,
     Large,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> AvatarSize<'a> {
@@ -62,7 +64,7 @@ impl<'a> From<&'a str> for AvatarSize<'a> {
             "small" => Self::Small,
             "medium" => Self::Medium,
             "large" => Self::Large,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -74,7 +76,7 @@ impl<'a> From<String> for AvatarSize<'a> {
             "small" => Self::Small,
             "medium" => Self::Medium,
             "large" => Self::Large,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -132,25 +134,17 @@ impl jacquard_common::IntoStatic for AvatarSize<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct AvatarOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
+    pub value: Response<'a>,
 }
 
-/// Response type for
-///org.atsui.Avatar
+/// Response type for org.atsui.Avatar
 pub struct AvatarResponse;
 impl jacquard_common::xrpc::XrpcResp for AvatarResponse {
     const NSID: &'static str = "org.atsui.Avatar";
@@ -167,8 +161,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Avatar<'a> {
     type Response = AvatarResponse;
 }
 
-/// Endpoint type for
-///org.atsui.Avatar
+/// Endpoint type for org.atsui.Avatar
 pub struct AvatarRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AvatarRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Avatar";
@@ -213,14 +206,14 @@ pub mod avatar_state {
 
 /// Builder for constructing an instance of this type
 pub struct AvatarBuilder<'a, S: avatar_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<AvatarSize<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        Option<Did<'a>>,
+        Option<bool>,
+        Option<AvatarSize<'a>>,
+        Option<Data<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Avatar<'a> {
@@ -234,27 +227,21 @@ impl<'a> AvatarBuilder<'a, avatar_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AvatarBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: avatar_state::State> AvatarBuilder<'a, S> {
     /// Set the `did` field (optional)
-    pub fn did(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
-    pub fn maybe_did(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_did(mut self, value: Option<Did<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -294,13 +281,13 @@ where
     /// Set the `src` field (required)
     pub fn src(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> AvatarBuilder<'a, avatar_state::SetSrc<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         AvatarBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -323,10 +310,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Avatar<'a> {
         Avatar {
             did: self.__unsafe_private_named.0,

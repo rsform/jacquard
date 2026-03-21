@@ -5,41 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::{Cid, UriValue};
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct StopLivestream<'a> {}
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct StopLivestreamOutput<'a> {
     ///The new CID of the stopped livestream record.
     #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub cid: Cid<'a>,
     ///The URI of the stopped livestream record.
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::UriValue<'a>,
+    pub uri: UriValue<'a>,
 }
 
-/// Response type for
-///place.stream.live.stopLivestream
+/// Response type for place.stream.live.stopLivestream
 pub struct StopLivestreamResponse;
 impl jacquard_common::xrpc::XrpcResp for StopLivestreamResponse {
     const NSID: &'static str = "place.stream.live.stopLivestream";
@@ -56,8 +45,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for StopLivestream<'a> {
     type Response = StopLivestreamResponse;
 }
 
-/// Endpoint type for
-///place.stream.live.stopLivestream
+/// Endpoint type for place.stream.live.stopLivestream
 pub struct StopLivestreamRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StopLivestreamRequest {
     const PATH: &'static str = "/xrpc/place.stream.live.stopLivestream";

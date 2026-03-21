@@ -5,26 +5,27 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::team::Member;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateMember<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub disabled: core::option::Option<bool>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub did: Did<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disabled: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub role: core::option::Option<UpdateMemberRole<'a>>,
+    pub role: Option<UpdateMemberRole<'a>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UpdateMemberRole<'a> {
@@ -32,7 +33,7 @@ pub enum UpdateMemberRole<'a> {
     RoleModerator,
     RoleVerifier,
     RoleTriage,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> UpdateMemberRole<'a> {
@@ -54,7 +55,7 @@ impl<'a> From<&'a str> for UpdateMemberRole<'a> {
             "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
             "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
             "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -66,7 +67,7 @@ impl<'a> From<String> for UpdateMemberRole<'a> {
             "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
             "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
             "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -124,41 +125,36 @@ impl jacquard_common::IntoStatic for UpdateMemberRole<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateMemberOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::tools_ozone::team::Member<'a>,
+    pub value: Member<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UpdateMemberError<'a> {
     /// The member being updated does not exist in the team
     #[serde(rename = "MemberNotFound")]
-    MemberNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    MemberNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for UpdateMemberError<'_> {
@@ -176,8 +172,7 @@ impl core::fmt::Display for UpdateMemberError<'_> {
     }
 }
 
-/// Response type for
-///tools.ozone.team.updateMember
+/// Response type for tools.ozone.team.updateMember
 pub struct UpdateMemberResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateMemberResponse {
     const NSID: &'static str = "tools.ozone.team.updateMember";
@@ -194,8 +189,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateMember<'a> {
     type Response = UpdateMemberResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.team.updateMember
+/// Endpoint type for tools.ozone.team.updateMember
 pub struct UpdateMemberRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateMemberRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.team.updateMember";
@@ -240,13 +234,13 @@ pub mod update_member_state {
 
 /// Builder for constructing an instance of this type
 pub struct UpdateMemberBuilder<'a, S: update_member_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<UpdateMemberRole<'a>>,
+        Option<Did<'a>>,
+        Option<bool>,
+        Option<UpdateMemberRole<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateMember<'a> {
@@ -260,9 +254,9 @@ impl<'a> UpdateMemberBuilder<'a, update_member_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateMemberBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -275,13 +269,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> UpdateMemberBuilder<'a, update_member_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         UpdateMemberBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -329,7 +323,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

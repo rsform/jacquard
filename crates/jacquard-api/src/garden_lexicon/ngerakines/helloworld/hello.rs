@@ -5,42 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Hello<'a> {
     ///(max length: 55)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subject: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub subject: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct HelloOutput<'a> {
     #[serde(borrow)]
-    pub message: jacquard_common::CowStr<'a>,
+    pub message: CowStr<'a>,
 }
 
-/// Response type for
-///garden.lexicon.ngerakines.helloworld.Hello
+/// Response type for garden.lexicon.ngerakines.helloworld.Hello
 pub struct HelloResponse;
 impl jacquard_common::xrpc::XrpcResp for HelloResponse {
     const NSID: &'static str = "garden.lexicon.ngerakines.helloworld.Hello";
@@ -55,8 +44,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Hello<'a> {
     type Response = HelloResponse;
 }
 
-/// Endpoint type for
-///garden.lexicon.ngerakines.helloworld.Hello
+/// Endpoint type for garden.lexicon.ngerakines.helloworld.Hello
 pub struct HelloRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for HelloRequest {
     const PATH: &'static str = "/xrpc/garden.lexicon.ngerakines.helloworld.Hello";
@@ -86,9 +74,9 @@ pub mod hello_state {
 
 /// Builder for constructing an instance of this type
 pub struct HelloBuilder<'a, S: hello_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Hello<'a> {
@@ -102,24 +90,21 @@ impl<'a> HelloBuilder<'a, hello_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         HelloBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: hello_state::State> HelloBuilder<'a, S> {
     /// Set the `subject` field (optional)
-    pub fn subject(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn subject(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
-    pub fn maybe_subject(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_subject(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }

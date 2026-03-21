@@ -5,370 +5,368 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A biodiversity occurrence record following the Simple Darwin Core standard. Each record represents one occurrence of an organism at a location and time.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Occurrence<'a> {
     ///Identifiers (URIs) of media associated with the occurrence. Pipe-delimited for multiple.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub associated_media: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub associated_media: Option<CowStr<'a>>,
     ///Identifiers of other occurrences associated with this one (e.g., parasite-host). Pipe-delimited.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub associated_occurrences: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub associated_occurrences: Option<CowStr<'a>>,
     ///Identifiers (URIs) of literature associated with the occurrence. Pipe-delimited for multiple.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub associated_references: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub associated_references: Option<CowStr<'a>>,
     ///Identifiers (URIs) of genetic sequence information associated with the occurrence. Pipe-delimited for multiple.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub associated_sequences: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub associated_sequences: Option<CowStr<'a>>,
     ///Audio evidence (bioacoustics, soundscape, species call, field recording, etc.).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub audio_evidence: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub audio_evidence: Option<Data<'a>>,
     ///The specific nature of the data record. Must be one of the Darwin Core class names.
     #[serde(borrow)]
-    pub basis_of_record: jacquard_common::CowStr<'a>,
+    pub basis_of_record: CowStr<'a>,
     ///The behavior shown by the subject at the time of occurrence (e.g., 'foraging', 'nesting', 'roosting').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub behavior: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub behavior: Option<CowStr<'a>>,
     ///The full scientific name of the class.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub class: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub class: Option<CowStr<'a>>,
     ///The name, acronym, or code identifying the collection or dataset from which the record was derived.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub collection_code: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub collection_code: Option<CowStr<'a>>,
     ///Horizontal distance (meters) from the given coordinates describing the smallest circle containing the whole location.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub coordinate_uncertainty_in_meters: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub coordinate_uncertainty_in_meters: Option<i64>,
     ///The name of the country or major administrative unit.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub country: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub country: Option<CowStr<'a>>,
     ///The standard code for the country (ISO 3166-1 alpha-2).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub country_code: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub country_code: Option<CowStr<'a>>,
     ///The full, unabbreviated name of the next smaller administrative region than stateProvince.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub county: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub county: Option<CowStr<'a>>,
     ///Timestamp of record creation in the ATProto PDS.
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///A description of actions taken to make the data less specific or complete (e.g., 'coordinates rounded to nearest 0.1 degree').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub data_generalizations: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub data_generalizations: Option<CowStr<'a>>,
     ///The name identifying the dataset from which the record was derived.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub dataset_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub dataset_name: Option<CowStr<'a>>,
     ///The date on which the identification was made. ISO 8601 format.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub date_identified: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub date_identified: Option<CowStr<'a>>,
     ///The Dublin Core type class that best describes the resource (dc:type).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub dc_type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub dc_type: Option<CowStr<'a>>,
     ///Geographic latitude in decimal degrees (WGS84). Positive values are north of the Equator. Range: -90 to 90.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub decimal_latitude: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub decimal_latitude: Option<CowStr<'a>>,
     ///Geographic longitude in decimal degrees (WGS84). Positive values are east of the Greenwich Meridian. Range: -180 to 180.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub decimal_longitude: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub decimal_longitude: Option<CowStr<'a>>,
     ///Additional structured data as a valid JSON string (per Simple DwC Section 7.1). Example: '{"iucnStatus":"vulnerable","canopyCover":"85%"}'. Should be flattened to a single line with no non-printing characters.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub dynamic_properties: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub dynamic_properties: Option<CowStr<'a>>,
     ///The date or date-time (or interval) during which the occurrence was recorded. ISO 8601 format (e.g., '2024-03-15', '2024-03-15T10:30:00Z', '2024-03/2024-06').
     #[serde(borrow)]
-    pub event_date: jacquard_common::CowStr<'a>,
+    pub event_date: CowStr<'a>,
     ///Identifier for the sampling event. Can be used to group occurrences from the same event.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub event_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub event_id: Option<CowStr<'a>>,
     ///AT-URI reference to an app.gainforest.dwc.event record (for star-schema linkage).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub event_ref: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub event_ref: Option<AtUri<'a>>,
     ///The time of the event. ISO 8601 format (e.g., '14:30:00', '14:30:00+02:00').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub event_time: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub event_time: Option<CowStr<'a>>,
     ///The full scientific name of the family.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub family: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub family: Option<CowStr<'a>>,
     ///Notes or reference to notes taken in the field about the event.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub field_notes: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub field_notes: Option<CowStr<'a>>,
     ///GBIF backbone taxonomy key for the identified taxon. Retained for backward compatibility with existing GainForest workflows.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub gbif_taxon_key: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub gbif_taxon_key: Option<CowStr<'a>>,
     ///The full scientific name of the genus.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub genus: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub genus: Option<CowStr<'a>>,
     ///The spatial reference system for the coordinates. Recommended: 'EPSG:4326' (WGS84).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geodetic_datum: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub geodetic_datum: Option<CowStr<'a>>,
     ///A description of the habitat in which the event occurred (e.g., 'tropical rainforest', 'mangrove swamp', 'montane cloud forest').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub habitat: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub habitat: Option<CowStr<'a>>,
     ///A complete list of taxa names terminating at the rank immediately superior to the taxon. Pipe-delimited (e.g., 'Animalia|Chordata|Mammalia|Rodentia|Ctenomyidae|Ctenomys').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub higher_classification: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub higher_classification: Option<CowStr<'a>>,
     ///A brief phrase or standard term qualifying the identification (e.g., 'cf. agrestis', 'aff. agrestis').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub identification_qualifier: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub identification_qualifier: Option<CowStr<'a>>,
     ///Comments or notes about the identification.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub identification_remarks: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub identification_remarks: Option<CowStr<'a>>,
     ///Person(s) who assigned the taxon to the occurrence. Pipe-delimited for multiple.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub identified_by: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub identified_by: Option<CowStr<'a>>,
     ///Persistent identifier(s) (e.g., ORCID) of the person(s) who identified. Pipe-delimited.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub identified_by_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub identified_by_id: Option<CowStr<'a>>,
     ///Image evidence (photo, camera trap, drone still, scanned specimen, etc.).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub image_evidence: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub image_evidence: Option<Data<'a>>,
     ///The number of individuals present at the time of the occurrence.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub individual_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub individual_count: Option<i64>,
     ///A description of what information is withheld from this record and why (e.g., 'coordinates generalized to protect endangered species').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub information_withheld: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub information_withheld: Option<CowStr<'a>>,
     ///The name of the lowest or terminal infraspecific epithet.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub infraspecific_epithet: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub infraspecific_epithet: Option<CowStr<'a>>,
     ///The name or acronym of the institution having custody of the object(s) or information in the record.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub institution_code: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub institution_code: Option<CowStr<'a>>,
     ///The full scientific name of the kingdom (e.g., 'Animalia', 'Plantae', 'Fungi').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub kingdom: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub kingdom: Option<CowStr<'a>>,
     ///A legal document giving official permission to do something with the record. Recommended: a Creative Commons URI (e.g., 'http://creativecommons.org/licenses/by/4.0/').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub license: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub license: Option<CowStr<'a>>,
     ///The age class or life stage at the time of occurrence (e.g., 'adult', 'juvenile', 'larva', 'seedling', 'sapling').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub life_stage: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub life_stage: Option<CowStr<'a>>,
     ///The specific description of the place (e.g., '500m upstream of bridge on Rio Pará').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub locality: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub locality: Option<CowStr<'a>>,
     ///Identifier for the location (e.g., a reference to a named site).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub location_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub location_id: Option<CowStr<'a>>,
     ///Comments about the location.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub location_remarks: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub location_remarks: Option<CowStr<'a>>,
     ///The greater depth of a range of depth below the local surface (in meters).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub maximum_depth_in_meters: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maximum_depth_in_meters: Option<i64>,
     ///The upper limit of the range of elevation (in meters above sea level).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub maximum_elevation_in_meters: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maximum_elevation_in_meters: Option<i64>,
     ///The lesser depth of a range of depth below the local surface (in meters).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub minimum_depth_in_meters: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minimum_depth_in_meters: Option<i64>,
     ///The lower limit of the range of elevation (in meters above sea level).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub minimum_elevation_in_meters: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minimum_elevation_in_meters: Option<i64>,
     ///The full, unabbreviated name of the next smaller administrative region than county.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub municipality: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub municipality: Option<CowStr<'a>>,
     ///The nomenclatural code under which the scientificName is constructed.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub nomenclatural_code: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub nomenclatural_code: Option<CowStr<'a>>,
     ///A globally unique identifier for the occurrence record. Recommended: a persistent URI (e.g., DOI, LSID, or UUID-based URI).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub occurrence_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub occurrence_id: Option<CowStr<'a>>,
     ///Comments or notes about the occurrence.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub occurrence_remarks: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub occurrence_remarks: Option<CowStr<'a>>,
     ///Statement about the presence or absence of a taxon at a location.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub occurrence_status: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub occurrence_status: Option<CowStr<'a>>,
     ///The full scientific name of the order.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub order: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub order: Option<CowStr<'a>>,
     ///A number or enumeration value for the quantity of organisms (e.g., '27', '12.5', 'many').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub organism_quantity: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub organism_quantity: Option<CowStr<'a>>,
     ///The type of quantification system used for organismQuantity (e.g., 'individuals', '% biomass', 'stems/ha').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub organism_quantity_type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub organism_quantity_type: Option<CowStr<'a>>,
     ///The full scientific name of the phylum or division.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub phylum: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub phylum: Option<CowStr<'a>>,
     ///Previous assignments of names to the occurrence. Pipe-delimited.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub previous_identifications: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub previous_identifications: Option<CowStr<'a>>,
     ///Person(s) responsible for recording the occurrence in the field. Pipe-delimited for multiple (e.g., 'Jane Smith | John Doe').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub recorded_by: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub recorded_by: Option<CowStr<'a>>,
     ///Persistent identifier(s) (e.g., ORCID) of the person(s) who recorded. Pipe-delimited for multiple.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub recorded_by_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub recorded_by_id: Option<CowStr<'a>>,
     ///A related resource that is referenced, cited, or otherwise pointed to by the record (URL).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub references: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub references: Option<UriValue<'a>>,
     ///The reproductive condition at the time of occurrence (e.g., 'flowering', 'fruiting', 'budding', 'pregnant').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub reproductive_condition: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub reproductive_condition: Option<CowStr<'a>>,
     ///Person or organization owning or managing rights over the resource.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub rights_holder: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub rights_holder: Option<CowStr<'a>>,
     ///The amount of effort expended during the event (e.g., '2 trap-nights', '30 minutes', '10 km transect').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sampling_effort: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub sampling_effort: Option<CowStr<'a>>,
     ///The method or protocol used during the event (e.g., 'camera trap', 'point count', 'mist net', '20m x 20m plot survey', 'acoustic monitoring').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sampling_protocol: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub sampling_protocol: Option<CowStr<'a>>,
     ///The full scientific name, with authorship and date if known (e.g., 'Centropyge flavicauda Fraser-Brunner 1933').
     #[serde(borrow)]
-    pub scientific_name: jacquard_common::CowStr<'a>,
+    pub scientific_name: CowStr<'a>,
     ///The authorship information for the scientific name (e.g., 'Fraser-Brunner 1933').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub scientific_name_authorship: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub scientific_name_authorship: Option<CowStr<'a>>,
     ///The sex of the biological individual(s).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sex: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub sex: Option<CowStr<'a>>,
     ///The name of the species epithet of the scientificName.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub specific_epithet: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub specific_epithet: Option<CowStr<'a>>,
     ///Spectrogram image showing frequency analysis of audio recording.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub spectrogram_evidence: core::option::Option<
-        jacquard_common::types::value::Data<'a>,
-    >,
+    pub spectrogram_evidence: Option<Data<'a>>,
     ///The name of the next smaller administrative region than country.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub state_province: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub state_province: Option<CowStr<'a>>,
     ///The taxonomic rank of the most specific name in scientificName.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub taxon_rank: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub taxon_rank: Option<CowStr<'a>>,
     ///The status of the use of the scientificName (e.g., 'accepted', 'synonym', 'doubtful').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub taxonomic_status: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub taxonomic_status: Option<CowStr<'a>>,
     ///The original textual description of the place as provided by the recorder.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub verbatim_locality: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub verbatim_locality: Option<CowStr<'a>>,
     ///A common or vernacular name for the taxon.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub vernacular_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub vernacular_name: Option<CowStr<'a>>,
     ///Video evidence (camera trap, drone footage, underwater video, behavioral observation, etc.).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub video_evidence: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub video_evidence: Option<Data<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct OccurrenceGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Occurrence<'a>,
 }
 
 impl<'a> Occurrence<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, OccurrenceRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, OccurrenceRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct OccurrenceRecord;
-impl jacquard_common::xrpc::XrpcResp for OccurrenceRecord {
+impl XrpcResp for OccurrenceRecord {
     const NSID: &'static str = "app.gainforest.dwc.occurrence";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = OccurrenceGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<OccurrenceGetRecordOutput<'_>> for Occurrence<'_> {
@@ -378,41 +376,33 @@ impl From<OccurrenceGetRecordOutput<'_>> for Occurrence<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Occurrence<'_> {
+impl Collection for Occurrence<'_> {
     const NSID: &'static str = "app.gainforest.dwc.occurrence";
     type Record = OccurrenceRecord;
 }
 
-impl jacquard_common::types::collection::Collection for OccurrenceRecord {
+impl Collection for OccurrenceRecord {
     const NSID: &'static str = "app.gainforest.dwc.occurrence";
     type Record = OccurrenceRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
+impl<'a> LexiconSchema for Occurrence<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.dwc.occurrence"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_gainforest_dwc_occurrence()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.associated_media {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "associated_media",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("associated_media"),
                         max: 2048usize,
                         actual: count,
                     });
@@ -421,16 +411,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.associated_occurrences {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "associated_occurrences",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("associated_occurrences"),
                         max: 2048usize,
                         actual: count,
                     });
@@ -439,16 +423,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.associated_references {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "associated_references",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("associated_references"),
                         max: 2048usize,
                         actual: count,
                     });
@@ -457,16 +435,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.associated_sequences {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "associated_sequences",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("associated_sequences"),
                         max: 2048usize,
                         actual: count,
                     });
@@ -476,16 +448,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         {
             let value = &self.basis_of_record;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "basis_of_record",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("basis_of_record"),
                         max: 64usize,
                         actual: count,
                     });
@@ -494,16 +460,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.behavior {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "behavior",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("behavior"),
                         max: 256usize,
                         actual: count,
                     });
@@ -512,16 +472,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.class {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "class",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("class"),
                         max: 128usize,
                         actual: count,
                     });
@@ -530,16 +484,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.collection_code {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "collection_code",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("collection_code"),
                         max: 256usize,
                         actual: count,
                     });
@@ -548,10 +496,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.coordinate_uncertainty_in_meters {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "coordinate_uncertainty_in_meters",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("coordinate_uncertainty_in_meters"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -559,16 +505,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.country {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "country",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("country"),
                         max: 128usize,
                         actual: count,
                     });
@@ -578,10 +518,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         if let Some(ref value) = self.country_code {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "country_code",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("country_code"),
                     max: 2usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -590,10 +528,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         if let Some(ref value) = self.country_code {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 2usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "country_code",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("country_code"),
                     min: 2usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -601,16 +537,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.county {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "county",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("county"),
                         max: 256usize,
                         actual: count,
                     });
@@ -619,16 +549,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.data_generalizations {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 1024usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "data_generalizations",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("data_generalizations"),
                         max: 1024usize,
                         actual: count,
                     });
@@ -637,16 +561,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.dataset_name {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "dataset_name",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("dataset_name"),
                         max: 256usize,
                         actual: count,
                     });
@@ -655,16 +573,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.date_identified {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "date_identified",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("date_identified"),
                         max: 64usize,
                         actual: count,
                     });
@@ -673,16 +585,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.dc_type {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "dc_type",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("dc_type"),
                         max: 64usize,
                         actual: count,
                     });
@@ -691,16 +597,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.decimal_latitude {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 32usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "decimal_latitude",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("decimal_latitude"),
                         max: 32usize,
                         actual: count,
                     });
@@ -709,16 +609,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.decimal_longitude {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 32usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "decimal_longitude",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("decimal_longitude"),
                         max: 32usize,
                         actual: count,
                     });
@@ -727,16 +621,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.dynamic_properties {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 10000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "dynamic_properties",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("dynamic_properties"),
                         max: 10000usize,
                         actual: count,
                     });
@@ -746,16 +634,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         {
             let value = &self.event_date;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "event_date",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("event_date"),
                         max: 64usize,
                         actual: count,
                     });
@@ -764,16 +646,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.event_id {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "event_id",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("event_id"),
                         max: 256usize,
                         actual: count,
                     });
@@ -782,16 +658,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.event_time {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "event_time",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("event_time"),
                         max: 64usize,
                         actual: count,
                     });
@@ -800,16 +670,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.family {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "family",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("family"),
                         max: 128usize,
                         actual: count,
                     });
@@ -818,16 +682,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.field_notes {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 10000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "field_notes",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("field_notes"),
                         max: 10000usize,
                         actual: count,
                     });
@@ -836,16 +694,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.gbif_taxon_key {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "gbif_taxon_key",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("gbif_taxon_key"),
                         max: 64usize,
                         actual: count,
                     });
@@ -854,16 +706,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.genus {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "genus",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("genus"),
                         max: 128usize,
                         actual: count,
                     });
@@ -872,16 +718,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.geodetic_datum {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "geodetic_datum",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("geodetic_datum"),
                         max: 64usize,
                         actual: count,
                     });
@@ -890,16 +730,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.habitat {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "habitat",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("habitat"),
                         max: 512usize,
                         actual: count,
                     });
@@ -908,16 +742,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.higher_classification {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 1024usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "higher_classification",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("higher_classification"),
                         max: 1024usize,
                         actual: count,
                     });
@@ -926,16 +754,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.identification_qualifier {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identification_qualifier",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("identification_qualifier"),
                         max: 256usize,
                         actual: count,
                     });
@@ -944,16 +766,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.identification_remarks {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identification_remarks",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("identification_remarks"),
                         max: 2048usize,
                         actual: count,
                     });
@@ -962,16 +778,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.identified_by {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identified_by",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("identified_by"),
                         max: 512usize,
                         actual: count,
                     });
@@ -980,16 +790,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.identified_by_id {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identified_by_id",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("identified_by_id"),
                         max: 512usize,
                         actual: count,
                     });
@@ -998,10 +802,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.individual_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "individual_count",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("individual_count"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1009,16 +811,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.information_withheld {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 1024usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "information_withheld",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("information_withheld"),
                         max: 1024usize,
                         actual: count,
                     });
@@ -1027,16 +823,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.infraspecific_epithet {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "infraspecific_epithet",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("infraspecific_epithet"),
                         max: 128usize,
                         actual: count,
                     });
@@ -1045,16 +835,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.institution_code {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "institution_code",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("institution_code"),
                         max: 256usize,
                         actual: count,
                     });
@@ -1063,16 +847,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.kingdom {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "kingdom",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("kingdom"),
                         max: 128usize,
                         actual: count,
                     });
@@ -1081,16 +859,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.license {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "license",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("license"),
                         max: 512usize,
                         actual: count,
                     });
@@ -1099,16 +871,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.life_stage {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "life_stage",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("life_stage"),
                         max: 128usize,
                         actual: count,
                     });
@@ -1117,16 +883,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.locality {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 1024usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "locality",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("locality"),
                         max: 1024usize,
                         actual: count,
                     });
@@ -1135,16 +895,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.location_id {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "location_id",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("location_id"),
                         max: 256usize,
                         actual: count,
                     });
@@ -1153,16 +907,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.location_remarks {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "location_remarks",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("location_remarks"),
                         max: 2048usize,
                         actual: count,
                     });
@@ -1171,10 +919,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.maximum_depth_in_meters {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "maximum_depth_in_meters",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("maximum_depth_in_meters"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1182,10 +928,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.minimum_depth_in_meters {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "minimum_depth_in_meters",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("minimum_depth_in_meters"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1193,16 +937,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.municipality {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "municipality",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("municipality"),
                         max: 256usize,
                         actual: count,
                     });
@@ -1211,16 +949,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.nomenclatural_code {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "nomenclatural_code",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("nomenclatural_code"),
                         max: 64usize,
                         actual: count,
                     });
@@ -1229,16 +961,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.occurrence_id {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "occurrence_id",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("occurrence_id"),
                         max: 256usize,
                         actual: count,
                     });
@@ -1247,16 +973,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.occurrence_remarks {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 5000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "occurrence_remarks",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("occurrence_remarks"),
                         max: 5000usize,
                         actual: count,
                     });
@@ -1265,16 +985,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.occurrence_status {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "occurrence_status",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("occurrence_status"),
                         max: 64usize,
                         actual: count,
                     });
@@ -1283,16 +997,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.order {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "order",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("order"),
                         max: 128usize,
                         actual: count,
                     });
@@ -1301,16 +1009,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.organism_quantity {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "organism_quantity",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("organism_quantity"),
                         max: 64usize,
                         actual: count,
                     });
@@ -1319,16 +1021,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.organism_quantity_type {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "organism_quantity_type",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("organism_quantity_type"),
                         max: 128usize,
                         actual: count,
                     });
@@ -1337,16 +1033,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.phylum {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "phylum",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("phylum"),
                         max: 128usize,
                         actual: count,
                     });
@@ -1355,16 +1045,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.previous_identifications {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "previous_identifications",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("previous_identifications"),
                         max: 2048usize,
                         actual: count,
                     });
@@ -1373,16 +1057,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.recorded_by {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "recorded_by",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("recorded_by"),
                         max: 512usize,
                         actual: count,
                     });
@@ -1391,16 +1069,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.recorded_by_id {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "recorded_by_id",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("recorded_by_id"),
                         max: 512usize,
                         actual: count,
                     });
@@ -1409,16 +1081,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.reproductive_condition {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "reproductive_condition",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("reproductive_condition"),
                         max: 128usize,
                         actual: count,
                     });
@@ -1427,16 +1093,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.rights_holder {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "rights_holder",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("rights_holder"),
                         max: 256usize,
                         actual: count,
                     });
@@ -1445,16 +1105,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.sampling_effort {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "sampling_effort",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("sampling_effort"),
                         max: 256usize,
                         actual: count,
                     });
@@ -1463,16 +1117,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.sampling_protocol {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 1024usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "sampling_protocol",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("sampling_protocol"),
                         max: 1024usize,
                         actual: count,
                     });
@@ -1482,16 +1130,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         {
             let value = &self.scientific_name;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "scientific_name",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("scientific_name"),
                         max: 512usize,
                         actual: count,
                     });
@@ -1500,16 +1142,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.scientific_name_authorship {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "scientific_name_authorship",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("scientific_name_authorship"),
                         max: 256usize,
                         actual: count,
                     });
@@ -1518,16 +1154,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.sex {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "sex",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("sex"),
                         max: 64usize,
                         actual: count,
                     });
@@ -1536,16 +1166,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.specific_epithet {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "specific_epithet",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("specific_epithet"),
                         max: 128usize,
                         actual: count,
                     });
@@ -1554,16 +1178,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.state_province {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "state_province",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("state_province"),
                         max: 256usize,
                         actual: count,
                     });
@@ -1572,16 +1190,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.taxon_rank {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "taxon_rank",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("taxon_rank"),
                         max: 64usize,
                         actual: count,
                     });
@@ -1590,16 +1202,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.taxonomic_status {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "taxonomic_status",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("taxonomic_status"),
                         max: 64usize,
                         actual: count,
                     });
@@ -1608,16 +1214,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.verbatim_locality {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 1024usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "verbatim_locality",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("verbatim_locality"),
                         max: 1024usize,
                         actual: count,
                     });
@@ -1626,16 +1226,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
         }
         if let Some(ref value) = self.vernacular_name {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "vernacular_name",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("vernacular_name"),
                         max: 256usize,
                         actual: count,
                     });
@@ -1656,155 +1250,155 @@ pub mod occurrence_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BasisOfRecord;
-        type EventDate;
-        type ScientificName;
         type CreatedAt;
+        type ScientificName;
+        type EventDate;
+        type BasisOfRecord;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BasisOfRecord = Unset;
-        type EventDate = Unset;
-        type ScientificName = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `basis_of_record` field to Set
-    pub struct SetBasisOfRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBasisOfRecord<S> {}
-    impl<S: State> State for SetBasisOfRecord<S> {
-        type BasisOfRecord = Set<members::basis_of_record>;
-        type EventDate = S::EventDate;
-        type ScientificName = S::ScientificName;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `event_date` field to Set
-    pub struct SetEventDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventDate<S> {}
-    impl<S: State> State for SetEventDate<S> {
-        type BasisOfRecord = S::BasisOfRecord;
-        type EventDate = Set<members::event_date>;
-        type ScientificName = S::ScientificName;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `scientific_name` field to Set
-    pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScientificName<S> {}
-    impl<S: State> State for SetScientificName<S> {
-        type BasisOfRecord = S::BasisOfRecord;
-        type EventDate = S::EventDate;
-        type ScientificName = Set<members::scientific_name>;
-        type CreatedAt = S::CreatedAt;
+        type ScientificName = Unset;
+        type EventDate = Unset;
+        type BasisOfRecord = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type BasisOfRecord = S::BasisOfRecord;
-        type EventDate = S::EventDate;
-        type ScientificName = S::ScientificName;
         type CreatedAt = Set<members::created_at>;
+        type ScientificName = S::ScientificName;
+        type EventDate = S::EventDate;
+        type BasisOfRecord = S::BasisOfRecord;
+    }
+    ///State transition - sets the `scientific_name` field to Set
+    pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScientificName<S> {}
+    impl<S: State> State for SetScientificName<S> {
+        type CreatedAt = S::CreatedAt;
+        type ScientificName = Set<members::scientific_name>;
+        type EventDate = S::EventDate;
+        type BasisOfRecord = S::BasisOfRecord;
+    }
+    ///State transition - sets the `event_date` field to Set
+    pub struct SetEventDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventDate<S> {}
+    impl<S: State> State for SetEventDate<S> {
+        type CreatedAt = S::CreatedAt;
+        type ScientificName = S::ScientificName;
+        type EventDate = Set<members::event_date>;
+        type BasisOfRecord = S::BasisOfRecord;
+    }
+    ///State transition - sets the `basis_of_record` field to Set
+    pub struct SetBasisOfRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBasisOfRecord<S> {}
+    impl<S: State> State for SetBasisOfRecord<S> {
+        type CreatedAt = S::CreatedAt;
+        type ScientificName = S::ScientificName;
+        type EventDate = S::EventDate;
+        type BasisOfRecord = Set<members::basis_of_record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `basis_of_record` field
-        pub struct basis_of_record(());
-        ///Marker type for the `event_date` field
-        pub struct event_date(());
-        ///Marker type for the `scientific_name` field
-        pub struct scientific_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `scientific_name` field
+        pub struct scientific_name(());
+        ///Marker type for the `event_date` field
+        pub struct event_date(());
+        ///Marker type for the `basis_of_record` field
+        pub struct basis_of_record(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct OccurrenceBuilder<'a, S: occurrence_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Data<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<AtUri<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Data<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<UriValue<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Data<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Data<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Occurrence<'a> {
@@ -1818,7 +1412,7 @@ impl<'a> OccurrenceBuilder<'a, occurrence_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         OccurrenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -1900,25 +1494,19 @@ impl<'a> OccurrenceBuilder<'a, occurrence_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `associatedMedia` field (optional)
-    pub fn associated_media(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn associated_media(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
-    pub fn maybe_associated_media(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_associated_media(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -1928,16 +1516,13 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `associatedOccurrences` field (optional)
     pub fn associated_occurrences(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `associatedOccurrences` field to an Option value (optional)
-    pub fn maybe_associated_occurrences(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_associated_occurrences(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -1947,16 +1532,13 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `associatedReferences` field (optional)
     pub fn associated_references(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `associatedReferences` field to an Option value (optional)
-    pub fn maybe_associated_references(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_associated_references(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -1964,18 +1546,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `associatedSequences` field (optional)
-    pub fn associated_sequences(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn associated_sequences(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `associatedSequences` field to an Option value (optional)
-    pub fn maybe_associated_sequences(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_associated_sequences(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -1983,18 +1559,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `audioEvidence` field (optional)
-    pub fn audio_evidence(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn audio_evidence(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `audioEvidence` field to an Option value (optional)
-    pub fn maybe_audio_evidence(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_audio_evidence(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -2008,28 +1578,25 @@ where
     /// Set the `basisOfRecord` field (required)
     pub fn basis_of_record(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> OccurrenceBuilder<'a, occurrence_state::SetBasisOfRecord<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         OccurrenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `behavior` field (optional)
-    pub fn behavior(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn behavior(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `behavior` field to an Option value (optional)
-    pub fn maybe_behavior(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_behavior(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -2037,15 +1604,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `class` field (optional)
-    pub fn class(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn class(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `class` field to an Option value (optional)
-    pub fn maybe_class(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_class(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -2053,18 +1617,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `collectionCode` field (optional)
-    pub fn collection_code(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn collection_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `collectionCode` field to an Option value (optional)
-    pub fn maybe_collection_code(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_collection_code(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -2088,15 +1646,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `country` field (optional)
-    pub fn country(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn country(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `country` field to an Option value (optional)
-    pub fn maybe_country(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_country(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -2104,18 +1659,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `countryCode` field (optional)
-    pub fn country_code(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn country_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `countryCode` field to an Option value (optional)
-    pub fn maybe_country_code(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_country_code(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.11 = value;
         self
     }
@@ -2123,15 +1672,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `county` field (optional)
-    pub fn county(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn county(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `county` field to an Option value (optional)
-    pub fn maybe_county(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_county(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.12 = value;
         self
     }
@@ -2145,31 +1691,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> OccurrenceBuilder<'a, occurrence_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.13 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.13 = Option::Some(value.into());
         OccurrenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `dataGeneralizations` field (optional)
-    pub fn data_generalizations(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn data_generalizations(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.14 = value.into();
         self
     }
     /// Set the `dataGeneralizations` field to an Option value (optional)
-    pub fn maybe_data_generalizations(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_data_generalizations(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.14 = value;
         self
     }
@@ -2177,18 +1717,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `datasetName` field (optional)
-    pub fn dataset_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn dataset_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.15 = value.into();
         self
     }
     /// Set the `datasetName` field to an Option value (optional)
-    pub fn maybe_dataset_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_dataset_name(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.15 = value;
         self
     }
@@ -2196,18 +1730,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `dateIdentified` field (optional)
-    pub fn date_identified(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn date_identified(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.16 = value.into();
         self
     }
     /// Set the `dateIdentified` field to an Option value (optional)
-    pub fn maybe_date_identified(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_date_identified(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.16 = value;
         self
     }
@@ -2215,15 +1743,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `dcType` field (optional)
-    pub fn dc_type(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn dc_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.17 = value.into();
         self
     }
     /// Set the `dcType` field to an Option value (optional)
-    pub fn maybe_dc_type(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_dc_type(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.17 = value;
         self
     }
@@ -2231,18 +1756,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `decimalLatitude` field (optional)
-    pub fn decimal_latitude(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn decimal_latitude(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.18 = value.into();
         self
     }
     /// Set the `decimalLatitude` field to an Option value (optional)
-    pub fn maybe_decimal_latitude(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_decimal_latitude(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.18 = value;
         self
     }
@@ -2250,18 +1769,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `decimalLongitude` field (optional)
-    pub fn decimal_longitude(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn decimal_longitude(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.19 = value.into();
         self
     }
     /// Set the `decimalLongitude` field to an Option value (optional)
-    pub fn maybe_decimal_longitude(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_decimal_longitude(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.19 = value;
         self
     }
@@ -2269,18 +1782,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `dynamicProperties` field (optional)
-    pub fn dynamic_properties(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn dynamic_properties(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.20 = value.into();
         self
     }
     /// Set the `dynamicProperties` field to an Option value (optional)
-    pub fn maybe_dynamic_properties(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_dynamic_properties(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.20 = value;
         self
     }
@@ -2294,28 +1801,25 @@ where
     /// Set the `eventDate` field (required)
     pub fn event_date(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> OccurrenceBuilder<'a, occurrence_state::SetEventDate<S>> {
-        self.__unsafe_private_named.21 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.21 = Option::Some(value.into());
         OccurrenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `eventID` field (optional)
-    pub fn event_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn event_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.22 = value.into();
         self
     }
     /// Set the `eventID` field to an Option value (optional)
-    pub fn maybe_event_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_event_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.22 = value;
         self
     }
@@ -2323,18 +1827,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `eventRef` field (optional)
-    pub fn event_ref(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn event_ref(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.23 = value.into();
         self
     }
     /// Set the `eventRef` field to an Option value (optional)
-    pub fn maybe_event_ref(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_event_ref(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.23 = value;
         self
     }
@@ -2342,18 +1840,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `eventTime` field (optional)
-    pub fn event_time(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn event_time(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.24 = value.into();
         self
     }
     /// Set the `eventTime` field to an Option value (optional)
-    pub fn maybe_event_time(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_event_time(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.24 = value;
         self
     }
@@ -2361,15 +1853,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `family` field (optional)
-    pub fn family(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn family(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.25 = value.into();
         self
     }
     /// Set the `family` field to an Option value (optional)
-    pub fn maybe_family(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_family(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.25 = value;
         self
     }
@@ -2377,18 +1866,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `fieldNotes` field (optional)
-    pub fn field_notes(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn field_notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.26 = value.into();
         self
     }
     /// Set the `fieldNotes` field to an Option value (optional)
-    pub fn maybe_field_notes(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_field_notes(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.26 = value;
         self
     }
@@ -2396,18 +1879,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `gbifTaxonKey` field (optional)
-    pub fn gbif_taxon_key(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn gbif_taxon_key(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.27 = value.into();
         self
     }
     /// Set the `gbifTaxonKey` field to an Option value (optional)
-    pub fn maybe_gbif_taxon_key(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_gbif_taxon_key(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.27 = value;
         self
     }
@@ -2415,15 +1892,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `genus` field (optional)
-    pub fn genus(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn genus(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.28 = value.into();
         self
     }
     /// Set the `genus` field to an Option value (optional)
-    pub fn maybe_genus(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_genus(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.28 = value;
         self
     }
@@ -2431,18 +1905,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `geodeticDatum` field (optional)
-    pub fn geodetic_datum(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn geodetic_datum(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.29 = value.into();
         self
     }
     /// Set the `geodeticDatum` field to an Option value (optional)
-    pub fn maybe_geodetic_datum(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_geodetic_datum(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.29 = value;
         self
     }
@@ -2450,15 +1918,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `habitat` field (optional)
-    pub fn habitat(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn habitat(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.30 = value.into();
         self
     }
     /// Set the `habitat` field to an Option value (optional)
-    pub fn maybe_habitat(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_habitat(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.30 = value;
         self
     }
@@ -2468,16 +1933,13 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `higherClassification` field (optional)
     pub fn higher_classification(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.31 = value.into();
         self
     }
     /// Set the `higherClassification` field to an Option value (optional)
-    pub fn maybe_higher_classification(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_higher_classification(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.31 = value;
         self
     }
@@ -2487,16 +1949,13 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `identificationQualifier` field (optional)
     pub fn identification_qualifier(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.32 = value.into();
         self
     }
     /// Set the `identificationQualifier` field to an Option value (optional)
-    pub fn maybe_identification_qualifier(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_identification_qualifier(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.32 = value;
         self
     }
@@ -2506,16 +1965,13 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `identificationRemarks` field (optional)
     pub fn identification_remarks(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.33 = value.into();
         self
     }
     /// Set the `identificationRemarks` field to an Option value (optional)
-    pub fn maybe_identification_remarks(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_identification_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.33 = value;
         self
     }
@@ -2523,18 +1979,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `identifiedBy` field (optional)
-    pub fn identified_by(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn identified_by(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.34 = value.into();
         self
     }
     /// Set the `identifiedBy` field to an Option value (optional)
-    pub fn maybe_identified_by(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_identified_by(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.34 = value;
         self
     }
@@ -2542,18 +1992,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `identifiedByID` field (optional)
-    pub fn identified_by_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn identified_by_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.35 = value.into();
         self
     }
     /// Set the `identifiedByID` field to an Option value (optional)
-    pub fn maybe_identified_by_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_identified_by_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.35 = value;
         self
     }
@@ -2561,18 +2005,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `imageEvidence` field (optional)
-    pub fn image_evidence(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn image_evidence(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.36 = value.into();
         self
     }
     /// Set the `imageEvidence` field to an Option value (optional)
-    pub fn maybe_image_evidence(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_image_evidence(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.36 = value;
         self
     }
@@ -2593,18 +2031,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `informationWithheld` field (optional)
-    pub fn information_withheld(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn information_withheld(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.38 = value.into();
         self
     }
     /// Set the `informationWithheld` field to an Option value (optional)
-    pub fn maybe_information_withheld(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_information_withheld(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.38 = value;
         self
     }
@@ -2614,16 +2046,13 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `infraspecificEpithet` field (optional)
     pub fn infraspecific_epithet(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.39 = value.into();
         self
     }
     /// Set the `infraspecificEpithet` field to an Option value (optional)
-    pub fn maybe_infraspecific_epithet(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_infraspecific_epithet(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.39 = value;
         self
     }
@@ -2631,18 +2060,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `institutionCode` field (optional)
-    pub fn institution_code(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn institution_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.40 = value.into();
         self
     }
     /// Set the `institutionCode` field to an Option value (optional)
-    pub fn maybe_institution_code(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_institution_code(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.40 = value;
         self
     }
@@ -2650,15 +2073,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `kingdom` field (optional)
-    pub fn kingdom(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn kingdom(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.41 = value.into();
         self
     }
     /// Set the `kingdom` field to an Option value (optional)
-    pub fn maybe_kingdom(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_kingdom(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.41 = value;
         self
     }
@@ -2666,15 +2086,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `license` field (optional)
-    pub fn license(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn license(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.42 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
-    pub fn maybe_license(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_license(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.42 = value;
         self
     }
@@ -2682,18 +2099,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `lifeStage` field (optional)
-    pub fn life_stage(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn life_stage(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.43 = value.into();
         self
     }
     /// Set the `lifeStage` field to an Option value (optional)
-    pub fn maybe_life_stage(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_life_stage(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.43 = value;
         self
     }
@@ -2701,15 +2112,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `locality` field (optional)
-    pub fn locality(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn locality(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.44 = value.into();
         self
     }
     /// Set the `locality` field to an Option value (optional)
-    pub fn maybe_locality(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_locality(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.44 = value;
         self
     }
@@ -2717,18 +2125,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `locationID` field (optional)
-    pub fn location_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn location_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.45 = value.into();
         self
     }
     /// Set the `locationID` field to an Option value (optional)
-    pub fn maybe_location_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_location_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.45 = value;
         self
     }
@@ -2736,18 +2138,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `locationRemarks` field (optional)
-    pub fn location_remarks(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn location_remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.46 = value.into();
         self
     }
     /// Set the `locationRemarks` field to an Option value (optional)
-    pub fn maybe_location_remarks(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_location_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.46 = value;
         self
     }
@@ -2807,18 +2203,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `municipality` field (optional)
-    pub fn municipality(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn municipality(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.51 = value.into();
         self
     }
     /// Set the `municipality` field to an Option value (optional)
-    pub fn maybe_municipality(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_municipality(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.51 = value;
         self
     }
@@ -2826,18 +2216,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `nomenclaturalCode` field (optional)
-    pub fn nomenclatural_code(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn nomenclatural_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.52 = value.into();
         self
     }
     /// Set the `nomenclaturalCode` field to an Option value (optional)
-    pub fn maybe_nomenclatural_code(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_nomenclatural_code(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.52 = value;
         self
     }
@@ -2845,18 +2229,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `occurrenceID` field (optional)
-    pub fn occurrence_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn occurrence_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.53 = value.into();
         self
     }
     /// Set the `occurrenceID` field to an Option value (optional)
-    pub fn maybe_occurrence_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_occurrence_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.53 = value;
         self
     }
@@ -2864,18 +2242,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `occurrenceRemarks` field (optional)
-    pub fn occurrence_remarks(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn occurrence_remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.54 = value.into();
         self
     }
     /// Set the `occurrenceRemarks` field to an Option value (optional)
-    pub fn maybe_occurrence_remarks(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_occurrence_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.54 = value;
         self
     }
@@ -2883,18 +2255,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `occurrenceStatus` field (optional)
-    pub fn occurrence_status(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn occurrence_status(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.55 = value.into();
         self
     }
     /// Set the `occurrenceStatus` field to an Option value (optional)
-    pub fn maybe_occurrence_status(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_occurrence_status(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.55 = value;
         self
     }
@@ -2902,15 +2268,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `order` field (optional)
-    pub fn order(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn order(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.56 = value.into();
         self
     }
     /// Set the `order` field to an Option value (optional)
-    pub fn maybe_order(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_order(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.56 = value;
         self
     }
@@ -2918,18 +2281,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `organismQuantity` field (optional)
-    pub fn organism_quantity(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn organism_quantity(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.57 = value.into();
         self
     }
     /// Set the `organismQuantity` field to an Option value (optional)
-    pub fn maybe_organism_quantity(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_organism_quantity(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.57 = value;
         self
     }
@@ -2939,16 +2296,13 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `organismQuantityType` field (optional)
     pub fn organism_quantity_type(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.58 = value.into();
         self
     }
     /// Set the `organismQuantityType` field to an Option value (optional)
-    pub fn maybe_organism_quantity_type(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_organism_quantity_type(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.58 = value;
         self
     }
@@ -2956,15 +2310,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `phylum` field (optional)
-    pub fn phylum(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn phylum(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.59 = value.into();
         self
     }
     /// Set the `phylum` field to an Option value (optional)
-    pub fn maybe_phylum(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_phylum(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.59 = value;
         self
     }
@@ -2974,16 +2325,13 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `previousIdentifications` field (optional)
     pub fn previous_identifications(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.60 = value.into();
         self
     }
     /// Set the `previousIdentifications` field to an Option value (optional)
-    pub fn maybe_previous_identifications(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_previous_identifications(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.60 = value;
         self
     }
@@ -2991,18 +2339,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `recordedBy` field (optional)
-    pub fn recorded_by(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn recorded_by(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.61 = value.into();
         self
     }
     /// Set the `recordedBy` field to an Option value (optional)
-    pub fn maybe_recorded_by(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_recorded_by(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.61 = value;
         self
     }
@@ -3010,18 +2352,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `recordedByID` field (optional)
-    pub fn recorded_by_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn recorded_by_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.62 = value.into();
         self
     }
     /// Set the `recordedByID` field to an Option value (optional)
-    pub fn maybe_recorded_by_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_recorded_by_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.62 = value;
         self
     }
@@ -3029,18 +2365,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `references` field (optional)
-    pub fn references(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn references(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.63 = value.into();
         self
     }
     /// Set the `references` field to an Option value (optional)
-    pub fn maybe_references(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_references(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.63 = value;
         self
     }
@@ -3050,16 +2380,13 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `reproductiveCondition` field (optional)
     pub fn reproductive_condition(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.64 = value.into();
         self
     }
     /// Set the `reproductiveCondition` field to an Option value (optional)
-    pub fn maybe_reproductive_condition(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_reproductive_condition(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.64 = value;
         self
     }
@@ -3067,18 +2394,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `rightsHolder` field (optional)
-    pub fn rights_holder(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn rights_holder(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.65 = value.into();
         self
     }
     /// Set the `rightsHolder` field to an Option value (optional)
-    pub fn maybe_rights_holder(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_rights_holder(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.65 = value;
         self
     }
@@ -3086,18 +2407,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `samplingEffort` field (optional)
-    pub fn sampling_effort(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn sampling_effort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.66 = value.into();
         self
     }
     /// Set the `samplingEffort` field to an Option value (optional)
-    pub fn maybe_sampling_effort(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_sampling_effort(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.66 = value;
         self
     }
@@ -3105,18 +2420,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `samplingProtocol` field (optional)
-    pub fn sampling_protocol(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn sampling_protocol(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.67 = value.into();
         self
     }
     /// Set the `samplingProtocol` field to an Option value (optional)
-    pub fn maybe_sampling_protocol(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_sampling_protocol(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.67 = value;
         self
     }
@@ -3130,13 +2439,13 @@ where
     /// Set the `scientificName` field (required)
     pub fn scientific_name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> OccurrenceBuilder<'a, occurrence_state::SetScientificName<S>> {
-        self.__unsafe_private_named.68 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.68 = Option::Some(value.into());
         OccurrenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3145,7 +2454,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `scientificNameAuthorship` field (optional)
     pub fn scientific_name_authorship(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.69 = value.into();
         self
@@ -3153,7 +2462,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `scientificNameAuthorship` field to an Option value (optional)
     pub fn maybe_scientific_name_authorship(
         mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
+        value: Option<CowStr<'a>>,
     ) -> Self {
         self.__unsafe_private_named.69 = value;
         self
@@ -3162,12 +2471,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `sex` field (optional)
-    pub fn sex(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn sex(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.70 = value.into();
         self
     }
     /// Set the `sex` field to an Option value (optional)
-    pub fn maybe_sex(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_sex(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.70 = value;
         self
     }
@@ -3175,18 +2484,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `specificEpithet` field (optional)
-    pub fn specific_epithet(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn specific_epithet(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.71 = value.into();
         self
     }
     /// Set the `specificEpithet` field to an Option value (optional)
-    pub fn maybe_specific_epithet(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_specific_epithet(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.71 = value;
         self
     }
@@ -3194,18 +2497,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `spectrogramEvidence` field (optional)
-    pub fn spectrogram_evidence(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn spectrogram_evidence(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.72 = value.into();
         self
     }
     /// Set the `spectrogramEvidence` field to an Option value (optional)
-    pub fn maybe_spectrogram_evidence(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_spectrogram_evidence(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.72 = value;
         self
     }
@@ -3213,18 +2510,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `stateProvince` field (optional)
-    pub fn state_province(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn state_province(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.73 = value.into();
         self
     }
     /// Set the `stateProvince` field to an Option value (optional)
-    pub fn maybe_state_province(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_state_province(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.73 = value;
         self
     }
@@ -3232,18 +2523,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `taxonRank` field (optional)
-    pub fn taxon_rank(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn taxon_rank(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.74 = value.into();
         self
     }
     /// Set the `taxonRank` field to an Option value (optional)
-    pub fn maybe_taxon_rank(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_taxon_rank(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.74 = value;
         self
     }
@@ -3251,18 +2536,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `taxonomicStatus` field (optional)
-    pub fn taxonomic_status(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn taxonomic_status(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.75 = value.into();
         self
     }
     /// Set the `taxonomicStatus` field to an Option value (optional)
-    pub fn maybe_taxonomic_status(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_taxonomic_status(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.75 = value;
         self
     }
@@ -3270,18 +2549,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `verbatimLocality` field (optional)
-    pub fn verbatim_locality(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn verbatim_locality(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.76 = value.into();
         self
     }
     /// Set the `verbatimLocality` field to an Option value (optional)
-    pub fn maybe_verbatim_locality(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_verbatim_locality(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.76 = value;
         self
     }
@@ -3289,18 +2562,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `vernacularName` field (optional)
-    pub fn vernacular_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn vernacular_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.77 = value.into();
         self
     }
     /// Set the `vernacularName` field to an Option value (optional)
-    pub fn maybe_vernacular_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_vernacular_name(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.77 = value;
         self
     }
@@ -3308,18 +2575,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `videoEvidence` field (optional)
-    pub fn video_evidence(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn video_evidence(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.78 = value.into();
         self
     }
     /// Set the `videoEvidence` field to an Option value (optional)
-    pub fn maybe_video_evidence(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_video_evidence(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.78 = value;
         self
     }
@@ -3328,10 +2589,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S> OccurrenceBuilder<'a, S>
 where
     S: occurrence_state::State,
-    S::BasisOfRecord: occurrence_state::IsSet,
-    S::EventDate: occurrence_state::IsSet,
-    S::ScientificName: occurrence_state::IsSet,
     S::CreatedAt: occurrence_state::IsSet,
+    S::ScientificName: occurrence_state::IsSet,
+    S::EventDate: occurrence_state::IsSet,
+    S::BasisOfRecord: occurrence_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Occurrence<'a> {
@@ -3421,10 +2682,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Occurrence<'a> {
         Occurrence {
             associated_media: self.__unsafe_private_named.0,
@@ -3511,1622 +2769,943 @@ where
     }
 }
 
-fn lexicon_doc_app_gainforest_dwc_occurrence() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.gainforest.dwc.occurrence"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_gainforest_dwc_occurrence() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.gainforest.dwc.occurrence"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A biodiversity occurrence record following the Simple Darwin Core standard. Each record represents one occurrence of an organism at a location and time.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("basisOfRecord"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("scientificName"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("eventDate"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("basisOfRecord"),
+                                SmolStr::new_static("scientificName"),
+                                SmolStr::new_static("eventDate"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "associatedMedia",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("associatedMedia"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Identifiers (URIs) of media associated with the occurrence. Pipe-delimited for multiple.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(2048usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "associatedOccurrences",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("associatedOccurrences"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Identifiers of other occurrences associated with this one (e.g., parasite-host). Pipe-delimited.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(2048usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "associatedReferences",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("associatedReferences"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Identifiers (URIs) of literature associated with the occurrence. Pipe-delimited for multiple.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(2048usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "associatedSequences",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("associatedSequences"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Identifiers (URIs) of genetic sequence information associated with the occurrence. Pipe-delimited for multiple.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(2048usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "audioEvidence",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("audioEvidence"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "app.gainforest.common.defs#audio",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "basisOfRecord",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("basisOfRecord"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The specific nature of the data record. Must be one of the Darwin Core class names.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "behavior",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("behavior"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The behavior shown by the subject at the time of occurrence (e.g., 'foraging', 'nesting', 'roosting').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "class",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("class"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "The full scientific name of the class.",
-                                        ),
+                                        CowStr::new_static("The full scientific name of the class."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(128usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "collectionCode",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("collectionCode"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The name, acronym, or code identifying the collection or dataset from which the record was derived.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "coordinateUncertaintyInMeters",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("coordinateUncertaintyInMeters"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "country",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("country"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The name of the country or major administrative unit.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(128usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "countryCode",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("countryCode"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The standard code for the country (ISO 3166-1 alpha-2).",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
                                     min_length: Some(2usize),
                                     max_length: Some(2usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "county",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("county"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The full, unabbreviated name of the next smaller administrative region than stateProvince.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp of record creation in the ATProto PDS.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "dataGeneralizations",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("dataGeneralizations"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "A description of actions taken to make the data less specific or complete (e.g., 'coordinates rounded to nearest 0.1 degree').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(1024usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "datasetName",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("datasetName"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The name identifying the dataset from which the record was derived.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "dateIdentified",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("dateIdentified"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The date on which the identification was made. ISO 8601 format.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "dcType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("dcType"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The Dublin Core type class that best describes the resource (dc:type).",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "decimalLatitude",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("decimalLatitude"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Geographic latitude in decimal degrees (WGS84). Positive values are north of the Equator. Range: -90 to 90.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(32usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "decimalLongitude",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("decimalLongitude"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Geographic longitude in decimal degrees (WGS84). Positive values are east of the Greenwich Meridian. Range: -180 to 180.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(32usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "dynamicProperties",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("dynamicProperties"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Additional structured data as a valid JSON string (per Simple DwC Section 7.1). Example: '{\"iucnStatus\":\"vulnerable\",\"canopyCover\":\"85%\"}'. Should be flattened to a single line with no non-printing characters.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(10000usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "eventDate",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("eventDate"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The date or date-time (or interval) during which the occurrence was recorded. ISO 8601 format (e.g., '2024-03-15', '2024-03-15T10:30:00Z', '2024-03/2024-06').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "eventID",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("eventID"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Identifier for the sampling event. Can be used to group occurrences from the same event.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "eventRef",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("eventRef"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "AT-URI reference to an app.gainforest.dwc.event record (for star-schema linkage).",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "eventTime",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("eventTime"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The time of the event. ISO 8601 format (e.g., '14:30:00', '14:30:00+02:00').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "family",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("family"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The full scientific name of the family.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(128usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "fieldNotes",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("fieldNotes"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Notes or reference to notes taken in the field about the event.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(10000usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "gbifTaxonKey",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("gbifTaxonKey"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "GBIF backbone taxonomy key for the identified taxon. Retained for backward compatibility with existing GainForest workflows.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "genus",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("genus"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "The full scientific name of the genus.",
-                                        ),
+                                        CowStr::new_static("The full scientific name of the genus."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(128usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "geodeticDatum",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("geodeticDatum"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The spatial reference system for the coordinates. Recommended: 'EPSG:4326' (WGS84).",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "habitat",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("habitat"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "A description of the habitat in which the event occurred (e.g., 'tropical rainforest', 'mangrove swamp', 'montane cloud forest').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(512usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "higherClassification",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("higherClassification"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "A complete list of taxa names terminating at the rank immediately superior to the taxon. Pipe-delimited (e.g., 'Animalia|Chordata|Mammalia|Rodentia|Ctenomyidae|Ctenomys').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(1024usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "identificationQualifier",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("identificationQualifier"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "A brief phrase or standard term qualifying the identification (e.g., 'cf. agrestis', 'aff. agrestis').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "identificationRemarks",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("identificationRemarks"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Comments or notes about the identification.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(2048usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "identifiedBy",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("identifiedBy"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Person(s) who assigned the taxon to the occurrence. Pipe-delimited for multiple.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(512usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "identifiedByID",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("identifiedByID"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Persistent identifier(s) (e.g., ORCID) of the person(s) who identified. Pipe-delimited.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(512usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "imageEvidence",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("imageEvidence"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "app.gainforest.common.defs#image",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "individualCount",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("individualCount"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "informationWithheld",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("informationWithheld"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "A description of what information is withheld from this record and why (e.g., 'coordinates generalized to protect endangered species').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(1024usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "infraspecificEpithet",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("infraspecificEpithet"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The name of the lowest or terminal infraspecific epithet.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(128usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "institutionCode",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("institutionCode"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The name or acronym of the institution having custody of the object(s) or information in the record.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "kingdom",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("kingdom"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The full scientific name of the kingdom (e.g., 'Animalia', 'Plantae', 'Fungi').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(128usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "license",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("license"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "A legal document giving official permission to do something with the record. Recommended: a Creative Commons URI (e.g., 'http://creativecommons.org/licenses/by/4.0/').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(512usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "lifeStage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("lifeStage"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The age class or life stage at the time of occurrence (e.g., 'adult', 'juvenile', 'larva', 'seedling', 'sapling').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(128usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "locality",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("locality"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The specific description of the place (e.g., '500m upstream of bridge on Rio Pará').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(1024usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "locationID",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("locationID"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Identifier for the location (e.g., a reference to a named site).",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "locationRemarks",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("locationRemarks"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Comments about the location.",
-                                        ),
+                                        CowStr::new_static("Comments about the location."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(2048usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "maximumDepthInMeters",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("maximumDepthInMeters"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "maximumElevationInMeters",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("maximumElevationInMeters"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "minimumDepthInMeters",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("minimumDepthInMeters"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "minimumElevationInMeters",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("minimumElevationInMeters"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "municipality",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("municipality"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The full, unabbreviated name of the next smaller administrative region than county.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "nomenclaturalCode",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("nomenclaturalCode"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The nomenclatural code under which the scientificName is constructed.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "occurrenceID",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("occurrenceID"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "A globally unique identifier for the occurrence record. Recommended: a persistent URI (e.g., DOI, LSID, or UUID-based URI).",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "occurrenceRemarks",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("occurrenceRemarks"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Comments or notes about the occurrence.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(5000usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "occurrenceStatus",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("occurrenceStatus"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Statement about the presence or absence of a taxon at a location.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "order",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("order"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "The full scientific name of the order.",
-                                        ),
+                                        CowStr::new_static("The full scientific name of the order."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(128usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "organismQuantity",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("organismQuantity"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "A number or enumeration value for the quantity of organisms (e.g., '27', '12.5', 'many').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "organismQuantityType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("organismQuantityType"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The type of quantification system used for organismQuantity (e.g., 'individuals', '% biomass', 'stems/ha').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(128usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "phylum",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("phylum"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The full scientific name of the phylum or division.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(128usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "previousIdentifications",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("previousIdentifications"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Previous assignments of names to the occurrence. Pipe-delimited.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(2048usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "recordedBy",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("recordedBy"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Person(s) responsible for recording the occurrence in the field. Pipe-delimited for multiple (e.g., 'Jane Smith | John Doe').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(512usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "recordedByID",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("recordedByID"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Persistent identifier(s) (e.g., ORCID) of the person(s) who recorded. Pipe-delimited for multiple.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(512usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "references",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("references"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "A related resource that is referenced, cited, or otherwise pointed to by the record (URL).",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Uri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "reproductiveCondition",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("reproductiveCondition"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The reproductive condition at the time of occurrence (e.g., 'flowering', 'fruiting', 'budding', 'pregnant').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(128usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "rightsHolder",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("rightsHolder"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Person or organization owning or managing rights over the resource.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "samplingEffort",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("samplingEffort"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The amount of effort expended during the event (e.g., '2 trap-nights', '30 minutes', '10 km transect').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "samplingProtocol",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("samplingProtocol"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The method or protocol used during the event (e.g., 'camera trap', 'point count', 'mist net', '20m x 20m plot survey', 'acoustic monitoring').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(1024usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "scientificName",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("scientificName"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The full scientific name, with authorship and date if known (e.g., 'Centropyge flavicauda Fraser-Brunner 1933').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(512usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "scientificNameAuthorship",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("scientificNameAuthorship"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The authorship information for the scientific name (e.g., 'Fraser-Brunner 1933').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sex",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("sex"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The sex of the biological individual(s).",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "specificEpithet",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("specificEpithet"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The name of the species epithet of the scientificName.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(128usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "spectrogramEvidence",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("spectrogramEvidence"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "app.gainforest.common.defs#spectrogram",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "stateProvince",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("stateProvince"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The name of the next smaller administrative region than country.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "taxonRank",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("taxonRank"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The taxonomic rank of the most specific name in scientificName.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "taxonomicStatus",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("taxonomicStatus"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The status of the use of the scientificName (e.g., 'accepted', 'synonym', 'doubtful').",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "verbatimLocality",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("verbatimLocality"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The original textual description of the place as provided by the recorder.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(1024usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "vernacularName",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("vernacularName"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "A common or vernacular name for the taxon.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(256usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "videoEvidence",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("videoEvidence"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "app.gainforest.common.defs#video",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

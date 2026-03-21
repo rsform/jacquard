@@ -5,34 +5,49 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::com_deckbelcher::CardRef;
+use crate::com_deckbelcher::richtext::Document;
+use crate::com_deckbelcher::deck::list;
 /// A card entry in a decklist.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Card<'a> {
     ///Number of copies in the deck.
     pub quantity: i64,
     ///Reference to the card (scryfall printing + oracle card).
     #[serde(borrow)]
-    pub r#ref: crate::com_deckbelcher::CardRef<'a>,
+    pub r#ref: CardRef<'a>,
     ///Which section of the deck this card belongs to. Extensible to support format-specific sections.
     #[serde(borrow)]
-    pub section: crate::com_deckbelcher::deck::list::Section<'a>,
+    pub section: list::Section<'a>,
     ///User annotations for this card in this deck (e.g., "removal", "wincon", "ramp").
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: Option<Vec<CowStr<'a>>>,
 }
 
 /// Game format for a deck.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Format<'a> {
     Standard,
@@ -58,7 +73,7 @@ pub enum Format<'a> {
     Penny,
     Cube,
     Kitchentable,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> Format<'a> {
@@ -118,7 +133,7 @@ impl<'a> From<&'a str> for Format<'a> {
             "penny" => Self::Penny,
             "cube" => Self::Cube,
             "kitchentable" => Self::Kitchentable,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -149,7 +164,7 @@ impl<'a> From<String> for Format<'a> {
             "penny" => Self::Penny,
             "cube" => Self::Cube,
             "kitchentable" => Self::Kitchentable,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -221,124 +236,89 @@ impl jacquard_common::IntoStatic for Format<'_> {
 }
 
 /// A Magic: The Gathering decklist.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct List<'a> {
     ///Array of cards in the decklist.
     #[serde(borrow)]
-    pub cards: Vec<crate::com_deckbelcher::deck::list::Card<'a>>,
+    pub cards: Vec<list::Card<'a>>,
     ///Timestamp when the decklist was created.
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///Format of the deck.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub format: core::option::Option<crate::com_deckbelcher::deck::list::Format<'a>>,
+    pub format: Option<list::Format<'a>>,
     ///Name of the decklist.
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///Deck primer with strategy, combos, and card choices.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub primer: core::option::Option<ListPrimer<'a>>,
+    pub primer: Option<ListPrimer<'a>>,
     ///Timestamp when the decklist was last updated.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<Datetime>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ListPrimer<'a> {
     #[serde(rename = "com.deckbelcher.richtext#document")]
-    RichtextDocument(Box<crate::com_deckbelcher::richtext::Document<'a>>),
+    RichtextDocument(Box<Document<'a>>),
     #[serde(rename = "com.deckbelcher.deck.list#primerUri")]
-    PrimerUri(Box<crate::com_deckbelcher::deck::list::PrimerUri<'a>>),
+    PrimerUri(Box<list::PrimerUri<'a>>),
     #[serde(rename = "com.deckbelcher.deck.list#primerRef")]
-    PrimerRef(Box<crate::com_deckbelcher::deck::list::PrimerRef<'a>>),
+    PrimerRef(Box<list::PrimerRef<'a>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: List<'a>,
 }
 
 /// Primer in a separate ATProto record. For use with any longform writing lexicon.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PrimerRef<'a> {
     #[serde(borrow)]
-    pub r#ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    pub r#ref: StrongRef<'a>,
 }
 
 /// External primer content. Typically a URL, but any valid URI scheme.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct PrimerUri<'a> {
     #[serde(borrow)]
-    pub uri: jacquard_common::CowStr<'a>,
+    pub uri: CowStr<'a>,
 }
 
 /// Which section of the deck this card belongs to. Extensible to support format-specific sections.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Section<'a> {
     Mainboard,
     Sideboard,
     Maybeboard,
     Commander,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> Section<'a> {
@@ -360,7 +340,7 @@ impl<'a> From<&'a str> for Section<'a> {
             "sideboard" => Self::Sideboard,
             "maybeboard" => Self::Maybeboard,
             "commander" => Self::Commander,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -372,7 +352,7 @@ impl<'a> From<String> for Section<'a> {
             "sideboard" => Self::Sideboard,
             "maybeboard" => Self::Maybeboard,
             "commander" => Self::Commander,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -426,37 +406,28 @@ impl jacquard_common::IntoStatic for Section<'_> {
 
 impl<'a> List<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ListRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ListRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Card<'a> {
+impl<'a> LexiconSchema for Card<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.deck.list"
     }
     fn def_name() -> &'static str {
         "card"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_deck_list()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.quantity;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "quantity",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("quantity"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -465,10 +436,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Card<'a> {
         if let Some(ref value) = self.tags {
             #[allow(unused_comparisons)]
             if value.len() > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("tags"),
                     max: 128usize,
                     actual: value.len(),
                 });
@@ -479,13 +448,14 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Card<'a> {
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ListRecord;
-impl jacquard_common::xrpc::XrpcResp for ListRecord {
+impl XrpcResp for ListRecord {
     const NSID: &'static str = "com.deckbelcher.deck.list";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ListGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ListGetRecordOutput<'_>> for List<'_> {
@@ -495,37 +465,33 @@ impl From<ListGetRecordOutput<'_>> for List<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for List<'_> {
+impl Collection for List<'_> {
     const NSID: &'static str = "com.deckbelcher.deck.list";
     type Record = ListRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ListRecord {
+impl Collection for ListRecord {
     const NSID: &'static str = "com.deckbelcher.deck.list";
     type Record = ListRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for List<'a> {
+impl<'a> LexiconSchema for List<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.deck.list"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_deck_list()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1280usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 1280usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -534,16 +500,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for List<'a> {
         {
             let value = &self.name;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 128usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("name"),
                         max: 128usize,
                         actual: count,
                     });
@@ -554,44 +514,38 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for List<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for PrimerRef<'a> {
+impl<'a> LexiconSchema for PrimerRef<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.deck.list"
     }
     fn def_name() -> &'static str {
         "primerRef"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_deck_list()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for PrimerUri<'a> {
+impl<'a> LexiconSchema for PrimerUri<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.deck.list"
     }
     fn def_name() -> &'static str {
         "primerUri"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_deck_list()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.uri;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "uri",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("uri"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -600,16 +554,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PrimerUri<'a> {
         {
             let value = &self.uri;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "uri",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("uri"),
                         max: 1000usize,
                         actual: count,
                     });
@@ -630,64 +578,64 @@ pub mod card_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Quantity;
         type Ref;
         type Section;
+        type Quantity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Quantity = Unset;
         type Ref = Unset;
         type Section = Unset;
-    }
-    ///State transition - sets the `quantity` field to Set
-    pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuantity<S> {}
-    impl<S: State> State for SetQuantity<S> {
-        type Quantity = Set<members::quantity>;
-        type Ref = S::Ref;
-        type Section = S::Section;
+        type Quantity = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type Quantity = S::Quantity;
         type Ref = Set<members::r#ref>;
         type Section = S::Section;
+        type Quantity = S::Quantity;
     }
     ///State transition - sets the `section` field to Set
     pub struct SetSection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSection<S> {}
     impl<S: State> State for SetSection<S> {
-        type Quantity = S::Quantity;
         type Ref = S::Ref;
         type Section = Set<members::section>;
+        type Quantity = S::Quantity;
+    }
+    ///State transition - sets the `quantity` field to Set
+    pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuantity<S> {}
+    impl<S: State> State for SetQuantity<S> {
+        type Ref = S::Ref;
+        type Section = S::Section;
+        type Quantity = Set<members::quantity>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `quantity` field
-        pub struct quantity(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
         ///Marker type for the `section` field
         pub struct section(());
+        ///Marker type for the `quantity` field
+        pub struct quantity(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CardBuilder<'a, S: card_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<crate::com_deckbelcher::CardRef<'a>>,
-        ::core::option::Option<crate::com_deckbelcher::deck::list::Section<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        Option<i64>,
+        Option<CardRef<'a>>,
+        Option<list::Section<'a>>,
+        Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Card<'a> {
@@ -701,9 +649,9 @@ impl<'a> CardBuilder<'a, card_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CardBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -718,11 +666,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CardBuilder<'a, card_state::SetQuantity<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CardBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -735,13 +683,13 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<crate::com_deckbelcher::CardRef<'a>>,
+        value: impl Into<CardRef<'a>>,
     ) -> CardBuilder<'a, card_state::SetRef<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CardBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -754,31 +702,25 @@ where
     /// Set the `section` field (required)
     pub fn section(
         mut self,
-        value: impl Into<crate::com_deckbelcher::deck::list::Section<'a>>,
+        value: impl Into<list::Section<'a>>,
     ) -> CardBuilder<'a, card_state::SetSection<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         CardBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: card_state::State> CardBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -787,9 +729,9 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
 impl<'a, S> CardBuilder<'a, S>
 where
     S: card_state::State,
-    S::Quantity: card_state::IsSet,
     S::Ref: card_state::IsSet,
     S::Section: card_state::IsSet,
+    S::Quantity: card_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Card<'a> {
@@ -804,7 +746,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -819,349 +761,244 @@ where
     }
 }
 
-fn lexicon_doc_com_deckbelcher_deck_list() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("com.deckbelcher.deck.list"),
-        revision: None,
-        description: None,
+fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("com.deckbelcher.deck.list"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("card"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A card entry in a decklist.",
-                        ),
-                    ),
+                SmolStr::new_static("card"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("A card entry in a decklist.")),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("ref"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("quantity"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("section")
+                            SmolStr::new_static("ref"), SmolStr::new_static("quantity"),
+                            SmolStr::new_static("section")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "quantity",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("quantity"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "ref",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "com.deckbelcher.defs#cardRef",
-                                ),
+                            SmolStr::new_static("ref"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("com.deckbelcher.defs#cardRef"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "section",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#section"),
+                            SmolStr::new_static("section"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#section"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "tags",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("tags"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "User annotations for this card in this deck (e.g., \"removal\", \"wincon\", \"ramp\").",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                items: LexArrayItem::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "A tag annotation for a card.",
-                                        ),
+                                        CowStr::new_static("A tag annotation for a card."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(640usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(128usize),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("format"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Game format for a deck."),
-                    ),
-                    format: None,
-                    default: None,
-                    min_length: None,
+                SmolStr::new_static("format"),
+                LexUserType::String(LexString {
+                    description: Some(CowStr::new_static("Game format for a deck.")),
                     max_length: Some(320usize),
-                    min_graphemes: None,
                     max_graphemes: Some(32usize),
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A Magic: The Gathering decklist.",
-                        ),
+                        CowStr::new_static("A Magic: The Gathering decklist."),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("cards"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("name"), SmolStr::new_static("cards"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "cards",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("cards"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Array of cards in the decklist.",
-                                        ),
+                                        CowStr::new_static("Array of cards in the decklist."),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static("#card"),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#card"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp when the decklist was created.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "format",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#format"),
+                                SmolStr::new_static("format"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#format"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("name"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Name of the decklist.",
-                                        ),
+                                        CowStr::new_static("Name of the decklist."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(1280usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(128usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "primer",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                SmolStr::new_static("primer"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Deck primer with strategy, combos, and card choices.",
                                         ),
                                     ),
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("com.deckbelcher.richtext#document"),
-                                        ::jacquard_common::CowStr::new_static("#primerUri"),
-                                        ::jacquard_common::CowStr::new_static("#primerRef")
+                                        CowStr::new_static("com.deckbelcher.richtext#document"),
+                                        CowStr::new_static("#primerUri"),
+                                        CowStr::new_static("#primerRef")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "updatedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("updatedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp when the decklist was last updated.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("primerRef"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("primerRef"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Primer in a separate ATProto record. For use with any longform writing lexicon.",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("ref")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("ref")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "ref",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "com.atproto.repo.strongRef",
-                                ),
+                            SmolStr::new_static("ref"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("primerUri"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("primerUri"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "External primer content. Typically a URL, but any valid URI scheme.",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(10000usize),
-                                min_graphemes: None,
                                 max_graphemes: Some(1000usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("section"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
+                SmolStr::new_static("section"),
+                LexUserType::String(LexString {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Which section of the deck this card belongs to. Extensible to support format-specific sections.",
                         ),
                     ),
-                    format: None,
-                    default: None,
-                    min_length: None,
                     max_length: Some(640usize),
-                    min_graphemes: None,
                     max_graphemes: Some(64usize),
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1225,16 +1062,16 @@ pub mod list_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListBuilder<'a, S: list_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::com_deckbelcher::deck::list::Card<'a>>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::com_deckbelcher::deck::list::Format<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<ListPrimer<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<Vec<list::Card<'a>>>,
+        Option<Datetime>,
+        Option<list::Format<'a>>,
+        Option<CowStr<'a>>,
+        Option<ListPrimer<'a>>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> List<'a> {
@@ -1248,9 +1085,9 @@ impl<'a> ListBuilder<'a, list_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1263,13 +1100,13 @@ where
     /// Set the `cards` field (required)
     pub fn cards(
         mut self,
-        value: impl Into<Vec<crate::com_deckbelcher::deck::list::Card<'a>>>,
+        value: impl Into<Vec<list::Card<'a>>>,
     ) -> ListBuilder<'a, list_state::SetCards<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1282,31 +1119,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ListBuilder<'a, list_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `format` field (optional)
-    pub fn format(
-        mut self,
-        value: impl Into<Option<crate::com_deckbelcher::deck::list::Format<'a>>>,
-    ) -> Self {
+    pub fn format(mut self, value: impl Into<Option<list::Format<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `format` field to an Option value (optional)
-    pub fn maybe_format(
-        mut self,
-        value: Option<crate::com_deckbelcher::deck::list::Format<'a>>,
-    ) -> Self {
+    pub fn maybe_format(mut self, value: Option<list::Format<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -1320,13 +1151,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ListBuilder<'a, list_state::SetName<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1346,18 +1177,12 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
 
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
-    pub fn updated_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
-    pub fn maybe_updated_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -1385,7 +1210,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1436,11 +1261,9 @@ pub mod primer_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct PrimerRefBuilder<'a, S: primer_ref_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<StrongRef<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> PrimerRef<'a> {
@@ -1454,9 +1277,9 @@ impl<'a> PrimerRefBuilder<'a, primer_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PrimerRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1469,13 +1292,13 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        value: impl Into<StrongRef<'a>>,
     ) -> PrimerRefBuilder<'a, primer_ref_state::SetRef<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PrimerRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1495,7 +1318,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

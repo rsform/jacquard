@@ -5,41 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::feed::NowPlayingsView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetNowPlayings {
     ///(min: 1)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub size: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size: Option<i64>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetNowPlayingsOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::feed::NowPlayingsView<'a>,
+    pub value: NowPlayingsView<'a>,
 }
 
-/// Response type for
-///app.rocksky.feed.getNowPlayings
+/// Response type for app.rocksky.feed.getNowPlayings
 pub struct GetNowPlayingsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetNowPlayingsResponse {
     const NSID: &'static str = "app.rocksky.feed.getNowPlayings";
@@ -54,8 +43,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetNowPlayings {
     type Response = GetNowPlayingsResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.feed.getNowPlayings
+/// Endpoint type for app.rocksky.feed.getNowPlayings
 pub struct GetNowPlayingsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetNowPlayingsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.feed.getNowPlayings";
@@ -85,8 +73,8 @@ pub mod get_now_playings_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetNowPlayingsBuilder<S: get_now_playings_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>,),
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>,),
 }
 
 impl GetNowPlayings {
@@ -100,7 +88,7 @@ impl GetNowPlayingsBuilder<get_now_playings_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetNowPlayingsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
         }
     }

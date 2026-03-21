@@ -5,72 +5,65 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::migrate_claim;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MigrateClaim<'a> {
     #[serde(borrow)]
-    pub claim: jacquard_common::types::string::AtUri<'a>,
+    pub claim: AtUri<'a>,
     #[serde(borrow)]
-    pub claim_review: jacquard_common::types::string::AtUri<'a>,
+    pub claim_review: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MigrateClaimOutput<'a> {
     #[serde(borrow)]
-    pub results: Vec<
-        crate::games_gamesgamesgamesgames::migrate_claim::MigrationResult<'a>,
-    >,
+    pub results: Vec<migrate_claim::MigrationResult<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MigrationResult<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub error: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub error: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub game_uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub game_uri: AtUri<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub new_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub new_uri: Option<AtUri<'a>>,
     #[serde(borrow)]
     pub status: MigrationResultStatus<'a>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MigrationResultStatus<'a> {
     Success,
     Failed,
     Skipped,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> MigrationResultStatus<'a> {
@@ -90,7 +83,7 @@ impl<'a> From<&'a str> for MigrationResultStatus<'a> {
             "success" => Self::Success,
             "failed" => Self::Failed,
             "skipped" => Self::Skipped,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -101,7 +94,7 @@ impl<'a> From<String> for MigrationResultStatus<'a> {
             "success" => Self::Success,
             "failed" => Self::Failed,
             "skipped" => Self::Skipped,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -160,8 +153,7 @@ impl jacquard_common::IntoStatic for MigrationResultStatus<'_> {
     }
 }
 
-/// Response type for
-///games.gamesgamesgamesgames.migrateClaim
+/// Response type for games.gamesgamesgamesgames.migrateClaim
 pub struct MigrateClaimResponse;
 impl jacquard_common::xrpc::XrpcResp for MigrateClaimResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.migrateClaim";
@@ -178,8 +170,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for MigrateClaim<'a> {
     type Response = MigrateClaimResponse;
 }
 
-/// Endpoint type for
-///games.gamesgamesgamesgames.migrateClaim
+/// Endpoint type for games.gamesgamesgamesgames.migrateClaim
 pub struct MigrateClaimRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MigrateClaimRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.migrateClaim";
@@ -190,19 +181,17 @@ impl jacquard_common::xrpc::XrpcEndpoint for MigrateClaimRequest {
     type Response = MigrateClaimResponse;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for MigrationResult<'a> {
+impl<'a> LexiconSchema for MigrationResult<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.migrateClaim"
     }
     fn def_name() -> &'static str {
         "migrationResult"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_migrateClaim()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -217,48 +206,45 @@ pub mod migrate_claim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ClaimReview;
         type Claim;
+        type ClaimReview;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ClaimReview = Unset;
         type Claim = Unset;
-    }
-    ///State transition - sets the `claim_review` field to Set
-    pub struct SetClaimReview<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClaimReview<S> {}
-    impl<S: State> State for SetClaimReview<S> {
-        type ClaimReview = Set<members::claim_review>;
-        type Claim = S::Claim;
+        type ClaimReview = Unset;
     }
     ///State transition - sets the `claim` field to Set
     pub struct SetClaim<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClaim<S> {}
     impl<S: State> State for SetClaim<S> {
-        type ClaimReview = S::ClaimReview;
         type Claim = Set<members::claim>;
+        type ClaimReview = S::ClaimReview;
+    }
+    ///State transition - sets the `claim_review` field to Set
+    pub struct SetClaimReview<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClaimReview<S> {}
+    impl<S: State> State for SetClaimReview<S> {
+        type Claim = S::Claim;
+        type ClaimReview = Set<members::claim_review>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `claim_review` field
-        pub struct claim_review(());
         ///Marker type for the `claim` field
         pub struct claim(());
+        ///Marker type for the `claim_review` field
+        pub struct claim_review(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MigrateClaimBuilder<'a, S: migrate_claim_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>, Option<AtUri<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> MigrateClaim<'a> {
@@ -272,9 +258,9 @@ impl<'a> MigrateClaimBuilder<'a, migrate_claim_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MigrateClaimBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -287,13 +273,13 @@ where
     /// Set the `claim` field (required)
     pub fn claim(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> MigrateClaimBuilder<'a, migrate_claim_state::SetClaim<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         MigrateClaimBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -306,13 +292,13 @@ where
     /// Set the `claimReview` field (required)
     pub fn claim_review(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> MigrateClaimBuilder<'a, migrate_claim_state::SetClaimReview<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         MigrateClaimBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -320,8 +306,8 @@ where
 impl<'a, S> MigrateClaimBuilder<'a, S>
 where
     S: migrate_claim_state::State,
-    S::ClaimReview: migrate_claim_state::IsSet,
     S::Claim: migrate_claim_state::IsSet,
+    S::ClaimReview: migrate_claim_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MigrateClaim<'a> {
@@ -334,7 +320,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -393,14 +379,14 @@ pub mod migration_result_state {
 
 /// Builder for constructing an instance of this type
 pub struct MigrationResultBuilder<'a, S: migration_result_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<MigrationResultStatus<'a>>,
+        Option<CowStr<'a>>,
+        Option<AtUri<'a>>,
+        Option<AtUri<'a>>,
+        Option<MigrationResultStatus<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> MigrationResult<'a> {
@@ -414,24 +400,21 @@ impl<'a> MigrationResultBuilder<'a, migration_result_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MigrationResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: migration_result_state::State> MigrationResultBuilder<'a, S> {
     /// Set the `error` field (optional)
-    pub fn error(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn error(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `error` field to an Option value (optional)
-    pub fn maybe_error(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_error(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -445,31 +428,25 @@ where
     /// Set the `gameUri` field (required)
     pub fn game_uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> MigrationResultBuilder<'a, migration_result_state::SetGameUri<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         MigrationResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: migration_result_state::State> MigrationResultBuilder<'a, S> {
     /// Set the `newUri` field (optional)
-    pub fn new_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn new_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `newUri` field to an Option value (optional)
-    pub fn maybe_new_uri(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_new_uri(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -485,11 +462,11 @@ where
         mut self,
         value: impl Into<MigrationResultStatus<'a>>,
     ) -> MigrationResultBuilder<'a, migration_result_state::SetStatus<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         MigrationResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -513,7 +490,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -528,181 +505,96 @@ where
     }
 }
 
-fn lexicon_doc_games_gamesgamesgamesgames_migrateClaim() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "games.gamesgamesgamesgames.migrateClaim",
-        ),
-        revision: None,
-        description: None,
+fn lexicon_doc_games_gamesgamesgamesgames_migrateClaim() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("games.gamesgamesgamesgames.migrateClaim"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
-                    description: None,
-                    parameters: None,
-                    input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
-                        description: None,
-                        encoding: ::jacquard_common::CowStr::new_static(
-                            "application/json",
-                        ),
+                SmolStr::new_static("main"),
+                LexUserType::XrpcProcedure(LexXrpcProcedure {
+                    input: Some(LexXrpcBody {
+                        encoding: CowStr::new_static("application/json"),
                         schema: Some(
-                            ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
-                                description: None,
+                            LexXrpcBodySchema::Object(LexObject {
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("claim"),
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("claimReview")
+                                        SmolStr::new_static("claim"),
+                                        SmolStr::new_static("claimReview")
                                     ],
                                 ),
-                                nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
-                                    let mut map = ::alloc::collections::BTreeMap::new();
+                                    let mut map = BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "claim",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
-                                            format: Some(
-                                                ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                            ),
-                                            default: None,
-                                            min_length: None,
-                                            max_length: None,
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                        SmolStr::new_static("claim"),
+                                        LexObjectProperty::String(LexString {
+                                            format: Some(LexStringFormat::AtUri),
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "claimReview",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
-                                            format: Some(
-                                                ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                            ),
-                                            default: None,
-                                            min_length: None,
-                                            max_length: None,
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                        SmolStr::new_static("claimReview"),
+                                        LexObjectProperty::String(LexString {
+                                            format: Some(LexStringFormat::AtUri),
+                                            ..Default::default()
                                         }),
                                     );
                                     map
                                 },
+                                ..Default::default()
                             }),
                         ),
+                        ..Default::default()
                     }),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "migrationResult",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("migrationResult"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("gameUri"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("status")
+                            SmolStr::new_static("gameUri"), SmolStr::new_static("status")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "error",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("error"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("gameUri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "gameUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("newUri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "newUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "status",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("status"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

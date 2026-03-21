@@ -5,36 +5,25 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::org_passingreads::book::StatefulBook;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListDroppedBooksOutput<'a> {
     #[serde(borrow)]
-    pub books: Vec<crate::org_passingreads::book::StatefulBook<'a>>,
+    pub books: Vec<StatefulBook<'a>>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct ListDroppedBooks;
-/// Response type for
-///org.passingreads.book.listDroppedBooks
+/// Response type for org.passingreads.book.listDroppedBooks
 pub struct ListDroppedBooksResponse;
 impl jacquard_common::xrpc::XrpcResp for ListDroppedBooksResponse {
     const NSID: &'static str = "org.passingreads.book.listDroppedBooks";
@@ -49,8 +38,7 @@ impl jacquard_common::xrpc::XrpcRequest for ListDroppedBooks {
     type Response = ListDroppedBooksResponse;
 }
 
-/// Endpoint type for
-///org.passingreads.book.listDroppedBooks
+/// Endpoint type for org.passingreads.book.listDroppedBooks
 pub struct ListDroppedBooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListDroppedBooksRequest {
     const PATH: &'static str = "/xrpc/org.passingreads.book.listDroppedBooks";

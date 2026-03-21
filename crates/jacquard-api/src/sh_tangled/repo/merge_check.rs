@@ -5,102 +5,90 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::repo::merge_check;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ConflictInfo<'a> {
     ///Name of the conflicted file
     #[serde(borrow)]
-    pub filename: jacquard_common::CowStr<'a>,
+    pub filename: CowStr<'a>,
     ///Reason for the conflict
     #[serde(borrow)]
-    pub reason: jacquard_common::CowStr<'a>,
+    pub reason: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MergeCheck<'a> {
     ///Target branch to merge into
     #[serde(borrow)]
-    pub branch: jacquard_common::CowStr<'a>,
+    pub branch: CowStr<'a>,
     ///DID of the repository owner
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
     ///Name of the repository
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///Patch or pull request to check for merge conflicts
     #[serde(borrow)]
-    pub patch: jacquard_common::CowStr<'a>,
+    pub patch: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MergeCheckOutput<'a> {
     ///List of files with merge conflicts
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub conflicts: core::option::Option<
-        Vec<crate::sh_tangled::repo::merge_check::ConflictInfo<'a>>,
-    >,
+    pub conflicts: Option<Vec<merge_check::ConflictInfo<'a>>>,
     ///Error message if check failed
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub error: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub error: Option<CowStr<'a>>,
     ///Whether the merge has conflicts
     pub is_conflicted: bool,
     ///Additional message about the merge check
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: Option<CowStr<'a>>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ConflictInfo<'a> {
+impl<'a> LexiconSchema for ConflictInfo<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.mergeCheck"
     }
     fn def_name() -> &'static str {
         "conflictInfo"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo_mergeCheck()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-/// Response type for
-///sh.tangled.repo.mergeCheck
+/// Response type for sh.tangled.repo.mergeCheck
 pub struct MergeCheckResponse;
 impl jacquard_common::xrpc::XrpcResp for MergeCheckResponse {
     const NSID: &'static str = "sh.tangled.repo.mergeCheck";
@@ -117,8 +105,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for MergeCheck<'a> {
     type Response = MergeCheckResponse;
 }
 
-/// Endpoint type for
-///sh.tangled.repo.mergeCheck
+/// Endpoint type for sh.tangled.repo.mergeCheck
 pub struct MergeCheckRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MergeCheckRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.mergeCheck";
@@ -129,198 +116,119 @@ impl jacquard_common::xrpc::XrpcEndpoint for MergeCheckRequest {
     type Response = MergeCheckResponse;
 }
 
-fn lexicon_doc_sh_tangled_repo_mergeCheck() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("sh.tangled.repo.mergeCheck"),
-        revision: None,
-        description: None,
+fn lexicon_doc_sh_tangled_repo_mergeCheck() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("sh.tangled.repo.mergeCheck"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("conflictInfo"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("conflictInfo"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("filename"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("reason")
+                            SmolStr::new_static("filename"),
+                            SmolStr::new_static("reason")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "filename",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("filename"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Name of the conflicted file",
-                                    ),
+                                    CowStr::new_static("Name of the conflicted file"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "reason",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("reason"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Reason for the conflict",
-                                    ),
+                                    CowStr::new_static("Reason for the conflict"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
-                    description: None,
-                    parameters: None,
-                    input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
-                        description: None,
-                        encoding: ::jacquard_common::CowStr::new_static(
-                            "application/json",
-                        ),
+                SmolStr::new_static("main"),
+                LexUserType::XrpcProcedure(LexXrpcProcedure {
+                    input: Some(LexXrpcBody {
+                        encoding: CowStr::new_static("application/json"),
                         schema: Some(
-                            ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
-                                description: None,
+                            LexXrpcBodySchema::Object(LexObject {
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("patch"),
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("branch")
+                                        SmolStr::new_static("did"), SmolStr::new_static("name"),
+                                        SmolStr::new_static("patch"), SmolStr::new_static("branch")
                                     ],
                                 ),
-                                nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
-                                    let mut map = ::alloc::collections::BTreeMap::new();
+                                    let mut map = BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "branch",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        SmolStr::new_static("branch"),
+                                        LexObjectProperty::String(LexString {
                                             description: Some(
-                                                ::jacquard_common::CowStr::new_static(
-                                                    "Target branch to merge into",
-                                                ),
+                                                CowStr::new_static("Target branch to merge into"),
                                             ),
-                                            format: None,
-                                            default: None,
-                                            min_length: None,
-                                            max_length: None,
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "did",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        SmolStr::new_static("did"),
+                                        LexObjectProperty::String(LexString {
                                             description: Some(
-                                                ::jacquard_common::CowStr::new_static(
-                                                    "DID of the repository owner",
-                                                ),
+                                                CowStr::new_static("DID of the repository owner"),
                                             ),
-                                            format: Some(
-                                                ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                            ),
-                                            default: None,
-                                            min_length: None,
-                                            max_length: None,
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                            format: Some(LexStringFormat::Did),
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "name",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        SmolStr::new_static("name"),
+                                        LexObjectProperty::String(LexString {
                                             description: Some(
-                                                ::jacquard_common::CowStr::new_static(
-                                                    "Name of the repository",
-                                                ),
+                                                CowStr::new_static("Name of the repository"),
                                             ),
-                                            format: None,
-                                            default: None,
-                                            min_length: None,
-                                            max_length: None,
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "patch",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        SmolStr::new_static("patch"),
+                                        LexObjectProperty::String(LexString {
                                             description: Some(
-                                                ::jacquard_common::CowStr::new_static(
+                                                CowStr::new_static(
                                                     "Patch or pull request to check for merge conflicts",
                                                 ),
                                             ),
-                                            format: None,
-                                            default: None,
-                                            min_length: None,
-                                            max_length: None,
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                            ..Default::default()
                                         }),
                                     );
                                     map
                                 },
+                                ..Default::default()
                             }),
                         ),
+                        ..Default::default()
                     }),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -334,80 +242,80 @@ pub mod merge_check_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Branch;
         type Did;
-        type Name;
         type Patch;
+        type Branch;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Branch = Unset;
         type Did = Unset;
-        type Name = Unset;
         type Patch = Unset;
-    }
-    ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranch<S> {}
-    impl<S: State> State for SetBranch<S> {
-        type Branch = Set<members::branch>;
-        type Did = S::Did;
-        type Name = S::Name;
-        type Patch = S::Patch;
+        type Branch = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Branch = S::Branch;
         type Did = Set<members::did>;
-        type Name = S::Name;
         type Patch = S::Patch;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
         type Branch = S::Branch;
-        type Did = S::Did;
-        type Name = Set<members::name>;
-        type Patch = S::Patch;
+        type Name = S::Name;
     }
     ///State transition - sets the `patch` field to Set
     pub struct SetPatch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPatch<S> {}
     impl<S: State> State for SetPatch<S> {
-        type Branch = S::Branch;
         type Did = S::Did;
-        type Name = S::Name;
         type Patch = Set<members::patch>;
+        type Branch = S::Branch;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranch<S> {}
+    impl<S: State> State for SetBranch<S> {
+        type Did = S::Did;
+        type Patch = S::Patch;
+        type Branch = Set<members::branch>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Did = S::Did;
+        type Patch = S::Patch;
+        type Branch = S::Branch;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `branch` field
-        pub struct branch(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `patch` field
         pub struct patch(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MergeCheckBuilder<'a, S: merge_check_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Did<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> MergeCheck<'a> {
@@ -421,9 +329,9 @@ impl<'a> MergeCheckBuilder<'a, merge_check_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MergeCheckBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -436,13 +344,13 @@ where
     /// Set the `branch` field (required)
     pub fn branch(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> MergeCheckBuilder<'a, merge_check_state::SetBranch<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         MergeCheckBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -455,13 +363,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> MergeCheckBuilder<'a, merge_check_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         MergeCheckBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -474,13 +382,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> MergeCheckBuilder<'a, merge_check_state::SetName<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         MergeCheckBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -493,13 +401,13 @@ where
     /// Set the `patch` field (required)
     pub fn patch(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> MergeCheckBuilder<'a, merge_check_state::SetPatch<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         MergeCheckBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -507,10 +415,10 @@ where
 impl<'a, S> MergeCheckBuilder<'a, S>
 where
     S: merge_check_state::State,
-    S::Branch: merge_check_state::IsSet,
     S::Did: merge_check_state::IsSet,
-    S::Name: merge_check_state::IsSet,
     S::Patch: merge_check_state::IsSet,
+    S::Branch: merge_check_state::IsSet,
+    S::Name: merge_check_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MergeCheck<'a> {
@@ -525,7 +433,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

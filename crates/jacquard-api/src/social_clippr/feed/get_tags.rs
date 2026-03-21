@@ -5,40 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::social_clippr::feed::TagView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTags<'a> {
     #[serde(borrow)]
-    pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
+    pub uris: Vec<AtUri<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTagsOutput<'a> {
     ///An array of hydrated tag views
     #[serde(borrow)]
-    pub tags: Vec<crate::social_clippr::feed::TagView<'a>>,
+    pub tags: Vec<TagView<'a>>,
 }
 
-/// Response type for
-///social.clippr.feed.getTags
+/// Response type for social.clippr.feed.getTags
 pub struct GetTagsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTagsResponse {
     const NSID: &'static str = "social.clippr.feed.getTags";
@@ -53,8 +44,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetTags<'a> {
     type Response = GetTagsResponse;
 }
 
-/// Endpoint type for
-///social.clippr.feed.getTags
+/// Endpoint type for social.clippr.feed.getTags
 pub struct GetTagsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTagsRequest {
     const PATH: &'static str = "/xrpc/social.clippr.feed.getTags";
@@ -97,11 +87,9 @@ pub mod get_tags_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetTagsBuilder<'a, S: get_tags_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<AtUri<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetTags<'a> {
@@ -115,9 +103,9 @@ impl<'a> GetTagsBuilder<'a, get_tags_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetTagsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -130,13 +118,13 @@ where
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<'a>>>,
     ) -> GetTagsBuilder<'a, get_tags_state::SetUris<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetTagsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

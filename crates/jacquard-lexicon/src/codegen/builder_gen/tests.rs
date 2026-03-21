@@ -5,13 +5,26 @@ use super::state_mod::{RequiredField, collect_required_fields, generate_state_mo
 use super::{BuilderGenContext, BuilderSchema};
 use crate::codegen::CodeGenerator;
 use crate::codegen::builder_gen::build_method;
+use crate::codegen::prettify::{CodegenMode, ImportSet, ResolvedImports};
 use crate::corpus::LexiconCorpus;
 use crate::lexicon::{
     LexInteger, LexObject, LexObjectProperty, LexString, LexXrpcParameters,
     LexXrpcParametersProperty,
 };
 use jacquard_common::deps::smol_str::SmolStr;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
+
+/// Create a default ResolvedImports in Macro mode for tests that don't need
+/// per-file resolution.
+fn test_resolved() -> ResolvedImports {
+    ResolvedImports::resolve(
+        &ImportSet::default(),
+        &HashSet::new(),
+        &HashSet::new(),
+        CodegenMode::Macro,
+        &BTreeMap::new(),
+    )
+}
 
 #[test]
 fn test_common_types_generation() {
@@ -179,7 +192,13 @@ fn test_build_method_generation() {
     };
 
     let schema = BuilderSchema::Object(&obj);
-    let tokens = build_method::generate_build_method("CreateRecord", &schema, &fields, true);
+    let tokens = build_method::generate_build_method(
+        "CreateRecord",
+        &schema,
+        &fields,
+        true,
+        &test_resolved(),
+    );
     let code = tokens.to_string();
 
     // Verify build method structure
@@ -243,7 +262,13 @@ fn test_build_method_parameters() {
     };
 
     let schema = BuilderSchema::Parameters(&params);
-    let tokens = build_method::generate_build_method("QueryParams", &schema, &fields, true);
+    let tokens = build_method::generate_build_method(
+        "QueryParams",
+        &schema,
+        &fields,
+        true,
+        &test_resolved(),
+    );
     let code = tokens.to_string();
 
     // Verify build method structure
@@ -322,8 +347,13 @@ fn test_complete_builder_object() {
 
     // Generate all components
     let state_module = generate_state_module("CreateRecord", &required_fields);
-    let build_method =
-        build_method::generate_build_method("CreateRecord", &schema, &required_fields, true);
+    let build_method = build_method::generate_build_method(
+        "CreateRecord",
+        &schema,
+        &required_fields,
+        true,
+        &test_resolved(),
+    );
 
     let state_code = state_module.to_string();
     let build_code = build_method.to_string();
@@ -415,8 +445,13 @@ fn test_print_complete_builder() {
     // Generate all components
     let common_types = generate_common_types();
     let state_module = generate_state_module("CreateRecord", &required_fields);
-    let build_method =
-        build_method::generate_build_method("CreateRecord", &schema, &required_fields, true);
+    let build_method = build_method::generate_build_method(
+        "CreateRecord",
+        &schema,
+        &required_fields,
+        true,
+        &test_resolved(),
+    );
 
     // Note: Can't generate builder_struct and setters without CodeGenerator
     // But we can print what we have
@@ -509,12 +544,14 @@ fn test_print_complete_builder_with_codegen() {
     };
 
     // Use BuilderGenContext to generate complete builder
+    let resolved = codegen.default_resolved_imports();
     let ctx = BuilderGenContext::from_object(
         &codegen,
         "com.atproto.repo.createRecord",
         "CreateRecord",
         &obj,
         true,
+        &resolved,
     );
 
     let builder_code = ctx.generate();

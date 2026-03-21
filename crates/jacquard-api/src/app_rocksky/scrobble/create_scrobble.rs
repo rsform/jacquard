@@ -5,125 +5,112 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::UriValue;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::scrobble::ScrobbleViewBasic;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateScrobble<'a> {
     ///The album of the track being scrobbled
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub album: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub album: Option<CowStr<'a>>,
     ///The URL of the album art for the track
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub album_art: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub album_art: Option<UriValue<'a>>,
     ///The Apple Music link for the track, if available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub apple_music_link: core::option::Option<
-        jacquard_common::types::string::UriValue<'a>,
-    >,
+    pub apple_music_link: Option<UriValue<'a>>,
     ///The artist of the track being scrobbled
     #[serde(borrow)]
-    pub artist: jacquard_common::CowStr<'a>,
+    pub artist: CowStr<'a>,
     ///The URL of the artist's picture, if available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub artist_picture: core::option::Option<
-        jacquard_common::types::string::UriValue<'a>,
-    >,
+    pub artist_picture: Option<UriValue<'a>>,
     ///The composer of the track, if available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub composer: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub composer: Option<CowStr<'a>>,
     ///The copyright message for the track, if available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub copyright_message: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub copyright_message: Option<CowStr<'a>>,
     ///The Deezer link for the track, if available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub deezer_link: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub deezer_link: Option<UriValue<'a>>,
     ///The disc number of the track in the album, if applicable
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub disc_number: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disc_number: Option<i64>,
     ///The duration of the track in seconds
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub duration: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub duration: Option<i64>,
     ///The record label of the track, if available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub label: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub label: Option<CowStr<'a>>,
     ///The Last.fm link for the track, if available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub lastfm_link: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub lastfm_link: Option<UriValue<'a>>,
     ///The lyrics of the track, if available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub lyrics: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub lyrics: Option<CowStr<'a>>,
     ///The MusicBrainz ID of the track, if available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub mb_id: Option<CowStr<'a>>,
     ///The release date of the track, formatted as YYYY-MM-DD
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub release_date: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub release_date: Option<CowStr<'a>>,
     ///The Spotify link for the track, if available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub spotify_link: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub spotify_link: Option<UriValue<'a>>,
     ///The Tidal link for the track, if available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tidal_link: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub tidal_link: Option<UriValue<'a>>,
     ///The timestamp of the scrobble in milliseconds since epoch
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub timestamp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub timestamp: Option<i64>,
     ///The title of the track being scrobbled
     #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
+    pub title: CowStr<'a>,
     ///The track number of the track in the album
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub track_number: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub track_number: Option<i64>,
     ///The year the track was released
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub year: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub year: Option<i64>,
     ///The Youtube link for the track, if available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub youtube_link: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub youtube_link: Option<UriValue<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateScrobbleOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::scrobble::ScrobbleViewBasic<'a>,
+    pub value: ScrobbleViewBasic<'a>,
 }
 
-/// Response type for
-///app.rocksky.scrobble.createScrobble
+/// Response type for app.rocksky.scrobble.createScrobble
 pub struct CreateScrobbleResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateScrobbleResponse {
     const NSID: &'static str = "app.rocksky.scrobble.createScrobble";
@@ -140,8 +127,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateScrobble<'a> {
     type Response = CreateScrobbleResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.scrobble.createScrobble
+/// Endpoint type for app.rocksky.scrobble.createScrobble
 pub struct CreateScrobbleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateScrobbleRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.scrobble.createScrobble";

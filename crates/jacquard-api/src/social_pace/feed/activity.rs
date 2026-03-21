@@ -5,93 +5,95 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::social_pace::feed::ActivityType;
+use crate::social_pace::feed::Split;
 /// A recording of an activity. Like running, walking, lifting weights, etc. Helpful to create the rkey tid from the start time and clock id 23 so you can upsert easily.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Activity<'a> {
     ///The number of active calories burned during the activity.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub calories: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub calories: Option<i64>,
     ///When the activity was created
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///The distance covered during the activity, if any. This is a string to allow for float values. pace.social support is in feet and meters.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub distance: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub distance: Option<CowStr<'a>>,
     ///The units used for distance measurement.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub distance_units: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub distance_units: Option<CowStr<'a>>,
     ///When the activity ended.
-    pub ended_at: jacquard_common::types::string::Datetime,
+    pub ended_at: Datetime,
     ///An export of the route taken during the activity, if any. A GPX or TCX file. Reminder, all atproto blobs are public. And is recommended if you do this to trim start and end.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub route: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub route: Option<BlobRef<'a>>,
     ///Array of splits if any.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub splits: core::option::Option<Vec<crate::social_pace::feed::Split<'a>>>,
+    pub splits: Option<Vec<Split<'a>>>,
     ///When the activity was started.
-    pub started_at: jacquard_common::types::string::Datetime,
+    pub started_at: Datetime,
     ///The number of steps taken during the activity.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub steps: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub steps: Option<i64>,
     #[serde(borrow)]
-    pub r#type: crate::social_pace::feed::ActivityType<'a>,
+    pub r#type: ActivityType<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Activity<'a>,
 }
 
 impl<'a> Activity<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ActivityRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ActivityRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ActivityRecord;
-impl jacquard_common::xrpc::XrpcResp for ActivityRecord {
+impl XrpcResp for ActivityRecord {
     const NSID: &'static str = "social.pace.feed.activity";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ActivityGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ActivityGetRecordOutput<'_>> for Activity<'_> {
@@ -101,36 +103,32 @@ impl From<ActivityGetRecordOutput<'_>> for Activity<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Activity<'_> {
+impl Collection for Activity<'_> {
     const NSID: &'static str = "social.pace.feed.activity";
     type Record = ActivityRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ActivityRecord {
+impl Collection for ActivityRecord {
     const NSID: &'static str = "social.pace.feed.activity";
     type Record = ActivityRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
+impl<'a> LexiconSchema for Activity<'a> {
     fn nsid() -> &'static str {
         "social.pace.feed.activity"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_social_pace_feed_activity()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.distance_units {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "distance_units",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("distance_units"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -157,10 +155,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "route",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("route"),
                         accepted: vec![
                             "application/vnd.garmin.tcx+xml".to_string(),
                             "application/gpx+xml.".to_string()
@@ -185,85 +181,85 @@ pub mod activity_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Type;
-        type CreatedAt;
-        type EndedAt;
         type StartedAt;
+        type EndedAt;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Type = Unset;
-        type CreatedAt = Unset;
-        type EndedAt = Unset;
         type StartedAt = Unset;
+        type EndedAt = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
         type Type = Set<members::r#type>;
-        type CreatedAt = S::CreatedAt;
+        type StartedAt = S::StartedAt;
         type EndedAt = S::EndedAt;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Type = S::Type;
-        type CreatedAt = Set<members::created_at>;
-        type EndedAt = S::EndedAt;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `ended_at` field to Set
-    pub struct SetEndedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEndedAt<S> {}
-    impl<S: State> State for SetEndedAt<S> {
-        type Type = S::Type;
         type CreatedAt = S::CreatedAt;
-        type EndedAt = Set<members::ended_at>;
-        type StartedAt = S::StartedAt;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartedAt<S> {}
     impl<S: State> State for SetStartedAt<S> {
         type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-        type EndedAt = S::EndedAt;
         type StartedAt = Set<members::started_at>;
+        type EndedAt = S::EndedAt;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `ended_at` field to Set
+    pub struct SetEndedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEndedAt<S> {}
+    impl<S: State> State for SetEndedAt<S> {
+        type Type = S::Type;
+        type StartedAt = S::StartedAt;
+        type EndedAt = Set<members::ended_at>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Type = S::Type;
+        type StartedAt = S::StartedAt;
+        type EndedAt = S::EndedAt;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `type` field
         pub struct r#type(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `ended_at` field
-        pub struct ended_at(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
+        ///Marker type for the `ended_at` field
+        pub struct ended_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ActivityBuilder<'a, S: activity_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<Vec<crate::social_pace::feed::Split<'a>>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<crate::social_pace::feed::ActivityType<'a>>,
+        Option<i64>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<BlobRef<'a>>,
+        Option<Vec<Split<'a>>>,
+        Option<Datetime>,
+        Option<i64>,
+        Option<ActivityType<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Activity<'a> {
@@ -277,7 +273,7 @@ impl<'a> ActivityBuilder<'a, activity_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ActivityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -290,7 +286,7 @@ impl<'a> ActivityBuilder<'a, activity_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -316,28 +312,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ActivityBuilder<'a, activity_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ActivityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `distance` field (optional)
-    pub fn distance(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn distance(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `distance` field to an Option value (optional)
-    pub fn maybe_distance(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_distance(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -345,18 +338,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `distanceUnits` field (optional)
-    pub fn distance_units(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn distance_units(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `distanceUnits` field to an Option value (optional)
-    pub fn maybe_distance_units(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_distance_units(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -370,31 +357,25 @@ where
     /// Set the `endedAt` field (required)
     pub fn ended_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ActivityBuilder<'a, activity_state::SetEndedAt<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         ActivityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `route` field (optional)
-    pub fn route(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
-    ) -> Self {
+    pub fn route(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `route` field to an Option value (optional)
-    pub fn maybe_route(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_route(mut self, value: Option<BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -402,18 +383,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `splits` field (optional)
-    pub fn splits(
-        mut self,
-        value: impl Into<Option<Vec<crate::social_pace::feed::Split<'a>>>>,
-    ) -> Self {
+    pub fn splits(mut self, value: impl Into<Option<Vec<Split<'a>>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `splits` field to an Option value (optional)
-    pub fn maybe_splits(
-        mut self,
-        value: Option<Vec<crate::social_pace::feed::Split<'a>>>,
-    ) -> Self {
+    pub fn maybe_splits(mut self, value: Option<Vec<Split<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -427,13 +402,13 @@ where
     /// Set the `startedAt` field (required)
     pub fn started_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ActivityBuilder<'a, activity_state::SetStartedAt<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         ActivityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -459,13 +434,13 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<crate::social_pace::feed::ActivityType<'a>>,
+        value: impl Into<ActivityType<'a>>,
     ) -> ActivityBuilder<'a, activity_state::SetType<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         ActivityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -474,9 +449,9 @@ impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
     S::Type: activity_state::IsSet,
-    S::CreatedAt: activity_state::IsSet,
-    S::EndedAt: activity_state::IsSet,
     S::StartedAt: activity_state::IsSet,
+    S::EndedAt: activity_state::IsSet,
+    S::CreatedAt: activity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Activity<'a> {
@@ -497,7 +472,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -518,223 +493,136 @@ where
     }
 }
 
-fn lexicon_doc_social_pace_feed_activity() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("social.pace.feed.activity"),
-        revision: None,
-        description: None,
+fn lexicon_doc_social_pace_feed_activity() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("social.pace.feed.activity"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A recording of an activity. Like running, walking, lifting weights, etc. Helpful to create the rkey tid from the start time and clock id 23 so you can upsert easily.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("startedAt"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("endedAt"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("startedAt"),
+                                SmolStr::new_static("endedAt"), SmolStr::new_static("type"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "calories",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("calories"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "When the activity was created",
-                                        ),
+                                        CowStr::new_static("When the activity was created"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "distance",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("distance"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The distance covered during the activity, if any. This is a string to allow for float values. pace.social support is in feet and meters.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "distanceUnits",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("distanceUnits"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The units used for distance measurement.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(10usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "endedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("endedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "When the activity ended.",
-                                        ),
+                                        CowStr::new_static("When the activity ended."),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "route",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                    description: None,
-                                    accept: None,
-                                    max_size: None,
-                                }),
+                                SmolStr::new_static("route"),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "splits",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("splits"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Array of splits if any.",
-                                        ),
+                                        CowStr::new_static("Array of splits if any."),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "social.pace.feed.defs#split",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("social.pace.feed.defs#split"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "startedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("startedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "When the activity was started.",
-                                        ),
+                                        CowStr::new_static("When the activity was started."),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "steps",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("steps"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "type",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("type"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "social.pace.feed.defs#activityType",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

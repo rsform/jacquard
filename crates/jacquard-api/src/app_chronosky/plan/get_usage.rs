@@ -5,84 +5,79 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::Datetime;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::app_chronosky::plan::get_usage;
 /// Current plan information.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CurrentPlan<'a> {
     ///Localized plan display names
     #[serde(borrow)]
-    pub display_name: jacquard_common::types::value::Data<'a>,
+    pub display_name: Data<'a>,
     ///Plan ID
     #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
+    pub id: CowStr<'a>,
     ///Whether the plan is currently active
     pub is_active: bool,
     ///Internal plan name
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///Plan tier (FREE, BASIC, STANDARD, PREMIUM)
     #[serde(borrow)]
-    pub tier: jacquard_common::CowStr<'a>,
+    pub tier: CowStr<'a>,
     ///Plan expiration date (ISO 8601)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub valid_until: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub valid_until: Option<Datetime>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetUsageOutput<'a> {
     #[serde(borrow)]
-    pub current_plan: crate::app_chronosky::plan::get_usage::CurrentPlan<'a>,
+    pub current_plan: get_usage::CurrentPlan<'a>,
     #[serde(borrow)]
-    pub limits: crate::app_chronosky::plan::get_usage::PlanLimits<'a>,
+    pub limits: get_usage::PlanLimits<'a>,
     #[serde(borrow)]
-    pub usage: crate::app_chronosky::plan::get_usage::UsageStats<'a>,
+    pub usage: get_usage::UsageStats<'a>,
 }
 
 /// Plan limits.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PlanLimits<'a> {
     ///Whether markdown formatting is supported
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub markdown_support: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub markdown_support: Option<bool>,
     ///Maximum image size (MB)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub max_image_size_mb: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_image_size_mb: Option<i64>,
     ///Maximum images per post
     pub max_images_per_post: i64,
     ///Maximum days in advance to schedule
     pub max_schedule_days: i64,
     ///Maximum video size (MB)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub max_video_size_mb: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_video_size_mb: Option<i64>,
     ///Maximum posts per month
     pub monthly_posts_limit: i64,
     ///Maximum concurrent pending posts
@@ -90,70 +85,59 @@ pub struct PlanLimits<'a> {
     ///Minimum interval between scheduled posts (minutes)
     pub schedule_interval_minutes: i64,
     ///Whether thread posts are enabled
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub thread_posts: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub thread_posts: Option<bool>,
     ///Maximum posts per thread
     pub thread_posts_limit: i64,
     ///Monthly video processing minutes
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub video_processing_minutes_monthly: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub video_processing_minutes_monthly: Option<i64>,
     ///Whether video uploads are enabled
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub video_upload: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub video_upload: Option<bool>,
 }
 
 /// Usage statistics.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UsageStats<'a> {
     ///API requests in current hour
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub api_requests_this_hour: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub api_requests_this_hour: Option<i64>,
     ///Last time usage was updated (ISO 8601)
-    pub last_updated: jacquard_common::types::string::Datetime,
+    pub last_updated: Datetime,
     ///End of current monthly period (ISO 8601)
-    pub monthly_period_end: jacquard_common::types::string::Datetime,
+    pub monthly_period_end: Datetime,
     ///Start of current monthly period (ISO 8601)
-    pub monthly_period_start: jacquard_common::types::string::Datetime,
+    pub monthly_period_start: Datetime,
     ///Number of posts this month
     pub monthly_posts_count: i64,
     ///Current number of pending posts
     pub pending_posts_count: i64,
     ///Storage used (MB)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub storage_used_mb: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub storage_used_mb: Option<i64>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CurrentPlan<'a> {
+impl<'a> LexiconSchema for CurrentPlan<'a> {
     fn nsid() -> &'static str {
         "app.chronosky.plan.getUsage"
     }
     fn def_name() -> &'static str {
         "currentPlan"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_chronosky_plan_getUsage()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("id"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -163,10 +147,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CurrentPlan<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -176,10 +158,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CurrentPlan<'a> {
             let value = &self.tier;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tier",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("tier"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -190,19 +170,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CurrentPlan<'a> {
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct GetUsage;
-/// Response type for
-///app.chronosky.plan.getUsage
+/// Response type for app.chronosky.plan.getUsage
 pub struct GetUsageResponse;
 impl jacquard_common::xrpc::XrpcResp for GetUsageResponse {
     const NSID: &'static str = "app.chronosky.plan.getUsage";
@@ -217,8 +188,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetUsage {
     type Response = GetUsageResponse;
 }
 
-/// Endpoint type for
-///app.chronosky.plan.getUsage
+/// Endpoint type for app.chronosky.plan.getUsage
 pub struct GetUsageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetUsageRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.plan.getUsage";
@@ -227,36 +197,32 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetUsageRequest {
     type Response = GetUsageResponse;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for PlanLimits<'a> {
+impl<'a> LexiconSchema for PlanLimits<'a> {
     fn nsid() -> &'static str {
         "app.chronosky.plan.getUsage"
     }
     fn def_name() -> &'static str {
         "planLimits"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_chronosky_plan_getUsage()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for UsageStats<'a> {
+impl<'a> LexiconSchema for UsageStats<'a> {
     fn nsid() -> &'static str {
         "app.chronosky.plan.getUsage"
     }
     fn def_name() -> &'static str {
         "usageStats"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_chronosky_plan_getUsage()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -271,100 +237,100 @@ pub mod current_plan_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
+        type DisplayName;
         type Tier;
         type IsActive;
-        type DisplayName;
         type Id;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
+        type DisplayName = Unset;
         type Tier = Unset;
         type IsActive = Unset;
-        type DisplayName = Unset;
         type Id = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `tier` field to Set
-    pub struct SetTier<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTier<S> {}
-    impl<S: State> State for SetTier<S> {
-        type Tier = Set<members::tier>;
-        type IsActive = S::IsActive;
-        type DisplayName = S::DisplayName;
-        type Id = S::Id;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `is_active` field to Set
-    pub struct SetIsActive<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsActive<S> {}
-    impl<S: State> State for SetIsActive<S> {
-        type Tier = S::Tier;
-        type IsActive = Set<members::is_active>;
-        type DisplayName = S::DisplayName;
-        type Id = S::Id;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type Tier = S::Tier;
-        type IsActive = S::IsActive;
-        type DisplayName = Set<members::display_name>;
-        type Id = S::Id;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Tier = S::Tier;
-        type IsActive = S::IsActive;
-        type DisplayName = S::DisplayName;
-        type Id = Set<members::id>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type DisplayName = S::DisplayName;
         type Tier = S::Tier;
         type IsActive = S::IsActive;
-        type DisplayName = S::DisplayName;
         type Id = S::Id;
-        type Name = Set<members::name>;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type Name = S::Name;
+        type DisplayName = Set<members::display_name>;
+        type Tier = S::Tier;
+        type IsActive = S::IsActive;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `tier` field to Set
+    pub struct SetTier<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTier<S> {}
+    impl<S: State> State for SetTier<S> {
+        type Name = S::Name;
+        type DisplayName = S::DisplayName;
+        type Tier = Set<members::tier>;
+        type IsActive = S::IsActive;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `is_active` field to Set
+    pub struct SetIsActive<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsActive<S> {}
+    impl<S: State> State for SetIsActive<S> {
+        type Name = S::Name;
+        type DisplayName = S::DisplayName;
+        type Tier = S::Tier;
+        type IsActive = Set<members::is_active>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Name = S::Name;
+        type DisplayName = S::DisplayName;
+        type Tier = S::Tier;
+        type IsActive = S::IsActive;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
         ///Marker type for the `tier` field
         pub struct tier(());
         ///Marker type for the `is_active` field
         pub struct is_active(());
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CurrentPlanBuilder<'a, S: current_plan_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<Data<'a>>,
+        Option<CowStr<'a>>,
+        Option<bool>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CurrentPlan<'a> {
@@ -378,9 +344,9 @@ impl<'a> CurrentPlanBuilder<'a, current_plan_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CurrentPlanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -393,13 +359,13 @@ where
     /// Set the `displayName` field (required)
     pub fn display_name(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> CurrentPlanBuilder<'a, current_plan_state::SetDisplayName<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CurrentPlanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -412,13 +378,13 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CurrentPlanBuilder<'a, current_plan_state::SetId<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CurrentPlanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -433,11 +399,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> CurrentPlanBuilder<'a, current_plan_state::SetIsActive<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         CurrentPlanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -450,13 +416,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CurrentPlanBuilder<'a, current_plan_state::SetName<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         CurrentPlanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -469,31 +435,25 @@ where
     /// Set the `tier` field (required)
     pub fn tier(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CurrentPlanBuilder<'a, current_plan_state::SetTier<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         CurrentPlanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: current_plan_state::State> CurrentPlanBuilder<'a, S> {
     /// Set the `validUntil` field (optional)
-    pub fn valid_until(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn valid_until(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `validUntil` field to an Option value (optional)
-    pub fn maybe_valid_until(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_valid_until(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -502,11 +462,11 @@ impl<'a, S: current_plan_state::State> CurrentPlanBuilder<'a, S> {
 impl<'a, S> CurrentPlanBuilder<'a, S>
 where
     S: current_plan_state::State,
+    S::Name: current_plan_state::IsSet,
+    S::DisplayName: current_plan_state::IsSet,
     S::Tier: current_plan_state::IsSet,
     S::IsActive: current_plan_state::IsSet,
-    S::DisplayName: current_plan_state::IsSet,
     S::Id: current_plan_state::IsSet,
-    S::Name: current_plan_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CurrentPlan<'a> {
@@ -523,10 +483,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> CurrentPlan<'a> {
         CurrentPlan {
             display_name: self.__unsafe_private_named.0.unwrap(),
@@ -540,465 +497,273 @@ where
     }
 }
 
-fn lexicon_doc_app_chronosky_plan_getUsage() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.chronosky.plan.getUsage"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_chronosky_plan_getUsage() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.chronosky.plan.getUsage"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("currentPlan"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Current plan information.",
-                        ),
-                    ),
+                SmolStr::new_static("currentPlan"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Current plan information.")),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("tier"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("displayName"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("isActive")
+                            SmolStr::new_static("id"), SmolStr::new_static("tier"),
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("displayName"),
+                            SmolStr::new_static("isActive")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "displayName",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
-                                description: None,
+                            SmolStr::new_static("displayName"),
+                            LexObjectProperty::Unknown(LexUnknown {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Plan ID"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("id"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Plan ID")),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "isActive",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("isActive"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Internal plan name"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Internal plan name")),
                                 max_length: Some(200usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "tier",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("tier"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Plan tier (FREE, BASIC, STANDARD, PREMIUM)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(50usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "validUntil",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("validUntil"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Plan expiration date (ISO 8601)",
-                                    ),
+                                    CowStr::new_static("Plan expiration date (ISO 8601)"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
+                                format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
-                    description: None,
+                SmolStr::new_static("main"),
+                LexUserType::XrpcQuery(LexXrpcQuery {
                     parameters: None,
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("planLimits"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Plan limits."),
-                    ),
+                SmolStr::new_static("planLimits"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Plan limits.")),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("monthlyPostsLimit"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("pendingPostsLimit"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("maxScheduleDays"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("scheduleIntervalMinutes"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("maxImagesPerPost"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("threadPostsLimit")
+                            SmolStr::new_static("monthlyPostsLimit"),
+                            SmolStr::new_static("pendingPostsLimit"),
+                            SmolStr::new_static("maxScheduleDays"),
+                            SmolStr::new_static("scheduleIntervalMinutes"),
+                            SmolStr::new_static("maxImagesPerPost"),
+                            SmolStr::new_static("threadPostsLimit")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "markdownSupport",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("markdownSupport"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maxImageSizeMb",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("maxImageSizeMb"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maxImagesPerPost",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("maxImagesPerPost"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maxScheduleDays",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("maxScheduleDays"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maxVideoSizeMb",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("maxVideoSizeMb"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "monthlyPostsLimit",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("monthlyPostsLimit"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "pendingPostsLimit",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("pendingPostsLimit"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "scheduleIntervalMinutes",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("scheduleIntervalMinutes"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "threadPosts",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("threadPosts"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "threadPostsLimit",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("threadPostsLimit"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "videoProcessingMinutesMonthly",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("videoProcessingMinutesMonthly"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "videoUpload",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("videoUpload"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("usageStats"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Usage statistics."),
-                    ),
+                SmolStr::new_static("usageStats"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Usage statistics.")),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("pendingPostsCount"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("monthlyPostsCount"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("monthlyPeriodStart"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("monthlyPeriodEnd"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("lastUpdated")
+                            SmolStr::new_static("pendingPostsCount"),
+                            SmolStr::new_static("monthlyPostsCount"),
+                            SmolStr::new_static("monthlyPeriodStart"),
+                            SmolStr::new_static("monthlyPeriodEnd"),
+                            SmolStr::new_static("lastUpdated")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "apiRequestsThisHour",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("apiRequestsThisHour"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "lastUpdated",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("lastUpdated"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Last time usage was updated (ISO 8601)",
-                                    ),
+                                    CowStr::new_static("Last time usage was updated (ISO 8601)"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
+                                format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "monthlyPeriodEnd",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("monthlyPeriodEnd"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "End of current monthly period (ISO 8601)",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
+                                format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "monthlyPeriodStart",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("monthlyPeriodStart"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Start of current monthly period (ISO 8601)",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
+                                format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "monthlyPostsCount",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("monthlyPostsCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "pendingPostsCount",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("pendingPostsCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "storageUsedMb",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("storageUsedMb"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1012,126 +777,126 @@ pub mod plan_limits_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ScheduleIntervalMinutes;
         type MonthlyPostsLimit;
-        type ThreadPostsLimit;
         type MaxImagesPerPost;
         type MaxScheduleDays;
+        type ScheduleIntervalMinutes;
         type PendingPostsLimit;
+        type ThreadPostsLimit;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ScheduleIntervalMinutes = Unset;
         type MonthlyPostsLimit = Unset;
-        type ThreadPostsLimit = Unset;
         type MaxImagesPerPost = Unset;
         type MaxScheduleDays = Unset;
+        type ScheduleIntervalMinutes = Unset;
         type PendingPostsLimit = Unset;
-    }
-    ///State transition - sets the `schedule_interval_minutes` field to Set
-    pub struct SetScheduleIntervalMinutes<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScheduleIntervalMinutes<S> {}
-    impl<S: State> State for SetScheduleIntervalMinutes<S> {
-        type ScheduleIntervalMinutes = Set<members::schedule_interval_minutes>;
-        type MonthlyPostsLimit = S::MonthlyPostsLimit;
-        type ThreadPostsLimit = S::ThreadPostsLimit;
-        type MaxImagesPerPost = S::MaxImagesPerPost;
-        type MaxScheduleDays = S::MaxScheduleDays;
-        type PendingPostsLimit = S::PendingPostsLimit;
+        type ThreadPostsLimit = Unset;
     }
     ///State transition - sets the `monthly_posts_limit` field to Set
     pub struct SetMonthlyPostsLimit<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMonthlyPostsLimit<S> {}
     impl<S: State> State for SetMonthlyPostsLimit<S> {
-        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
         type MonthlyPostsLimit = Set<members::monthly_posts_limit>;
-        type ThreadPostsLimit = S::ThreadPostsLimit;
         type MaxImagesPerPost = S::MaxImagesPerPost;
         type MaxScheduleDays = S::MaxScheduleDays;
-        type PendingPostsLimit = S::PendingPostsLimit;
-    }
-    ///State transition - sets the `thread_posts_limit` field to Set
-    pub struct SetThreadPostsLimit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThreadPostsLimit<S> {}
-    impl<S: State> State for SetThreadPostsLimit<S> {
         type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
-        type MonthlyPostsLimit = S::MonthlyPostsLimit;
-        type ThreadPostsLimit = Set<members::thread_posts_limit>;
-        type MaxImagesPerPost = S::MaxImagesPerPost;
-        type MaxScheduleDays = S::MaxScheduleDays;
         type PendingPostsLimit = S::PendingPostsLimit;
+        type ThreadPostsLimit = S::ThreadPostsLimit;
     }
     ///State transition - sets the `max_images_per_post` field to Set
     pub struct SetMaxImagesPerPost<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMaxImagesPerPost<S> {}
     impl<S: State> State for SetMaxImagesPerPost<S> {
-        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
         type MonthlyPostsLimit = S::MonthlyPostsLimit;
-        type ThreadPostsLimit = S::ThreadPostsLimit;
         type MaxImagesPerPost = Set<members::max_images_per_post>;
         type MaxScheduleDays = S::MaxScheduleDays;
+        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
         type PendingPostsLimit = S::PendingPostsLimit;
+        type ThreadPostsLimit = S::ThreadPostsLimit;
     }
     ///State transition - sets the `max_schedule_days` field to Set
     pub struct SetMaxScheduleDays<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMaxScheduleDays<S> {}
     impl<S: State> State for SetMaxScheduleDays<S> {
-        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
         type MonthlyPostsLimit = S::MonthlyPostsLimit;
-        type ThreadPostsLimit = S::ThreadPostsLimit;
         type MaxImagesPerPost = S::MaxImagesPerPost;
         type MaxScheduleDays = Set<members::max_schedule_days>;
+        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
         type PendingPostsLimit = S::PendingPostsLimit;
+        type ThreadPostsLimit = S::ThreadPostsLimit;
+    }
+    ///State transition - sets the `schedule_interval_minutes` field to Set
+    pub struct SetScheduleIntervalMinutes<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScheduleIntervalMinutes<S> {}
+    impl<S: State> State for SetScheduleIntervalMinutes<S> {
+        type MonthlyPostsLimit = S::MonthlyPostsLimit;
+        type MaxImagesPerPost = S::MaxImagesPerPost;
+        type MaxScheduleDays = S::MaxScheduleDays;
+        type ScheduleIntervalMinutes = Set<members::schedule_interval_minutes>;
+        type PendingPostsLimit = S::PendingPostsLimit;
+        type ThreadPostsLimit = S::ThreadPostsLimit;
     }
     ///State transition - sets the `pending_posts_limit` field to Set
     pub struct SetPendingPostsLimit<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPendingPostsLimit<S> {}
     impl<S: State> State for SetPendingPostsLimit<S> {
-        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
         type MonthlyPostsLimit = S::MonthlyPostsLimit;
-        type ThreadPostsLimit = S::ThreadPostsLimit;
         type MaxImagesPerPost = S::MaxImagesPerPost;
         type MaxScheduleDays = S::MaxScheduleDays;
+        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
         type PendingPostsLimit = Set<members::pending_posts_limit>;
+        type ThreadPostsLimit = S::ThreadPostsLimit;
+    }
+    ///State transition - sets the `thread_posts_limit` field to Set
+    pub struct SetThreadPostsLimit<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThreadPostsLimit<S> {}
+    impl<S: State> State for SetThreadPostsLimit<S> {
+        type MonthlyPostsLimit = S::MonthlyPostsLimit;
+        type MaxImagesPerPost = S::MaxImagesPerPost;
+        type MaxScheduleDays = S::MaxScheduleDays;
+        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
+        type PendingPostsLimit = S::PendingPostsLimit;
+        type ThreadPostsLimit = Set<members::thread_posts_limit>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `schedule_interval_minutes` field
-        pub struct schedule_interval_minutes(());
         ///Marker type for the `monthly_posts_limit` field
         pub struct monthly_posts_limit(());
-        ///Marker type for the `thread_posts_limit` field
-        pub struct thread_posts_limit(());
         ///Marker type for the `max_images_per_post` field
         pub struct max_images_per_post(());
         ///Marker type for the `max_schedule_days` field
         pub struct max_schedule_days(());
+        ///Marker type for the `schedule_interval_minutes` field
+        pub struct schedule_interval_minutes(());
         ///Marker type for the `pending_posts_limit` field
         pub struct pending_posts_limit(());
+        ///Marker type for the `thread_posts_limit` field
+        pub struct thread_posts_limit(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PlanLimitsBuilder<'a, S: plan_limits_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<bool>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<bool>,
+        Option<bool>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<bool>,
+        Option<i64>,
+        Option<i64>,
+        Option<bool>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> PlanLimits<'a> {
@@ -1145,7 +910,7 @@ impl<'a> PlanLimitsBuilder<'a, plan_limits_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PlanLimitsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -1160,7 +925,7 @@ impl<'a> PlanLimitsBuilder<'a, plan_limits_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1201,11 +966,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PlanLimitsBuilder<'a, plan_limits_state::SetMaxImagesPerPost<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         PlanLimitsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1220,11 +985,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PlanLimitsBuilder<'a, plan_limits_state::SetMaxScheduleDays<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         PlanLimitsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1252,11 +1017,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PlanLimitsBuilder<'a, plan_limits_state::SetMonthlyPostsLimit<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         PlanLimitsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1271,11 +1036,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PlanLimitsBuilder<'a, plan_limits_state::SetPendingPostsLimit<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         PlanLimitsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1290,11 +1055,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PlanLimitsBuilder<'a, plan_limits_state::SetScheduleIntervalMinutes<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         PlanLimitsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1322,11 +1087,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PlanLimitsBuilder<'a, plan_limits_state::SetThreadPostsLimit<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         PlanLimitsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1363,12 +1128,12 @@ impl<'a, S: plan_limits_state::State> PlanLimitsBuilder<'a, S> {
 impl<'a, S> PlanLimitsBuilder<'a, S>
 where
     S: plan_limits_state::State,
-    S::ScheduleIntervalMinutes: plan_limits_state::IsSet,
     S::MonthlyPostsLimit: plan_limits_state::IsSet,
-    S::ThreadPostsLimit: plan_limits_state::IsSet,
     S::MaxImagesPerPost: plan_limits_state::IsSet,
     S::MaxScheduleDays: plan_limits_state::IsSet,
+    S::ScheduleIntervalMinutes: plan_limits_state::IsSet,
     S::PendingPostsLimit: plan_limits_state::IsSet,
+    S::ThreadPostsLimit: plan_limits_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PlanLimits<'a> {
@@ -1391,10 +1156,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> PlanLimits<'a> {
         PlanLimits {
             markdown_support: self.__unsafe_private_named.0,
@@ -1425,100 +1187,100 @@ pub mod usage_stats_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type PendingPostsCount;
-        type MonthlyPeriodEnd;
         type MonthlyPeriodStart;
         type LastUpdated;
         type MonthlyPostsCount;
+        type MonthlyPeriodEnd;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type PendingPostsCount = Unset;
-        type MonthlyPeriodEnd = Unset;
         type MonthlyPeriodStart = Unset;
         type LastUpdated = Unset;
         type MonthlyPostsCount = Unset;
+        type MonthlyPeriodEnd = Unset;
     }
     ///State transition - sets the `pending_posts_count` field to Set
     pub struct SetPendingPostsCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPendingPostsCount<S> {}
     impl<S: State> State for SetPendingPostsCount<S> {
         type PendingPostsCount = Set<members::pending_posts_count>;
+        type MonthlyPeriodStart = S::MonthlyPeriodStart;
+        type LastUpdated = S::LastUpdated;
+        type MonthlyPostsCount = S::MonthlyPostsCount;
         type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
-        type MonthlyPeriodStart = S::MonthlyPeriodStart;
-        type LastUpdated = S::LastUpdated;
-        type MonthlyPostsCount = S::MonthlyPostsCount;
-    }
-    ///State transition - sets the `monthly_period_end` field to Set
-    pub struct SetMonthlyPeriodEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMonthlyPeriodEnd<S> {}
-    impl<S: State> State for SetMonthlyPeriodEnd<S> {
-        type PendingPostsCount = S::PendingPostsCount;
-        type MonthlyPeriodEnd = Set<members::monthly_period_end>;
-        type MonthlyPeriodStart = S::MonthlyPeriodStart;
-        type LastUpdated = S::LastUpdated;
-        type MonthlyPostsCount = S::MonthlyPostsCount;
     }
     ///State transition - sets the `monthly_period_start` field to Set
     pub struct SetMonthlyPeriodStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMonthlyPeriodStart<S> {}
     impl<S: State> State for SetMonthlyPeriodStart<S> {
         type PendingPostsCount = S::PendingPostsCount;
-        type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
         type MonthlyPeriodStart = Set<members::monthly_period_start>;
         type LastUpdated = S::LastUpdated;
         type MonthlyPostsCount = S::MonthlyPostsCount;
+        type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
     }
     ///State transition - sets the `last_updated` field to Set
     pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
     impl<S: State> State for SetLastUpdated<S> {
         type PendingPostsCount = S::PendingPostsCount;
-        type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
         type MonthlyPeriodStart = S::MonthlyPeriodStart;
         type LastUpdated = Set<members::last_updated>;
         type MonthlyPostsCount = S::MonthlyPostsCount;
+        type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
     }
     ///State transition - sets the `monthly_posts_count` field to Set
     pub struct SetMonthlyPostsCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMonthlyPostsCount<S> {}
     impl<S: State> State for SetMonthlyPostsCount<S> {
         type PendingPostsCount = S::PendingPostsCount;
-        type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
         type MonthlyPeriodStart = S::MonthlyPeriodStart;
         type LastUpdated = S::LastUpdated;
         type MonthlyPostsCount = Set<members::monthly_posts_count>;
+        type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
+    }
+    ///State transition - sets the `monthly_period_end` field to Set
+    pub struct SetMonthlyPeriodEnd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMonthlyPeriodEnd<S> {}
+    impl<S: State> State for SetMonthlyPeriodEnd<S> {
+        type PendingPostsCount = S::PendingPostsCount;
+        type MonthlyPeriodStart = S::MonthlyPeriodStart;
+        type LastUpdated = S::LastUpdated;
+        type MonthlyPostsCount = S::MonthlyPostsCount;
+        type MonthlyPeriodEnd = Set<members::monthly_period_end>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `pending_posts_count` field
         pub struct pending_posts_count(());
-        ///Marker type for the `monthly_period_end` field
-        pub struct monthly_period_end(());
         ///Marker type for the `monthly_period_start` field
         pub struct monthly_period_start(());
         ///Marker type for the `last_updated` field
         pub struct last_updated(());
         ///Marker type for the `monthly_posts_count` field
         pub struct monthly_posts_count(());
+        ///Marker type for the `monthly_period_end` field
+        pub struct monthly_period_end(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct UsageStatsBuilder<'a, S: usage_stats_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
+        Option<i64>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UsageStats<'a> {
@@ -1532,9 +1294,9 @@ impl<'a> UsageStatsBuilder<'a, usage_stats_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UsageStatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1560,13 +1322,13 @@ where
     /// Set the `lastUpdated` field (required)
     pub fn last_updated(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> UsageStatsBuilder<'a, usage_stats_state::SetLastUpdated<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         UsageStatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1579,13 +1341,13 @@ where
     /// Set the `monthlyPeriodEnd` field (required)
     pub fn monthly_period_end(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> UsageStatsBuilder<'a, usage_stats_state::SetMonthlyPeriodEnd<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         UsageStatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1598,13 +1360,13 @@ where
     /// Set the `monthlyPeriodStart` field (required)
     pub fn monthly_period_start(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> UsageStatsBuilder<'a, usage_stats_state::SetMonthlyPeriodStart<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         UsageStatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1619,11 +1381,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> UsageStatsBuilder<'a, usage_stats_state::SetMonthlyPostsCount<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         UsageStatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1638,11 +1400,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> UsageStatsBuilder<'a, usage_stats_state::SetPendingPostsCount<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         UsageStatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1664,10 +1426,10 @@ impl<'a, S> UsageStatsBuilder<'a, S>
 where
     S: usage_stats_state::State,
     S::PendingPostsCount: usage_stats_state::IsSet,
-    S::MonthlyPeriodEnd: usage_stats_state::IsSet,
     S::MonthlyPeriodStart: usage_stats_state::IsSet,
     S::LastUpdated: usage_stats_state::IsSet,
     S::MonthlyPostsCount: usage_stats_state::IsSet,
+    S::MonthlyPeriodEnd: usage_stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UsageStats<'a> {
@@ -1685,10 +1447,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> UsageStats<'a> {
         UsageStats {
             api_requests_this_hour: self.__unsafe_private_named.0,

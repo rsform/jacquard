@@ -5,64 +5,57 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::sync::HostStatus;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetHostStatus<'a> {
     #[serde(borrow)]
-    pub hostname: jacquard_common::CowStr<'a>,
+    pub hostname: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetHostStatusOutput<'a> {
     ///Number of accounts on the server which are associated with the upstream host. Note that the upstream may actually have more accounts.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub account_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_count: Option<i64>,
     #[serde(borrow)]
-    pub hostname: jacquard_common::CowStr<'a>,
+    pub hostname: CowStr<'a>,
     ///Recent repo stream event sequence number. May be delayed from actual stream processing (eg, persisted cursor not in-memory cursor).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub seq: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub seq: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: core::option::Option<crate::com_atproto::sync::HostStatus<'a>>,
+    pub status: Option<HostStatus<'a>>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetHostStatusError<'a> {
     #[serde(rename = "HostNotFound")]
-    HostNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    HostNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetHostStatusError<'_> {
@@ -80,8 +73,7 @@ impl core::fmt::Display for GetHostStatusError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.sync.getHostStatus
+/// Response type for com.atproto.sync.getHostStatus
 pub struct GetHostStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetHostStatusResponse {
     const NSID: &'static str = "com.atproto.sync.getHostStatus";
@@ -96,8 +88,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetHostStatus<'a> {
     type Response = GetHostStatusResponse;
 }
 
-/// Endpoint type for
-///com.atproto.sync.getHostStatus
+/// Endpoint type for com.atproto.sync.getHostStatus
 pub struct GetHostStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetHostStatusRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.getHostStatus";
@@ -140,9 +131,9 @@ pub mod get_host_status_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetHostStatusBuilder<'a, S: get_host_status_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetHostStatus<'a> {
@@ -156,9 +147,9 @@ impl<'a> GetHostStatusBuilder<'a, get_host_status_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetHostStatusBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -171,13 +162,13 @@ where
     /// Set the `hostname` field (required)
     pub fn hostname(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetHostStatusBuilder<'a, get_host_status_state::SetHostname<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetHostStatusBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

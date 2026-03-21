@@ -5,38 +5,28 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct SyncUserCollections<'a> {
     ///AT-URI of the slice to sync user data into
     #[serde(borrow)]
-    pub slice: jacquard_common::CowStr<'a>,
-    ///Timeout in seconds for the sync operation Defaults to `30`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub slice: CowStr<'a>,
+    ///Timeout in seconds for the sync operation  Defaults to `30`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_sync_user_collections_timeout_seconds")]
-    pub timeout_seconds: core::option::Option<i64>,
+    pub timeout_seconds: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SyncUserCollectionsOutput<'a> {
     ///Number of records successfully synced
@@ -47,8 +37,7 @@ pub struct SyncUserCollectionsOutput<'a> {
     pub timed_out: bool,
 }
 
-/// Response type for
-///network.slices.slice.syncUserCollections
+/// Response type for network.slices.slice.syncUserCollections
 pub struct SyncUserCollectionsResponse;
 impl jacquard_common::xrpc::XrpcResp for SyncUserCollectionsResponse {
     const NSID: &'static str = "network.slices.slice.syncUserCollections";
@@ -65,8 +54,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SyncUserCollections<'a> {
     type Response = SyncUserCollectionsResponse;
 }
 
-/// Endpoint type for
-///network.slices.slice.syncUserCollections
+/// Endpoint type for network.slices.slice.syncUserCollections
 pub struct SyncUserCollectionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SyncUserCollectionsRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.syncUserCollections";
@@ -77,6 +65,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for SyncUserCollectionsRequest {
     type Response = SyncUserCollectionsResponse;
 }
 
-fn _default_sync_user_collections_timeout_seconds() -> core::option::Option<i64> {
+fn _default_sync_user_collections_timeout_seconds() -> Option<i64> {
     Some(30i64)
 }

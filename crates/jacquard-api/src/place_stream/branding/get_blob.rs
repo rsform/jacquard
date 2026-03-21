@@ -5,57 +5,51 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlob<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub broadcaster: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub broadcaster: Option<Did<'a>>,
     #[serde(borrow)]
-    pub key: jacquard_common::CowStr<'a>,
+    pub key: CowStr<'a>,
 }
 
 /// Raw blob data with appropriate content-type
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlobOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetBlobError<'a> {
     /// The requested branding asset does not exist
     #[serde(rename = "BrandingNotFound")]
-    BrandingNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    BrandingNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetBlobError<'_> {
@@ -73,8 +67,7 @@ impl core::fmt::Display for GetBlobError<'_> {
     }
 }
 
-/// Response type for
-///place.stream.branding.getBlob
+/// Response type for place.stream.branding.getBlob
 pub struct GetBlobResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBlobResponse {
     const NSID: &'static str = "place.stream.branding.getBlob";
@@ -104,8 +97,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetBlob<'a> {
     type Response = GetBlobResponse;
 }
 
-/// Endpoint type for
-///place.stream.branding.getBlob
+/// Endpoint type for place.stream.branding.getBlob
 pub struct GetBlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBlobRequest {
     const PATH: &'static str = "/xrpc/place.stream.branding.getBlob";
@@ -148,12 +140,9 @@ pub mod get_blob_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetBlobBuilder<'a, S: get_blob_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetBlob<'a> {
@@ -167,27 +156,21 @@ impl<'a> GetBlobBuilder<'a, get_blob_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetBlobBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_blob_state::State> GetBlobBuilder<'a, S> {
     /// Set the `broadcaster` field (optional)
-    pub fn broadcaster(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn broadcaster(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `broadcaster` field to an Option value (optional)
-    pub fn maybe_broadcaster(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_broadcaster(mut self, value: Option<Did<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -201,13 +184,13 @@ where
     /// Set the `key` field (required)
     pub fn key(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetBlobBuilder<'a, get_blob_state::SetKey<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetBlobBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

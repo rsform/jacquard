@@ -5,41 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::googledrive::FileListView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFiles<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub at: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub at: Option<CowStr<'a>>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFilesOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::googledrive::FileListView<'a>,
+    pub value: FileListView<'a>,
 }
 
-/// Response type for
-///app.rocksky.googledrive.getFiles
+/// Response type for app.rocksky.googledrive.getFiles
 pub struct GetFilesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFilesResponse {
     const NSID: &'static str = "app.rocksky.googledrive.getFiles";
@@ -54,8 +44,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetFiles<'a> {
     type Response = GetFilesResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.googledrive.getFiles
+/// Endpoint type for app.rocksky.googledrive.getFiles
 pub struct GetFilesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFilesRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.googledrive.getFiles";
@@ -85,9 +74,9 @@ pub mod get_files_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetFilesBuilder<'a, S: get_files_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetFiles<'a> {
@@ -101,21 +90,21 @@ impl<'a> GetFilesBuilder<'a, get_files_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetFilesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_files_state::State> GetFilesBuilder<'a, S> {
     /// Set the `at` field (optional)
-    pub fn at(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn at(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `at` field to an Option value (optional)
-    pub fn maybe_at(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_at(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }

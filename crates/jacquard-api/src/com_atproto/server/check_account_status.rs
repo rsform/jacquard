@@ -5,16 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Cid;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CheckAccountStatusOutput<'a> {
     pub activated: bool,
@@ -24,26 +23,17 @@ pub struct CheckAccountStatusOutput<'a> {
     pub private_state_values: i64,
     pub repo_blocks: i64,
     #[serde(borrow)]
-    pub repo_commit: jacquard_common::types::string::Cid<'a>,
+    pub repo_commit: Cid<'a>,
     #[serde(borrow)]
-    pub repo_rev: jacquard_common::CowStr<'a>,
+    pub repo_rev: CowStr<'a>,
     pub valid_did: bool,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct CheckAccountStatus;
-/// Response type for
-///com.atproto.server.checkAccountStatus
+/// Response type for com.atproto.server.checkAccountStatus
 pub struct CheckAccountStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for CheckAccountStatusResponse {
     const NSID: &'static str = "com.atproto.server.checkAccountStatus";
@@ -58,8 +48,7 @@ impl jacquard_common::xrpc::XrpcRequest for CheckAccountStatus {
     type Response = CheckAccountStatusResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.checkAccountStatus
+/// Endpoint type for com.atproto.server.checkAccountStatus
 pub struct CheckAccountStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CheckAccountStatusRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.checkAccountStatus";

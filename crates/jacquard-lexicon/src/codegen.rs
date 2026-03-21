@@ -71,14 +71,17 @@ impl<'c> CodeGenerator<'c> {
     }
 
     /// Create a ResolvedImports instance for this generator's mode with no collisions.
-    /// Used during code generation when a specific per-file resolution isn't yet available.
+    /// Used in tests and as a fallback when per-file ResolvedImports isn't available.
     /// In Macro mode, this produces fully-qualified paths for all types.
     /// In Pretty mode, this produces short names (but should normally use per-file ResolvedImports from Phase 2).
+    #[cfg(test)]
     pub(crate) fn default_resolved_imports(&self) -> prettify::ResolvedImports {
         prettify::ResolvedImports::resolve(
             &prettify::ImportSet::default(),
             &std::collections::HashSet::new(),
+            &std::collections::HashSet::new(),
             self.mode,
+            &std::collections::BTreeMap::new(),
         )
     }
 
@@ -123,14 +126,22 @@ impl<'c> CodeGenerator<'c> {
         let mut generated = self.generated_shared_docs.borrow_mut();
         let shared_fn = if !generated.contains(nsid) {
             generated.insert(nsid.to_string());
-            // Codegen from JSON doesn't have union_fields (those are for Rust -> lexicon derive)
-            let doc_literal = crate::derive_impl::doc_to_tokens::doc_to_tokens(
+            // Codegen from JSON doesn't have union_fields (those are for Rust -> lexicon derive).
+            use crate::derive_impl::doc_to_tokens::{DocPaths, doc_to_tokens_with_paths};
+            let doc_paths = match self.mode {
+                prettify::CodegenMode::Pretty => DocPaths::short(),
+                prettify::CodegenMode::Macro => DocPaths::qualified(),
+            };
+            let scoped_imports = doc_paths.scoped_imports();
+            let doc_literal = doc_to_tokens_with_paths(
                 lex_doc,
                 &std::collections::BTreeMap::new(),
+                &doc_paths,
             );
             let lexicon_doc_path = resolved.external_type_tokens(&prettify::ExternalImport::LexiconDoc);
             Some(quote! {
                 fn #shared_fn_ident() -> #lexicon_doc_path<'static> {
+                    #scoped_imports
                     #doc_literal
                 }
             })
@@ -146,14 +157,17 @@ impl<'c> CodeGenerator<'c> {
             (quote! {}, quote! {})
         };
 
-        // Extract validation checks for this specific def
+        // Extract validation checks for this specific def.
         let validation_checks = schema_impl::extract_validation_checks(lex_doc, def_name);
         let validation_code =
-            crate::derive_impl::doc_to_tokens::validations_to_tokens(&validation_checks);
+            crate::derive_impl::doc_to_tokens::validations_to_tokens_resolved(
+                &validation_checks,
+                Some(resolved),
+            );
 
+        let constraint_error_type = resolved.external_type_tokens(&prettify::ExternalImport::ConstraintError);
         let schema_path = resolved.external_type_tokens(&prettify::ExternalImport::LexiconSchema);
         let lexicon_doc_path = resolved.external_type_tokens(&prettify::ExternalImport::LexiconDoc);
-        let constraint_error_path = resolved.external_type_tokens(&prettify::ExternalImport::ConstraintError);
 
         let trait_impl = quote! {
             impl #impl_generics #schema_path for #type_ident #type_generics {
@@ -169,7 +183,7 @@ impl<'c> CodeGenerator<'c> {
                     #shared_fn_ident()
                 }
 
-                fn validate(&self) -> ::core::result::Result<(), #constraint_error_path> {
+                fn validate(&self) -> Result<(), #constraint_error_type> {
                     #validation_code
                 }
             }

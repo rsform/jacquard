@@ -5,47 +5,46 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::safelink::Event;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryEvents<'a> {
     ///Cursor for pagination
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
-    ///Maximum number of results to return Defaults to `50`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cursor: Option<CowStr<'a>>,
+    ///Maximum number of results to return  Defaults to `50`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_query_events_limit")]
-    pub limit: core::option::Option<i64>,
+    pub limit: Option<i64>,
     ///Filter by pattern type
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub pattern_type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub pattern_type: Option<CowStr<'a>>,
     ///Sort direction
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort_direction: core::option::Option<QueryEventsSortDirection<'a>>,
+    pub sort_direction: Option<QueryEventsSortDirection<'a>>,
     ///Filter by specific URLs or domains
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub urls: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub urls: Option<Vec<CowStr<'a>>>,
 }
 
 /// Sort direction
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum QueryEventsSortDirection<'a> {
     Asc,
     Desc,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> QueryEventsSortDirection<'a> {
@@ -63,7 +62,7 @@ impl<'a> From<&'a str> for QueryEventsSortDirection<'a> {
         match s {
             "asc" => Self::Asc,
             "desc" => Self::Desc,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -73,7 +72,7 @@ impl<'a> From<String> for QueryEventsSortDirection<'a> {
         match s.as_str() {
             "asc" => Self::Asc,
             "desc" => Self::Desc,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -131,28 +130,20 @@ impl jacquard_common::IntoStatic for QueryEventsSortDirection<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryEventsOutput<'a> {
     ///Next cursor for pagination. Only present if there are more results.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub events: Vec<crate::tools_ozone::safelink::Event<'a>>,
+    pub events: Vec<Event<'a>>,
 }
 
-/// Response type for
-///tools.ozone.safelink.queryEvents
+/// Response type for tools.ozone.safelink.queryEvents
 pub struct QueryEventsResponse;
 impl jacquard_common::xrpc::XrpcResp for QueryEventsResponse {
     const NSID: &'static str = "tools.ozone.safelink.queryEvents";
@@ -169,8 +160,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for QueryEvents<'a> {
     type Response = QueryEventsResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.safelink.queryEvents
+/// Endpoint type for tools.ozone.safelink.queryEvents
 pub struct QueryEventsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QueryEventsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.safelink.queryEvents";
@@ -181,6 +171,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for QueryEventsRequest {
     type Response = QueryEventsResponse;
 }
 
-fn _default_query_events_limit() -> core::option::Option<i64> {
+fn _default_query_events_limit() -> Option<i64> {
     Some(50i64)
 }

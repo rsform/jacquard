@@ -5,59 +5,53 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+use crate::com_atprotofans::hydrated_profile::HydratedProfile;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfile<'a> {
     #[serde(borrow)]
-    pub subject: jacquard_common::types::string::Did<'a>,
+    pub subject: Did<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfileOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::com_atprotofans::hydrated_profile::HydratedProfile<'a>,
+    pub value: HydratedProfile<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetProfileError<'a> {
     /// Invalid DID format.
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRequest(Option<CowStr<'a>>),
     /// No profile found for the given DID.
     #[serde(rename = "ProfileNotFound")]
-    ProfileNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    ProfileNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetProfileError<'_> {
@@ -82,8 +76,7 @@ impl core::fmt::Display for GetProfileError<'_> {
     }
 }
 
-/// Response type for
-///com.atprotofans.getProfile
+/// Response type for com.atprotofans.getProfile
 pub struct GetProfileResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfileResponse {
     const NSID: &'static str = "com.atprotofans.getProfile";
@@ -98,8 +91,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfile<'a> {
     type Response = GetProfileResponse;
 }
 
-/// Endpoint type for
-///com.atprotofans.getProfile
+/// Endpoint type for com.atprotofans.getProfile
 pub struct GetProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfileRequest {
     const PATH: &'static str = "/xrpc/com.atprotofans.getProfile";
@@ -142,11 +134,9 @@ pub mod get_profile_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetProfileBuilder<'a, S: get_profile_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetProfile<'a> {
@@ -160,9 +150,9 @@ impl<'a> GetProfileBuilder<'a, get_profile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetProfileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -175,13 +165,13 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetProfileBuilder<'a, get_profile_state::SetSubject<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetProfileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

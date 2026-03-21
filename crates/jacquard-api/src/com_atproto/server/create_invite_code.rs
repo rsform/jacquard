@@ -5,43 +5,33 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateInviteCode<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub for_account: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub for_account: Option<Did<'a>>,
     pub use_count: i64,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateInviteCodeOutput<'a> {
     #[serde(borrow)]
-    pub code: jacquard_common::CowStr<'a>,
+    pub code: CowStr<'a>,
 }
 
-/// Response type for
-///com.atproto.server.createInviteCode
+/// Response type for com.atproto.server.createInviteCode
 pub struct CreateInviteCodeResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateInviteCodeResponse {
     const NSID: &'static str = "com.atproto.server.createInviteCode";
@@ -58,8 +48,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateInviteCode<'a> {
     type Response = CreateInviteCodeResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.createInviteCode
+/// Endpoint type for com.atproto.server.createInviteCode
 pub struct CreateInviteCodeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateInviteCodeRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.createInviteCode";
@@ -104,12 +93,9 @@ pub mod create_invite_code_state {
 
 /// Builder for constructing an instance of this type
 pub struct CreateInviteCodeBuilder<'a, S: create_invite_code_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CreateInviteCode<'a> {
@@ -123,27 +109,21 @@ impl<'a> CreateInviteCodeBuilder<'a, create_invite_code_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateInviteCodeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: create_invite_code_state::State> CreateInviteCodeBuilder<'a, S> {
     /// Set the `forAccount` field (optional)
-    pub fn for_account(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn for_account(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `forAccount` field to an Option value (optional)
-    pub fn maybe_for_account(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_for_account(mut self, value: Option<Did<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -159,11 +139,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CreateInviteCodeBuilder<'a, create_invite_code_state::SetUseCount<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CreateInviteCodeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -184,7 +164,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

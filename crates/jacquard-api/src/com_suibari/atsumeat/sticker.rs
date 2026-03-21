@@ -5,69 +5,81 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// Definition of a sticker
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Sticker<'a> {
     ///The image content, either a string URL (for CDN/Blob) or a BlobRef.
     #[serde(borrow)]
-    pub image: jacquard_common::types::value::Data<'a>,
+    pub image: Data<'a>,
     ///Type of the image source.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub image_type: core::option::Option<StickerImageType<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub image_type: Option<StickerImageType<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: Option<CowStr<'a>>,
     ///Identifier for the sticker model. 'default' for avatar stickers, 'cid:<cid>' for custom stickers.
     #[serde(borrow)]
-    pub model: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub model: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: Option<CowStr<'a>>,
     ///The timestamp when this sticker was obtained.
-    pub obtained_at: jacquard_common::types::string::Datetime,
+    pub obtained_at: Datetime,
     ///The DID of the user from whom this sticker was obtained (for provenance).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub obtained_from: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub obtained_from: Option<Did<'a>>,
     ///The DID of the original creator/minter of this sticker.
     #[serde(borrow)]
-    pub original_owner: jacquard_common::types::string::Did<'a>,
+    pub original_owner: Did<'a>,
     ///The shape of the sticker canvas.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub shape: core::option::Option<StickerShape<'a>>,
+    pub shape: Option<StickerShape<'a>>,
     ///Cryptographic signature from the server verifying the sticker's authenticity/provenance.
     #[serde(borrow)]
-    pub signature: jacquard_common::CowStr<'a>,
+    pub signature: CowStr<'a>,
     ///The original JSON payload that was signed by the server.
     #[serde(borrow)]
-    pub signed_payload: jacquard_common::CowStr<'a>,
+    pub signed_payload: CowStr<'a>,
     ///The DID of the user depicted in the sticker, if applicable (e.g. for avatar stickers).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subject_did: core::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub subject_did: Option<Did<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: Option<Vec<CowStr<'a>>>,
 }
 
 /// Type of the image source.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum StickerImageType<'a> {
     Avatar,
     Custom,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> StickerImageType<'a> {
@@ -85,7 +97,7 @@ impl<'a> From<&'a str> for StickerImageType<'a> {
         match s {
             "avatar" => Self::Avatar,
             "custom" => Self::Custom,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -95,7 +107,7 @@ impl<'a> From<String> for StickerImageType<'a> {
         match s.as_str() {
             "avatar" => Self::Avatar,
             "custom" => Self::Custom,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -152,6 +164,7 @@ impl jacquard_common::IntoStatic for StickerImageType<'_> {
 }
 
 /// The shape of the sticker canvas.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum StickerShape<'a> {
     Circle,
@@ -162,7 +175,7 @@ pub enum StickerShape<'a> {
     Diamond,
     Butterfly,
     Transparent,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> StickerShape<'a> {
@@ -192,7 +205,7 @@ impl<'a> From<&'a str> for StickerShape<'a> {
             "diamond" => Self::Diamond,
             "butterfly" => Self::Butterfly,
             "transparent" => Self::Transparent,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -208,7 +221,7 @@ impl<'a> From<String> for StickerShape<'a> {
             "diamond" => Self::Diamond,
             "butterfly" => Self::Butterfly,
             "transparent" => Self::Transparent,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -271,47 +284,36 @@ impl jacquard_common::IntoStatic for StickerShape<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct StickerGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Sticker<'a>,
 }
 
 impl<'a> Sticker<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StickerRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, StickerRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct StickerRecord;
-impl jacquard_common::xrpc::XrpcResp for StickerRecord {
+impl XrpcResp for StickerRecord {
     const NSID: &'static str = "com.suibari.atsumeat.sticker";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = StickerGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<StickerGetRecordOutput<'_>> for Sticker<'_> {
@@ -321,36 +323,32 @@ impl From<StickerGetRecordOutput<'_>> for Sticker<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Sticker<'_> {
+impl Collection for Sticker<'_> {
     const NSID: &'static str = "com.suibari.atsumeat.sticker";
     type Record = StickerRecord;
 }
 
-impl jacquard_common::types::collection::Collection for StickerRecord {
+impl Collection for StickerRecord {
     const NSID: &'static str = "com.suibari.atsumeat.sticker";
     type Record = StickerRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
+impl<'a> LexiconSchema for Sticker<'a> {
     fn nsid() -> &'static str {
         "com.suibari.atsumeat.sticker"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_com_suibari_atsumeat_sticker()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.image_type {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "image_type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("image_type"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -359,10 +357,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
         if let Some(ref value) = self.message {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 6400usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "message",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("message"),
                     max: 6400usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -370,16 +366,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
         }
         if let Some(ref value) = self.message {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 640usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "message",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("message"),
                         max: 640usize,
                         actual: count,
                     });
@@ -390,10 +380,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
             let value = &self.model;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "model",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("model"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -402,10 +390,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
         if let Some(ref value) = self.name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 640usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -413,16 +399,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
         }
         if let Some(ref value) = self.name {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("name"),
                         max: 64usize,
                         actual: count,
                     });
@@ -432,10 +412,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
         if let Some(ref value) = self.shape {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "shape",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("shape"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -445,10 +423,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
             let value = &self.signature;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "signature",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("signature"),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -458,10 +434,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
             let value = &self.signed_payload;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "signed_payload",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("signed_payload"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -470,10 +444,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
         if let Some(ref value) = self.tags {
             #[allow(unused_comparisons)]
             if value.len() > 8usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("tags"),
                     max: 8usize,
                     actual: value.len(),
                 });
@@ -493,127 +465,127 @@ pub mod sticker_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Image;
-        type Signature;
         type OriginalOwner;
-        type Model;
         type ObtainedAt;
+        type Signature;
         type SignedPayload;
+        type Model;
+        type Image;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Image = Unset;
-        type Signature = Unset;
         type OriginalOwner = Unset;
-        type Model = Unset;
         type ObtainedAt = Unset;
+        type Signature = Unset;
         type SignedPayload = Unset;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type Image = Set<members::image>;
-        type Signature = S::Signature;
-        type OriginalOwner = S::OriginalOwner;
-        type Model = S::Model;
-        type ObtainedAt = S::ObtainedAt;
-        type SignedPayload = S::SignedPayload;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignature<S> {}
-    impl<S: State> State for SetSignature<S> {
-        type Image = S::Image;
-        type Signature = Set<members::signature>;
-        type OriginalOwner = S::OriginalOwner;
-        type Model = S::Model;
-        type ObtainedAt = S::ObtainedAt;
-        type SignedPayload = S::SignedPayload;
+        type Model = Unset;
+        type Image = Unset;
     }
     ///State transition - sets the `original_owner` field to Set
     pub struct SetOriginalOwner<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOriginalOwner<S> {}
     impl<S: State> State for SetOriginalOwner<S> {
-        type Image = S::Image;
-        type Signature = S::Signature;
         type OriginalOwner = Set<members::original_owner>;
-        type Model = S::Model;
         type ObtainedAt = S::ObtainedAt;
-        type SignedPayload = S::SignedPayload;
-    }
-    ///State transition - sets the `model` field to Set
-    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModel<S> {}
-    impl<S: State> State for SetModel<S> {
-        type Image = S::Image;
         type Signature = S::Signature;
-        type OriginalOwner = S::OriginalOwner;
-        type Model = Set<members::model>;
-        type ObtainedAt = S::ObtainedAt;
         type SignedPayload = S::SignedPayload;
+        type Model = S::Model;
+        type Image = S::Image;
     }
     ///State transition - sets the `obtained_at` field to Set
     pub struct SetObtainedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObtainedAt<S> {}
     impl<S: State> State for SetObtainedAt<S> {
-        type Image = S::Image;
-        type Signature = S::Signature;
         type OriginalOwner = S::OriginalOwner;
-        type Model = S::Model;
         type ObtainedAt = Set<members::obtained_at>;
+        type Signature = S::Signature;
         type SignedPayload = S::SignedPayload;
+        type Model = S::Model;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignature<S> {}
+    impl<S: State> State for SetSignature<S> {
+        type OriginalOwner = S::OriginalOwner;
+        type ObtainedAt = S::ObtainedAt;
+        type Signature = Set<members::signature>;
+        type SignedPayload = S::SignedPayload;
+        type Model = S::Model;
+        type Image = S::Image;
     }
     ///State transition - sets the `signed_payload` field to Set
     pub struct SetSignedPayload<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSignedPayload<S> {}
     impl<S: State> State for SetSignedPayload<S> {
-        type Image = S::Image;
-        type Signature = S::Signature;
         type OriginalOwner = S::OriginalOwner;
-        type Model = S::Model;
         type ObtainedAt = S::ObtainedAt;
+        type Signature = S::Signature;
         type SignedPayload = Set<members::signed_payload>;
+        type Model = S::Model;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `model` field to Set
+    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetModel<S> {}
+    impl<S: State> State for SetModel<S> {
+        type OriginalOwner = S::OriginalOwner;
+        type ObtainedAt = S::ObtainedAt;
+        type Signature = S::Signature;
+        type SignedPayload = S::SignedPayload;
+        type Model = Set<members::model>;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImage<S> {}
+    impl<S: State> State for SetImage<S> {
+        type OriginalOwner = S::OriginalOwner;
+        type ObtainedAt = S::ObtainedAt;
+        type Signature = S::Signature;
+        type SignedPayload = S::SignedPayload;
+        type Model = S::Model;
+        type Image = Set<members::image>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image` field
-        pub struct image(());
-        ///Marker type for the `signature` field
-        pub struct signature(());
         ///Marker type for the `original_owner` field
         pub struct original_owner(());
-        ///Marker type for the `model` field
-        pub struct model(());
         ///Marker type for the `obtained_at` field
         pub struct obtained_at(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
         ///Marker type for the `signed_payload` field
         pub struct signed_payload(());
+        ///Marker type for the `model` field
+        pub struct model(());
+        ///Marker type for the `image` field
+        pub struct image(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct StickerBuilder<'a, S: sticker_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<StickerImageType<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<StickerShape<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        Option<Data<'a>>,
+        Option<StickerImageType<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<Did<'a>>,
+        Option<Did<'a>>,
+        Option<StickerShape<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Did<'a>>,
+        Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Sticker<'a> {
@@ -627,7 +599,7 @@ impl<'a> StickerBuilder<'a, sticker_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StickerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -643,7 +615,7 @@ impl<'a> StickerBuilder<'a, sticker_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -656,13 +628,13 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> StickerBuilder<'a, sticker_state::SetImage<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         StickerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -682,15 +654,12 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
-    pub fn maybe_message(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -704,28 +673,25 @@ where
     /// Set the `model` field (required)
     pub fn model(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> StickerBuilder<'a, sticker_state::SetModel<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         StickerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -739,31 +705,25 @@ where
     /// Set the `obtainedAt` field (required)
     pub fn obtained_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> StickerBuilder<'a, sticker_state::SetObtainedAt<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         StickerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `obtainedFrom` field (optional)
-    pub fn obtained_from(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn obtained_from(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `obtainedFrom` field to an Option value (optional)
-    pub fn maybe_obtained_from(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_obtained_from(mut self, value: Option<Did<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -777,13 +737,13 @@ where
     /// Set the `originalOwner` field (required)
     pub fn original_owner(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> StickerBuilder<'a, sticker_state::SetOriginalOwner<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         StickerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -809,13 +769,13 @@ where
     /// Set the `signature` field (required)
     pub fn signature(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> StickerBuilder<'a, sticker_state::SetSignature<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         StickerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -828,31 +788,25 @@ where
     /// Set the `signedPayload` field (required)
     pub fn signed_payload(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> StickerBuilder<'a, sticker_state::SetSignedPayload<S>> {
-        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.10 = Option::Some(value.into());
         StickerBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `subjectDid` field (optional)
-    pub fn subject_did(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn subject_did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `subjectDid` field to an Option value (optional)
-    pub fn maybe_subject_did(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_subject_did(mut self, value: Option<Did<'a>>) -> Self {
         self.__unsafe_private_named.11 = value;
         self
     }
@@ -860,18 +814,12 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.12 = value;
         self
     }
@@ -880,12 +828,12 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 impl<'a, S> StickerBuilder<'a, S>
 where
     S: sticker_state::State,
-    S::Image: sticker_state::IsSet,
-    S::Signature: sticker_state::IsSet,
     S::OriginalOwner: sticker_state::IsSet,
-    S::Model: sticker_state::IsSet,
     S::ObtainedAt: sticker_state::IsSet,
+    S::Signature: sticker_state::IsSet,
     S::SignedPayload: sticker_state::IsSet,
+    S::Model: sticker_state::IsSet,
+    S::Image: sticker_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sticker<'a> {
@@ -909,10 +857,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Sticker<'a> {
         Sticker {
             image: self.__unsafe_private_named.0.unwrap(),
@@ -933,306 +878,182 @@ where
     }
 }
 
-fn lexicon_doc_com_suibari_atsumeat_sticker() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("com.suibari.atsumeat.sticker"),
-        revision: None,
-        description: None,
+fn lexicon_doc_com_suibari_atsumeat_sticker() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("com.suibari.atsumeat.sticker"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Definition of a sticker"),
-                    ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
+                    description: Some(CowStr::new_static("Definition of a sticker")),
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("image"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("originalOwner"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("model"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("obtainedAt"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("signature"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("signedPayload")
+                                SmolStr::new_static("image"),
+                                SmolStr::new_static("originalOwner"),
+                                SmolStr::new_static("model"),
+                                SmolStr::new_static("obtainedAt"),
+                                SmolStr::new_static("signature"),
+                                SmolStr::new_static("signedPayload")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "image",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
-                                    description: None,
+                                SmolStr::new_static("image"),
+                                LexObjectProperty::Unknown(LexUnknown {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "imageType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("imageType"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Type of the image source.",
-                                        ),
+                                        CowStr::new_static("Type of the image source."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(64usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "message",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("message"),
+                                LexObjectProperty::String(LexString {
                                     max_length: Some(6400usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(640usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "model",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("model"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Identifier for the sticker model. 'default' for avatar stickers, 'cid:<cid>' for custom stickers.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(64usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("name"),
+                                LexObjectProperty::String(LexString {
                                     max_length: Some(640usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(64usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "obtainedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("obtainedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The timestamp when this sticker was obtained.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "obtainedFrom",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("obtainedFrom"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The DID of the user from whom this sticker was obtained (for provenance).",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "originalOwner",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("originalOwner"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The DID of the original creator/minter of this sticker.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "shape",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("shape"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "The shape of the sticker canvas.",
-                                        ),
+                                        CowStr::new_static("The shape of the sticker canvas."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(64usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "signature",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("signature"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Cryptographic signature from the server verifying the sticker's authenticity/provenance.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(2048usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "signedPayload",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("signedPayload"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The original JSON payload that was signed by the server.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(10000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "subjectDid",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("subjectDid"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The DID of the user depicted in the sticker, if applicable (e.g. for avatar stickers).",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "tags",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
+                                SmolStr::new_static("tags"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::String(LexString {
                                         max_length: Some(640usize),
-                                        min_graphemes: None,
                                         max_graphemes: Some(64usize),
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(8usize),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

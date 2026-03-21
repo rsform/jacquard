@@ -5,76 +5,69 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::EntryView;
+use crate::sh_weaver::notebook::NotebookView;
+use crate::sh_weaver::notebook::ReadingProgress;
+use crate::sh_weaver::notebook::get_reading_history;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetReadingHistory<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
     ///Defaults to `"all"`.
     #[serde(default = "_default_status")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetReadingHistoryOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub history: Vec<
-        crate::sh_weaver::notebook::get_reading_history::ReadingHistoryItem<'a>,
-    >,
+    pub history: Vec<get_reading_history::ReadingHistoryItem<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ReadingHistoryItem<'a> {
     ///The entry the user was last reading.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub current_entry: core::option::Option<crate::sh_weaver::notebook::EntryView<'a>>,
+    pub current_entry: Option<EntryView<'a>>,
     #[serde(borrow)]
-    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
+    pub notebook: NotebookView<'a>,
     #[serde(borrow)]
-    pub progress: crate::sh_weaver::notebook::ReadingProgress<'a>,
+    pub progress: ReadingProgress<'a>,
 }
 
-/// Response type for
-///sh.weaver.notebook.getReadingHistory
+/// Response type for sh.weaver.notebook.getReadingHistory
 pub struct GetReadingHistoryResponse;
 impl jacquard_common::xrpc::XrpcResp for GetReadingHistoryResponse {
     const NSID: &'static str = "sh.weaver.notebook.getReadingHistory";
@@ -89,8 +82,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetReadingHistory<'a> {
     type Response = GetReadingHistoryResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notebook.getReadingHistory
+/// Endpoint type for sh.weaver.notebook.getReadingHistory
 pub struct GetReadingHistoryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetReadingHistoryRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getReadingHistory";
@@ -99,29 +91,27 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetReadingHistoryRequest {
     type Response = GetReadingHistoryResponse;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ReadingHistoryItem<'a> {
+impl<'a> LexiconSchema for ReadingHistoryItem<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.getReadingHistory"
     }
     fn def_name() -> &'static str {
         "readingHistoryItem"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_getReadingHistory()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_status() -> core::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("all"))
+fn _default_status() -> Option<CowStr<'static>> {
+    Some(CowStr::from("all"))
 }
 
 pub mod get_reading_history_state {
@@ -145,13 +135,9 @@ pub mod get_reading_history_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetReadingHistoryBuilder<'a, S: get_reading_history_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetReadingHistory<'a> {
@@ -165,24 +151,21 @@ impl<'a> GetReadingHistoryBuilder<'a, get_reading_history_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetReadingHistoryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -203,15 +186,12 @@ impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
 
 impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn status(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -241,49 +221,49 @@ pub mod reading_history_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Notebook;
         type Progress;
+        type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Notebook = Unset;
         type Progress = Unset;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type Notebook = Set<members::notebook>;
-        type Progress = S::Progress;
+        type Notebook = Unset;
     }
     ///State transition - sets the `progress` field to Set
     pub struct SetProgress<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetProgress<S> {}
     impl<S: State> State for SetProgress<S> {
-        type Notebook = S::Notebook;
         type Progress = Set<members::progress>;
+        type Notebook = S::Notebook;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotebook<S> {}
+    impl<S: State> State for SetNotebook<S> {
+        type Progress = S::Progress;
+        type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
         ///Marker type for the `progress` field
         pub struct progress(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ReadingHistoryItemBuilder<'a, S: reading_history_item_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::sh_weaver::notebook::EntryView<'a>>,
-        ::core::option::Option<crate::sh_weaver::notebook::NotebookView<'a>>,
-        ::core::option::Option<crate::sh_weaver::notebook::ReadingProgress<'a>>,
+        Option<EntryView<'a>>,
+        Option<NotebookView<'a>>,
+        Option<ReadingProgress<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ReadingHistoryItem<'a> {
@@ -297,27 +277,21 @@ impl<'a> ReadingHistoryItemBuilder<'a, reading_history_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReadingHistoryItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: reading_history_item_state::State> ReadingHistoryItemBuilder<'a, S> {
     /// Set the `currentEntry` field (optional)
-    pub fn current_entry(
-        mut self,
-        value: impl Into<Option<crate::sh_weaver::notebook::EntryView<'a>>>,
-    ) -> Self {
+    pub fn current_entry(mut self, value: impl Into<Option<EntryView<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `currentEntry` field to an Option value (optional)
-    pub fn maybe_current_entry(
-        mut self,
-        value: Option<crate::sh_weaver::notebook::EntryView<'a>>,
-    ) -> Self {
+    pub fn maybe_current_entry(mut self, value: Option<EntryView<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -331,13 +305,13 @@ where
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
-        value: impl Into<crate::sh_weaver::notebook::NotebookView<'a>>,
+        value: impl Into<NotebookView<'a>>,
     ) -> ReadingHistoryItemBuilder<'a, reading_history_item_state::SetNotebook<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ReadingHistoryItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -350,13 +324,13 @@ where
     /// Set the `progress` field (required)
     pub fn progress(
         mut self,
-        value: impl Into<crate::sh_weaver::notebook::ReadingProgress<'a>>,
+        value: impl Into<ReadingProgress<'a>>,
     ) -> ReadingHistoryItemBuilder<'a, reading_history_item_state::SetProgress<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         ReadingHistoryItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -364,8 +338,8 @@ where
 impl<'a, S> ReadingHistoryItemBuilder<'a, S>
 where
     S: reading_history_item_state::State,
-    S::Notebook: reading_history_item_state::IsSet,
     S::Progress: reading_history_item_state::IsSet,
+    S::Notebook: reading_history_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReadingHistoryItem<'a> {
@@ -379,7 +353,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -393,142 +367,99 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "sh.weaver.notebook.getReadingHistory",
-        ),
-        revision: None,
-        description: None,
+fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("sh.weaver.notebook.getReadingHistory"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
-                    description: None,
+                SmolStr::new_static("main"),
+                LexUserType::XrpcQuery(LexXrpcQuery {
                     parameters: Some(
-                        ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
-                            description: None,
-                            required: None,
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::alloc::collections::BTreeMap::new();
+                                let mut map = BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                        "cursor",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        ..Default::default()
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                        "limit",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
                                     }),
                                 );
                                 map.insert(
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                        "status",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    SmolStr::new_static("status"),
+                                    LexXrpcParametersProperty::String(LexString {
                                         description: Some(
-                                            ::jacquard_common::CowStr::new_static(
-                                                "Filter by reading status.",
-                                            ),
+                                            CowStr::new_static("Filter by reading status."),
                                         ),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                        ..Default::default()
                                     }),
                                 );
                                 map
                             },
+                            ..Default::default()
                         }),
                     ),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "readingHistoryItem",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("readingHistoryItem"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("notebook"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("progress")
+                            SmolStr::new_static("notebook"),
+                            SmolStr::new_static("progress")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "currentEntry",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("currentEntry"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "sh.weaver.notebook.defs#entryView",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "notebook",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("notebook"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "sh.weaver.notebook.defs#notebookView",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "progress",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("progress"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "sh.weaver.notebook.defs#readingProgress",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

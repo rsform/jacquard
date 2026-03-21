@@ -5,109 +5,101 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, Nsid, Datetime, UriValue};
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::moderation::ModEventView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryEvents<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub added_labels: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub added_labels: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub added_tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub added_tags: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub age_assurance_state: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub age_assurance_state: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub batch_id: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub batch_id: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub collections: core::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub collections: Option<Vec<Nsid<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub created_after: core::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub created_before: core::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub comment: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_after: Option<Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_before: Option<Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub created_by: core::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_by: Option<Did<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub has_comment: core::option::Option<bool>,
+    pub cursor: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_comment: Option<bool>,
     /// Defaults to `false`.
     #[serde(default = "_default_include_all_user_records")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub include_all_user_records: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_all_user_records: Option<bool>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub mod_tool: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub mod_tool: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub policies: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub policies: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub removed_labels: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub removed_labels: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub removed_tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub removed_tags: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub report_types: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub report_types: Option<Vec<CowStr<'a>>>,
     ///Defaults to `"desc"`.
     #[serde(default = "_default_sort_direction")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort_direction: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sort_direction: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subject: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub subject: Option<UriValue<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subject_type: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub subject_type: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub types: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub with_strike: core::option::Option<bool>,
+    pub types: Option<Vec<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub with_strike: Option<bool>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryEventsOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub events: Vec<crate::tools_ozone::moderation::ModEventView<'a>>,
+    pub events: Vec<ModEventView<'a>>,
 }
 
-/// Response type for
-///tools.ozone.moderation.queryEvents
+/// Response type for tools.ozone.moderation.queryEvents
 pub struct QueryEventsResponse;
 impl jacquard_common::xrpc::XrpcResp for QueryEventsResponse {
     const NSID: &'static str = "tools.ozone.moderation.queryEvents";
@@ -122,8 +114,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for QueryEvents<'a> {
     type Response = QueryEventsResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.moderation.queryEvents
+/// Endpoint type for tools.ozone.moderation.queryEvents
 pub struct QueryEventsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QueryEventsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.queryEvents";
@@ -132,16 +123,16 @@ impl jacquard_common::xrpc::XrpcEndpoint for QueryEventsRequest {
     type Response = QueryEventsResponse;
 }
 
-fn _default_include_all_user_records() -> core::option::Option<bool> {
+fn _default_include_all_user_records() -> Option<bool> {
     Some(false)
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_sort_direction() -> core::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("desc"))
+fn _default_sort_direction() -> Option<CowStr<'static>> {
+    Some(CowStr::from("desc"))
 }
 
 pub mod query_events_state {
@@ -165,33 +156,33 @@ pub mod query_events_state {
 
 /// Builder for constructing an instance of this type
 pub struct QueryEventsBuilder<'a, S: query_events_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<bool>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Vec<Nsid<'a>>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<Did<'a>>,
+        Option<CowStr<'a>>,
+        Option<bool>,
+        Option<bool>,
+        Option<i64>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<CowStr<'a>>,
+        Option<UriValue<'a>>,
+        Option<CowStr<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<bool>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> QueryEvents<'a> {
@@ -205,7 +196,7 @@ impl<'a> QueryEventsBuilder<'a, query_events_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         QueryEventsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -231,25 +222,19 @@ impl<'a> QueryEventsBuilder<'a, query_events_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `addedLabels` field (optional)
-    pub fn added_labels(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn added_labels(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `addedLabels` field to an Option value (optional)
-    pub fn maybe_added_labels(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_added_labels(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -257,18 +242,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `addedTags` field (optional)
-    pub fn added_tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn added_tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `addedTags` field to an Option value (optional)
-    pub fn maybe_added_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_added_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -276,18 +255,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `ageAssuranceState` field (optional)
-    pub fn age_assurance_state(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn age_assurance_state(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `ageAssuranceState` field to an Option value (optional)
-    pub fn maybe_age_assurance_state(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_age_assurance_state(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -295,15 +268,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `batchId` field (optional)
-    pub fn batch_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn batch_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `batchId` field to an Option value (optional)
-    pub fn maybe_batch_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_batch_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -311,18 +281,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `collections` field (optional)
-    pub fn collections(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::string::Nsid<'a>>>>,
-    ) -> Self {
+    pub fn collections(mut self, value: impl Into<Option<Vec<Nsid<'a>>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `collections` field to an Option value (optional)
-    pub fn maybe_collections(
-        mut self,
-        value: Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
-    ) -> Self {
+    pub fn maybe_collections(mut self, value: Option<Vec<Nsid<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -330,15 +294,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
-    pub fn maybe_comment(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -346,18 +307,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `createdAfter` field (optional)
-    pub fn created_after(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn created_after(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `createdAfter` field to an Option value (optional)
-    pub fn maybe_created_after(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_created_after(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -365,18 +320,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `createdBefore` field (optional)
-    pub fn created_before(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn created_before(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `createdBefore` field to an Option value (optional)
-    pub fn maybe_created_before(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_created_before(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -384,18 +333,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `createdBy` field (optional)
-    pub fn created_by(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn created_by(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `createdBy` field to an Option value (optional)
-    pub fn maybe_created_by(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_created_by(mut self, value: Option<Did<'a>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -403,15 +346,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -458,18 +398,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `modTool` field (optional)
-    pub fn mod_tool(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn mod_tool(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.13 = value.into();
         self
     }
     /// Set the `modTool` field to an Option value (optional)
-    pub fn maybe_mod_tool(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_mod_tool(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.13 = value;
         self
     }
@@ -477,18 +411,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `policies` field (optional)
-    pub fn policies(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn policies(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.14 = value.into();
         self
     }
     /// Set the `policies` field to an Option value (optional)
-    pub fn maybe_policies(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_policies(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.14 = value;
         self
     }
@@ -496,18 +424,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `removedLabels` field (optional)
-    pub fn removed_labels(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn removed_labels(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.15 = value.into();
         self
     }
     /// Set the `removedLabels` field to an Option value (optional)
-    pub fn maybe_removed_labels(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_removed_labels(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.15 = value;
         self
     }
@@ -515,18 +437,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `removedTags` field (optional)
-    pub fn removed_tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn removed_tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.16 = value.into();
         self
     }
     /// Set the `removedTags` field to an Option value (optional)
-    pub fn maybe_removed_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_removed_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.16 = value;
         self
     }
@@ -534,18 +450,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `reportTypes` field (optional)
-    pub fn report_types(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn report_types(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.17 = value.into();
         self
     }
     /// Set the `reportTypes` field to an Option value (optional)
-    pub fn maybe_report_types(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_report_types(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.17 = value;
         self
     }
@@ -553,18 +463,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `sortDirection` field (optional)
-    pub fn sort_direction(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn sort_direction(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.18 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
-    pub fn maybe_sort_direction(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_sort_direction(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.18 = value;
         self
     }
@@ -572,18 +476,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `subject` field (optional)
-    pub fn subject(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn subject(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.19 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
-    pub fn maybe_subject(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_subject(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.19 = value;
         self
     }
@@ -591,18 +489,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `subjectType` field (optional)
-    pub fn subject_type(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn subject_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.20 = value.into();
         self
     }
     /// Set the `subjectType` field to an Option value (optional)
-    pub fn maybe_subject_type(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_subject_type(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.20 = value;
         self
     }
@@ -610,18 +502,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `types` field (optional)
-    pub fn types(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn types(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.21 = value.into();
         self
     }
     /// Set the `types` field to an Option value (optional)
-    pub fn maybe_types(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_types(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.21 = value;
         self
     }

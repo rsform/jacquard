@@ -5,178 +5,158 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::beta::game::progress;
 /// Record representing a player's level progression and game statistics
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Progress<'a> {
     ///URI of the card that was advanced when triggerSource is card_advance
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub card_uri: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub card_uri: Option<CowStr<'a>>,
     ///When the progress record was created
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///Current stamina level when this progress was recorded (decimal string, e.g. '85.5')
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub current_stamina: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub current_stamina: Option<CowStr<'a>>,
     ///Current player level
     pub level: i64,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub metadata: core::option::Option<
-        crate::net_anisota::beta::game::progress::Metadata<'a>,
-    >,
+    pub metadata: Option<progress::Metadata<'a>>,
     ///Previous level before this update (for tracking level progression)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub previous_level: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub previous_level: Option<i64>,
     ///Progress percentage to the next level (decimal string, e.g. '75.5')
     #[serde(borrow)]
-    pub progress_percentage: jacquard_common::CowStr<'a>,
+    pub progress_percentage: CowStr<'a>,
     ///URIs of related game log records that contributed to this progress
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub related_log_uris: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub related_log_uris: Option<Vec<CowStr<'a>>>,
     ///Session ID when this progress was recorded (for linking with log records)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub session_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub session_id: Option<CowStr<'a>>,
     ///URI of the session record when this progress was recorded
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub session_uri: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub session_uri: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub stats: core::option::Option<crate::net_anisota::beta::game::progress::Stats<'a>>,
+    pub stats: Option<progress::Stats<'a>>,
     ///Total experience points accumulated
     pub total_xp: i64,
     ///What action triggered this progress save
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub trigger_source: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub trigger_source: Option<CowStr<'a>>,
     ///Experience points gained since the last progress save
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub xp_gained_since_last_save: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub xp_gained_since_last_save: Option<i64>,
     ///Experience points needed to reach the next level
     pub xp_to_next_level: i64,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ProgressGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Progress<'a>,
 }
 
 /// Additional metadata about this progress update
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Metadata<'a> {
     ///Version of the client when this progress was recorded
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub client_version: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub client_version: Option<CowStr<'a>>,
     ///Platform where the level up occurred (web, mobile, etc.)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub platform: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub platform: Option<CowStr<'a>>,
 }
 
 /// Game-specific statistics and metrics
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Stats<'a> {
     ///Total daily rewards claimed
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub daily_rewards_claimed: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub daily_rewards_claimed: Option<i64>,
     ///Total items collected
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub items_collected: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items_collected: Option<i64>,
     ///Date when posts read today was last updated (for daily reset tracking)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub last_post_read_date: core::option::Option<
-        jacquard_common::types::string::Datetime,
-    >,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_post_read_date: Option<Datetime>,
     ///Posts read today (resets daily)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub posts_read_today: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posts_read_today: Option<i64>,
     ///Total posts read (all time, cumulative)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub posts_read_total: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posts_read_total: Option<i64>,
     ///Total posts viewed
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub posts_viewed: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posts_viewed: Option<i64>,
     ///Total shuffles performed
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub shuffles_performed: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub shuffles_performed: Option<i64>,
     ///Total specimens collected
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub specimens_collected: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub specimens_collected: Option<i64>,
 }
 
 impl<'a> Progress<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ProgressRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ProgressRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ProgressRecord;
-impl jacquard_common::xrpc::XrpcResp for ProgressRecord {
+impl XrpcResp for ProgressRecord {
     const NSID: &'static str = "net.anisota.beta.game.progress";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ProgressGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ProgressGetRecordOutput<'_>> for Progress<'_> {
@@ -186,36 +166,32 @@ impl From<ProgressGetRecordOutput<'_>> for Progress<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Progress<'_> {
+impl Collection for Progress<'_> {
     const NSID: &'static str = "net.anisota.beta.game.progress";
     type Record = ProgressRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ProgressRecord {
+impl Collection for ProgressRecord {
     const NSID: &'static str = "net.anisota.beta.game.progress";
     type Record = ProgressRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
+impl<'a> LexiconSchema for Progress<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.progress"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_progress()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.level;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("level"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -223,10 +199,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
         }
         if let Some(ref value) = self.previous_level {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "previous_level",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("previous_level"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -235,10 +209,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
         {
             let value = &self.total_xp;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total_xp",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("total_xp"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -246,10 +218,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
         }
         if let Some(ref value) = self.xp_gained_since_last_save {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "xp_gained_since_last_save",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("xp_gained_since_last_save"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -258,10 +228,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
         {
             let value = &self.xp_to_next_level;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "xp_to_next_level",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("xp_to_next_level"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -271,42 +239,36 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
+impl<'a> LexiconSchema for Metadata<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.progress"
     }
     fn def_name() -> &'static str {
         "metadata"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_progress()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
+impl<'a> LexiconSchema for Stats<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.progress"
     }
     fn def_name() -> &'static str {
         "stats"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_progress()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.daily_rewards_claimed {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "daily_rewards_claimed",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("daily_rewards_claimed"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -314,10 +276,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
         }
         if let Some(ref value) = self.items_collected {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "items_collected",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("items_collected"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -325,10 +285,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
         }
         if let Some(ref value) = self.posts_read_today {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "posts_read_today",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("posts_read_today"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -336,10 +294,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
         }
         if let Some(ref value) = self.posts_read_total {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "posts_read_total",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("posts_read_total"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -347,10 +303,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
         }
         if let Some(ref value) = self.posts_viewed {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "posts_viewed",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("posts_viewed"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -358,10 +312,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
         }
         if let Some(ref value) = self.shuffles_performed {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "shuffles_performed",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("shuffles_performed"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -369,10 +321,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
         }
         if let Some(ref value) = self.specimens_collected {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "specimens_collected",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("specimens_collected"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -392,83 +342,83 @@ pub mod progress_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type XpToNextLevel;
+        type TotalXp;
         type Level;
         type CreatedAt;
-        type TotalXp;
-        type XpToNextLevel;
         type ProgressPercentage;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type XpToNextLevel = Unset;
+        type TotalXp = Unset;
         type Level = Unset;
         type CreatedAt = Unset;
-        type TotalXp = Unset;
-        type XpToNextLevel = Unset;
         type ProgressPercentage = Unset;
     }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type Level = Set<members::level>;
-        type CreatedAt = S::CreatedAt;
+    ///State transition - sets the `xp_to_next_level` field to Set
+    pub struct SetXpToNextLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetXpToNextLevel<S> {}
+    impl<S: State> State for SetXpToNextLevel<S> {
+        type XpToNextLevel = Set<members::xp_to_next_level>;
         type TotalXp = S::TotalXp;
-        type XpToNextLevel = S::XpToNextLevel;
-        type ProgressPercentage = S::ProgressPercentage;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Level = S::Level;
-        type CreatedAt = Set<members::created_at>;
-        type TotalXp = S::TotalXp;
-        type XpToNextLevel = S::XpToNextLevel;
+        type CreatedAt = S::CreatedAt;
         type ProgressPercentage = S::ProgressPercentage;
     }
     ///State transition - sets the `total_xp` field to Set
     pub struct SetTotalXp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotalXp<S> {}
     impl<S: State> State for SetTotalXp<S> {
+        type XpToNextLevel = S::XpToNextLevel;
+        type TotalXp = Set<members::total_xp>;
         type Level = S::Level;
         type CreatedAt = S::CreatedAt;
-        type TotalXp = Set<members::total_xp>;
-        type XpToNextLevel = S::XpToNextLevel;
         type ProgressPercentage = S::ProgressPercentage;
     }
-    ///State transition - sets the `xp_to_next_level` field to Set
-    pub struct SetXpToNextLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetXpToNextLevel<S> {}
-    impl<S: State> State for SetXpToNextLevel<S> {
-        type Level = S::Level;
-        type CreatedAt = S::CreatedAt;
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type XpToNextLevel = S::XpToNextLevel;
         type TotalXp = S::TotalXp;
-        type XpToNextLevel = Set<members::xp_to_next_level>;
+        type Level = Set<members::level>;
+        type CreatedAt = S::CreatedAt;
+        type ProgressPercentage = S::ProgressPercentage;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type XpToNextLevel = S::XpToNextLevel;
+        type TotalXp = S::TotalXp;
+        type Level = S::Level;
+        type CreatedAt = Set<members::created_at>;
         type ProgressPercentage = S::ProgressPercentage;
     }
     ///State transition - sets the `progress_percentage` field to Set
     pub struct SetProgressPercentage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetProgressPercentage<S> {}
     impl<S: State> State for SetProgressPercentage<S> {
+        type XpToNextLevel = S::XpToNextLevel;
+        type TotalXp = S::TotalXp;
         type Level = S::Level;
         type CreatedAt = S::CreatedAt;
-        type TotalXp = S::TotalXp;
-        type XpToNextLevel = S::XpToNextLevel;
         type ProgressPercentage = Set<members::progress_percentage>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `xp_to_next_level` field
+        pub struct xp_to_next_level(());
+        ///Marker type for the `total_xp` field
+        pub struct total_xp(());
         ///Marker type for the `level` field
         pub struct level(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `total_xp` field
-        pub struct total_xp(());
-        ///Marker type for the `xp_to_next_level` field
-        pub struct xp_to_next_level(());
         ///Marker type for the `progress_percentage` field
         pub struct progress_percentage(());
     }
@@ -476,25 +426,25 @@ pub mod progress_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProgressBuilder<'a, S: progress_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<crate::net_anisota::beta::game::progress::Metadata<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::net_anisota::beta::game::progress::Stats<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<progress::Metadata<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<progress::Stats<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Progress<'a> {
@@ -508,7 +458,7 @@ impl<'a> ProgressBuilder<'a, progress_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProgressBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -526,22 +476,19 @@ impl<'a> ProgressBuilder<'a, progress_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `cardUri` field (optional)
-    pub fn card_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn card_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `cardUri` field to an Option value (optional)
-    pub fn maybe_card_uri(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_card_uri(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -555,31 +502,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ProgressBuilder<'a, progress_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ProgressBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `currentStamina` field (optional)
-    pub fn current_stamina(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn current_stamina(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `currentStamina` field to an Option value (optional)
-    pub fn maybe_current_stamina(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_current_stamina(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -595,29 +536,23 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ProgressBuilder<'a, progress_state::SetLevel<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         ProgressBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `metadata` field (optional)
-    pub fn metadata(
-        mut self,
-        value: impl Into<Option<crate::net_anisota::beta::game::progress::Metadata<'a>>>,
-    ) -> Self {
+    pub fn metadata(mut self, value: impl Into<Option<progress::Metadata<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
-    pub fn maybe_metadata(
-        mut self,
-        value: Option<crate::net_anisota::beta::game::progress::Metadata<'a>>,
-    ) -> Self {
+    pub fn maybe_metadata(mut self, value: Option<progress::Metadata<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -644,13 +579,13 @@ where
     /// Set the `progressPercentage` field (required)
     pub fn progress_percentage(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ProgressBuilder<'a, progress_state::SetProgressPercentage<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         ProgressBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -659,16 +594,13 @@ impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `relatedLogUris` field (optional)
     pub fn related_log_uris(
         mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+        value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `relatedLogUris` field to an Option value (optional)
-    pub fn maybe_related_log_uris(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_related_log_uris(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -676,18 +608,12 @@ impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
 
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `sessionId` field (optional)
-    pub fn session_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn session_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `sessionId` field to an Option value (optional)
-    pub fn maybe_session_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_session_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -695,18 +621,12 @@ impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
 
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `sessionUri` field (optional)
-    pub fn session_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn session_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `sessionUri` field to an Option value (optional)
-    pub fn maybe_session_uri(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_session_uri(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -714,18 +634,12 @@ impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
 
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `stats` field (optional)
-    pub fn stats(
-        mut self,
-        value: impl Into<Option<crate::net_anisota::beta::game::progress::Stats<'a>>>,
-    ) -> Self {
+    pub fn stats(mut self, value: impl Into<Option<progress::Stats<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `stats` field to an Option value (optional)
-    pub fn maybe_stats(
-        mut self,
-        value: Option<crate::net_anisota::beta::game::progress::Stats<'a>>,
-    ) -> Self {
+    pub fn maybe_stats(mut self, value: Option<progress::Stats<'a>>) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -741,29 +655,23 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ProgressBuilder<'a, progress_state::SetTotalXp<S>> {
-        self.__unsafe_private_named.11 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.11 = Option::Some(value.into());
         ProgressBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `triggerSource` field (optional)
-    pub fn trigger_source(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn trigger_source(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `triggerSource` field to an Option value (optional)
-    pub fn maybe_trigger_source(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_trigger_source(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.12 = value;
         self
     }
@@ -792,11 +700,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ProgressBuilder<'a, progress_state::SetXpToNextLevel<S>> {
-        self.__unsafe_private_named.14 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.14 = Option::Some(value.into());
         ProgressBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -804,10 +712,10 @@ where
 impl<'a, S> ProgressBuilder<'a, S>
 where
     S: progress_state::State,
+    S::XpToNextLevel: progress_state::IsSet,
+    S::TotalXp: progress_state::IsSet,
     S::Level: progress_state::IsSet,
     S::CreatedAt: progress_state::IsSet,
-    S::TotalXp: progress_state::IsSet,
-    S::XpToNextLevel: progress_state::IsSet,
     S::ProgressPercentage: progress_state::IsSet,
 {
     /// Build the final struct
@@ -834,7 +742,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -860,494 +768,299 @@ where
     }
 }
 
-fn lexicon_doc_net_anisota_beta_game_progress() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("net.anisota.beta.game.progress"),
-        revision: None,
-        description: None,
+fn lexicon_doc_net_anisota_beta_game_progress() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("net.anisota.beta.game.progress"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Record representing a player's level progression and game statistics",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("level"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("totalXP"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("progressPercentage"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("xpToNextLevel"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("level"),
+                                SmolStr::new_static("totalXP"),
+                                SmolStr::new_static("progressPercentage"),
+                                SmolStr::new_static("xpToNextLevel"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "cardUri",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("cardUri"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "URI of the card that was advanced when triggerSource is card_advance",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "When the progress record was created",
-                                        ),
+                                        CowStr::new_static("When the progress record was created"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "currentStamina",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("currentStamina"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Current stamina level when this progress was recorded (decimal string, e.g. '85.5')",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "level",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("level"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "metadata",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#metadata"),
+                                SmolStr::new_static("metadata"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#metadata"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "previousLevel",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("previousLevel"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "progressPercentage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("progressPercentage"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Progress percentage to the next level (decimal string, e.g. '75.5')",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "relatedLogUris",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("relatedLogUris"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "URIs of related game log records that contributed to this progress",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    items: LexArrayItem::String(LexString {
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sessionId",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("sessionId"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Session ID when this progress was recorded (for linking with log records)",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sessionUri",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("sessionUri"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "URI of the session record when this progress was recorded",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "stats",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#stats"),
+                                SmolStr::new_static("stats"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#stats"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "totalXP",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("totalXP"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "triggerSource",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("triggerSource"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "What action triggered this progress save",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "xpGainedSinceLastSave",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("xpGainedSinceLastSave"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "xpToNextLevel",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("xpToNextLevel"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("metadata"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("metadata"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Additional metadata about this progress update",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "clientVersion",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("clientVersion"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Version of the client when this progress was recorded",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "platform",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("platform"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Platform where the level up occurred (web, mobile, etc.)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("stats"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("stats"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Game-specific statistics and metrics",
-                        ),
+                        CowStr::new_static("Game-specific statistics and metrics"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "dailyRewardsClaimed",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("dailyRewardsClaimed"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "itemsCollected",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("itemsCollected"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "lastPostReadDate",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("lastPostReadDate"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Date when posts read today was last updated (for daily reset tracking)",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "postsReadToday",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("postsReadToday"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "postsReadTotal",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("postsReadTotal"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "postsViewed",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("postsViewed"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "shufflesPerformed",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("shufflesPerformed"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "specimensCollected",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("specimensCollected"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

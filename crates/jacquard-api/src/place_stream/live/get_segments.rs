@@ -5,49 +5,37 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::{Did, Datetime};
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::segment::SegmentView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSegments<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub before: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub before: Option<Datetime>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
     #[serde(borrow)]
-    pub user_did: jacquard_common::types::string::Did<'a>,
+    pub user_did: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSegmentsOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub segments: core::option::Option<
-        Vec<crate::place_stream::segment::SegmentView<'a>>,
-    >,
+    pub segments: Option<Vec<SegmentView<'a>>>,
 }
 
-/// Response type for
-///place.stream.live.getSegments
+/// Response type for place.stream.live.getSegments
 pub struct GetSegmentsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSegmentsResponse {
     const NSID: &'static str = "place.stream.live.getSegments";
@@ -62,8 +50,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSegments<'a> {
     type Response = GetSegmentsResponse;
 }
 
-/// Endpoint type for
-///place.stream.live.getSegments
+/// Endpoint type for place.stream.live.getSegments
 pub struct GetSegmentsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSegmentsRequest {
     const PATH: &'static str = "/xrpc/place.stream.live.getSegments";
@@ -72,7 +59,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSegmentsRequest {
     type Response = GetSegmentsResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
@@ -110,13 +97,9 @@ pub mod get_segments_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetSegmentsBuilder<'a, S: get_segments_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Datetime>, Option<i64>, Option<Did<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetSegments<'a> {
@@ -130,27 +113,21 @@ impl<'a> GetSegmentsBuilder<'a, get_segments_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSegmentsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_segments_state::State> GetSegmentsBuilder<'a, S> {
     /// Set the `before` field (optional)
-    pub fn before(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn before(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `before` field to an Option value (optional)
-    pub fn maybe_before(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_before(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -177,13 +154,13 @@ where
     /// Set the `userDID` field (required)
     pub fn user_did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetSegmentsBuilder<'a, get_segments_state::SetUserDid<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         GetSegmentsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

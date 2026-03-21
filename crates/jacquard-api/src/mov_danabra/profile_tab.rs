@@ -5,34 +5,35 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileTab<'a> {
-    ///Defaults to `10`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    /// Defaults to `10`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_profile_tab_limit")]
-    pub limit: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tab: core::option::Option<ProfileTabTab<'a>>,
+    pub tab: Option<ProfileTabTab<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProfileTabTab<'a> {
     PostsAndAuthorThreads,
     PostsAndReplies,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ProfileTabTab<'a> {
@@ -50,7 +51,7 @@ impl<'a> From<&'a str> for ProfileTabTab<'a> {
         match s {
             "posts_and_author_threads" => Self::PostsAndAuthorThreads,
             "posts_and_replies" => Self::PostsAndReplies,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -60,7 +61,7 @@ impl<'a> From<String> for ProfileTabTab<'a> {
         match s.as_str() {
             "posts_and_author_threads" => Self::PostsAndAuthorThreads,
             "posts_and_replies" => Self::PostsAndReplies,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -116,25 +117,17 @@ impl jacquard_common::IntoStatic for ProfileTabTab<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileTabOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
+    pub value: Data<'a>,
 }
 
-/// Response type for
-///mov.danabra.ProfileTab
+/// Response type for mov.danabra.ProfileTab
 pub struct ProfileTabResponse;
 impl jacquard_common::xrpc::XrpcResp for ProfileTabResponse {
     const NSID: &'static str = "mov.danabra.ProfileTab";
@@ -151,8 +144,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ProfileTab<'a> {
     type Response = ProfileTabResponse;
 }
 
-/// Endpoint type for
-///mov.danabra.ProfileTab
+/// Endpoint type for mov.danabra.ProfileTab
 pub struct ProfileTabRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ProfileTabRequest {
     const PATH: &'static str = "/xrpc/mov.danabra.ProfileTab";
@@ -163,7 +155,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ProfileTabRequest {
     type Response = ProfileTabResponse;
 }
 
-fn _default_profile_tab_limit() -> core::option::Option<i64> {
+fn _default_profile_tab_limit() -> Option<i64> {
     Some(10i64)
 }
 
@@ -201,13 +193,9 @@ pub mod profile_tab_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProfileTabBuilder<'a, S: profile_tab_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<ProfileTabTab<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<ProfileTabTab<'a>>, Option<AtUri<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ProfileTab<'a> {
@@ -221,9 +209,9 @@ impl<'a> ProfileTabBuilder<'a, profile_tab_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileTabBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -262,13 +250,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> ProfileTabBuilder<'a, profile_tab_state::SetUri<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         ProfileTabBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -290,10 +278,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ProfileTab<'a> {
         ProfileTab {
             limit: self.__unsafe_private_named.0.or_else(|| Some(10i64)),

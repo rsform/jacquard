@@ -5,74 +5,65 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::slice::SparklinePoint;
+use crate::network_slices::slice::get_sparklines;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSparklines<'a> {
-    ///Time range to fetch data for Defaults to `"24h"`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    ///Time range to fetch data for  Defaults to `"24h"`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_get_sparklines_duration")]
     #[serde(borrow)]
-    pub duration: core::option::Option<jacquard_common::CowStr<'a>>,
-    ///Time interval for data points Defaults to `"hour"`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duration: Option<CowStr<'a>>,
+    ///Time interval for data points  Defaults to `"hour"`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_get_sparklines_interval")]
     #[serde(borrow)]
-    pub interval: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub interval: Option<CowStr<'a>>,
     ///Array of slice AT-URIs to get sparkline data for
     #[serde(borrow)]
-    pub slices: Vec<jacquard_common::CowStr<'a>>,
+    pub slices: Vec<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSparklinesOutput<'a> {
     ///Array of slice sparkline data entries
     #[serde(borrow)]
-    pub sparklines: Vec<
-        crate::network_slices::slice::get_sparklines::SparklineEntry<'a>,
-    >,
+    pub sparklines: Vec<get_sparklines::SparklineEntry<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SparklineEntry<'a> {
     ///Array of sparkline data points
     #[serde(borrow)]
-    pub points: Vec<crate::network_slices::slice::SparklinePoint<'a>>,
+    pub points: Vec<SparklinePoint<'a>>,
     ///AT-URI of the slice
     #[serde(borrow)]
-    pub slice_uri: jacquard_common::CowStr<'a>,
+    pub slice_uri: CowStr<'a>,
 }
 
-/// Response type for
-///network.slices.slice.getSparklines
+/// Response type for network.slices.slice.getSparklines
 pub struct GetSparklinesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSparklinesResponse {
     const NSID: &'static str = "network.slices.slice.getSparklines";
@@ -89,8 +80,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSparklines<'a> {
     type Response = GetSparklinesResponse;
 }
 
-/// Endpoint type for
-///network.slices.slice.getSparklines
+/// Endpoint type for network.slices.slice.getSparklines
 pub struct GetSparklinesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSparklinesRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.getSparklines";
@@ -101,33 +91,27 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSparklinesRequest {
     type Response = GetSparklinesResponse;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for SparklineEntry<'a> {
+impl<'a> LexiconSchema for SparklineEntry<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice.getSparklines"
     }
     fn def_name() -> &'static str {
         "sparklineEntry"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_network_slices_slice_getSparklines()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_get_sparklines_duration() -> core::option::Option<
-    jacquard_common::CowStr<'static>,
-> {
-    Some(jacquard_common::CowStr::from("24h"))
+fn _default_get_sparklines_duration() -> Option<CowStr<'static>> {
+    Some(CowStr::from("24h"))
 }
 
-fn _default_get_sparklines_interval() -> core::option::Option<
-    jacquard_common::CowStr<'static>,
-> {
-    Some(jacquard_common::CowStr::from("hour"))
+fn _default_get_sparklines_interval() -> Option<CowStr<'static>> {
+    Some(CowStr::from("hour"))
 }
 
 pub mod get_sparklines_state {
@@ -164,13 +148,13 @@ pub mod get_sparklines_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetSparklinesBuilder<'a, S: get_sparklines_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetSparklines<'a> {
@@ -184,24 +168,21 @@ impl<'a> GetSparklinesBuilder<'a, get_sparklines_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSparklinesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_sparklines_state::State> GetSparklinesBuilder<'a, S> {
     /// Set the `duration` field (optional)
-    pub fn duration(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn duration(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `duration` field to an Option value (optional)
-    pub fn maybe_duration(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_duration(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -209,15 +190,12 @@ impl<'a, S: get_sparklines_state::State> GetSparklinesBuilder<'a, S> {
 
 impl<'a, S: get_sparklines_state::State> GetSparklinesBuilder<'a, S> {
     /// Set the `interval` field (optional)
-    pub fn interval(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn interval(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `interval` field to an Option value (optional)
-    pub fn maybe_interval(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_interval(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -231,13 +209,13 @@ where
     /// Set the `slices` field (required)
     pub fn slices(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> GetSparklinesBuilder<'a, get_sparklines_state::SetSlices<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         GetSparklinesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -253,11 +231,11 @@ where
             duration: self
                 .__unsafe_private_named
                 .0
-                .or_else(|| Some(jacquard_common::CowStr::from("24h"))),
+                .or_else(|| Some(CowStr::from("24h"))),
             interval: self
                 .__unsafe_private_named
                 .1
-                .or_else(|| Some(jacquard_common::CowStr::from("hour"))),
+                .or_else(|| Some(CowStr::from("hour"))),
             slices: self.__unsafe_private_named.2.unwrap(),
             extra_data: Default::default(),
         }
@@ -265,7 +243,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -274,11 +252,11 @@ where
             duration: self
                 .__unsafe_private_named
                 .0
-                .or_else(|| Some(jacquard_common::CowStr::from("24h"))),
+                .or_else(|| Some(CowStr::from("24h"))),
             interval: self
                 .__unsafe_private_named
                 .1
-                .or_else(|| Some(jacquard_common::CowStr::from("hour"))),
+                .or_else(|| Some(CowStr::from("hour"))),
             slices: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
@@ -331,12 +309,9 @@ pub mod sparkline_entry_state {
 
 /// Builder for constructing an instance of this type
 pub struct SparklineEntryBuilder<'a, S: sparkline_entry_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::network_slices::slice::SparklinePoint<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<SparklinePoint<'a>>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SparklineEntry<'a> {
@@ -350,9 +325,9 @@ impl<'a> SparklineEntryBuilder<'a, sparkline_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SparklineEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -365,13 +340,13 @@ where
     /// Set the `points` field (required)
     pub fn points(
         mut self,
-        value: impl Into<Vec<crate::network_slices::slice::SparklinePoint<'a>>>,
+        value: impl Into<Vec<SparklinePoint<'a>>>,
     ) -> SparklineEntryBuilder<'a, sparkline_entry_state::SetPoints<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SparklineEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -384,13 +359,13 @@ where
     /// Set the `sliceUri` field (required)
     pub fn slice_uri(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SparklineEntryBuilder<'a, sparkline_entry_state::SetSliceUri<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         SparklineEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -412,7 +387,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -425,173 +400,112 @@ where
     }
 }
 
-fn lexicon_doc_network_slices_slice_getSparklines() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("network.slices.slice.getSparklines"),
-        revision: None,
-        description: None,
+fn lexicon_doc_network_slices_slice_getSparklines() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("network.slices.slice.getSparklines"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
-                    description: None,
-                    parameters: None,
-                    input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
-                        description: None,
-                        encoding: ::jacquard_common::CowStr::new_static(
-                            "application/json",
-                        ),
+                SmolStr::new_static("main"),
+                LexUserType::XrpcProcedure(LexXrpcProcedure {
+                    input: Some(LexXrpcBody {
+                        encoding: CowStr::new_static("application/json"),
                         schema: Some(
-                            ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
-                                description: None,
-                                required: Some(
-                                    vec![
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("slices")
-                                    ],
-                                ),
-                                nullable: None,
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(vec![SmolStr::new_static("slices")]),
                                 properties: {
                                     #[allow(unused_mut)]
-                                    let mut map = ::alloc::collections::BTreeMap::new();
+                                    let mut map = BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "duration",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        SmolStr::new_static("duration"),
+                                        LexObjectProperty::String(LexString {
                                             description: Some(
-                                                ::jacquard_common::CowStr::new_static(
-                                                    "Time range to fetch data for",
-                                                ),
+                                                CowStr::new_static("Time range to fetch data for"),
                                             ),
-                                            format: None,
-                                            default: None,
-                                            min_length: None,
-                                            max_length: None,
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "interval",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        SmolStr::new_static("interval"),
+                                        LexObjectProperty::String(LexString {
                                             description: Some(
-                                                ::jacquard_common::CowStr::new_static(
-                                                    "Time interval for data points",
-                                                ),
+                                                CowStr::new_static("Time interval for data points"),
                                             ),
-                                            format: None,
-                                            default: None,
-                                            min_length: None,
-                                            max_length: None,
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "slices",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        SmolStr::new_static("slices"),
+                                        LexObjectProperty::Array(LexArray {
                                             description: Some(
-                                                ::jacquard_common::CowStr::new_static(
+                                                CowStr::new_static(
                                                     "Array of slice AT-URIs to get sparkline data for",
                                                 ),
                                             ),
-                                            items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                                description: None,
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                            items: LexArrayItem::String(LexString {
+                                                ..Default::default()
                                             }),
-                                            min_length: None,
-                                            max_length: None,
+                                            ..Default::default()
                                         }),
                                     );
                                     map
                                 },
+                                ..Default::default()
                             }),
                         ),
+                        ..Default::default()
                     }),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("sparklineEntry"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("sparklineEntry"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("sliceUri"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("points")
+                            SmolStr::new_static("sliceUri"),
+                            SmolStr::new_static("points")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "points",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("points"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Array of sparkline data points",
-                                    ),
+                                    CowStr::new_static("Array of sparkline data points"),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "network.slices.slice.defs#sparklinePoint",
                                     ),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sliceUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("sliceUri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static("AT-URI of the slice"),
+                                    CowStr::new_static("AT-URI of the slice"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

@@ -5,53 +5,64 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// Site configuration for spores.garden, including title and subtitle.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Config<'a> {
     ///Body font ID
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub body_font: core::option::Option<ConfigBodyFont<'a>>,
+    pub body_font: Option<ConfigBodyFont<'a>>,
     ///Deprecated legacy key for body font ID
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub font_body: core::option::Option<ConfigFontBody<'a>>,
+    pub font_body: Option<ConfigFontBody<'a>>,
     ///Deprecated legacy key for heading font ID
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub font_heading: core::option::Option<ConfigFontHeading<'a>>,
+    pub font_heading: Option<ConfigFontHeading<'a>>,
     ///Heading font ID
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub heading_font: core::option::Option<ConfigHeadingFont<'a>>,
+    pub heading_font: Option<ConfigHeadingFont<'a>>,
     ///Site subtitle
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subtitle: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub subtitle: Option<CowStr<'a>>,
     ///Site title
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: Option<CowStr<'a>>,
 }
 
 /// Body font ID
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConfigBodyFont<'a> {
     WorkSans,
     Georgia,
     JetbrainsMono,
     CourierNew,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ConfigBodyFont<'a> {
@@ -73,7 +84,7 @@ impl<'a> From<&'a str> for ConfigBodyFont<'a> {
             "georgia" => Self::Georgia,
             "jetbrains-mono" => Self::JetbrainsMono,
             "courier-new" => Self::CourierNew,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -85,7 +96,7 @@ impl<'a> From<String> for ConfigBodyFont<'a> {
             "georgia" => Self::Georgia,
             "jetbrains-mono" => Self::JetbrainsMono,
             "courier-new" => Self::CourierNew,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -144,13 +155,14 @@ impl jacquard_common::IntoStatic for ConfigBodyFont<'_> {
 }
 
 /// Deprecated legacy key for body font ID
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConfigFontBody<'a> {
     WorkSans,
     Georgia,
     JetbrainsMono,
     CourierNew,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ConfigFontBody<'a> {
@@ -172,7 +184,7 @@ impl<'a> From<&'a str> for ConfigFontBody<'a> {
             "georgia" => Self::Georgia,
             "jetbrains-mono" => Self::JetbrainsMono,
             "courier-new" => Self::CourierNew,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -184,7 +196,7 @@ impl<'a> From<String> for ConfigFontBody<'a> {
             "georgia" => Self::Georgia,
             "jetbrains-mono" => Self::JetbrainsMono,
             "courier-new" => Self::CourierNew,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -243,13 +255,14 @@ impl jacquard_common::IntoStatic for ConfigFontBody<'_> {
 }
 
 /// Deprecated legacy key for heading font ID
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConfigFontHeading<'a> {
     WorkSans,
     Georgia,
     JetbrainsMono,
     CourierNew,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ConfigFontHeading<'a> {
@@ -271,7 +284,7 @@ impl<'a> From<&'a str> for ConfigFontHeading<'a> {
             "georgia" => Self::Georgia,
             "jetbrains-mono" => Self::JetbrainsMono,
             "courier-new" => Self::CourierNew,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -283,7 +296,7 @@ impl<'a> From<String> for ConfigFontHeading<'a> {
             "georgia" => Self::Georgia,
             "jetbrains-mono" => Self::JetbrainsMono,
             "courier-new" => Self::CourierNew,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -342,13 +355,14 @@ impl jacquard_common::IntoStatic for ConfigFontHeading<'_> {
 }
 
 /// Heading font ID
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConfigHeadingFont<'a> {
     WorkSans,
     Georgia,
     JetbrainsMono,
     CourierNew,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ConfigHeadingFont<'a> {
@@ -370,7 +384,7 @@ impl<'a> From<&'a str> for ConfigHeadingFont<'a> {
             "georgia" => Self::Georgia,
             "jetbrains-mono" => Self::JetbrainsMono,
             "courier-new" => Self::CourierNew,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -382,7 +396,7 @@ impl<'a> From<String> for ConfigHeadingFont<'a> {
             "georgia" => Self::Georgia,
             "jetbrains-mono" => Self::JetbrainsMono,
             "courier-new" => Self::CourierNew,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -441,47 +455,36 @@ impl jacquard_common::IntoStatic for ConfigHeadingFont<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ConfigGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Config<'a>,
 }
 
 impl<'a> Config<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ConfigRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ConfigRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ConfigRecord;
-impl jacquard_common::xrpc::XrpcResp for ConfigRecord {
+impl XrpcResp for ConfigRecord {
     const NSID: &'static str = "coop.hypha.spores.site.config";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ConfigGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ConfigGetRecordOutput<'_>> for Config<'_> {
@@ -491,36 +494,32 @@ impl From<ConfigGetRecordOutput<'_>> for Config<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Config<'_> {
+impl Collection for Config<'_> {
     const NSID: &'static str = "coop.hypha.spores.site.config";
     type Record = ConfigRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ConfigRecord {
+impl Collection for ConfigRecord {
     const NSID: &'static str = "coop.hypha.spores.site.config";
     type Record = ConfigRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Config<'a> {
+impl<'a> LexiconSchema for Config<'a> {
     fn nsid() -> &'static str {
         "coop.hypha.spores.site.config"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_coop_hypha_spores_site_config()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.body_font {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "body_font",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("body_font"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -529,10 +528,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Config<'a> {
         if let Some(ref value) = self.font_body {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "font_body",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("font_body"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -541,10 +538,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Config<'a> {
         if let Some(ref value) = self.font_heading {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "font_heading",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("font_heading"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -553,10 +548,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Config<'a> {
         if let Some(ref value) = self.heading_font {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "heading_font",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("heading_font"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -565,10 +558,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Config<'a> {
         if let Some(ref value) = self.subtitle {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "subtitle",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("subtitle"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -576,16 +567,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Config<'a> {
         }
         if let Some(ref value) = self.subtitle {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 200usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "subtitle",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("subtitle"),
                         max: 200usize,
                         actual: count,
                     });
@@ -595,10 +580,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Config<'a> {
         if let Some(ref value) = self.title {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("title"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -606,16 +589,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Config<'a> {
         }
         if let Some(ref value) = self.title {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "title",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("title"),
                         max: 100usize,
                         actual: count,
                     });
@@ -647,16 +624,16 @@ pub mod config_state {
 
 /// Builder for constructing an instance of this type
 pub struct ConfigBuilder<'a, S: config_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<ConfigBodyFont<'a>>,
-        ::core::option::Option<ConfigFontBody<'a>>,
-        ::core::option::Option<ConfigFontHeading<'a>>,
-        ::core::option::Option<ConfigHeadingFont<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<ConfigBodyFont<'a>>,
+        Option<ConfigFontBody<'a>>,
+        Option<ConfigFontHeading<'a>>,
+        Option<ConfigHeadingFont<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Config<'a> {
@@ -670,9 +647,9 @@ impl<'a> ConfigBuilder<'a, config_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -737,15 +714,12 @@ impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
 
 impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
     /// Set the `subtitle` field (optional)
-    pub fn subtitle(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn subtitle(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `subtitle` field to an Option value (optional)
-    pub fn maybe_subtitle(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_subtitle(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -753,15 +727,12 @@ impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
 
 impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -786,7 +757,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -803,156 +774,94 @@ where
     }
 }
 
-fn lexicon_doc_coop_hypha_spores_site_config() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("coop.hypha.spores.site.config"),
-        revision: None,
-        description: None,
+fn lexicon_doc_coop_hypha_spores_site_config() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("coop.hypha.spores.site.config"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Site configuration for spores.garden, including title and subtitle.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: None,
-                        nullable: None,
+                    key: Some(CowStr::new_static("literal:self")),
+                    record: LexRecordRecord::Object(LexObject {
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "bodyFont",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static("Body font ID"),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("bodyFont"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(CowStr::new_static("Body font ID")),
                                     max_length: Some(50usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "fontBody",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("fontBody"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Deprecated legacy key for body font ID",
-                                        ),
+                                        CowStr::new_static("Deprecated legacy key for body font ID"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(50usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "fontHeading",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("fontHeading"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Deprecated legacy key for heading font ID",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(50usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "headingFont",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static("Heading font ID"),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("headingFont"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(CowStr::new_static("Heading font ID")),
                                     max_length: Some(50usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "subtitle",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static("Site subtitle"),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("subtitle"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(CowStr::new_static("Site subtitle")),
                                     max_length: Some(2000usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(200usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "title",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static("Site title"),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("title"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(CowStr::new_static("Site title")),
                                     max_length: Some(1000usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(100usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

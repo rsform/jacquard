@@ -5,80 +5,71 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::UriValue;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::song::SongViewDetailed;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSong<'a> {
     ///The album of the song, if applicable
     #[serde(borrow)]
-    pub album: jacquard_common::CowStr<'a>,
+    pub album: CowStr<'a>,
     ///The URL of the album art for the song
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub album_art: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub album_art: Option<UriValue<'a>>,
     ///The album artist of the song, if different from the main artist
     #[serde(borrow)]
-    pub album_artist: jacquard_common::CowStr<'a>,
+    pub album_artist: CowStr<'a>,
     ///The artist of the song
     #[serde(borrow)]
-    pub artist: jacquard_common::CowStr<'a>,
+    pub artist: CowStr<'a>,
     ///The disc number of the song in the album, if applicable
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub disc_number: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disc_number: Option<i64>,
     ///The duration of the song in seconds
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub duration: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub duration: Option<i64>,
     ///The lyrics of the song, if available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub lyrics: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub lyrics: Option<CowStr<'a>>,
     ///The MusicBrainz ID of the song, if available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub mb_id: Option<CowStr<'a>>,
     ///The release date of the song, formatted as YYYY-MM-DD
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub release_date: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub release_date: Option<CowStr<'a>>,
     ///The title of the song
     #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
+    pub title: CowStr<'a>,
     ///The track number of the song in the album, if applicable
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub track_number: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub track_number: Option<i64>,
     ///The year the song was released
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub year: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub year: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSongOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::song::SongViewDetailed<'a>,
+    pub value: SongViewDetailed<'a>,
 }
 
-/// Response type for
-///app.rocksky.song.createSong
+/// Response type for app.rocksky.song.createSong
 pub struct CreateSongResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateSongResponse {
     const NSID: &'static str = "app.rocksky.song.createSong";
@@ -95,8 +86,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateSong<'a> {
     type Response = CreateSongResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.song.createSong
+/// Endpoint type for app.rocksky.song.createSong
 pub struct CreateSongRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateSongRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.song.createSong";

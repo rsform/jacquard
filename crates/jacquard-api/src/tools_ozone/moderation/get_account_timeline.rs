@@ -5,56 +5,57 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::moderation::get_account_timeline;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountTimeline<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountTimelineOutput<'a> {
     #[serde(borrow)]
-    pub timeline: Vec<
-        crate::tools_ozone::moderation::get_account_timeline::TimelineItem<'a>,
-    >,
+    pub timeline: Vec<get_account_timeline::TimelineItem<'a>>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetAccountTimelineError<'a> {
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetAccountTimelineError<'_> {
@@ -72,36 +73,20 @@ impl core::fmt::Display for GetAccountTimelineError<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct TimelineItem<'a> {
     #[serde(borrow)]
-    pub day: jacquard_common::CowStr<'a>,
+    pub day: CowStr<'a>,
     #[serde(borrow)]
-    pub summary: Vec<
-        crate::tools_ozone::moderation::get_account_timeline::TimelineItemSummary<'a>,
-    >,
+    pub summary: Vec<get_account_timeline::TimelineItemSummary<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct TimelineItemSummary<'a> {
     pub count: i64,
@@ -111,12 +96,13 @@ pub struct TimelineItemSummary<'a> {
     pub event_type: TimelineItemSummaryEventType<'a>,
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TimelineItemSummaryEventSubjectType<'a> {
     Account,
     Record,
     Chat,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> TimelineItemSummaryEventSubjectType<'a> {
@@ -136,7 +122,7 @@ impl<'a> From<&'a str> for TimelineItemSummaryEventSubjectType<'a> {
             "account" => Self::Account,
             "record" => Self::Record,
             "chat" => Self::Chat,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -147,7 +133,7 @@ impl<'a> From<String> for TimelineItemSummaryEventSubjectType<'a> {
             "account" => Self::Account,
             "record" => Self::Record,
             "chat" => Self::Chat,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -212,6 +198,7 @@ impl jacquard_common::IntoStatic for TimelineItemSummaryEventSubjectType<'_> {
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TimelineItemSummaryEventType<'a> {
     ModEventTakedown,
@@ -245,7 +232,7 @@ pub enum TimelineItemSummaryEventType<'a> {
     HandleUpdated,
     ScheduleTakedownEvent,
     CancelScheduledTakedownEvent,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> TimelineItemSummaryEventType<'a> {
@@ -385,7 +372,7 @@ impl<'a> From<&'a str> for TimelineItemSummaryEventType<'a> {
             "tools.ozone.moderation.defs#cancelScheduledTakedownEvent" => {
                 Self::CancelScheduledTakedownEvent
             }
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -456,7 +443,7 @@ impl<'a> From<String> for TimelineItemSummaryEventType<'a> {
             "tools.ozone.moderation.defs#cancelScheduledTakedownEvent" => {
                 Self::CancelScheduledTakedownEvent
             }
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -605,8 +592,7 @@ impl jacquard_common::IntoStatic for TimelineItemSummaryEventType<'_> {
     }
 }
 
-/// Response type for
-///tools.ozone.moderation.getAccountTimeline
+/// Response type for tools.ozone.moderation.getAccountTimeline
 pub struct GetAccountTimelineResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAccountTimelineResponse {
     const NSID: &'static str = "tools.ozone.moderation.getAccountTimeline";
@@ -621,8 +607,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetAccountTimeline<'a> {
     type Response = GetAccountTimelineResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.moderation.getAccountTimeline
+/// Endpoint type for tools.ozone.moderation.getAccountTimeline
 pub struct GetAccountTimelineRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAccountTimelineRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.getAccountTimeline";
@@ -631,36 +616,32 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetAccountTimelineRequest {
     type Response = GetAccountTimelineResponse;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for TimelineItem<'a> {
+impl<'a> LexiconSchema for TimelineItem<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.getAccountTimeline"
     }
     fn def_name() -> &'static str {
         "timelineItem"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_getAccountTimeline()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for TimelineItemSummary<'a> {
+impl<'a> LexiconSchema for TimelineItemSummary<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.getAccountTimeline"
     }
     fn def_name() -> &'static str {
         "timelineItemSummary"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_getAccountTimeline()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -699,11 +680,9 @@ pub mod get_account_timeline_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetAccountTimelineBuilder<'a, S: get_account_timeline_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetAccountTimeline<'a> {
@@ -717,9 +696,9 @@ impl<'a> GetAccountTimelineBuilder<'a, get_account_timeline_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetAccountTimelineBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -732,13 +711,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetAccountTimelineBuilder<'a, get_account_timeline_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetAccountTimelineBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -802,18 +781,12 @@ pub mod timeline_item_state {
 
 /// Builder for constructing an instance of this type
 pub struct TimelineItemBuilder<'a, S: timeline_item_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<
-            Vec<
-                crate::tools_ozone::moderation::get_account_timeline::TimelineItemSummary<
-                    'a,
-                >,
-            >,
-        >,
+        Option<CowStr<'a>>,
+        Option<Vec<get_account_timeline::TimelineItemSummary<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> TimelineItem<'a> {
@@ -827,9 +800,9 @@ impl<'a> TimelineItemBuilder<'a, timeline_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TimelineItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -842,13 +815,13 @@ where
     /// Set the `day` field (required)
     pub fn day(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> TimelineItemBuilder<'a, timeline_item_state::SetDay<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         TimelineItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -861,19 +834,13 @@ where
     /// Set the `summary` field (required)
     pub fn summary(
         mut self,
-        value: impl Into<
-            Vec<
-                crate::tools_ozone::moderation::get_account_timeline::TimelineItemSummary<
-                    'a,
-                >,
-            >,
-        >,
+        value: impl Into<Vec<get_account_timeline::TimelineItemSummary<'a>>>,
     ) -> TimelineItemBuilder<'a, timeline_item_state::SetSummary<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         TimelineItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -895,7 +862,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -908,181 +875,103 @@ where
     }
 }
 
-fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "tools.ozone.moderation.getAccountTimeline",
-        ),
-        revision: None,
-        description: None,
+fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("tools.ozone.moderation.getAccountTimeline"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
-                    description: None,
+                SmolStr::new_static("main"),
+                LexUserType::XrpcQuery(LexXrpcQuery {
                     parameters: Some(
-                        ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
-                            description: None,
-                            required: Some(
-                                vec![
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("did")
-                                ],
-                            ),
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("did")]),
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::alloc::collections::BTreeMap::new();
+                                let mut map = BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                        "did",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    SmolStr::new_static("did"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        format: Some(LexStringFormat::Did),
+                                        ..Default::default()
                                     }),
                                 );
                                 map
                             },
+                            ..Default::default()
                         }),
                     ),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("timelineItem"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("timelineItem"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("day"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("summary")
-                        ],
+                        vec![SmolStr::new_static("day"), SmolStr::new_static("summary")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "day",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("day"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "summary",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#timelineItemSummary",
-                                    ),
+                            SmolStr::new_static("summary"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#timelineItemSummary"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "timelineItemSummary",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("timelineItemSummary"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("eventSubjectType"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("eventType"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("count")
+                            SmolStr::new_static("eventSubjectType"),
+                            SmolStr::new_static("eventType"),
+                            SmolStr::new_static("count")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "count",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("count"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "eventSubjectType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("eventSubjectType"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "eventType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("eventType"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1097,62 +986,62 @@ pub mod timeline_item_summary_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Count;
-        type EventType;
         type EventSubjectType;
+        type EventType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Count = Unset;
-        type EventType = Unset;
         type EventSubjectType = Unset;
+        type EventType = Unset;
     }
     ///State transition - sets the `count` field to Set
     pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCount<S> {}
     impl<S: State> State for SetCount<S> {
         type Count = Set<members::count>;
+        type EventSubjectType = S::EventSubjectType;
         type EventType = S::EventType;
-        type EventSubjectType = S::EventSubjectType;
-    }
-    ///State transition - sets the `event_type` field to Set
-    pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventType<S> {}
-    impl<S: State> State for SetEventType<S> {
-        type Count = S::Count;
-        type EventType = Set<members::event_type>;
-        type EventSubjectType = S::EventSubjectType;
     }
     ///State transition - sets the `event_subject_type` field to Set
     pub struct SetEventSubjectType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEventSubjectType<S> {}
     impl<S: State> State for SetEventSubjectType<S> {
         type Count = S::Count;
-        type EventType = S::EventType;
         type EventSubjectType = Set<members::event_subject_type>;
+        type EventType = S::EventType;
+    }
+    ///State transition - sets the `event_type` field to Set
+    pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventType<S> {}
+    impl<S: State> State for SetEventType<S> {
+        type Count = S::Count;
+        type EventSubjectType = S::EventSubjectType;
+        type EventType = Set<members::event_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `count` field
         pub struct count(());
-        ///Marker type for the `event_type` field
-        pub struct event_type(());
         ///Marker type for the `event_subject_type` field
         pub struct event_subject_type(());
+        ///Marker type for the `event_type` field
+        pub struct event_type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TimelineItemSummaryBuilder<'a, S: timeline_item_summary_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<TimelineItemSummaryEventSubjectType<'a>>,
-        ::core::option::Option<TimelineItemSummaryEventType<'a>>,
+        Option<i64>,
+        Option<TimelineItemSummaryEventSubjectType<'a>>,
+        Option<TimelineItemSummaryEventType<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> TimelineItemSummary<'a> {
@@ -1166,9 +1055,9 @@ impl<'a> TimelineItemSummaryBuilder<'a, timeline_item_summary_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TimelineItemSummaryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1183,11 +1072,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> TimelineItemSummaryBuilder<'a, timeline_item_summary_state::SetCount<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         TimelineItemSummaryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1205,11 +1094,11 @@ where
         'a,
         timeline_item_summary_state::SetEventSubjectType<S>,
     > {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         TimelineItemSummaryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1224,11 +1113,11 @@ where
         mut self,
         value: impl Into<TimelineItemSummaryEventType<'a>>,
     ) -> TimelineItemSummaryBuilder<'a, timeline_item_summary_state::SetEventType<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         TimelineItemSummaryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1237,8 +1126,8 @@ impl<'a, S> TimelineItemSummaryBuilder<'a, S>
 where
     S: timeline_item_summary_state::State,
     S::Count: timeline_item_summary_state::IsSet,
-    S::EventType: timeline_item_summary_state::IsSet,
     S::EventSubjectType: timeline_item_summary_state::IsSet,
+    S::EventType: timeline_item_summary_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TimelineItemSummary<'a> {
@@ -1252,7 +1141,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

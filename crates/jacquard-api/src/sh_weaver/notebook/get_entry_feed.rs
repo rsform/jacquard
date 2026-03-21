@@ -5,58 +5,50 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::FeedEntryView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetEntryFeed<'a> {
     ///Defaults to `"chronological"`.
     #[serde(default = "_default_algorithm")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub algorithm: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub algorithm: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cursor: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub feed: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub feed: Option<AtUri<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: Option<Vec<CowStr<'a>>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetEntryFeedOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub feed: Vec<crate::sh_weaver::notebook::FeedEntryView<'a>>,
+    pub feed: Vec<FeedEntryView<'a>>,
 }
 
-/// Response type for
-///sh.weaver.notebook.getEntryFeed
+/// Response type for sh.weaver.notebook.getEntryFeed
 pub struct GetEntryFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryFeedResponse {
     const NSID: &'static str = "sh.weaver.notebook.getEntryFeed";
@@ -71,8 +63,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntryFeed<'a> {
     type Response = GetEntryFeedResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notebook.getEntryFeed
+/// Endpoint type for sh.weaver.notebook.getEntryFeed
 pub struct GetEntryFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryFeedRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryFeed";
@@ -81,11 +72,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetEntryFeedRequest {
     type Response = GetEntryFeedResponse;
 }
 
-fn _default_algorithm() -> core::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("chronological"))
+fn _default_algorithm() -> Option<CowStr<'static>> {
+    Some(CowStr::from("chronological"))
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
@@ -110,15 +101,15 @@ pub mod get_entry_feed_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetEntryFeedBuilder<'a, S: get_entry_feed_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<AtUri<'a>>,
+        Option<i64>,
+        Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetEntryFeed<'a> {
@@ -132,27 +123,21 @@ impl<'a> GetEntryFeedBuilder<'a, get_entry_feed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetEntryFeedBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_entry_feed_state::State> GetEntryFeedBuilder<'a, S> {
     /// Set the `algorithm` field (optional)
-    pub fn algorithm(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn algorithm(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `algorithm` field to an Option value (optional)
-    pub fn maybe_algorithm(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_algorithm(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -160,15 +145,12 @@ impl<'a, S: get_entry_feed_state::State> GetEntryFeedBuilder<'a, S> {
 
 impl<'a, S: get_entry_feed_state::State> GetEntryFeedBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -176,18 +158,12 @@ impl<'a, S: get_entry_feed_state::State> GetEntryFeedBuilder<'a, S> {
 
 impl<'a, S: get_entry_feed_state::State> GetEntryFeedBuilder<'a, S> {
     /// Set the `feed` field (optional)
-    pub fn feed(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn feed(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `feed` field to an Option value (optional)
-    pub fn maybe_feed(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_feed(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -208,18 +184,12 @@ impl<'a, S: get_entry_feed_state::State> GetEntryFeedBuilder<'a, S> {
 
 impl<'a, S: get_entry_feed_state::State> GetEntryFeedBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }

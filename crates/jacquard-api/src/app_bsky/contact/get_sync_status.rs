@@ -5,55 +5,48 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::contact::SyncStatus;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSyncStatus;
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSyncStatusOutput<'a> {
     ///If present, indicates the user has imported their contacts. If not present, indicates the user never used the feature or called `app.bsky.contact.removeData` and didn't import again since.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sync_status: core::option::Option<crate::app_bsky::contact::SyncStatus<'a>>,
+    pub sync_status: Option<SyncStatus<'a>>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetSyncStatusError<'a> {
     #[serde(rename = "InvalidDid")]
-    InvalidDid(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidDid(Option<CowStr<'a>>),
     #[serde(rename = "InternalError")]
-    InternalError(core::option::Option<jacquard_common::CowStr<'a>>),
+    InternalError(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetSyncStatusError<'_> {
@@ -78,8 +71,7 @@ impl core::fmt::Display for GetSyncStatusError<'_> {
     }
 }
 
-/// Response type for
-///app.bsky.contact.getSyncStatus
+/// Response type for app.bsky.contact.getSyncStatus
 pub struct GetSyncStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSyncStatusResponse {
     const NSID: &'static str = "app.bsky.contact.getSyncStatus";
@@ -94,8 +86,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetSyncStatus {
     type Response = GetSyncStatusResponse;
 }
 
-/// Endpoint type for
-///app.bsky.contact.getSyncStatus
+/// Endpoint type for app.bsky.contact.getSyncStatus
 pub struct GetSyncStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSyncStatusRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.getSyncStatus";

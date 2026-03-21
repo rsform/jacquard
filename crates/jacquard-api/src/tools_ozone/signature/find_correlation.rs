@@ -5,39 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::signature::SigDetail;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct FindCorrelation<'a> {
     #[serde(borrow)]
-    pub dids: Vec<jacquard_common::types::string::Did<'a>>,
+    pub dids: Vec<Did<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct FindCorrelationOutput<'a> {
     #[serde(borrow)]
-    pub details: Vec<crate::tools_ozone::signature::SigDetail<'a>>,
+    pub details: Vec<SigDetail<'a>>,
 }
 
-/// Response type for
-///tools.ozone.signature.findCorrelation
+/// Response type for tools.ozone.signature.findCorrelation
 pub struct FindCorrelationResponse;
 impl jacquard_common::xrpc::XrpcResp for FindCorrelationResponse {
     const NSID: &'static str = "tools.ozone.signature.findCorrelation";
@@ -52,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for FindCorrelation<'a> {
     type Response = FindCorrelationResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.signature.findCorrelation
+/// Endpoint type for tools.ozone.signature.findCorrelation
 pub struct FindCorrelationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for FindCorrelationRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.signature.findCorrelation";
@@ -96,11 +86,9 @@ pub mod find_correlation_state {
 
 /// Builder for constructing an instance of this type
 pub struct FindCorrelationBuilder<'a, S: find_correlation_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<Did<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> FindCorrelation<'a> {
@@ -114,9 +102,9 @@ impl<'a> FindCorrelationBuilder<'a, find_correlation_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FindCorrelationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -129,13 +117,13 @@ where
     /// Set the `dids` field (required)
     pub fn dids(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+        value: impl Into<Vec<Did<'a>>>,
     ) -> FindCorrelationBuilder<'a, find_correlation_state::SetDids<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         FindCorrelationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

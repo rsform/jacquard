@@ -5,364 +5,288 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::beta::game::log;
 /// Details about item/specimen collection
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionData<'a> {
     ///Catch probability for specimens (decimal string between 0.0 and 1.0)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub catch_probability: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub catch_probability: Option<CowStr<'a>>,
     ///URI of the created inventory record
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub inventory_record_uri: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub inventory_record_uri: Option<CowStr<'a>>,
     ///How the item was obtained
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub method: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub method: Option<CowStr<'a>>,
     ///URI of the created specimen record
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub specimen_record_uri: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub specimen_record_uri: Option<CowStr<'a>>,
     ///Whether collection was successful
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub success: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub success: Option<bool>,
     ///Milliseconds between card generation and collection
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub time_since_generation: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub time_since_generation: Option<i64>,
     ///Milliseconds between card being viewed and collected
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub time_since_viewed: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub time_since_viewed: Option<i64>,
 }
 
 /// Details about daily rewards claim
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DailyRewardsData<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub reward_items: core::option::Option<
-        Vec<crate::net_anisota::beta::game::log::RewardItem<'a>>,
-    >,
+    pub reward_items: Option<Vec<log::RewardItem<'a>>>,
     ///Number of rewards claimed
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub rewards_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rewards_count: Option<i64>,
     ///Current daily reward streak
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub streak: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub streak: Option<i64>,
     ///Milliseconds since last claim
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub time_since_last_claim: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub time_since_last_claim: Option<i64>,
 }
 
 /// Context about the feed when event occurred
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct FeedContext<'a> {
     ///URI of the feed being viewed
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub feed_uri: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub feed_uri: Option<CowStr<'a>>,
     ///Number of game cards injected
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub game_card_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub game_card_count: Option<i64>,
     ///Number of posts in the feed
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub post_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub post_count: Option<i64>,
     ///User's scroll position or card index
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub scroll_position: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scroll_position: Option<i64>,
 }
 
 /// Details about game cards generated or interacted with
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GameCardData<'a> {
     ///Type of game card
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub card_type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub card_type: Option<CowStr<'a>>,
     ///Unique identifier for the game card
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub card_uri: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub card_uri: Option<CowStr<'a>>,
     ///Random seed used for generation (for verification)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub generation_seed: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub generation_seed: Option<CowStr<'a>>,
     ///Position where card was injected in feed
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub injection_position: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub injection_position: Option<i64>,
     ///ID of the item/specimen
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub item_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub item_id: Option<CowStr<'a>>,
     ///Quantity of items
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub quantity: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quantity: Option<i64>,
     ///Rarity of the item/specimen
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub rarity: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub rarity: Option<CowStr<'a>>,
 }
 
 /// Details about item usage
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ItemUsageData<'a> {
     ///Effect that was applied
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub effect_applied: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub effect_applied: Option<CowStr<'a>>,
     ///URI of the modified inventory record
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub inventory_record_uri: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub inventory_record_uri: Option<CowStr<'a>>,
     ///ID of the item used
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub item_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub item_id: Option<CowStr<'a>>,
     ///Quantity of the item used
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub quantity_used: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quantity_used: Option<i64>,
     ///Remaining quantity after use
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub remaining_quantity: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub remaining_quantity: Option<i64>,
 }
 
 /// A log record for tracking game events and user actions for provenance and anti-bot analysis
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Log<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub collection_data: core::option::Option<
-        crate::net_anisota::beta::game::log::CollectionData<'a>,
-    >,
+    pub collection_data: Option<log::CollectionData<'a>>,
     ///When the log record was created
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub daily_rewards_data: core::option::Option<
-        crate::net_anisota::beta::game::log::DailyRewardsData<'a>,
-    >,
+    pub daily_rewards_data: Option<log::DailyRewardsData<'a>>,
     ///Type of event being logged
     #[serde(borrow)]
-    pub event_type: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub event_type: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub feed_context: core::option::Option<
-        crate::net_anisota::beta::game::log::FeedContext<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub feed_context: Option<log::FeedContext<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub game_card_data: core::option::Option<
-        crate::net_anisota::beta::game::log::GameCardData<'a>,
-    >,
+    pub game_card_data: Option<log::GameCardData<'a>>,
     ///Unique ID of the game card this event relates to
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub game_card_id: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub game_card_id: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub item_usage_data: core::option::Option<
-        crate::net_anisota::beta::game::log::ItemUsageData<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub item_usage_data: Option<log::ItemUsageData<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub metadata: core::option::Option<
-        crate::net_anisota::beta::game::log::Metadata<'a>,
-    >,
+    pub metadata: Option<log::Metadata<'a>>,
     ///URI of the parent log record that triggered this event
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub parent_log_uri: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub parent_log_uri: Option<CowStr<'a>>,
     ///URI of the root log record in this event chain
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub root_log_uri: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub root_log_uri: Option<CowStr<'a>>,
     ///Unique session identifier to group related events
     #[serde(borrow)]
-    pub session_id: jacquard_common::CowStr<'a>,
+    pub session_id: CowStr<'a>,
     ///URI of the session record this event belongs to (at://did/collection/rkey)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub session_uri: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub session_uri: Option<CowStr<'a>>,
     ///When the event occurred (ISO 8601)
-    pub timestamp: jacquard_common::types::string::Datetime,
+    pub timestamp: Datetime,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct LogGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Log<'a>,
 }
 
 /// Additional event-specific metadata
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Metadata<'a> {
     ///Version of the client application
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub client_version: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub client_version: Option<CowStr<'a>>,
     ///Network latency in milliseconds
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub network_latency: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub network_latency: Option<i64>,
     ///Performance timing data
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub performance_timings: core::option::Option<
-        jacquard_common::types::value::Data<'a>,
-    >,
+    pub performance_timings: Option<Data<'a>>,
     ///Platform (web, mobile, etc.)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub platform: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub platform: Option<CowStr<'a>>,
 }
 
 /// Item received as a reward
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RewardItem<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub item_id: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub quantity: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub item_id: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quantity: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub rarity: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub rarity: Option<CowStr<'a>>,
 }
 
 impl<'a> Log<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LogRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, LogRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CollectionData<'a> {
+impl<'a> LexiconSchema for CollectionData<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "collectionData"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.time_since_generation {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "time_since_generation",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("time_since_generation"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -370,10 +294,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CollectionData<'a> {
         }
         if let Some(ref value) = self.time_since_viewed {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "time_since_viewed",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("time_since_viewed"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -383,25 +305,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CollectionData<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for DailyRewardsData<'a> {
+impl<'a> LexiconSchema for DailyRewardsData<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "dailyRewardsData"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.rewards_count {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rewards_count",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("rewards_count"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -409,10 +327,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DailyRewardsData<'a> {
         }
         if let Some(ref value) = self.streak {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "streak",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("streak"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -420,10 +336,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DailyRewardsData<'a> {
         }
         if let Some(ref value) = self.time_since_last_claim {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "time_since_last_claim",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("time_since_last_claim"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -433,25 +347,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for DailyRewardsData<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for FeedContext<'a> {
+impl<'a> LexiconSchema for FeedContext<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "feedContext"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.game_card_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "game_card_count",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("game_card_count"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -459,10 +369,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for FeedContext<'a> {
         }
         if let Some(ref value) = self.post_count {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "post_count",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("post_count"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -470,10 +378,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for FeedContext<'a> {
         }
         if let Some(ref value) = self.scroll_position {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "scroll_position",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("scroll_position"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -483,25 +389,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for FeedContext<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for GameCardData<'a> {
+impl<'a> LexiconSchema for GameCardData<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "gameCardData"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.injection_position {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "injection_position",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("injection_position"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -509,10 +411,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for GameCardData<'a> {
         }
         if let Some(ref value) = self.quantity {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "quantity",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("quantity"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -522,25 +422,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for GameCardData<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ItemUsageData<'a> {
+impl<'a> LexiconSchema for ItemUsageData<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "itemUsageData"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.quantity_used {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "quantity_used",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("quantity_used"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -548,10 +444,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ItemUsageData<'a> {
         }
         if let Some(ref value) = self.remaining_quantity {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "remaining_quantity",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("remaining_quantity"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -562,13 +456,14 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ItemUsageData<'a> {
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LogRecord;
-impl jacquard_common::xrpc::XrpcResp for LogRecord {
+impl XrpcResp for LogRecord {
     const NSID: &'static str = "net.anisota.beta.game.log";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = LogGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<LogGetRecordOutput<'_>> for Log<'_> {
@@ -578,37 +473,33 @@ impl From<LogGetRecordOutput<'_>> for Log<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Log<'_> {
+impl Collection for Log<'_> {
     const NSID: &'static str = "net.anisota.beta.game.log";
     type Record = LogRecord;
 }
 
-impl jacquard_common::types::collection::Collection for LogRecord {
+impl Collection for LogRecord {
     const NSID: &'static str = "net.anisota.beta.game.log";
     type Record = LogRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Log<'a> {
+impl<'a> LexiconSchema for Log<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.session_id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "session_id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("session_id"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -618,25 +509,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Log<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
+impl<'a> LexiconSchema for Metadata<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "metadata"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.network_latency {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "network_latency",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("network_latency"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -646,25 +533,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for RewardItem<'a> {
+impl<'a> LexiconSchema for RewardItem<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "rewardItem"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.quantity {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "quantity",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("quantity"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -674,957 +557,534 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RewardItem<'a> {
     }
 }
 
-fn lexicon_doc_net_anisota_beta_game_log() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("net.anisota.beta.game.log"),
-        revision: None,
-        description: None,
+fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("net.anisota.beta.game.log"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("collectionData"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("collectionData"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Details about item/specimen collection",
-                        ),
+                        CowStr::new_static("Details about item/specimen collection"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "catchProbability",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("catchProbability"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Catch probability for specimens (decimal string between 0.0 and 1.0)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "inventoryRecordUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("inventoryRecordUri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "URI of the created inventory record",
-                                    ),
+                                    CowStr::new_static("URI of the created inventory record"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "method",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("method"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "How the item was obtained",
-                                    ),
+                                    CowStr::new_static("How the item was obtained"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "specimenRecordUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("specimenRecordUri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "URI of the created specimen record",
-                                    ),
+                                    CowStr::new_static("URI of the created specimen record"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "success",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("success"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "timeSinceGeneration",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("timeSinceGeneration"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "timeSinceViewed",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("timeSinceViewed"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "dailyRewardsData",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("dailyRewardsData"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Details about daily rewards claim",
-                        ),
+                        CowStr::new_static("Details about daily rewards claim"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "rewardItems",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#rewardItem"),
+                            SmolStr::new_static("rewardItems"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#rewardItem"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "rewardsCount",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("rewardsCount"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "streak",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("streak"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "timeSinceLastClaim",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("timeSinceLastClaim"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("feedContext"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("feedContext"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Context about the feed when event occurred",
-                        ),
+                        CowStr::new_static("Context about the feed when event occurred"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "feedUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("feedUri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "URI of the feed being viewed",
-                                    ),
+                                    CowStr::new_static("URI of the feed being viewed"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "gameCardCount",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("gameCardCount"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "postCount",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("postCount"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "scrollPosition",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("scrollPosition"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("gameCardData"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("gameCardData"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Details about game cards generated or interacted with",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cardType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Type of game card"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("cardType"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Type of game card")),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cardUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("cardUri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Unique identifier for the game card",
-                                    ),
+                                    CowStr::new_static("Unique identifier for the game card"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "generationSeed",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("generationSeed"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Random seed used for generation (for verification)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "injectionPosition",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("injectionPosition"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "itemId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("itemId"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "ID of the item/specimen",
-                                    ),
+                                    CowStr::new_static("ID of the item/specimen"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "quantity",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("quantity"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "rarity",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("rarity"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Rarity of the item/specimen",
-                                    ),
+                                    CowStr::new_static("Rarity of the item/specimen"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("itemUsageData"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Details about item usage"),
-                    ),
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("itemUsageData"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Details about item usage")),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "effectApplied",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("effectApplied"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Effect that was applied",
-                                    ),
+                                    CowStr::new_static("Effect that was applied"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "inventoryRecordUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("inventoryRecordUri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "URI of the modified inventory record",
-                                    ),
+                                    CowStr::new_static("URI of the modified inventory record"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "itemId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("itemId"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static("ID of the item used"),
+                                    CowStr::new_static("ID of the item used"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "quantityUsed",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("quantityUsed"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "remainingQuantity",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("remainingQuantity"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A log record for tracking game events and user actions for provenance and anti-bot analysis",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("eventType"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("timestamp"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("sessionId")
+                                SmolStr::new_static("eventType"),
+                                SmolStr::new_static("timestamp"),
+                                SmolStr::new_static("sessionId")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "collectionData",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#collectionData",
-                                    ),
+                                SmolStr::new_static("collectionData"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#collectionData"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "When the log record was created",
-                                        ),
+                                        CowStr::new_static("When the log record was created"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "dailyRewardsData",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#dailyRewardsData",
-                                    ),
+                                SmolStr::new_static("dailyRewardsData"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#dailyRewardsData"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "eventType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("eventType"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Type of event being logged",
-                                        ),
+                                        CowStr::new_static("Type of event being logged"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "feedContext",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#feedContext"),
+                                SmolStr::new_static("feedContext"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#feedContext"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "gameCardData",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#gameCardData",
-                                    ),
+                                SmolStr::new_static("gameCardData"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#gameCardData"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "gameCardId",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("gameCardId"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Unique ID of the game card this event relates to",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "itemUsageData",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#itemUsageData",
-                                    ),
+                                SmolStr::new_static("itemUsageData"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#itemUsageData"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "metadata",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#metadata"),
+                                SmolStr::new_static("metadata"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#metadata"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "parentLogUri",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("parentLogUri"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "URI of the parent log record that triggered this event",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "rootLogUri",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("rootLogUri"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "URI of the root log record in this event chain",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sessionId",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("sessionId"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Unique session identifier to group related events",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(64usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sessionUri",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("sessionUri"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "URI of the session record this event belongs to (at://did/collection/rkey)",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "timestamp",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("timestamp"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "When the event occurred (ISO 8601)",
-                                        ),
+                                        CowStr::new_static("When the event occurred (ISO 8601)"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("metadata"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("metadata"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Additional event-specific metadata",
-                        ),
+                        CowStr::new_static("Additional event-specific metadata"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "clientVersion",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("clientVersion"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Version of the client application",
-                                    ),
+                                    CowStr::new_static("Version of the client application"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "networkLatency",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("networkLatency"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "performanceTimings",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
-                                description: None,
+                            SmolStr::new_static("performanceTimings"),
+                            LexObjectProperty::Unknown(LexUnknown {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "platform",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("platform"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Platform (web, mobile, etc.)",
-                                    ),
+                                    CowStr::new_static("Platform (web, mobile, etc.)"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("rewardItem"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Item received as a reward",
-                        ),
-                    ),
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("rewardItem"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Item received as a reward")),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "itemId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("itemId"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "quantity",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("quantity"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "rarity",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("rarity"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1688,26 +1148,24 @@ pub mod log_state {
 
 /// Builder for constructing an instance of this type
 pub struct LogBuilder<'a, S: log_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::net_anisota::beta::game::log::CollectionData<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<
-            crate::net_anisota::beta::game::log::DailyRewardsData<'a>,
-        >,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::net_anisota::beta::game::log::FeedContext<'a>>,
-        ::core::option::Option<crate::net_anisota::beta::game::log::GameCardData<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::net_anisota::beta::game::log::ItemUsageData<'a>>,
-        ::core::option::Option<crate::net_anisota::beta::game::log::Metadata<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<log::CollectionData<'a>>,
+        Option<Datetime>,
+        Option<log::DailyRewardsData<'a>>,
+        Option<CowStr<'a>>,
+        Option<log::FeedContext<'a>>,
+        Option<log::GameCardData<'a>>,
+        Option<CowStr<'a>>,
+        Option<log::ItemUsageData<'a>>,
+        Option<log::Metadata<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Log<'a> {
@@ -1721,7 +1179,7 @@ impl<'a> LogBuilder<'a, log_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LogBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -1738,7 +1196,7 @@ impl<'a> LogBuilder<'a, log_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1747,7 +1205,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `collectionData` field (optional)
     pub fn collection_data(
         mut self,
-        value: impl Into<Option<crate::net_anisota::beta::game::log::CollectionData<'a>>>,
+        value: impl Into<Option<log::CollectionData<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -1755,7 +1213,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `collectionData` field to an Option value (optional)
     pub fn maybe_collection_data(
         mut self,
-        value: Option<crate::net_anisota::beta::game::log::CollectionData<'a>>,
+        value: Option<log::CollectionData<'a>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
@@ -1764,18 +1222,12 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
 
 impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
-    pub fn created_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
-    pub fn maybe_created_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -1785,9 +1237,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `dailyRewardsData` field (optional)
     pub fn daily_rewards_data(
         mut self,
-        value: impl Into<
-            Option<crate::net_anisota::beta::game::log::DailyRewardsData<'a>>,
-        >,
+        value: impl Into<Option<log::DailyRewardsData<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -1795,7 +1245,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `dailyRewardsData` field to an Option value (optional)
     pub fn maybe_daily_rewards_data(
         mut self,
-        value: Option<crate::net_anisota::beta::game::log::DailyRewardsData<'a>>,
+        value: Option<log::DailyRewardsData<'a>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
@@ -1810,13 +1260,13 @@ where
     /// Set the `eventType` field (required)
     pub fn event_type(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> LogBuilder<'a, log_state::SetEventType<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         LogBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1825,16 +1275,13 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `feedContext` field (optional)
     pub fn feed_context(
         mut self,
-        value: impl Into<Option<crate::net_anisota::beta::game::log::FeedContext<'a>>>,
+        value: impl Into<Option<log::FeedContext<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `feedContext` field to an Option value (optional)
-    pub fn maybe_feed_context(
-        mut self,
-        value: Option<crate::net_anisota::beta::game::log::FeedContext<'a>>,
-    ) -> Self {
+    pub fn maybe_feed_context(mut self, value: Option<log::FeedContext<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -1844,16 +1291,13 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `gameCardData` field (optional)
     pub fn game_card_data(
         mut self,
-        value: impl Into<Option<crate::net_anisota::beta::game::log::GameCardData<'a>>>,
+        value: impl Into<Option<log::GameCardData<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `gameCardData` field to an Option value (optional)
-    pub fn maybe_game_card_data(
-        mut self,
-        value: Option<crate::net_anisota::beta::game::log::GameCardData<'a>>,
-    ) -> Self {
+    pub fn maybe_game_card_data(mut self, value: Option<log::GameCardData<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -1861,18 +1305,12 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
 
 impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `gameCardId` field (optional)
-    pub fn game_card_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn game_card_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `gameCardId` field to an Option value (optional)
-    pub fn maybe_game_card_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_game_card_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -1882,7 +1320,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `itemUsageData` field (optional)
     pub fn item_usage_data(
         mut self,
-        value: impl Into<Option<crate::net_anisota::beta::game::log::ItemUsageData<'a>>>,
+        value: impl Into<Option<log::ItemUsageData<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
@@ -1890,7 +1328,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `itemUsageData` field to an Option value (optional)
     pub fn maybe_item_usage_data(
         mut self,
-        value: Option<crate::net_anisota::beta::game::log::ItemUsageData<'a>>,
+        value: Option<log::ItemUsageData<'a>>,
     ) -> Self {
         self.__unsafe_private_named.7 = value;
         self
@@ -1899,18 +1337,12 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
 
 impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `metadata` field (optional)
-    pub fn metadata(
-        mut self,
-        value: impl Into<Option<crate::net_anisota::beta::game::log::Metadata<'a>>>,
-    ) -> Self {
+    pub fn metadata(mut self, value: impl Into<Option<log::Metadata<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
-    pub fn maybe_metadata(
-        mut self,
-        value: Option<crate::net_anisota::beta::game::log::Metadata<'a>>,
-    ) -> Self {
+    pub fn maybe_metadata(mut self, value: Option<log::Metadata<'a>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -1918,18 +1350,12 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
 
 impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `parentLogUri` field (optional)
-    pub fn parent_log_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn parent_log_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `parentLogUri` field to an Option value (optional)
-    pub fn maybe_parent_log_uri(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_parent_log_uri(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -1937,18 +1363,12 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
 
 impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `rootLogUri` field (optional)
-    pub fn root_log_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn root_log_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `rootLogUri` field to an Option value (optional)
-    pub fn maybe_root_log_uri(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_root_log_uri(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -1962,31 +1382,25 @@ where
     /// Set the `sessionId` field (required)
     pub fn session_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> LogBuilder<'a, log_state::SetSessionId<S>> {
-        self.__unsafe_private_named.11 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.11 = Option::Some(value.into());
         LogBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `sessionUri` field (optional)
-    pub fn session_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn session_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `sessionUri` field to an Option value (optional)
-    pub fn maybe_session_uri(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_session_uri(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.12 = value;
         self
     }
@@ -2000,13 +1414,13 @@ where
     /// Set the `timestamp` field (required)
     pub fn timestamp(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> LogBuilder<'a, log_state::SetTimestamp<S>> {
-        self.__unsafe_private_named.13 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.13 = Option::Some(value.into());
         LogBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2041,10 +1455,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Log<'a> {
         Log {
             collection_data: self.__unsafe_private_named.0,

@@ -5,12 +5,14 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use jacquard_common::CowStr;
 /// Extra feed type for Klearsky. Used as an extension in app.bsky.actor.defs#savedFeedsPrefV2 items.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ExtraFeed<'a> {
     Trending,
     Globalline,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ExtraFeed<'a> {
@@ -28,7 +30,7 @@ impl<'a> From<&'a str> for ExtraFeed<'a> {
         match s {
             "trending" => Self::Trending,
             "globalline" => Self::Globalline,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -38,7 +40,7 @@ impl<'a> From<String> for ExtraFeed<'a> {
         match s.as_str() {
             "trending" => Self::Trending,
             "globalline" => Self::Globalline,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }

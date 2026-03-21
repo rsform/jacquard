@@ -5,44 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::song::SongViewDetailed;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DislikeSong<'a> {
     ///The unique identifier of the song to dislike
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: Option<AtUri<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DislikeSongOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::song::SongViewDetailed<'a>,
+    pub value: SongViewDetailed<'a>,
 }
 
-/// Response type for
-///app.rocksky.like.dislikeSong
+/// Response type for app.rocksky.like.dislikeSong
 pub struct DislikeSongResponse;
 impl jacquard_common::xrpc::XrpcResp for DislikeSongResponse {
     const NSID: &'static str = "app.rocksky.like.dislikeSong";
@@ -59,8 +49,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DislikeSong<'a> {
     type Response = DislikeSongResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.like.dislikeSong
+/// Endpoint type for app.rocksky.like.dislikeSong
 pub struct DislikeSongRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DislikeSongRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.like.dislikeSong";

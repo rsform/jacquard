@@ -5,63 +5,52 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::games_firehose::barklesheep::place_sheeps;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PlaceSheeps<'a> {
     #[serde(borrow)]
-    pub game_id: jacquard_common::CowStr<'a>,
+    pub game_id: CowStr<'a>,
     #[serde(borrow)]
-    pub sheeps: Vec<
-        crate::games_firehose::barklesheep::place_sheeps::SheepPlacement<'a>,
-    >,
+    pub sheeps: Vec<place_sheeps::SheepPlacement<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct PlaceSheepsOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub success: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub success: Option<bool>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SheepPlacement<'a> {
     pub horizontal: bool,
     pub start: i64,
     #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
+    pub r#type: CowStr<'a>,
 }
 
-/// Response type for
-///games.firehose.barklesheep.placeSheeps
+/// Response type for games.firehose.barklesheep.placeSheeps
 pub struct PlaceSheepsResponse;
 impl jacquard_common::xrpc::XrpcResp for PlaceSheepsResponse {
     const NSID: &'static str = "games.firehose.barklesheep.placeSheeps";
@@ -78,8 +67,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PlaceSheeps<'a> {
     type Response = PlaceSheepsResponse;
 }
 
-/// Endpoint type for
-///games.firehose.barklesheep.placeSheeps
+/// Endpoint type for games.firehose.barklesheep.placeSheeps
 pub struct PlaceSheepsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PlaceSheepsRequest {
     const PATH: &'static str = "/xrpc/games.firehose.barklesheep.placeSheeps";
@@ -90,19 +78,17 @@ impl jacquard_common::xrpc::XrpcEndpoint for PlaceSheepsRequest {
     type Response = PlaceSheepsResponse;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for SheepPlacement<'a> {
+impl<'a> LexiconSchema for SheepPlacement<'a> {
     fn nsid() -> &'static str {
         "games.firehose.barklesheep.placeSheeps"
     }
     fn def_name() -> &'static str {
         "sheepPlacement"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_games_firehose_barklesheep_placeSheeps()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -153,14 +139,12 @@ pub mod place_sheeps_state {
 
 /// Builder for constructing an instance of this type
 pub struct PlaceSheepsBuilder<'a, S: place_sheeps_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<
-            Vec<crate::games_firehose::barklesheep::place_sheeps::SheepPlacement<'a>>,
-        >,
+        Option<CowStr<'a>>,
+        Option<Vec<place_sheeps::SheepPlacement<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> PlaceSheeps<'a> {
@@ -174,9 +158,9 @@ impl<'a> PlaceSheepsBuilder<'a, place_sheeps_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PlaceSheepsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -189,13 +173,13 @@ where
     /// Set the `gameId` field (required)
     pub fn game_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> PlaceSheepsBuilder<'a, place_sheeps_state::SetGameId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PlaceSheepsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -208,15 +192,13 @@ where
     /// Set the `sheeps` field (required)
     pub fn sheeps(
         mut self,
-        value: impl Into<
-            Vec<crate::games_firehose::barklesheep::place_sheeps::SheepPlacement<'a>>,
-        >,
+        value: impl Into<Vec<place_sheeps::SheepPlacement<'a>>>,
     ) -> PlaceSheepsBuilder<'a, place_sheeps_state::SetSheeps<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         PlaceSheepsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -238,7 +220,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -261,49 +243,49 @@ pub mod sheep_placement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Horizontal;
         type Type;
+        type Horizontal;
         type Start;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Horizontal = Unset;
         type Type = Unset;
+        type Horizontal = Unset;
         type Start = Unset;
-    }
-    ///State transition - sets the `horizontal` field to Set
-    pub struct SetHorizontal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHorizontal<S> {}
-    impl<S: State> State for SetHorizontal<S> {
-        type Horizontal = Set<members::horizontal>;
-        type Type = S::Type;
-        type Start = S::Start;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Horizontal = S::Horizontal;
         type Type = Set<members::r#type>;
+        type Horizontal = S::Horizontal;
+        type Start = S::Start;
+    }
+    ///State transition - sets the `horizontal` field to Set
+    pub struct SetHorizontal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHorizontal<S> {}
+    impl<S: State> State for SetHorizontal<S> {
+        type Type = S::Type;
+        type Horizontal = Set<members::horizontal>;
         type Start = S::Start;
     }
     ///State transition - sets the `start` field to Set
     pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStart<S> {}
     impl<S: State> State for SetStart<S> {
-        type Horizontal = S::Horizontal;
         type Type = S::Type;
+        type Horizontal = S::Horizontal;
         type Start = Set<members::start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `horizontal` field
-        pub struct horizontal(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `horizontal` field
+        pub struct horizontal(());
         ///Marker type for the `start` field
         pub struct start(());
     }
@@ -311,13 +293,9 @@ pub mod sheep_placement_state {
 
 /// Builder for constructing an instance of this type
 pub struct SheepPlacementBuilder<'a, S: sheep_placement_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<bool>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<bool>, Option<i64>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SheepPlacement<'a> {
@@ -331,9 +309,9 @@ impl<'a> SheepPlacementBuilder<'a, sheep_placement_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SheepPlacementBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -348,11 +326,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> SheepPlacementBuilder<'a, sheep_placement_state::SetHorizontal<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SheepPlacementBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -367,11 +345,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SheepPlacementBuilder<'a, sheep_placement_state::SetStart<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         SheepPlacementBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -384,13 +362,13 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SheepPlacementBuilder<'a, sheep_placement_state::SetType<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         SheepPlacementBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -398,8 +376,8 @@ where
 impl<'a, S> SheepPlacementBuilder<'a, S>
 where
     S: sheep_placement_state::State,
-    S::Horizontal: sheep_placement_state::IsSet,
     S::Type: sheep_placement_state::IsSet,
+    S::Horizontal: sheep_placement_state::IsSet,
     S::Start: sheep_placement_state::IsSet,
 {
     /// Build the final struct
@@ -414,7 +392,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -428,143 +406,92 @@ where
     }
 }
 
-fn lexicon_doc_games_firehose_barklesheep_placeSheeps() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "games.firehose.barklesheep.placeSheeps",
-        ),
-        revision: None,
-        description: None,
+fn lexicon_doc_games_firehose_barklesheep_placeSheeps() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("games.firehose.barklesheep.placeSheeps"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
-                    description: None,
-                    parameters: None,
-                    input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
-                        description: None,
-                        encoding: ::jacquard_common::CowStr::new_static(
-                            "application/json",
-                        ),
+                SmolStr::new_static("main"),
+                LexUserType::XrpcProcedure(LexXrpcProcedure {
+                    input: Some(LexXrpcBody {
+                        encoding: CowStr::new_static("application/json"),
                         schema: Some(
-                            ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
-                                description: None,
+                            LexXrpcBodySchema::Object(LexObject {
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("gameId"),
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("sheeps")
+                                        SmolStr::new_static("gameId"), SmolStr::new_static("sheeps")
                                     ],
                                 ),
-                                nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
-                                    let mut map = ::alloc::collections::BTreeMap::new();
+                                    let mut map = BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "gameId",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
-                                            format: None,
-                                            default: None,
-                                            min_length: None,
-                                            max_length: None,
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                        SmolStr::new_static("gameId"),
+                                        LexObjectProperty::String(LexString {
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "sheeps",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                            description: None,
-                                            items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                                description: None,
-                                                r#ref: ::jacquard_common::CowStr::new_static(
-                                                    "#sheepPlacement",
-                                                ),
+                                        SmolStr::new_static("sheeps"),
+                                        LexObjectProperty::Array(LexArray {
+                                            items: LexArrayItem::Ref(LexRef {
+                                                r#ref: CowStr::new_static("#sheepPlacement"),
+                                                ..Default::default()
                                             }),
-                                            min_length: None,
-                                            max_length: None,
+                                            ..Default::default()
                                         }),
                                     );
                                     map
                                 },
+                                ..Default::default()
                             }),
                         ),
+                        ..Default::default()
                     }),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("sheepPlacement"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("sheepPlacement"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("start"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("horizontal")
+                            SmolStr::new_static("type"), SmolStr::new_static("start"),
+                            SmolStr::new_static("horizontal")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "horizontal",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("horizontal"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "start",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("start"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

@@ -5,47 +5,38 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::GameFeedViewItem;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetHotGamesFeed<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetHotGamesFeedOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub feed: Vec<crate::games_gamesgamesgamesgames::GameFeedViewItem<'a>>,
+    pub feed: Vec<GameFeedViewItem<'a>>,
 }
 
-/// Response type for
-///games.gamesgamesgamesgames.feed.getHotGamesFeed
+/// Response type for games.gamesgamesgamesgames.feed.getHotGamesFeed
 pub struct GetHotGamesFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetHotGamesFeedResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.getHotGamesFeed";
@@ -60,8 +51,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetHotGamesFeed<'a> {
     type Response = GetHotGamesFeedResponse;
 }
 
-/// Endpoint type for
-///games.gamesgamesgamesgames.feed.getHotGamesFeed
+/// Endpoint type for games.gamesgamesgamesgames.feed.getHotGamesFeed
 pub struct GetHotGamesFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetHotGamesFeedRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.getHotGamesFeed";
@@ -70,7 +60,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetHotGamesFeedRequest {
     type Response = GetHotGamesFeedResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
@@ -95,12 +85,9 @@ pub mod get_hot_games_feed_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetHotGamesFeedBuilder<'a, S: get_hot_games_feed_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetHotGamesFeed<'a> {
@@ -114,24 +101,21 @@ impl<'a> GetHotGamesFeedBuilder<'a, get_hot_games_feed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetHotGamesFeedBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_hot_games_feed_state::State> GetHotGamesFeedBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }

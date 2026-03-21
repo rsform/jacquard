@@ -5,66 +5,77 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// User preferences and settings for BeaconBits
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
     ///Who can tag this user in beacons
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub allow_tags: core::option::Option<ProfileAllowTags<'a>>,
+    pub allow_tags: Option<ProfileAllowTags<'a>>,
     ///Timestamp when settings were first created
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<Datetime>,
     ///Default delayed reveal setting for new beacons
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub default_delayed_reveal: core::option::Option<ProfileDefaultDelayedReveal<'a>>,
+    pub default_delayed_reveal: Option<ProfileDefaultDelayedReveal<'a>>,
     ///Default visibility for new beacons
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub default_visibility: core::option::Option<ProfileDefaultVisibility<'a>>,
+    pub default_visibility: Option<ProfileDefaultVisibility<'a>>,
     ///Preferred distance unit
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub distance_unit: core::option::Option<ProfileDistanceUnit<'a>>,
-    ///Whether to hide past beacons from public view Defaults to `false`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub distance_unit: Option<ProfileDistanceUnit<'a>>,
+    ///Whether to hide past beacons from public view  Defaults to `false`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_profile_hide_past_beacons")]
-    pub hide_past_beacons: core::option::Option<bool>,
+    pub hide_past_beacons: Option<bool>,
     ///Preferred language setting
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub language: core::option::Option<ProfileLanguage<'a>>,
+    pub language: Option<ProfileLanguage<'a>>,
     ///Hex color code for map marker (e.g., #e24630)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub marker_color: core::option::Option<jacquard_common::CowStr<'a>>,
-    ///Whether to include beacon links in Bluesky posts Defaults to `true`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub marker_color: Option<CowStr<'a>>,
+    ///Whether to include beacon links in Bluesky posts  Defaults to `true`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_profile_post_beacon_links")]
-    pub post_beacon_links: core::option::Option<bool>,
+    pub post_beacon_links: Option<bool>,
     ///Timestamp when settings were last updated
-    pub updated_at: jacquard_common::types::string::Datetime,
+    pub updated_at: Datetime,
 }
 
 /// Who can tag this user in beacons
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProfileAllowTags<'a> {
     All,
     Followers,
     Mutuals,
     None,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ProfileAllowTags<'a> {
@@ -86,7 +97,7 @@ impl<'a> From<&'a str> for ProfileAllowTags<'a> {
             "followers" => Self::Followers,
             "mutuals" => Self::Mutuals,
             "none" => Self::None,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -98,7 +109,7 @@ impl<'a> From<String> for ProfileAllowTags<'a> {
             "followers" => Self::Followers,
             "mutuals" => Self::Mutuals,
             "none" => Self::None,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -157,13 +168,14 @@ impl jacquard_common::IntoStatic for ProfileAllowTags<'_> {
 }
 
 /// Default delayed reveal setting for new beacons
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProfileDefaultDelayedReveal<'a> {
     None,
     _1h,
     _1d,
     Custom,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ProfileDefaultDelayedReveal<'a> {
@@ -185,7 +197,7 @@ impl<'a> From<&'a str> for ProfileDefaultDelayedReveal<'a> {
             "1h" => Self::_1h,
             "1d" => Self::_1d,
             "custom" => Self::Custom,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -197,7 +209,7 @@ impl<'a> From<String> for ProfileDefaultDelayedReveal<'a> {
             "1h" => Self::_1h,
             "1d" => Self::_1d,
             "custom" => Self::Custom,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -258,13 +270,14 @@ impl jacquard_common::IntoStatic for ProfileDefaultDelayedReveal<'_> {
 }
 
 /// Default visibility for new beacons
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProfileDefaultVisibility<'a> {
     Public,
     Followers,
     Mutuals,
     Hidden,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ProfileDefaultVisibility<'a> {
@@ -286,7 +299,7 @@ impl<'a> From<&'a str> for ProfileDefaultVisibility<'a> {
             "followers" => Self::Followers,
             "mutuals" => Self::Mutuals,
             "hidden" => Self::Hidden,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -298,7 +311,7 @@ impl<'a> From<String> for ProfileDefaultVisibility<'a> {
             "followers" => Self::Followers,
             "mutuals" => Self::Mutuals,
             "hidden" => Self::Hidden,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -359,11 +372,12 @@ impl jacquard_common::IntoStatic for ProfileDefaultVisibility<'_> {
 }
 
 /// Preferred distance unit
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProfileDistanceUnit<'a> {
     Km,
     Miles,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ProfileDistanceUnit<'a> {
@@ -381,7 +395,7 @@ impl<'a> From<&'a str> for ProfileDistanceUnit<'a> {
         match s {
             "km" => Self::Km,
             "miles" => Self::Miles,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -391,7 +405,7 @@ impl<'a> From<String> for ProfileDistanceUnit<'a> {
         match s.as_str() {
             "km" => Self::Km,
             "miles" => Self::Miles,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -448,6 +462,7 @@ impl jacquard_common::IntoStatic for ProfileDistanceUnit<'_> {
 }
 
 /// Preferred language setting
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProfileLanguage<'a> {
     Auto,
@@ -459,7 +474,7 @@ pub enum ProfileLanguage<'a> {
     Ja,
     ZhHans,
     Ko,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ProfileLanguage<'a> {
@@ -491,7 +506,7 @@ impl<'a> From<&'a str> for ProfileLanguage<'a> {
             "ja" => Self::Ja,
             "zh-Hans" => Self::ZhHans,
             "ko" => Self::Ko,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -508,7 +523,7 @@ impl<'a> From<String> for ProfileLanguage<'a> {
             "ja" => Self::Ja,
             "zh-Hans" => Self::ZhHans,
             "ko" => Self::Ko,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -572,47 +587,36 @@ impl jacquard_common::IntoStatic for ProfileLanguage<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Profile<'a>,
 }
 
 impl<'a> Profile<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ProfileRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ProfileRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ProfileRecord;
-impl jacquard_common::xrpc::XrpcResp for ProfileRecord {
+impl XrpcResp for ProfileRecord {
     const NSID: &'static str = "app.beaconbits.profile";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ProfileGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ProfileGetRecordOutput<'_>> for Profile<'_> {
@@ -622,41 +626,33 @@ impl From<ProfileGetRecordOutput<'_>> for Profile<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Profile<'_> {
+impl Collection for Profile<'_> {
     const NSID: &'static str = "app.beaconbits.profile";
     type Record = ProfileRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ProfileRecord {
+impl Collection for ProfileRecord {
     const NSID: &'static str = "app.beaconbits.profile";
     type Record = ProfileRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
+impl<'a> LexiconSchema for Profile<'a> {
     fn nsid() -> &'static str {
         "app.beaconbits.profile"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_beaconbits_profile()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.allow_tags {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 32usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "allow_tags",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("allow_tags"),
                         max: 32usize,
                         actual: count,
                     });
@@ -665,16 +661,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
         }
         if let Some(ref value) = self.default_delayed_reveal {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 16usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "default_delayed_reveal",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("default_delayed_reveal"),
                         max: 16usize,
                         actual: count,
                     });
@@ -683,16 +673,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
         }
         if let Some(ref value) = self.default_visibility {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 32usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "default_visibility",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("default_visibility"),
                         max: 32usize,
                         actual: count,
                     });
@@ -701,16 +685,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
         }
         if let Some(ref value) = self.distance_unit {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 16usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "distance_unit",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("distance_unit"),
                         max: 16usize,
                         actual: count,
                     });
@@ -719,16 +697,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
         }
         if let Some(ref value) = self.language {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 16usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "language",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("language"),
                         max: 16usize,
                         actual: count,
                     });
@@ -737,16 +709,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
         }
         if let Some(ref value) = self.marker_color {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 7usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "marker_color",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("marker_color"),
                         max: 7usize,
                         actual: count,
                     });
@@ -757,11 +723,11 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     }
 }
 
-fn _default_profile_hide_past_beacons() -> core::option::Option<bool> {
+fn _default_profile_hide_past_beacons() -> Option<bool> {
     Some(false)
 }
 
-fn _default_profile_post_beacon_links() -> core::option::Option<bool> {
+fn _default_profile_post_beacon_links() -> Option<bool> {
     Some(true)
 }
 
@@ -799,20 +765,20 @@ pub mod profile_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProfileBuilder<'a, S: profile_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<ProfileAllowTags<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<ProfileDefaultDelayedReveal<'a>>,
-        ::core::option::Option<ProfileDefaultVisibility<'a>>,
-        ::core::option::Option<ProfileDistanceUnit<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<ProfileLanguage<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<ProfileAllowTags<'a>>,
+        Option<Datetime>,
+        Option<ProfileDefaultDelayedReveal<'a>>,
+        Option<ProfileDefaultVisibility<'a>>,
+        Option<ProfileDistanceUnit<'a>>,
+        Option<bool>,
+        Option<ProfileLanguage<'a>>,
+        Option<CowStr<'a>>,
+        Option<bool>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Profile<'a> {
@@ -826,7 +792,7 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -839,7 +805,7 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -859,18 +825,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
-    pub fn created_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
-    pub fn maybe_created_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -961,18 +921,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `markerColor` field (optional)
-    pub fn marker_color(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn marker_color(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `markerColor` field to an Option value (optional)
-    pub fn maybe_marker_color(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_marker_color(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -999,13 +953,13 @@ where
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ProfileBuilder<'a, profile_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         ProfileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1034,7 +988,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1055,234 +1009,139 @@ where
     }
 }
 
-fn lexicon_doc_app_beaconbits_profile() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.beaconbits.profile"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_beaconbits_profile() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.beaconbits.profile"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "User preferences and settings for BeaconBits",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
-                            ],
-                        ),
-                        nullable: None,
+                    key: Some(CowStr::new_static("literal:self")),
+                    record: LexRecordRecord::Object(LexObject {
+                        required: Some(vec![SmolStr::new_static("updatedAt")]),
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "allowTags",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("allowTags"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Who can tag this user in beacons",
-                                        ),
+                                        CowStr::new_static("Who can tag this user in beacons"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(32usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp when settings were first created",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "defaultDelayedReveal",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("defaultDelayedReveal"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Default delayed reveal setting for new beacons",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(16usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "defaultVisibility",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("defaultVisibility"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Default visibility for new beacons",
-                                        ),
+                                        CowStr::new_static("Default visibility for new beacons"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(32usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "distanceUnit",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("distanceUnit"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Preferred distance unit",
-                                        ),
+                                        CowStr::new_static("Preferred distance unit"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(16usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "hidePastBeacons",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
+                                SmolStr::new_static("hidePastBeacons"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "language",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("language"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Preferred language setting",
-                                        ),
+                                        CowStr::new_static("Preferred language setting"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(16usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "markerColor",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("markerColor"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Hex color code for map marker (e.g., #e24630)",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
                                     max_graphemes: Some(7usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "postBeaconLinks",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
+                                SmolStr::new_static("postBeaconLinks"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "updatedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("updatedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp when settings were last updated",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

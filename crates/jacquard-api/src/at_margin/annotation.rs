@@ -5,155 +5,137 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::label::SelfLabels;
+use crate::at_margin::annotation;
 /// Annotation body - the content of the annotation
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Body<'a> {
-    ///MIME type of the body content Defaults to `"text/plain"`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    ///MIME type of the body content  Defaults to `"text/plain"`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_body_format")]
     #[serde(borrow)]
-    pub format: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub format: Option<CowStr<'a>>,
     ///BCP47 language tag
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub language: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub language: Option<CowStr<'a>>,
     ///Reference to external body content
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub uri: Option<UriValue<'a>>,
     ///Text content of the annotation
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub value: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub value: Option<CowStr<'a>>,
 }
 
 /// W3C CssSelector - select DOM elements by CSS selector
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CssSelector<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#type: Option<CowStr<'a>>,
     ///CSS selector string
     #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
+    pub value: CowStr<'a>,
 }
 
 /// W3C FragmentSelector - select by URI fragment
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct FragmentSelector<'a> {
     ///Specification the fragment conforms to
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub conforms_to: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub conforms_to: Option<UriValue<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#type: Option<CowStr<'a>>,
     ///Fragment identifier value
     #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
+    pub value: CowStr<'a>,
 }
 
 /// The client/agent that created this record
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Generator<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub homepage: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub homepage: Option<UriValue<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub id: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub id: Option<UriValue<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: Option<CowStr<'a>>,
 }
 
 /// A W3C-compliant web annotation stored on the AT Protocol
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Annotation<'a> {
     ///The annotation content (text or reference)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub body: core::option::Option<crate::at_margin::annotation::Body<'a>>,
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub body: Option<annotation::Body<'a>>,
+    pub created_at: Datetime,
     ///The client/agent that created this record
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub generator: core::option::Option<crate::at_margin::annotation::Generator<'a>>,
+    pub generator: Option<annotation::Generator<'a>>,
     ///Self-applied content labels for this annotation
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub labels: core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: Option<SelfLabels<'a>>,
     ///W3C motivation for the annotation
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub motivation: core::option::Option<AnnotationMotivation<'a>>,
+    pub motivation: Option<AnnotationMotivation<'a>>,
     ///License URI (e.g., https://creativecommons.org/licenses/by/4.0/)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub rights: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub rights: Option<UriValue<'a>>,
     ///Tags for categorization
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: Option<Vec<CowStr<'a>>>,
     ///The resource being annotated with optional selector
     #[serde(borrow)]
-    pub target: crate::at_margin::annotation::Target<'a>,
+    pub target: annotation::Target<'a>,
 }
 
 /// W3C motivation for the annotation
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AnnotationMotivation<'a> {
     Commenting,
@@ -166,7 +148,7 @@ pub enum AnnotationMotivation<'a> {
     Editing,
     Questioning,
     Assessing,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> AnnotationMotivation<'a> {
@@ -200,7 +182,7 @@ impl<'a> From<&'a str> for AnnotationMotivation<'a> {
             "editing" => Self::Editing,
             "questioning" => Self::Questioning,
             "assessing" => Self::Assessing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -218,7 +200,7 @@ impl<'a> From<String> for AnnotationMotivation<'a> {
             "editing" => Self::Editing,
             "questioning" => Self::Questioning,
             "assessing" => Self::Assessing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -285,37 +267,23 @@ impl jacquard_common::IntoStatic for AnnotationMotivation<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct AnnotationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Annotation<'a>,
 }
 
 /// W3C RangeSelector - select range between two selectors
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RangeSelector<'a> {
     ///Selector for range end
@@ -324,248 +292,180 @@ pub struct RangeSelector<'a> {
     ///Selector for range start
     #[serde(borrow)]
     pub start_selector: RangeSelectorStartSelector<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#type: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RangeSelectorEndSelector<'a> {
     #[serde(rename = "at.margin.annotation#textQuoteSelector")]
-    TextQuoteSelector(Box<crate::at_margin::annotation::TextQuoteSelector<'a>>),
+    TextQuoteSelector(Box<annotation::TextQuoteSelector<'a>>),
     #[serde(rename = "at.margin.annotation#textPositionSelector")]
-    TextPositionSelector(Box<crate::at_margin::annotation::TextPositionSelector<'a>>),
+    TextPositionSelector(Box<annotation::TextPositionSelector<'a>>),
     #[serde(rename = "at.margin.annotation#cssSelector")]
-    CssSelector(Box<crate::at_margin::annotation::CssSelector<'a>>),
+    CssSelector(Box<annotation::CssSelector<'a>>),
     #[serde(rename = "at.margin.annotation#xpathSelector")]
-    XpathSelector(Box<crate::at_margin::annotation::XpathSelector<'a>>),
+    XpathSelector(Box<annotation::XpathSelector<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RangeSelectorStartSelector<'a> {
     #[serde(rename = "at.margin.annotation#textQuoteSelector")]
-    TextQuoteSelector(Box<crate::at_margin::annotation::TextQuoteSelector<'a>>),
+    TextQuoteSelector(Box<annotation::TextQuoteSelector<'a>>),
     #[serde(rename = "at.margin.annotation#textPositionSelector")]
-    TextPositionSelector(Box<crate::at_margin::annotation::TextPositionSelector<'a>>),
+    TextPositionSelector(Box<annotation::TextPositionSelector<'a>>),
     #[serde(rename = "at.margin.annotation#cssSelector")]
-    CssSelector(Box<crate::at_margin::annotation::CssSelector<'a>>),
+    CssSelector(Box<annotation::CssSelector<'a>>),
     #[serde(rename = "at.margin.annotation#xpathSelector")]
-    XpathSelector(Box<crate::at_margin::annotation::XpathSelector<'a>>),
+    XpathSelector(Box<annotation::XpathSelector<'a>>),
 }
 
 /// W3C SpecificResource - the target with optional selector
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Target<'a> {
     ///Selector to identify the specific segment
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub selector: core::option::Option<TargetSelector<'a>>,
+    pub selector: Option<TargetSelector<'a>>,
     ///The URL being annotated
     #[serde(borrow)]
-    pub source: jacquard_common::types::string::UriValue<'a>,
+    pub source: UriValue<'a>,
     ///SHA256 hash of normalized URL for indexing
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub source_hash: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub source_hash: Option<CowStr<'a>>,
     ///State of the resource at annotation time
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub state: core::option::Option<crate::at_margin::annotation::TimeState<'a>>,
+    pub state: Option<annotation::TimeState<'a>>,
     ///Page title at time of annotation
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum TargetSelector<'a> {
     #[serde(rename = "at.margin.annotation#textQuoteSelector")]
-    TextQuoteSelector(Box<crate::at_margin::annotation::TextQuoteSelector<'a>>),
+    TextQuoteSelector(Box<annotation::TextQuoteSelector<'a>>),
     #[serde(rename = "at.margin.annotation#textPositionSelector")]
-    TextPositionSelector(Box<crate::at_margin::annotation::TextPositionSelector<'a>>),
+    TextPositionSelector(Box<annotation::TextPositionSelector<'a>>),
     #[serde(rename = "at.margin.annotation#cssSelector")]
-    CssSelector(Box<crate::at_margin::annotation::CssSelector<'a>>),
+    CssSelector(Box<annotation::CssSelector<'a>>),
     #[serde(rename = "at.margin.annotation#xpathSelector")]
-    XpathSelector(Box<crate::at_margin::annotation::XpathSelector<'a>>),
+    XpathSelector(Box<annotation::XpathSelector<'a>>),
     #[serde(rename = "at.margin.annotation#fragmentSelector")]
-    FragmentSelector(Box<crate::at_margin::annotation::FragmentSelector<'a>>),
+    FragmentSelector(Box<annotation::FragmentSelector<'a>>),
     #[serde(rename = "at.margin.annotation#rangeSelector")]
-    RangeSelector(Box<crate::at_margin::annotation::RangeSelector<'a>>),
+    RangeSelector(Box<annotation::RangeSelector<'a>>),
 }
 
 /// W3C TextPositionSelector - select by character offsets
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct TextPositionSelector<'a> {
     ///Ending character position (exclusive)
     pub end: i64,
     ///Starting character position (0-indexed, inclusive)
     pub start: i64,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#type: Option<CowStr<'a>>,
 }
 
 /// W3C TextQuoteSelector - select text by quoting it with context
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct TextQuoteSelector<'a> {
     ///The exact text to match
     #[serde(borrow)]
-    pub exact: jacquard_common::CowStr<'a>,
+    pub exact: CowStr<'a>,
     ///Text immediately before the selection
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub prefix: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub prefix: Option<CowStr<'a>>,
     ///Text immediately after the selection
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub suffix: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub suffix: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#type: Option<CowStr<'a>>,
 }
 
 /// W3C TimeState - record when content was captured
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct TimeState<'a> {
     ///URL to cached/archived version
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cached: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub cached: Option<UriValue<'a>>,
     ///When the source was accessed
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub source_date: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_date: Option<Datetime>,
 }
 
 /// W3C XPathSelector - select by XPath expression
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct XpathSelector<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#type: Option<CowStr<'a>>,
     ///XPath expression
     #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
+    pub value: CowStr<'a>,
 }
 
 impl<'a> Annotation<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, AnnotationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, AnnotationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Body<'a> {
+impl<'a> LexiconSchema for Body<'a> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
     fn def_name() -> &'static str {
         "body"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_at_margin_annotation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.value {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "value",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("value"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -573,16 +473,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Body<'a> {
         }
         if let Some(ref value) = self.value {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 3000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "value",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("value"),
                         max: 3000usize,
                         actual: count,
                     });
@@ -593,27 +487,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Body<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CssSelector<'a> {
+impl<'a> LexiconSchema for CssSelector<'a> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
     fn def_name() -> &'static str {
         "cssSelector"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_at_margin_annotation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.value;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "value",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("value"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -623,27 +513,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CssSelector<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for FragmentSelector<'a> {
+impl<'a> LexiconSchema for FragmentSelector<'a> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
     fn def_name() -> &'static str {
         "fragmentSelector"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_at_margin_annotation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.value;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "value",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("value"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -653,31 +539,30 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for FragmentSelector<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Generator<'a> {
+impl<'a> LexiconSchema for Generator<'a> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
     fn def_name() -> &'static str {
         "generator"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_at_margin_annotation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct AnnotationRecord;
-impl jacquard_common::xrpc::XrpcResp for AnnotationRecord {
+impl XrpcResp for AnnotationRecord {
     const NSID: &'static str = "at.margin.annotation";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = AnnotationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<AnnotationGetRecordOutput<'_>> for Annotation<'_> {
@@ -687,36 +572,32 @@ impl From<AnnotationGetRecordOutput<'_>> for Annotation<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Annotation<'_> {
+impl Collection for Annotation<'_> {
     const NSID: &'static str = "at.margin.annotation";
     type Record = AnnotationRecord;
 }
 
-impl jacquard_common::types::collection::Collection for AnnotationRecord {
+impl Collection for AnnotationRecord {
     const NSID: &'static str = "at.margin.annotation";
     type Record = AnnotationRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Annotation<'a> {
+impl<'a> LexiconSchema for Annotation<'a> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_at_margin_annotation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.tags {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("tags"),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -726,43 +607,37 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Annotation<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for RangeSelector<'a> {
+impl<'a> LexiconSchema for RangeSelector<'a> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
     fn def_name() -> &'static str {
         "rangeSelector"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_at_margin_annotation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Target<'a> {
+impl<'a> LexiconSchema for Target<'a> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
     fn def_name() -> &'static str {
         "target"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_at_margin_annotation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.title {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("title"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -772,26 +647,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Target<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for TextPositionSelector<'a> {
+impl<'a> LexiconSchema for TextPositionSelector<'a> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
     fn def_name() -> &'static str {
         "textPositionSelector"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_at_margin_annotation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.end;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "end",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("end"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -800,10 +671,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TextPositionSelector<'a> {
         {
             let value = &self.start;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "start",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("start"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -813,27 +682,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TextPositionSelector<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for TextQuoteSelector<'a> {
+impl<'a> LexiconSchema for TextQuoteSelector<'a> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
     fn def_name() -> &'static str {
         "textQuoteSelector"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_at_margin_annotation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.exact;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "exact",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("exact"),
                     max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -842,16 +707,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TextQuoteSelector<'a> {
         {
             let value = &self.exact;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 1500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "exact",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("exact"),
                         max: 1500usize,
                         actual: count,
                     });
@@ -861,10 +720,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TextQuoteSelector<'a> {
         if let Some(ref value) = self.prefix {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "prefix",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("prefix"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -872,16 +729,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TextQuoteSelector<'a> {
         }
         if let Some(ref value) = self.prefix {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 150usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "prefix",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("prefix"),
                         max: 150usize,
                         actual: count,
                     });
@@ -891,10 +742,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TextQuoteSelector<'a> {
         if let Some(ref value) = self.suffix {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "suffix",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("suffix"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -902,16 +751,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TextQuoteSelector<'a> {
         }
         if let Some(ref value) = self.suffix {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 150usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "suffix",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("suffix"),
                         max: 150usize,
                         actual: count,
                     });
@@ -922,44 +765,38 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TextQuoteSelector<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for TimeState<'a> {
+impl<'a> LexiconSchema for TimeState<'a> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
     fn def_name() -> &'static str {
         "timeState"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_at_margin_annotation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for XpathSelector<'a> {
+impl<'a> LexiconSchema for XpathSelector<'a> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
     fn def_name() -> &'static str {
         "xpathSelector"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_at_margin_annotation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.value;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "value",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("value"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -969,14 +806,14 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for XpathSelector<'a> {
     }
 }
 
-fn _default_body_format() -> core::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("text/plain"))
+fn _default_body_format() -> Option<CowStr<'static>> {
+    Some(CowStr::from("text/plain"))
 }
 
 impl Default for Body<'_> {
     fn default() -> Self {
         Self {
-            format: Some(jacquard_common::CowStr::from("text/plain")),
+            format: Some(CowStr::from("text/plain")),
             language: None,
             uri: None,
             value: None,
@@ -985,964 +822,561 @@ impl Default for Body<'_> {
     }
 }
 
-fn lexicon_doc_at_margin_annotation() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("at.margin.annotation"),
-        revision: None,
-        description: None,
+fn lexicon_doc_at_margin_annotation() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("at.margin.annotation"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("body"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("body"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Annotation body - the content of the annotation",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "format",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("format"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "MIME type of the body content",
-                                    ),
+                                    CowStr::new_static("MIME type of the body content"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "language",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("BCP47 language tag"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("language"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("BCP47 language tag")),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Reference to external body content",
-                                    ),
+                                    CowStr::new_static("Reference to external body content"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "value",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("value"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Text content of the annotation",
-                                    ),
+                                    CowStr::new_static("Text content of the annotation"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(10000usize),
-                                min_graphemes: None,
                                 max_graphemes: Some(3000usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("cssSelector"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("cssSelector"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "W3C CssSelector - select DOM elements by CSS selector",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("value")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "value",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("value"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static("CSS selector string"),
+                                    CowStr::new_static("CSS selector string"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(2000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "fragmentSelector",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("fragmentSelector"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "W3C FragmentSelector - select by URI fragment",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("value")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "conformsTo",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("conformsTo"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Specification the fragment conforms to",
-                                    ),
+                                    CowStr::new_static("Specification the fragment conforms to"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "value",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("value"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Fragment identifier value",
-                                    ),
+                                    CowStr::new_static("Fragment identifier value"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(1000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("generator"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("generator"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "The client/agent that created this record",
-                        ),
+                        CowStr::new_static("The client/agent that created this record"),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "homepage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("homepage"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("id"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A W3C-compliant web annotation stored on the AT Protocol",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("target"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("target"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "body",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#body"),
+                                SmolStr::new_static("body"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#body"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "generator",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#generator"),
+                                SmolStr::new_static("generator"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#generator"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "labels",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("labels"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "com.atproto.label.defs#selfLabels",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "motivation",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("motivation"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "W3C motivation for the annotation",
-                                        ),
+                                        CowStr::new_static("W3C motivation for the annotation"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "rights",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("rights"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "License URI (e.g., https://creativecommons.org/licenses/by/4.0/)",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Uri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "tags",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("tags"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Tags for categorization",
-                                        ),
+                                        CowStr::new_static("Tags for categorization"),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
+                                    items: LexArrayItem::String(LexString {
                                         max_length: Some(64usize),
-                                        min_graphemes: None,
                                         max_graphemes: Some(32usize),
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(10usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "target",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#target"),
+                                SmolStr::new_static("target"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#target"),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("rangeSelector"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("rangeSelector"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "W3C RangeSelector - select range between two selectors",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("startSelector"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("endSelector")
+                            SmolStr::new_static("startSelector"),
+                            SmolStr::new_static("endSelector")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "endSelector",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                            SmolStr::new_static("endSelector"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Selector for range end",
-                                    ),
+                                    CowStr::new_static("Selector for range end"),
                                 ),
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("#textQuoteSelector"),
-                                    ::jacquard_common::CowStr::new_static("#textPositionSelector"),
-                                    ::jacquard_common::CowStr::new_static("#cssSelector"),
-                                    ::jacquard_common::CowStr::new_static("#xpathSelector")
+                                    CowStr::new_static("#textQuoteSelector"),
+                                    CowStr::new_static("#textPositionSelector"),
+                                    CowStr::new_static("#cssSelector"),
+                                    CowStr::new_static("#xpathSelector")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "startSelector",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                            SmolStr::new_static("startSelector"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Selector for range start",
-                                    ),
+                                    CowStr::new_static("Selector for range start"),
                                 ),
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("#textQuoteSelector"),
-                                    ::jacquard_common::CowStr::new_static("#textPositionSelector"),
-                                    ::jacquard_common::CowStr::new_static("#cssSelector"),
-                                    ::jacquard_common::CowStr::new_static("#xpathSelector")
+                                    CowStr::new_static("#textQuoteSelector"),
+                                    CowStr::new_static("#textPositionSelector"),
+                                    CowStr::new_static("#cssSelector"),
+                                    CowStr::new_static("#xpathSelector")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("target"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("target"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "W3C SpecificResource - the target with optional selector",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("source")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("source")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "selector",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                            SmolStr::new_static("selector"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Selector to identify the specific segment",
                                     ),
                                 ),
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("#textQuoteSelector"),
-                                    ::jacquard_common::CowStr::new_static("#textPositionSelector"),
-                                    ::jacquard_common::CowStr::new_static("#cssSelector"),
-                                    ::jacquard_common::CowStr::new_static("#xpathSelector"),
-                                    ::jacquard_common::CowStr::new_static("#fragmentSelector"),
-                                    ::jacquard_common::CowStr::new_static("#rangeSelector")
+                                    CowStr::new_static("#textQuoteSelector"),
+                                    CowStr::new_static("#textPositionSelector"),
+                                    CowStr::new_static("#cssSelector"),
+                                    CowStr::new_static("#xpathSelector"),
+                                    CowStr::new_static("#fragmentSelector"),
+                                    CowStr::new_static("#rangeSelector")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "source",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("source"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The URL being annotated",
-                                    ),
+                                    CowStr::new_static("The URL being annotated"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sourceHash",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("sourceHash"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "SHA256 hash of normalized URL for indexing",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "state",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#timeState"),
+                            SmolStr::new_static("state"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#timeState"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "title",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("title"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Page title at time of annotation",
-                                    ),
+                                    CowStr::new_static("Page title at time of annotation"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "textPositionSelector",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("textPositionSelector"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "W3C TextPositionSelector - select by character offsets",
                         ),
                     ),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("start"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("end")
-                        ],
+                        vec![SmolStr::new_static("start"), SmolStr::new_static("end")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "end",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("end"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "start",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("start"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "textQuoteSelector",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("textQuoteSelector"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "W3C TextQuoteSelector - select text by quoting it with context",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("exact")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("exact")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "exact",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("exact"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The exact text to match",
-                                    ),
+                                    CowStr::new_static("The exact text to match"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(5000usize),
-                                min_graphemes: None,
                                 max_graphemes: Some(1500usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "prefix",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("prefix"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Text immediately before the selection",
-                                    ),
+                                    CowStr::new_static("Text immediately before the selection"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
                                 max_graphemes: Some(150usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "suffix",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("suffix"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Text immediately after the selection",
-                                    ),
+                                    CowStr::new_static("Text immediately after the selection"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
                                 max_graphemes: Some(150usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("timeState"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("timeState"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "W3C TimeState - record when content was captured",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cached",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("cached"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "URL to cached/archived version",
-                                    ),
+                                    CowStr::new_static("URL to cached/archived version"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sourceDate",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("sourceDate"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "When the source was accessed",
-                                    ),
+                                    CowStr::new_static("When the source was accessed"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("xpathSelector"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("xpathSelector"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "W3C XPathSelector - select by XPath expression",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("value")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "value",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("XPath expression"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("value"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("XPath expression")),
                                 max_length: Some(2000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1992,18 +1426,18 @@ pub mod annotation_state {
 
 /// Builder for constructing an instance of this type
 pub struct AnnotationBuilder<'a, S: annotation_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::at_margin::annotation::Body<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::at_margin::annotation::Generator<'a>>,
-        ::core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
-        ::core::option::Option<AnnotationMotivation<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<crate::at_margin::annotation::Target<'a>>,
+        Option<annotation::Body<'a>>,
+        Option<Datetime>,
+        Option<annotation::Generator<'a>>,
+        Option<SelfLabels<'a>>,
+        Option<AnnotationMotivation<'a>>,
+        Option<UriValue<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<annotation::Target<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Annotation<'a> {
@@ -2017,27 +1451,21 @@ impl<'a> AnnotationBuilder<'a, annotation_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AnnotationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `body` field (optional)
-    pub fn body(
-        mut self,
-        value: impl Into<Option<crate::at_margin::annotation::Body<'a>>>,
-    ) -> Self {
+    pub fn body(mut self, value: impl Into<Option<annotation::Body<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `body` field to an Option value (optional)
-    pub fn maybe_body(
-        mut self,
-        value: Option<crate::at_margin::annotation::Body<'a>>,
-    ) -> Self {
+    pub fn maybe_body(mut self, value: Option<annotation::Body<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -2051,13 +1479,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> AnnotationBuilder<'a, annotation_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         AnnotationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2066,16 +1494,13 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `generator` field (optional)
     pub fn generator(
         mut self,
-        value: impl Into<Option<crate::at_margin::annotation::Generator<'a>>>,
+        value: impl Into<Option<annotation::Generator<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `generator` field to an Option value (optional)
-    pub fn maybe_generator(
-        mut self,
-        value: Option<crate::at_margin::annotation::Generator<'a>>,
-    ) -> Self {
+    pub fn maybe_generator(mut self, value: Option<annotation::Generator<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -2083,18 +1508,12 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
 
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(
-        mut self,
-        value: impl Into<Option<crate::com_atproto::label::SelfLabels<'a>>>,
-    ) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(
-        mut self,
-        value: Option<crate::com_atproto::label::SelfLabels<'a>>,
-    ) -> Self {
+    pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -2118,18 +1537,12 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
 
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `rights` field (optional)
-    pub fn rights(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn rights(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `rights` field to an Option value (optional)
-    pub fn maybe_rights(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_rights(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -2137,18 +1550,12 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
 
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -2162,13 +1569,13 @@ where
     /// Set the `target` field (required)
     pub fn target(
         mut self,
-        value: impl Into<crate::at_margin::annotation::Target<'a>>,
+        value: impl Into<annotation::Target<'a>>,
     ) -> AnnotationBuilder<'a, annotation_state::SetTarget<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         AnnotationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2196,7 +1603,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2261,13 +1668,13 @@ pub mod range_selector_state {
 
 /// Builder for constructing an instance of this type
 pub struct RangeSelectorBuilder<'a, S: range_selector_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<RangeSelectorEndSelector<'a>>,
-        ::core::option::Option<RangeSelectorStartSelector<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<RangeSelectorEndSelector<'a>>,
+        Option<RangeSelectorStartSelector<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> RangeSelector<'a> {
@@ -2281,9 +1688,9 @@ impl<'a> RangeSelectorBuilder<'a, range_selector_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RangeSelectorBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2298,11 +1705,11 @@ where
         mut self,
         value: impl Into<RangeSelectorEndSelector<'a>>,
     ) -> RangeSelectorBuilder<'a, range_selector_state::SetEndSelector<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         RangeSelectorBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2317,26 +1724,23 @@ where
         mut self,
         value: impl Into<RangeSelectorStartSelector<'a>>,
     ) -> RangeSelectorBuilder<'a, range_selector_state::SetStartSelector<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         RangeSelectorBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: range_selector_state::State> RangeSelectorBuilder<'a, S> {
     /// Set the `type` field (optional)
-    pub fn r#type(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn r#type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `type` field to an Option value (optional)
-    pub fn maybe_type(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_type(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -2360,7 +1764,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2408,15 +1812,15 @@ pub mod target_state {
 
 /// Builder for constructing an instance of this type
 pub struct TargetBuilder<'a, S: target_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<TargetSelector<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::at_margin::annotation::TimeState<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<TargetSelector<'a>>,
+        Option<UriValue<'a>>,
+        Option<CowStr<'a>>,
+        Option<annotation::TimeState<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Target<'a> {
@@ -2430,9 +1834,9 @@ impl<'a> TargetBuilder<'a, target_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TargetBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2458,31 +1862,25 @@ where
     /// Set the `source` field (required)
     pub fn source(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> TargetBuilder<'a, target_state::SetSource<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         TargetBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     /// Set the `sourceHash` field (optional)
-    pub fn source_hash(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn source_hash(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `sourceHash` field to an Option value (optional)
-    pub fn maybe_source_hash(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_source_hash(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -2490,18 +1888,12 @@ impl<'a, S: target_state::State> TargetBuilder<'a, S> {
 
 impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     /// Set the `state` field (optional)
-    pub fn state(
-        mut self,
-        value: impl Into<Option<crate::at_margin::annotation::TimeState<'a>>>,
-    ) -> Self {
+    pub fn state(mut self, value: impl Into<Option<annotation::TimeState<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `state` field to an Option value (optional)
-    pub fn maybe_state(
-        mut self,
-        value: Option<crate::at_margin::annotation::TimeState<'a>>,
-    ) -> Self {
+    pub fn maybe_state(mut self, value: Option<annotation::TimeState<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -2509,15 +1901,12 @@ impl<'a, S: target_state::State> TargetBuilder<'a, S> {
 
 impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -2542,7 +1931,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2604,13 +1993,9 @@ pub mod text_position_selector_state {
 
 /// Builder for constructing an instance of this type
 pub struct TextPositionSelectorBuilder<'a, S: text_position_selector_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<i64>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> TextPositionSelector<'a> {
@@ -2627,9 +2012,9 @@ impl<'a> TextPositionSelectorBuilder<'a, text_position_selector_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TextPositionSelectorBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2644,11 +2029,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> TextPositionSelectorBuilder<'a, text_position_selector_state::SetEnd<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         TextPositionSelectorBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2663,26 +2048,23 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> TextPositionSelectorBuilder<'a, text_position_selector_state::SetStart<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         TextPositionSelectorBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: text_position_selector_state::State> TextPositionSelectorBuilder<'a, S> {
     /// Set the `type` field (optional)
-    pub fn r#type(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn r#type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `type` field to an Option value (optional)
-    pub fn maybe_type(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_type(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -2706,7 +2088,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

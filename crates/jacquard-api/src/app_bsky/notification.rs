@@ -17,32 +17,33 @@ pub mod register_push;
 pub mod unregister_push;
 pub mod update_seen;
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::notification;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ActivitySubscription<'a> {
     pub post: bool,
     pub reply: bool,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ChatPreference<'a> {
     #[serde(borrow)]
@@ -50,11 +51,12 @@ pub struct ChatPreference<'a> {
     pub push: bool,
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ChatPreferenceInclude<'a> {
     All,
     Accepted,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ChatPreferenceInclude<'a> {
@@ -72,7 +74,7 @@ impl<'a> From<&'a str> for ChatPreferenceInclude<'a> {
         match s {
             "all" => Self::All,
             "accepted" => Self::Accepted,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -82,7 +84,7 @@ impl<'a> From<String> for ChatPreferenceInclude<'a> {
         match s.as_str() {
             "all" => Self::All,
             "accepted" => Self::Accepted,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -140,16 +142,9 @@ impl jacquard_common::IntoStatic for ChatPreferenceInclude<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct FilterablePreference<'a> {
     #[serde(borrow)]
@@ -158,11 +153,12 @@ pub struct FilterablePreference<'a> {
     pub push: bool,
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum FilterablePreferenceInclude<'a> {
     All,
     Follows,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> FilterablePreferenceInclude<'a> {
@@ -180,7 +176,7 @@ impl<'a> From<&'a str> for FilterablePreferenceInclude<'a> {
         match s {
             "all" => Self::All,
             "follows" => Self::Follows,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -190,7 +186,7 @@ impl<'a> From<String> for FilterablePreferenceInclude<'a> {
         match s.as_str() {
             "all" => Self::All,
             "follows" => Self::Follows,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -248,209 +244,166 @@ impl jacquard_common::IntoStatic for FilterablePreferenceInclude<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Preference<'a> {
     pub list: bool,
     pub push: bool,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Preferences<'a> {
     #[serde(borrow)]
-    pub chat: crate::app_bsky::notification::ChatPreference<'a>,
+    pub chat: notification::ChatPreference<'a>,
     #[serde(borrow)]
-    pub follow: crate::app_bsky::notification::FilterablePreference<'a>,
+    pub follow: notification::FilterablePreference<'a>,
     #[serde(borrow)]
-    pub like: crate::app_bsky::notification::FilterablePreference<'a>,
+    pub like: notification::FilterablePreference<'a>,
     #[serde(borrow)]
-    pub like_via_repost: crate::app_bsky::notification::FilterablePreference<'a>,
+    pub like_via_repost: notification::FilterablePreference<'a>,
     #[serde(borrow)]
-    pub mention: crate::app_bsky::notification::FilterablePreference<'a>,
+    pub mention: notification::FilterablePreference<'a>,
     #[serde(borrow)]
-    pub quote: crate::app_bsky::notification::FilterablePreference<'a>,
+    pub quote: notification::FilterablePreference<'a>,
     #[serde(borrow)]
-    pub reply: crate::app_bsky::notification::FilterablePreference<'a>,
+    pub reply: notification::FilterablePreference<'a>,
     #[serde(borrow)]
-    pub repost: crate::app_bsky::notification::FilterablePreference<'a>,
+    pub repost: notification::FilterablePreference<'a>,
     #[serde(borrow)]
-    pub repost_via_repost: crate::app_bsky::notification::FilterablePreference<'a>,
+    pub repost_via_repost: notification::FilterablePreference<'a>,
     #[serde(borrow)]
-    pub starterpack_joined: crate::app_bsky::notification::Preference<'a>,
+    pub starterpack_joined: notification::Preference<'a>,
     #[serde(borrow)]
-    pub subscribed_post: crate::app_bsky::notification::Preference<'a>,
+    pub subscribed_post: notification::Preference<'a>,
     #[serde(borrow)]
-    pub unverified: crate::app_bsky::notification::Preference<'a>,
+    pub unverified: notification::Preference<'a>,
     #[serde(borrow)]
-    pub verified: crate::app_bsky::notification::Preference<'a>,
+    pub verified: notification::Preference<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RecordDeleted<'a> {}
 /// Object used to store activity subscription data in stash.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SubjectActivitySubscription<'a> {
     #[serde(borrow)]
-    pub activity_subscription: crate::app_bsky::notification::ActivitySubscription<'a>,
+    pub activity_subscription: notification::ActivitySubscription<'a>,
     #[serde(borrow)]
-    pub subject: jacquard_common::types::string::Did<'a>,
+    pub subject: Did<'a>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ActivitySubscription<'a> {
+impl<'a> LexiconSchema for ActivitySubscription<'a> {
     fn nsid() -> &'static str {
         "app.bsky.notification.defs"
     }
     fn def_name() -> &'static str {
         "activitySubscription"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_notification_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ChatPreference<'a> {
+impl<'a> LexiconSchema for ChatPreference<'a> {
     fn nsid() -> &'static str {
         "app.bsky.notification.defs"
     }
     fn def_name() -> &'static str {
         "chatPreference"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_notification_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for FilterablePreference<'a> {
+impl<'a> LexiconSchema for FilterablePreference<'a> {
     fn nsid() -> &'static str {
         "app.bsky.notification.defs"
     }
     fn def_name() -> &'static str {
         "filterablePreference"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_notification_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Preference<'a> {
+impl<'a> LexiconSchema for Preference<'a> {
     fn nsid() -> &'static str {
         "app.bsky.notification.defs"
     }
     fn def_name() -> &'static str {
         "preference"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_notification_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
+impl<'a> LexiconSchema for Preferences<'a> {
     fn nsid() -> &'static str {
         "app.bsky.notification.defs"
     }
     fn def_name() -> &'static str {
         "preferences"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_notification_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for RecordDeleted<'a> {
+impl<'a> LexiconSchema for RecordDeleted<'a> {
     fn nsid() -> &'static str {
         "app.bsky.notification.defs"
     }
     fn def_name() -> &'static str {
         "recordDeleted"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_notification_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for SubjectActivitySubscription<'a> {
+impl<'a> LexiconSchema for SubjectActivitySubscription<'a> {
     fn nsid() -> &'static str {
         "app.bsky.notification.defs"
     }
     fn def_name() -> &'static str {
         "subjectActivitySubscription"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_notification_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -465,45 +418,45 @@ pub mod activity_subscription_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Post;
         type Reply;
+        type Post;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Post = Unset;
         type Reply = Unset;
-    }
-    ///State transition - sets the `post` field to Set
-    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPost<S> {}
-    impl<S: State> State for SetPost<S> {
-        type Post = Set<members::post>;
-        type Reply = S::Reply;
+        type Post = Unset;
     }
     ///State transition - sets the `reply` field to Set
     pub struct SetReply<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReply<S> {}
     impl<S: State> State for SetReply<S> {
-        type Post = S::Post;
         type Reply = Set<members::reply>;
+        type Post = S::Post;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type Reply = S::Reply;
+        type Post = Set<members::post>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `post` field
-        pub struct post(());
         ///Marker type for the `reply` field
         pub struct reply(());
+        ///Marker type for the `post` field
+        pub struct post(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ActivitySubscriptionBuilder<'a, S: activity_subscription_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<bool>, ::core::option::Option<bool>),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<bool>, Option<bool>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ActivitySubscription<'a> {
@@ -517,9 +470,9 @@ impl<'a> ActivitySubscriptionBuilder<'a, activity_subscription_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ActivitySubscriptionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -534,11 +487,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ActivitySubscriptionBuilder<'a, activity_subscription_state::SetPost<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ActivitySubscriptionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -553,11 +506,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ActivitySubscriptionBuilder<'a, activity_subscription_state::SetReply<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ActivitySubscriptionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -565,8 +518,8 @@ where
 impl<'a, S> ActivitySubscriptionBuilder<'a, S>
 where
     S: activity_subscription_state::State,
-    S::Post: activity_subscription_state::IsSet,
     S::Reply: activity_subscription_state::IsSet,
+    S::Post: activity_subscription_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ActivitySubscription<'a> {
@@ -579,7 +532,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -592,430 +545,291 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_notification_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.bsky.notification.defs"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_bsky_notification_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.bsky.notification.defs"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "activitySubscription",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("activitySubscription"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![SmolStr::new_static("post"), SmolStr::new_static("reply")],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("post"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("reply"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("chatPreference"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![SmolStr::new_static("include"), SmolStr::new_static("push")],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("include"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("push"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("filterablePreference"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("post"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("reply")
+                            SmolStr::new_static("include"), SmolStr::new_static("list"),
+                            SmolStr::new_static("push")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "post",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("include"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("list"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "reply",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("push"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("chatPreference"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("preference"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![SmolStr::new_static("list"), SmolStr::new_static("push")],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("list"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("push"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("preferences"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("include"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("push")
+                            SmolStr::new_static("chat"), SmolStr::new_static("follow"),
+                            SmolStr::new_static("like"),
+                            SmolStr::new_static("likeViaRepost"),
+                            SmolStr::new_static("mention"), SmolStr::new_static("quote"),
+                            SmolStr::new_static("reply"), SmolStr::new_static("repost"),
+                            SmolStr::new_static("repostViaRepost"),
+                            SmolStr::new_static("starterpackJoined"),
+                            SmolStr::new_static("subscribedPost"),
+                            SmolStr::new_static("unverified"),
+                            SmolStr::new_static("verified")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "include",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("chat"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#chatPreference"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "push",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("follow"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#filterablePreference"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("like"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#filterablePreference"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("likeViaRepost"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#filterablePreference"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("mention"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#filterablePreference"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("quote"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#filterablePreference"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("reply"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#filterablePreference"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("repost"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#filterablePreference"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("repostViaRepost"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#filterablePreference"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("starterpackJoined"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#preference"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("subscribedPost"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#preference"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("unverified"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#preference"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("verified"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#preference"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "filterablePreference",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("include"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("list"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("push")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("recordDeleted"),
+                LexUserType::Object(LexObject {
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "include",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "list",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "push",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
+                        let mut map = BTreeMap::new();
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("preference"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("list"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("push")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "list",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "push",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("preferences"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("chat"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("follow"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("like"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("likeViaRepost"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("mention"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("quote"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("reply"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("repost"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("repostViaRepost"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("starterpackJoined"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("subscribedPost"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("unverified"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("verified")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "chat",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#chatPreference",
-                                ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "follow",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#filterablePreference",
-                                ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "like",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#filterablePreference",
-                                ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "likeViaRepost",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#filterablePreference",
-                                ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "mention",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#filterablePreference",
-                                ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "quote",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#filterablePreference",
-                                ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "reply",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#filterablePreference",
-                                ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "repost",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#filterablePreference",
-                                ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "repostViaRepost",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#filterablePreference",
-                                ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "starterpackJoined",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#preference"),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "subscribedPost",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#preference"),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "unverified",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#preference"),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "verified",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#preference"),
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("recordDeleted"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "subjectActivitySubscription",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("subjectActivitySubscription"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Object used to store activity subscription data in stash.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("subject"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("activitySubscription")
+                            SmolStr::new_static("subject"),
+                            SmolStr::new_static("activitySubscription")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "activitySubscription",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#activitySubscription",
-                                ),
+                            SmolStr::new_static("activitySubscription"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#activitySubscription"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "subject",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("subject"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1065,12 +879,9 @@ pub mod chat_preference_state {
 
 /// Builder for constructing an instance of this type
 pub struct ChatPreferenceBuilder<'a, S: chat_preference_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<ChatPreferenceInclude<'a>>,
-        ::core::option::Option<bool>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<ChatPreferenceInclude<'a>>, Option<bool>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ChatPreference<'a> {
@@ -1084,9 +895,9 @@ impl<'a> ChatPreferenceBuilder<'a, chat_preference_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ChatPreferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1101,11 +912,11 @@ where
         mut self,
         value: impl Into<ChatPreferenceInclude<'a>>,
     ) -> ChatPreferenceBuilder<'a, chat_preference_state::SetInclude<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ChatPreferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1120,11 +931,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ChatPreferenceBuilder<'a, chat_preference_state::SetPush<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ChatPreferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1146,7 +957,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1170,62 +981,62 @@ pub mod filterable_preference_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Push;
-        type List;
         type Include;
+        type List;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Push = Unset;
-        type List = Unset;
         type Include = Unset;
+        type List = Unset;
     }
     ///State transition - sets the `push` field to Set
     pub struct SetPush<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPush<S> {}
     impl<S: State> State for SetPush<S> {
         type Push = Set<members::push>;
+        type Include = S::Include;
         type List = S::List;
-        type Include = S::Include;
-    }
-    ///State transition - sets the `list` field to Set
-    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetList<S> {}
-    impl<S: State> State for SetList<S> {
-        type Push = S::Push;
-        type List = Set<members::list>;
-        type Include = S::Include;
     }
     ///State transition - sets the `include` field to Set
     pub struct SetInclude<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInclude<S> {}
     impl<S: State> State for SetInclude<S> {
         type Push = S::Push;
-        type List = S::List;
         type Include = Set<members::include>;
+        type List = S::List;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type Push = S::Push;
+        type Include = S::Include;
+        type List = Set<members::list>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `push` field
         pub struct push(());
-        ///Marker type for the `list` field
-        pub struct list(());
         ///Marker type for the `include` field
         pub struct include(());
+        ///Marker type for the `list` field
+        pub struct list(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FilterablePreferenceBuilder<'a, S: filterable_preference_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<FilterablePreferenceInclude<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<bool>,
+        Option<FilterablePreferenceInclude<'a>>,
+        Option<bool>,
+        Option<bool>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> FilterablePreference<'a> {
@@ -1239,9 +1050,9 @@ impl<'a> FilterablePreferenceBuilder<'a, filterable_preference_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FilterablePreferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1256,11 +1067,11 @@ where
         mut self,
         value: impl Into<FilterablePreferenceInclude<'a>>,
     ) -> FilterablePreferenceBuilder<'a, filterable_preference_state::SetInclude<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         FilterablePreferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1275,11 +1086,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> FilterablePreferenceBuilder<'a, filterable_preference_state::SetList<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         FilterablePreferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1294,11 +1105,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> FilterablePreferenceBuilder<'a, filterable_preference_state::SetPush<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         FilterablePreferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1307,8 +1118,8 @@ impl<'a, S> FilterablePreferenceBuilder<'a, S>
 where
     S: filterable_preference_state::State,
     S::Push: filterable_preference_state::IsSet,
-    S::List: filterable_preference_state::IsSet,
     S::Include: filterable_preference_state::IsSet,
+    S::List: filterable_preference_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FilterablePreference<'a> {
@@ -1322,7 +1133,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1346,45 +1157,45 @@ pub mod preference_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Push;
         type List;
+        type Push;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Push = Unset;
         type List = Unset;
-    }
-    ///State transition - sets the `push` field to Set
-    pub struct SetPush<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPush<S> {}
-    impl<S: State> State for SetPush<S> {
-        type Push = Set<members::push>;
-        type List = S::List;
+        type Push = Unset;
     }
     ///State transition - sets the `list` field to Set
     pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetList<S> {}
     impl<S: State> State for SetList<S> {
-        type Push = S::Push;
         type List = Set<members::list>;
+        type Push = S::Push;
+    }
+    ///State transition - sets the `push` field to Set
+    pub struct SetPush<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPush<S> {}
+    impl<S: State> State for SetPush<S> {
+        type List = S::List;
+        type Push = Set<members::push>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `push` field
-        pub struct push(());
         ///Marker type for the `list` field
         pub struct list(());
+        ///Marker type for the `push` field
+        pub struct push(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PreferenceBuilder<'a, S: preference_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<bool>, ::core::option::Option<bool>),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<bool>, Option<bool>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Preference<'a> {
@@ -1398,9 +1209,9 @@ impl<'a> PreferenceBuilder<'a, preference_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PreferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1415,11 +1226,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> PreferenceBuilder<'a, preference_state::SetList<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PreferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1434,11 +1245,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> PreferenceBuilder<'a, preference_state::SetPush<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         PreferenceBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1446,8 +1257,8 @@ where
 impl<'a, S> PreferenceBuilder<'a, S>
 where
     S: preference_state::State,
-    S::Push: preference_state::IsSet,
     S::List: preference_state::IsSet,
+    S::Push: preference_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Preference<'a> {
@@ -1460,7 +1271,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1483,323 +1294,323 @@ pub mod preferences_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Quote;
+        type LikeViaRepost;
+        type Chat;
+        type RepostViaRepost;
+        type StarterpackJoined;
+        type SubscribedPost;
+        type Verified;
+        type Mention;
+        type Repost;
+        type Follow;
         type Reply;
         type Like;
-        type SubscribedPost;
-        type Mention;
-        type Quote;
         type Unverified;
-        type Verified;
-        type Follow;
-        type Chat;
-        type Repost;
-        type StarterpackJoined;
-        type RepostViaRepost;
-        type LikeViaRepost;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Quote = Unset;
+        type LikeViaRepost = Unset;
+        type Chat = Unset;
+        type RepostViaRepost = Unset;
+        type StarterpackJoined = Unset;
+        type SubscribedPost = Unset;
+        type Verified = Unset;
+        type Mention = Unset;
+        type Repost = Unset;
+        type Follow = Unset;
         type Reply = Unset;
         type Like = Unset;
-        type SubscribedPost = Unset;
-        type Mention = Unset;
-        type Quote = Unset;
         type Unverified = Unset;
-        type Verified = Unset;
-        type Follow = Unset;
-        type Chat = Unset;
-        type Repost = Unset;
-        type StarterpackJoined = Unset;
-        type RepostViaRepost = Unset;
-        type LikeViaRepost = Unset;
-    }
-    ///State transition - sets the `reply` field to Set
-    pub struct SetReply<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReply<S> {}
-    impl<S: State> State for SetReply<S> {
-        type Reply = Set<members::reply>;
-        type Like = S::Like;
-        type SubscribedPost = S::SubscribedPost;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type Unverified = S::Unverified;
-        type Verified = S::Verified;
-        type Follow = S::Follow;
-        type Chat = S::Chat;
-        type Repost = S::Repost;
-        type StarterpackJoined = S::StarterpackJoined;
-        type RepostViaRepost = S::RepostViaRepost;
-        type LikeViaRepost = S::LikeViaRepost;
-    }
-    ///State transition - sets the `like` field to Set
-    pub struct SetLike<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLike<S> {}
-    impl<S: State> State for SetLike<S> {
-        type Reply = S::Reply;
-        type Like = Set<members::like>;
-        type SubscribedPost = S::SubscribedPost;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type Unverified = S::Unverified;
-        type Verified = S::Verified;
-        type Follow = S::Follow;
-        type Chat = S::Chat;
-        type Repost = S::Repost;
-        type StarterpackJoined = S::StarterpackJoined;
-        type RepostViaRepost = S::RepostViaRepost;
-        type LikeViaRepost = S::LikeViaRepost;
-    }
-    ///State transition - sets the `subscribed_post` field to Set
-    pub struct SetSubscribedPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubscribedPost<S> {}
-    impl<S: State> State for SetSubscribedPost<S> {
-        type Reply = S::Reply;
-        type Like = S::Like;
-        type SubscribedPost = Set<members::subscribed_post>;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type Unverified = S::Unverified;
-        type Verified = S::Verified;
-        type Follow = S::Follow;
-        type Chat = S::Chat;
-        type Repost = S::Repost;
-        type StarterpackJoined = S::StarterpackJoined;
-        type RepostViaRepost = S::RepostViaRepost;
-        type LikeViaRepost = S::LikeViaRepost;
-    }
-    ///State transition - sets the `mention` field to Set
-    pub struct SetMention<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMention<S> {}
-    impl<S: State> State for SetMention<S> {
-        type Reply = S::Reply;
-        type Like = S::Like;
-        type SubscribedPost = S::SubscribedPost;
-        type Mention = Set<members::mention>;
-        type Quote = S::Quote;
-        type Unverified = S::Unverified;
-        type Verified = S::Verified;
-        type Follow = S::Follow;
-        type Chat = S::Chat;
-        type Repost = S::Repost;
-        type StarterpackJoined = S::StarterpackJoined;
-        type RepostViaRepost = S::RepostViaRepost;
-        type LikeViaRepost = S::LikeViaRepost;
     }
     ///State transition - sets the `quote` field to Set
     pub struct SetQuote<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuote<S> {}
     impl<S: State> State for SetQuote<S> {
-        type Reply = S::Reply;
-        type Like = S::Like;
-        type SubscribedPost = S::SubscribedPost;
-        type Mention = S::Mention;
         type Quote = Set<members::quote>;
-        type Unverified = S::Unverified;
-        type Verified = S::Verified;
-        type Follow = S::Follow;
-        type Chat = S::Chat;
-        type Repost = S::Repost;
-        type StarterpackJoined = S::StarterpackJoined;
-        type RepostViaRepost = S::RepostViaRepost;
         type LikeViaRepost = S::LikeViaRepost;
-    }
-    ///State transition - sets the `unverified` field to Set
-    pub struct SetUnverified<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnverified<S> {}
-    impl<S: State> State for SetUnverified<S> {
+        type Chat = S::Chat;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Verified = S::Verified;
+        type Mention = S::Mention;
+        type Repost = S::Repost;
+        type Follow = S::Follow;
         type Reply = S::Reply;
         type Like = S::Like;
-        type SubscribedPost = S::SubscribedPost;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type Unverified = Set<members::unverified>;
-        type Verified = S::Verified;
-        type Follow = S::Follow;
-        type Chat = S::Chat;
-        type Repost = S::Repost;
-        type StarterpackJoined = S::StarterpackJoined;
-        type RepostViaRepost = S::RepostViaRepost;
-        type LikeViaRepost = S::LikeViaRepost;
-    }
-    ///State transition - sets the `verified` field to Set
-    pub struct SetVerified<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVerified<S> {}
-    impl<S: State> State for SetVerified<S> {
-        type Reply = S::Reply;
-        type Like = S::Like;
-        type SubscribedPost = S::SubscribedPost;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
         type Unverified = S::Unverified;
-        type Verified = Set<members::verified>;
-        type Follow = S::Follow;
-        type Chat = S::Chat;
-        type Repost = S::Repost;
-        type StarterpackJoined = S::StarterpackJoined;
-        type RepostViaRepost = S::RepostViaRepost;
-        type LikeViaRepost = S::LikeViaRepost;
-    }
-    ///State transition - sets the `follow` field to Set
-    pub struct SetFollow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFollow<S> {}
-    impl<S: State> State for SetFollow<S> {
-        type Reply = S::Reply;
-        type Like = S::Like;
-        type SubscribedPost = S::SubscribedPost;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type Unverified = S::Unverified;
-        type Verified = S::Verified;
-        type Follow = Set<members::follow>;
-        type Chat = S::Chat;
-        type Repost = S::Repost;
-        type StarterpackJoined = S::StarterpackJoined;
-        type RepostViaRepost = S::RepostViaRepost;
-        type LikeViaRepost = S::LikeViaRepost;
-    }
-    ///State transition - sets the `chat` field to Set
-    pub struct SetChat<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChat<S> {}
-    impl<S: State> State for SetChat<S> {
-        type Reply = S::Reply;
-        type Like = S::Like;
-        type SubscribedPost = S::SubscribedPost;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type Unverified = S::Unverified;
-        type Verified = S::Verified;
-        type Follow = S::Follow;
-        type Chat = Set<members::chat>;
-        type Repost = S::Repost;
-        type StarterpackJoined = S::StarterpackJoined;
-        type RepostViaRepost = S::RepostViaRepost;
-        type LikeViaRepost = S::LikeViaRepost;
-    }
-    ///State transition - sets the `repost` field to Set
-    pub struct SetRepost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepost<S> {}
-    impl<S: State> State for SetRepost<S> {
-        type Reply = S::Reply;
-        type Like = S::Like;
-        type SubscribedPost = S::SubscribedPost;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type Unverified = S::Unverified;
-        type Verified = S::Verified;
-        type Follow = S::Follow;
-        type Chat = S::Chat;
-        type Repost = Set<members::repost>;
-        type StarterpackJoined = S::StarterpackJoined;
-        type RepostViaRepost = S::RepostViaRepost;
-        type LikeViaRepost = S::LikeViaRepost;
-    }
-    ///State transition - sets the `starterpack_joined` field to Set
-    pub struct SetStarterpackJoined<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStarterpackJoined<S> {}
-    impl<S: State> State for SetStarterpackJoined<S> {
-        type Reply = S::Reply;
-        type Like = S::Like;
-        type SubscribedPost = S::SubscribedPost;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type Unverified = S::Unverified;
-        type Verified = S::Verified;
-        type Follow = S::Follow;
-        type Chat = S::Chat;
-        type Repost = S::Repost;
-        type StarterpackJoined = Set<members::starterpack_joined>;
-        type RepostViaRepost = S::RepostViaRepost;
-        type LikeViaRepost = S::LikeViaRepost;
-    }
-    ///State transition - sets the `repost_via_repost` field to Set
-    pub struct SetRepostViaRepost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepostViaRepost<S> {}
-    impl<S: State> State for SetRepostViaRepost<S> {
-        type Reply = S::Reply;
-        type Like = S::Like;
-        type SubscribedPost = S::SubscribedPost;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
-        type Unverified = S::Unverified;
-        type Verified = S::Verified;
-        type Follow = S::Follow;
-        type Chat = S::Chat;
-        type Repost = S::Repost;
-        type StarterpackJoined = S::StarterpackJoined;
-        type RepostViaRepost = Set<members::repost_via_repost>;
-        type LikeViaRepost = S::LikeViaRepost;
     }
     ///State transition - sets the `like_via_repost` field to Set
     pub struct SetLikeViaRepost<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLikeViaRepost<S> {}
     impl<S: State> State for SetLikeViaRepost<S> {
+        type Quote = S::Quote;
+        type LikeViaRepost = Set<members::like_via_repost>;
+        type Chat = S::Chat;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Verified = S::Verified;
+        type Mention = S::Mention;
+        type Repost = S::Repost;
+        type Follow = S::Follow;
         type Reply = S::Reply;
         type Like = S::Like;
-        type SubscribedPost = S::SubscribedPost;
-        type Mention = S::Mention;
-        type Quote = S::Quote;
         type Unverified = S::Unverified;
-        type Verified = S::Verified;
-        type Follow = S::Follow;
-        type Chat = S::Chat;
-        type Repost = S::Repost;
-        type StarterpackJoined = S::StarterpackJoined;
+    }
+    ///State transition - sets the `chat` field to Set
+    pub struct SetChat<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChat<S> {}
+    impl<S: State> State for SetChat<S> {
+        type Quote = S::Quote;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Chat = Set<members::chat>;
         type RepostViaRepost = S::RepostViaRepost;
-        type LikeViaRepost = Set<members::like_via_repost>;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Verified = S::Verified;
+        type Mention = S::Mention;
+        type Repost = S::Repost;
+        type Follow = S::Follow;
+        type Reply = S::Reply;
+        type Like = S::Like;
+        type Unverified = S::Unverified;
+    }
+    ///State transition - sets the `repost_via_repost` field to Set
+    pub struct SetRepostViaRepost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepostViaRepost<S> {}
+    impl<S: State> State for SetRepostViaRepost<S> {
+        type Quote = S::Quote;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Chat = S::Chat;
+        type RepostViaRepost = Set<members::repost_via_repost>;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Verified = S::Verified;
+        type Mention = S::Mention;
+        type Repost = S::Repost;
+        type Follow = S::Follow;
+        type Reply = S::Reply;
+        type Like = S::Like;
+        type Unverified = S::Unverified;
+    }
+    ///State transition - sets the `starterpack_joined` field to Set
+    pub struct SetStarterpackJoined<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStarterpackJoined<S> {}
+    impl<S: State> State for SetStarterpackJoined<S> {
+        type Quote = S::Quote;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Chat = S::Chat;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = Set<members::starterpack_joined>;
+        type SubscribedPost = S::SubscribedPost;
+        type Verified = S::Verified;
+        type Mention = S::Mention;
+        type Repost = S::Repost;
+        type Follow = S::Follow;
+        type Reply = S::Reply;
+        type Like = S::Like;
+        type Unverified = S::Unverified;
+    }
+    ///State transition - sets the `subscribed_post` field to Set
+    pub struct SetSubscribedPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubscribedPost<S> {}
+    impl<S: State> State for SetSubscribedPost<S> {
+        type Quote = S::Quote;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Chat = S::Chat;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = Set<members::subscribed_post>;
+        type Verified = S::Verified;
+        type Mention = S::Mention;
+        type Repost = S::Repost;
+        type Follow = S::Follow;
+        type Reply = S::Reply;
+        type Like = S::Like;
+        type Unverified = S::Unverified;
+    }
+    ///State transition - sets the `verified` field to Set
+    pub struct SetVerified<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVerified<S> {}
+    impl<S: State> State for SetVerified<S> {
+        type Quote = S::Quote;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Chat = S::Chat;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Verified = Set<members::verified>;
+        type Mention = S::Mention;
+        type Repost = S::Repost;
+        type Follow = S::Follow;
+        type Reply = S::Reply;
+        type Like = S::Like;
+        type Unverified = S::Unverified;
+    }
+    ///State transition - sets the `mention` field to Set
+    pub struct SetMention<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMention<S> {}
+    impl<S: State> State for SetMention<S> {
+        type Quote = S::Quote;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Chat = S::Chat;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Verified = S::Verified;
+        type Mention = Set<members::mention>;
+        type Repost = S::Repost;
+        type Follow = S::Follow;
+        type Reply = S::Reply;
+        type Like = S::Like;
+        type Unverified = S::Unverified;
+    }
+    ///State transition - sets the `repost` field to Set
+    pub struct SetRepost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepost<S> {}
+    impl<S: State> State for SetRepost<S> {
+        type Quote = S::Quote;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Chat = S::Chat;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Verified = S::Verified;
+        type Mention = S::Mention;
+        type Repost = Set<members::repost>;
+        type Follow = S::Follow;
+        type Reply = S::Reply;
+        type Like = S::Like;
+        type Unverified = S::Unverified;
+    }
+    ///State transition - sets the `follow` field to Set
+    pub struct SetFollow<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFollow<S> {}
+    impl<S: State> State for SetFollow<S> {
+        type Quote = S::Quote;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Chat = S::Chat;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Verified = S::Verified;
+        type Mention = S::Mention;
+        type Repost = S::Repost;
+        type Follow = Set<members::follow>;
+        type Reply = S::Reply;
+        type Like = S::Like;
+        type Unverified = S::Unverified;
+    }
+    ///State transition - sets the `reply` field to Set
+    pub struct SetReply<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReply<S> {}
+    impl<S: State> State for SetReply<S> {
+        type Quote = S::Quote;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Chat = S::Chat;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Verified = S::Verified;
+        type Mention = S::Mention;
+        type Repost = S::Repost;
+        type Follow = S::Follow;
+        type Reply = Set<members::reply>;
+        type Like = S::Like;
+        type Unverified = S::Unverified;
+    }
+    ///State transition - sets the `like` field to Set
+    pub struct SetLike<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLike<S> {}
+    impl<S: State> State for SetLike<S> {
+        type Quote = S::Quote;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Chat = S::Chat;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Verified = S::Verified;
+        type Mention = S::Mention;
+        type Repost = S::Repost;
+        type Follow = S::Follow;
+        type Reply = S::Reply;
+        type Like = Set<members::like>;
+        type Unverified = S::Unverified;
+    }
+    ///State transition - sets the `unverified` field to Set
+    pub struct SetUnverified<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnverified<S> {}
+    impl<S: State> State for SetUnverified<S> {
+        type Quote = S::Quote;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Chat = S::Chat;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Verified = S::Verified;
+        type Mention = S::Mention;
+        type Repost = S::Repost;
+        type Follow = S::Follow;
+        type Reply = S::Reply;
+        type Like = S::Like;
+        type Unverified = Set<members::unverified>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `quote` field
+        pub struct quote(());
+        ///Marker type for the `like_via_repost` field
+        pub struct like_via_repost(());
+        ///Marker type for the `chat` field
+        pub struct chat(());
+        ///Marker type for the `repost_via_repost` field
+        pub struct repost_via_repost(());
+        ///Marker type for the `starterpack_joined` field
+        pub struct starterpack_joined(());
+        ///Marker type for the `subscribed_post` field
+        pub struct subscribed_post(());
+        ///Marker type for the `verified` field
+        pub struct verified(());
+        ///Marker type for the `mention` field
+        pub struct mention(());
+        ///Marker type for the `repost` field
+        pub struct repost(());
+        ///Marker type for the `follow` field
+        pub struct follow(());
         ///Marker type for the `reply` field
         pub struct reply(());
         ///Marker type for the `like` field
         pub struct like(());
-        ///Marker type for the `subscribed_post` field
-        pub struct subscribed_post(());
-        ///Marker type for the `mention` field
-        pub struct mention(());
-        ///Marker type for the `quote` field
-        pub struct quote(());
         ///Marker type for the `unverified` field
         pub struct unverified(());
-        ///Marker type for the `verified` field
-        pub struct verified(());
-        ///Marker type for the `follow` field
-        pub struct follow(());
-        ///Marker type for the `chat` field
-        pub struct chat(());
-        ///Marker type for the `repost` field
-        pub struct repost(());
-        ///Marker type for the `starterpack_joined` field
-        pub struct starterpack_joined(());
-        ///Marker type for the `repost_via_repost` field
-        pub struct repost_via_repost(());
-        ///Marker type for the `like_via_repost` field
-        pub struct like_via_repost(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PreferencesBuilder<'a, S: preferences_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::app_bsky::notification::ChatPreference<'a>>,
-        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
-        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
-        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
-        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
-        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
-        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
-        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
-        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
-        ::core::option::Option<crate::app_bsky::notification::Preference<'a>>,
-        ::core::option::Option<crate::app_bsky::notification::Preference<'a>>,
-        ::core::option::Option<crate::app_bsky::notification::Preference<'a>>,
-        ::core::option::Option<crate::app_bsky::notification::Preference<'a>>,
+        Option<notification::ChatPreference<'a>>,
+        Option<notification::FilterablePreference<'a>>,
+        Option<notification::FilterablePreference<'a>>,
+        Option<notification::FilterablePreference<'a>>,
+        Option<notification::FilterablePreference<'a>>,
+        Option<notification::FilterablePreference<'a>>,
+        Option<notification::FilterablePreference<'a>>,
+        Option<notification::FilterablePreference<'a>>,
+        Option<notification::FilterablePreference<'a>>,
+        Option<notification::Preference<'a>>,
+        Option<notification::Preference<'a>>,
+        Option<notification::Preference<'a>>,
+        Option<notification::Preference<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Preferences<'a> {
@@ -1813,7 +1624,7 @@ impl<'a> PreferencesBuilder<'a, preferences_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -1829,7 +1640,7 @@ impl<'a> PreferencesBuilder<'a, preferences_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1842,13 +1653,13 @@ where
     /// Set the `chat` field (required)
     pub fn chat(
         mut self,
-        value: impl Into<crate::app_bsky::notification::ChatPreference<'a>>,
+        value: impl Into<notification::ChatPreference<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetChat<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1861,13 +1672,13 @@ where
     /// Set the `follow` field (required)
     pub fn follow(
         mut self,
-        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+        value: impl Into<notification::FilterablePreference<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetFollow<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1880,13 +1691,13 @@ where
     /// Set the `like` field (required)
     pub fn like(
         mut self,
-        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+        value: impl Into<notification::FilterablePreference<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetLike<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1899,13 +1710,13 @@ where
     /// Set the `likeViaRepost` field (required)
     pub fn like_via_repost(
         mut self,
-        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+        value: impl Into<notification::FilterablePreference<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetLikeViaRepost<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1918,13 +1729,13 @@ where
     /// Set the `mention` field (required)
     pub fn mention(
         mut self,
-        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+        value: impl Into<notification::FilterablePreference<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetMention<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1937,13 +1748,13 @@ where
     /// Set the `quote` field (required)
     pub fn quote(
         mut self,
-        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+        value: impl Into<notification::FilterablePreference<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetQuote<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1956,13 +1767,13 @@ where
     /// Set the `reply` field (required)
     pub fn reply(
         mut self,
-        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+        value: impl Into<notification::FilterablePreference<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetReply<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1975,13 +1786,13 @@ where
     /// Set the `repost` field (required)
     pub fn repost(
         mut self,
-        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+        value: impl Into<notification::FilterablePreference<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetRepost<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1994,13 +1805,13 @@ where
     /// Set the `repostViaRepost` field (required)
     pub fn repost_via_repost(
         mut self,
-        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+        value: impl Into<notification::FilterablePreference<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetRepostViaRepost<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2013,13 +1824,13 @@ where
     /// Set the `starterpackJoined` field (required)
     pub fn starterpack_joined(
         mut self,
-        value: impl Into<crate::app_bsky::notification::Preference<'a>>,
+        value: impl Into<notification::Preference<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetStarterpackJoined<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2032,13 +1843,13 @@ where
     /// Set the `subscribedPost` field (required)
     pub fn subscribed_post(
         mut self,
-        value: impl Into<crate::app_bsky::notification::Preference<'a>>,
+        value: impl Into<notification::Preference<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetSubscribedPost<S>> {
-        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.10 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2051,13 +1862,13 @@ where
     /// Set the `unverified` field (required)
     pub fn unverified(
         mut self,
-        value: impl Into<crate::app_bsky::notification::Preference<'a>>,
+        value: impl Into<notification::Preference<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetUnverified<S>> {
-        self.__unsafe_private_named.11 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.11 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2070,13 +1881,13 @@ where
     /// Set the `verified` field (required)
     pub fn verified(
         mut self,
-        value: impl Into<crate::app_bsky::notification::Preference<'a>>,
+        value: impl Into<notification::Preference<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetVerified<S>> {
-        self.__unsafe_private_named.12 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.12 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2084,19 +1895,19 @@ where
 impl<'a, S> PreferencesBuilder<'a, S>
 where
     S: preferences_state::State,
+    S::Quote: preferences_state::IsSet,
+    S::LikeViaRepost: preferences_state::IsSet,
+    S::Chat: preferences_state::IsSet,
+    S::RepostViaRepost: preferences_state::IsSet,
+    S::StarterpackJoined: preferences_state::IsSet,
+    S::SubscribedPost: preferences_state::IsSet,
+    S::Verified: preferences_state::IsSet,
+    S::Mention: preferences_state::IsSet,
+    S::Repost: preferences_state::IsSet,
+    S::Follow: preferences_state::IsSet,
     S::Reply: preferences_state::IsSet,
     S::Like: preferences_state::IsSet,
-    S::SubscribedPost: preferences_state::IsSet,
-    S::Mention: preferences_state::IsSet,
-    S::Quote: preferences_state::IsSet,
     S::Unverified: preferences_state::IsSet,
-    S::Verified: preferences_state::IsSet,
-    S::Follow: preferences_state::IsSet,
-    S::Chat: preferences_state::IsSet,
-    S::Repost: preferences_state::IsSet,
-    S::StarterpackJoined: preferences_state::IsSet,
-    S::RepostViaRepost: preferences_state::IsSet,
-    S::LikeViaRepost: preferences_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Preferences<'a> {
@@ -2120,7 +1931,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2193,12 +2004,12 @@ pub struct SubjectActivitySubscriptionBuilder<
     'a,
     S: subject_activity_subscription_state::State,
 > {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::app_bsky::notification::ActivitySubscription<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        Option<notification::ActivitySubscription<'a>>,
+        Option<Did<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SubjectActivitySubscription<'a> {
@@ -2217,9 +2028,9 @@ impl<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SubjectActivitySubscriptionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2232,16 +2043,16 @@ where
     /// Set the `activitySubscription` field (required)
     pub fn activity_subscription(
         mut self,
-        value: impl Into<crate::app_bsky::notification::ActivitySubscription<'a>>,
+        value: impl Into<notification::ActivitySubscription<'a>>,
     ) -> SubjectActivitySubscriptionBuilder<
         'a,
         subject_activity_subscription_state::SetActivitySubscription<S>,
     > {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SubjectActivitySubscriptionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2254,16 +2065,16 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> SubjectActivitySubscriptionBuilder<
         'a,
         subject_activity_subscription_state::SetSubject<S>,
     > {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         SubjectActivitySubscriptionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -2285,7 +2096,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

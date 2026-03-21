@@ -5,40 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_common::types::string::Handle;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetHandleFromDid<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub did: AtIdentifier<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetHandleFromDidOutput<'a> {
     ///The handle.
     #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
+    pub handle: Handle<'a>,
 }
 
-/// Response type for
-///com.shinolabs.pinksea.getHandleFromDid
+/// Response type for com.shinolabs.pinksea.getHandleFromDid
 pub struct GetHandleFromDidResponse;
 impl jacquard_common::xrpc::XrpcResp for GetHandleFromDidResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getHandleFromDid";
@@ -53,8 +44,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetHandleFromDid<'a> {
     type Response = GetHandleFromDidResponse;
 }
 
-/// Endpoint type for
-///com.shinolabs.pinksea.getHandleFromDid
+/// Endpoint type for com.shinolabs.pinksea.getHandleFromDid
 pub struct GetHandleFromDidRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetHandleFromDidRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getHandleFromDid";
@@ -97,11 +87,9 @@ pub mod get_handle_from_did_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetHandleFromDidBuilder<'a, S: get_handle_from_did_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetHandleFromDid<'a> {
@@ -115,9 +103,9 @@ impl<'a> GetHandleFromDidBuilder<'a, get_handle_from_did_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetHandleFromDidBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -130,13 +118,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> GetHandleFromDidBuilder<'a, get_handle_from_did_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetHandleFromDidBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

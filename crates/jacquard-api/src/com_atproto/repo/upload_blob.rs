@@ -5,38 +5,29 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UploadBlob {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UploadBlobOutput<'a> {
     #[serde(borrow)]
-    pub blob: jacquard_common::types::blob::BlobRef<'a>,
+    pub blob: BlobRef<'a>,
 }
 
-/// Response type for
-///com.atproto.repo.uploadBlob
+/// Response type for com.atproto.repo.uploadBlob
 pub struct UploadBlobResponse;
 impl jacquard_common::xrpc::XrpcResp for UploadBlobResponse {
     const NSID: &'static str = "com.atproto.repo.uploadBlob";
@@ -68,8 +59,7 @@ impl jacquard_common::xrpc::XrpcRequest for UploadBlob {
     }
 }
 
-/// Endpoint type for
-///com.atproto.repo.uploadBlob
+/// Endpoint type for com.atproto.repo.uploadBlob
 pub struct UploadBlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UploadBlobRequest {
     const PATH: &'static str = "/xrpc/com.atproto.repo.uploadBlob";

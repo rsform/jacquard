@@ -5,39 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::feed::PostView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPosts<'a> {
     #[serde(borrow)]
-    pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
+    pub uris: Vec<AtUri<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostsOutput<'a> {
     #[serde(borrow)]
-    pub posts: Vec<crate::app_bsky::feed::PostView<'a>>,
+    pub posts: Vec<PostView<'a>>,
 }
 
-/// Response type for
-///app.bsky.feed.getPosts
+/// Response type for app.bsky.feed.getPosts
 pub struct GetPostsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPostsResponse {
     const NSID: &'static str = "app.bsky.feed.getPosts";
@@ -52,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPosts<'a> {
     type Response = GetPostsResponse;
 }
 
-/// Endpoint type for
-///app.bsky.feed.getPosts
+/// Endpoint type for app.bsky.feed.getPosts
 pub struct GetPostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.feed.getPosts";
@@ -96,11 +86,9 @@ pub mod get_posts_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetPostsBuilder<'a, S: get_posts_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<AtUri<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetPosts<'a> {
@@ -114,9 +102,9 @@ impl<'a> GetPostsBuilder<'a, get_posts_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetPostsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -129,13 +117,13 @@ where
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<'a>>>,
     ) -> GetPostsBuilder<'a, get_posts_state::SetUris<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetPostsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

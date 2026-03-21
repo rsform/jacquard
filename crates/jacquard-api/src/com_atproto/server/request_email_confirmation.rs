@@ -5,20 +5,14 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use core::marker::PhantomData;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct RequestEmailConfirmation;
-/// Response type for
-///com.atproto.server.requestEmailConfirmation
+/// Response type for com.atproto.server.requestEmailConfirmation
 pub struct RequestEmailConfirmationResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestEmailConfirmationResponse {
     const NSID: &'static str = "com.atproto.server.requestEmailConfirmation";
@@ -35,8 +29,7 @@ impl jacquard_common::xrpc::XrpcRequest for RequestEmailConfirmation {
     type Response = RequestEmailConfirmationResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.requestEmailConfirmation
+/// Endpoint type for com.atproto.server.requestEmailConfirmation
 pub struct RequestEmailConfirmationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestEmailConfirmationRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.requestEmailConfirmation";

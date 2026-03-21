@@ -5,97 +5,91 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::org_hypercerts::SmallBlob;
+use crate::org_hypercerts::Uri;
 /// Describes the rights that a contributor and/or an owner has, such as whether the hypercert can be sold, transferred, and under what conditions.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Rights<'a> {
     ///An attachment to define the rights further, e.g. a legal document.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub attachment: core::option::Option<RightsAttachment<'a>>,
+    pub attachment: Option<RightsAttachment<'a>>,
     ///Client-declared timestamp when this record was originally created
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///Detailed explanation of the rights holders' permissions, restrictions, and conditions
     #[serde(borrow)]
-    pub rights_description: jacquard_common::CowStr<'a>,
+    pub rights_description: CowStr<'a>,
     ///Human-readable name for these rights (e.g. 'All Rights Reserved', 'CC BY-SA 4.0')
     #[serde(borrow)]
-    pub rights_name: jacquard_common::CowStr<'a>,
+    pub rights_name: CowStr<'a>,
     ///Short identifier code for this rights type (e.g. 'ARR', 'CC-BY-SA') to facilitate filtering and search
     #[serde(borrow)]
-    pub rights_type: jacquard_common::CowStr<'a>,
+    pub rights_type: CowStr<'a>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RightsAttachment<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<crate::org_hypercerts::Uri<'a>>),
+    Uri(Box<Uri<'a>>),
     #[serde(rename = "org.hypercerts.defs#smallBlob")]
-    SmallBlob(Box<crate::org_hypercerts::SmallBlob<'a>>),
+    SmallBlob(Box<SmallBlob<'a>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RightsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Rights<'a>,
 }
 
 impl<'a> Rights<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, RightsRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, RightsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RightsRecord;
-impl jacquard_common::xrpc::XrpcResp for RightsRecord {
+impl XrpcResp for RightsRecord {
     const NSID: &'static str = "org.hypercerts.claim.rights";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = RightsGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<RightsGetRecordOutput<'_>> for Rights<'_> {
@@ -105,37 +99,33 @@ impl From<RightsGetRecordOutput<'_>> for Rights<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Rights<'_> {
+impl Collection for Rights<'_> {
     const NSID: &'static str = "org.hypercerts.claim.rights";
     type Record = RightsRecord;
 }
 
-impl jacquard_common::types::collection::Collection for RightsRecord {
+impl Collection for RightsRecord {
     const NSID: &'static str = "org.hypercerts.claim.rights";
     type Record = RightsRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Rights<'a> {
+impl<'a> LexiconSchema for Rights<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.claim.rights"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_claim_rights()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.rights_description;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rights_description",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("rights_description"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -144,16 +134,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Rights<'a> {
         {
             let value = &self.rights_description;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 1000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "rights_description",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("rights_description"),
                         max: 1000usize,
                         actual: count,
                     });
@@ -164,10 +148,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Rights<'a> {
             let value = &self.rights_name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rights_name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("rights_name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -177,10 +159,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Rights<'a> {
             let value = &self.rights_type;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "rights_type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("rights_type"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -200,81 +180,81 @@ pub mod rights_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type RightsDescription;
         type RightsName;
+        type RightsDescription;
         type RightsType;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type RightsDescription = Unset;
         type RightsName = Unset;
+        type RightsDescription = Unset;
         type RightsType = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type RightsDescription = S::RightsDescription;
-        type RightsName = S::RightsName;
-        type RightsType = S::RightsType;
-    }
-    ///State transition - sets the `rights_description` field to Set
-    pub struct SetRightsDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRightsDescription<S> {}
-    impl<S: State> State for SetRightsDescription<S> {
-        type CreatedAt = S::CreatedAt;
-        type RightsDescription = Set<members::rights_description>;
-        type RightsName = S::RightsName;
-        type RightsType = S::RightsType;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `rights_name` field to Set
     pub struct SetRightsName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRightsName<S> {}
     impl<S: State> State for SetRightsName<S> {
-        type CreatedAt = S::CreatedAt;
-        type RightsDescription = S::RightsDescription;
         type RightsName = Set<members::rights_name>;
+        type RightsDescription = S::RightsDescription;
         type RightsType = S::RightsType;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `rights_description` field to Set
+    pub struct SetRightsDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRightsDescription<S> {}
+    impl<S: State> State for SetRightsDescription<S> {
+        type RightsName = S::RightsName;
+        type RightsDescription = Set<members::rights_description>;
+        type RightsType = S::RightsType;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `rights_type` field to Set
     pub struct SetRightsType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRightsType<S> {}
     impl<S: State> State for SetRightsType<S> {
-        type CreatedAt = S::CreatedAt;
-        type RightsDescription = S::RightsDescription;
         type RightsName = S::RightsName;
+        type RightsDescription = S::RightsDescription;
         type RightsType = Set<members::rights_type>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type RightsName = S::RightsName;
+        type RightsDescription = S::RightsDescription;
+        type RightsType = S::RightsType;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `rights_description` field
-        pub struct rights_description(());
         ///Marker type for the `rights_name` field
         pub struct rights_name(());
+        ///Marker type for the `rights_description` field
+        pub struct rights_description(());
         ///Marker type for the `rights_type` field
         pub struct rights_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RightsBuilder<'a, S: rights_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<RightsAttachment<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<RightsAttachment<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Rights<'a> {
@@ -288,9 +268,9 @@ impl<'a> RightsBuilder<'a, rights_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RightsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -316,13 +296,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> RightsBuilder<'a, rights_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         RightsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -335,13 +315,13 @@ where
     /// Set the `rightsDescription` field (required)
     pub fn rights_description(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RightsBuilder<'a, rights_state::SetRightsDescription<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         RightsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -354,13 +334,13 @@ where
     /// Set the `rightsName` field (required)
     pub fn rights_name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RightsBuilder<'a, rights_state::SetRightsName<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         RightsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -373,13 +353,13 @@ where
     /// Set the `rightsType` field (required)
     pub fn rights_type(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RightsBuilder<'a, rights_state::SetRightsType<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         RightsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -387,10 +367,10 @@ where
 impl<'a, S> RightsBuilder<'a, S>
 where
     S: rights_state::State,
-    S::CreatedAt: rights_state::IsSet,
-    S::RightsDescription: rights_state::IsSet,
     S::RightsName: rights_state::IsSet,
+    S::RightsDescription: rights_state::IsSet,
     S::RightsType: rights_state::IsSet,
+    S::CreatedAt: rights_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rights<'a> {
@@ -406,7 +386,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -422,148 +402,110 @@ where
     }
 }
 
-fn lexicon_doc_org_hypercerts_claim_rights() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.hypercerts.claim.rights"),
-        revision: None,
-        description: None,
+fn lexicon_doc_org_hypercerts_claim_rights() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("org.hypercerts.claim.rights"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Describes the rights that a contributor and/or an owner has, such as whether the hypercert can be sold, transferred, and under what conditions.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("rightsName"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("rightsType"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("rightsDescription"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("rightsName"),
+                                SmolStr::new_static("rightsType"),
+                                SmolStr::new_static("rightsDescription"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "attachment",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                SmolStr::new_static("attachment"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "An attachment to define the rights further, e.g. a legal document.",
                                         ),
                                     ),
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("org.hypercerts.defs#uri"),
-                                        ::jacquard_common::CowStr::new_static("org.hypercerts.defs#smallBlob")
+                                        CowStr::new_static("org.hypercerts.defs#uri"),
+                                        CowStr::new_static("org.hypercerts.defs#smallBlob")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Client-declared timestamp when this record was originally created",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "rightsDescription",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("rightsDescription"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Detailed explanation of the rights holders' permissions, restrictions, and conditions",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(10000usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(1000usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "rightsName",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("rightsName"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Human-readable name for these rights (e.g. 'All Rights Reserved', 'CC BY-SA 4.0')",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "rightsType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("rightsType"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Short identifier code for this rights type (e.g. 'ARR', 'CC-BY-SA') to facilitate filtering and search",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(10usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

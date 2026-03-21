@@ -5,39 +5,29 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetMentionsByEntry<'a> {
     #[serde(borrow)]
-    pub post_uri: jacquard_common::types::string::AtUri<'a>,
+    pub post_uri: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetMentionsByEntryOutput<'a> {
     #[serde(borrow)]
-    pub mentions: Vec<jacquard_common::types::string::AtUri<'a>>,
+    pub mentions: Vec<AtUri<'a>>,
 }
 
-/// Response type for
-///com.whtwnd.blog.getMentionsByEntry
+/// Response type for com.whtwnd.blog.getMentionsByEntry
 pub struct GetMentionsByEntryResponse;
 impl jacquard_common::xrpc::XrpcResp for GetMentionsByEntryResponse {
     const NSID: &'static str = "com.whtwnd.blog.getMentionsByEntry";
@@ -52,8 +42,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetMentionsByEntry<'a> {
     type Response = GetMentionsByEntryResponse;
 }
 
-/// Endpoint type for
-///com.whtwnd.blog.getMentionsByEntry
+/// Endpoint type for com.whtwnd.blog.getMentionsByEntry
 pub struct GetMentionsByEntryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetMentionsByEntryRequest {
     const PATH: &'static str = "/xrpc/com.whtwnd.blog.getMentionsByEntry";
@@ -96,11 +85,9 @@ pub mod get_mentions_by_entry_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetMentionsByEntryBuilder<'a, S: get_mentions_by_entry_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetMentionsByEntry<'a> {
@@ -114,9 +101,9 @@ impl<'a> GetMentionsByEntryBuilder<'a, get_mentions_by_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetMentionsByEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -129,13 +116,13 @@ where
     /// Set the `postUri` field (required)
     pub fn post_uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetMentionsByEntryBuilder<'a, get_mentions_by_entry_state::SetPostUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetMentionsByEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

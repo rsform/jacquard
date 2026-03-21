@@ -5,17 +5,12 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use jacquard_common::CowStr;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 /// JavaScript programming language.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Javascript;
 impl core::fmt::Display for Javascript {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -24,13 +19,14 @@ impl core::fmt::Display for Javascript {
 }
 
 /// Programming language identifier for code references. Uses Linguist language identifiers (lowercase). Known values correspond to token definitions in this Lexicon. New languages can be added as tokens without breaking changes.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProgrammingLanguage<'a> {
     Python,
     Typescript,
     Javascript,
     Rust,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ProgrammingLanguage<'a> {
@@ -52,7 +48,7 @@ impl<'a> From<&'a str> for ProgrammingLanguage<'a> {
             "typescript" => Self::Typescript,
             "javascript" => Self::Javascript,
             "rust" => Self::Rust,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -64,7 +60,7 @@ impl<'a> From<String> for ProgrammingLanguage<'a> {
             "typescript" => Self::Typescript,
             "javascript" => Self::Javascript,
             "rust" => Self::Rust,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -117,16 +113,8 @@ impl jacquard_common::IntoStatic for ProgrammingLanguage<'_> {
 }
 
 /// Python programming language.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Python;
 impl core::fmt::Display for Python {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -135,16 +123,8 @@ impl core::fmt::Display for Python {
 }
 
 /// Rust programming language.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Rust;
 impl core::fmt::Display for Rust {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -153,16 +133,8 @@ impl core::fmt::Display for Rust {
 }
 
 /// TypeScript programming language.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Typescript;
 impl core::fmt::Display for Typescript {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {

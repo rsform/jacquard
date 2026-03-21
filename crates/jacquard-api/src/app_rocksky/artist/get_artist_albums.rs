@@ -5,41 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::album::AlbumViewBasic;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetArtistAlbums<'a> {
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetArtistAlbumsOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub albums: core::option::Option<Vec<crate::app_rocksky::album::AlbumViewBasic<'a>>>,
+    pub albums: Option<Vec<AlbumViewBasic<'a>>>,
 }
 
-/// Response type for
-///app.rocksky.artist.getArtistAlbums
+/// Response type for app.rocksky.artist.getArtistAlbums
 pub struct GetArtistAlbumsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetArtistAlbumsResponse {
     const NSID: &'static str = "app.rocksky.artist.getArtistAlbums";
@@ -54,8 +44,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetArtistAlbums<'a> {
     type Response = GetArtistAlbumsResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.artist.getArtistAlbums
+/// Endpoint type for app.rocksky.artist.getArtistAlbums
 pub struct GetArtistAlbumsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetArtistAlbumsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.artist.getArtistAlbums";
@@ -98,11 +87,9 @@ pub mod get_artist_albums_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetArtistAlbumsBuilder<'a, S: get_artist_albums_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetArtistAlbums<'a> {
@@ -116,9 +103,9 @@ impl<'a> GetArtistAlbumsBuilder<'a, get_artist_albums_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetArtistAlbumsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -131,13 +118,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetArtistAlbumsBuilder<'a, get_artist_albums_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetArtistAlbumsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

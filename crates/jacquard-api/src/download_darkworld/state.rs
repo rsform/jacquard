@@ -5,98 +5,89 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::download_darkworld::state;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Favorite<'a> {
     #[serde(borrow)]
-    pub album: Vec<jacquard_common::CowStr<'a>>,
+    pub album: Vec<CowStr<'a>>,
     #[serde(borrow)]
-    pub artist: Vec<jacquard_common::CowStr<'a>>,
+    pub artist: Vec<CowStr<'a>>,
     #[serde(borrow)]
-    pub deltarune_character: Vec<jacquard_common::CowStr<'a>>,
+    pub deltarune_character: Vec<CowStr<'a>>,
     #[serde(borrow)]
-    pub game: Vec<jacquard_common::CowStr<'a>>,
+    pub game: Vec<CowStr<'a>>,
 }
 
 /// The record used by darkworld.download to determine the website's content.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct State<'a> {
     ///The user's favorites/likes/preferences.
     #[serde(borrow)]
-    pub favorite: crate::download_darkworld::state::Favorite<'a>,
+    pub favorite: state::Favorite<'a>,
     ///Describe the site's content/look.
     #[serde(borrow)]
-    pub site: crate::download_darkworld::state::Site<'a>,
+    pub site: state::Site<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct StateGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: State<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Site<'a> {
     ///Swap out Kris with Susie in the prophecy panel.
     pub susie_prophecy: bool,
     ///TBD
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub title_colors: core::option::Option<SiteTitleColors<'a>>,
+    pub title_colors: Option<SiteTitleColors<'a>>,
 }
 
 /// TBD
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SiteTitleColors<'a> {
     Enby,
     Trans,
     Pan,
     Latvia,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> SiteTitleColors<'a> {
@@ -118,7 +109,7 @@ impl<'a> From<&'a str> for SiteTitleColors<'a> {
             "trans" => Self::Trans,
             "pan" => Self::Pan,
             "latvia" => Self::Latvia,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -130,7 +121,7 @@ impl<'a> From<String> for SiteTitleColors<'a> {
             "trans" => Self::Trans,
             "pan" => Self::Pan,
             "latvia" => Self::Latvia,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -190,42 +181,36 @@ impl jacquard_common::IntoStatic for SiteTitleColors<'_> {
 
 impl<'a> State<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StateRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, StateRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Favorite<'a> {
+impl<'a> LexiconSchema for Favorite<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.state"
     }
     fn def_name() -> &'static str {
         "favorite"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_download_darkworld_state()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct StateRecord;
-impl jacquard_common::xrpc::XrpcResp for StateRecord {
+impl XrpcResp for StateRecord {
     const NSID: &'static str = "download.darkworld.state";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = StateGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<StateGetRecordOutput<'_>> for State<'_> {
@@ -235,46 +220,42 @@ impl From<StateGetRecordOutput<'_>> for State<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for State<'_> {
+impl Collection for State<'_> {
     const NSID: &'static str = "download.darkworld.state";
     type Record = StateRecord;
 }
 
-impl jacquard_common::types::collection::Collection for StateRecord {
+impl Collection for StateRecord {
     const NSID: &'static str = "download.darkworld.state";
     type Record = StateRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for State<'a> {
+impl<'a> LexiconSchema for State<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.state"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_download_darkworld_state()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Site<'a> {
+impl<'a> LexiconSchema for Site<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.state"
     }
     fn def_name() -> &'static str {
         "site"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_download_darkworld_state()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -289,8 +270,8 @@ pub mod favorite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Game;
         type Artist;
+        type Game;
         type Album;
         type DeltaruneCharacter;
     }
@@ -298,26 +279,26 @@ pub mod favorite_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Game = Unset;
         type Artist = Unset;
+        type Game = Unset;
         type Album = Unset;
         type DeltaruneCharacter = Unset;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
-        type Game = Set<members::game>;
-        type Artist = S::Artist;
-        type Album = S::Album;
-        type DeltaruneCharacter = S::DeltaruneCharacter;
     }
     ///State transition - sets the `artist` field to Set
     pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtist<S> {}
     impl<S: State> State for SetArtist<S> {
-        type Game = S::Game;
         type Artist = Set<members::artist>;
+        type Game = S::Game;
+        type Album = S::Album;
+        type DeltaruneCharacter = S::DeltaruneCharacter;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGame<S> {}
+    impl<S: State> State for SetGame<S> {
+        type Artist = S::Artist;
+        type Game = Set<members::game>;
         type Album = S::Album;
         type DeltaruneCharacter = S::DeltaruneCharacter;
     }
@@ -325,8 +306,8 @@ pub mod favorite_state {
     pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAlbum<S> {}
     impl<S: State> State for SetAlbum<S> {
-        type Game = S::Game;
         type Artist = S::Artist;
+        type Game = S::Game;
         type Album = Set<members::album>;
         type DeltaruneCharacter = S::DeltaruneCharacter;
     }
@@ -334,18 +315,18 @@ pub mod favorite_state {
     pub struct SetDeltaruneCharacter<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDeltaruneCharacter<S> {}
     impl<S: State> State for SetDeltaruneCharacter<S> {
-        type Game = S::Game;
         type Artist = S::Artist;
+        type Game = S::Game;
         type Album = S::Album;
         type DeltaruneCharacter = Set<members::deltarune_character>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `game` field
-        pub struct game(());
         ///Marker type for the `artist` field
         pub struct artist(());
+        ///Marker type for the `game` field
+        pub struct game(());
         ///Marker type for the `album` field
         pub struct album(());
         ///Marker type for the `deltarune_character` field
@@ -355,14 +336,14 @@ pub mod favorite_state {
 
 /// Builder for constructing an instance of this type
 pub struct FavoriteBuilder<'a, S: favorite_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Favorite<'a> {
@@ -376,9 +357,9 @@ impl<'a> FavoriteBuilder<'a, favorite_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FavoriteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -391,13 +372,13 @@ where
     /// Set the `album` field (required)
     pub fn album(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> FavoriteBuilder<'a, favorite_state::SetAlbum<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         FavoriteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -410,13 +391,13 @@ where
     /// Set the `artist` field (required)
     pub fn artist(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> FavoriteBuilder<'a, favorite_state::SetArtist<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         FavoriteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -429,13 +410,13 @@ where
     /// Set the `deltaruneCharacter` field (required)
     pub fn deltarune_character(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> FavoriteBuilder<'a, favorite_state::SetDeltaruneCharacter<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         FavoriteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -448,13 +429,13 @@ where
     /// Set the `game` field (required)
     pub fn game(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> FavoriteBuilder<'a, favorite_state::SetGame<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         FavoriteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -462,8 +443,8 @@ where
 impl<'a, S> FavoriteBuilder<'a, S>
 where
     S: favorite_state::State,
-    S::Game: favorite_state::IsSet,
     S::Artist: favorite_state::IsSet,
+    S::Game: favorite_state::IsSet,
     S::Album: favorite_state::IsSet,
     S::DeltaruneCharacter: favorite_state::IsSet,
 {
@@ -480,7 +461,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -495,228 +476,147 @@ where
     }
 }
 
-fn lexicon_doc_download_darkworld_state() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("download.darkworld.state"),
-        revision: None,
-        description: None,
+fn lexicon_doc_download_darkworld_state() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("download.darkworld.state"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("favorite"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("favorite"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("game"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("artist"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("album"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("deltaruneCharacter")
+                            SmolStr::new_static("game"), SmolStr::new_static("artist"),
+                            SmolStr::new_static("album"),
+                            SmolStr::new_static("deltaruneCharacter")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "album",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                            SmolStr::new_static("album"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "artist",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                            SmolStr::new_static("artist"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "deltaruneCharacter",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                            SmolStr::new_static("deltaruneCharacter"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "game",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                            SmolStr::new_static("game"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "The record used by darkworld.download to determine the website's content.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("literal:self")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("site"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("favorite")
+                                SmolStr::new_static("site"), SmolStr::new_static("favorite")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "favorite",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                SmolStr::new_static("favorite"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The user's favorites/likes/preferences.",
                                         ),
                                     ),
-                                    refs: vec![
-                                        ::jacquard_common::CowStr::new_static("#favorite")
-                                    ],
+                                    refs: vec![CowStr::new_static("#favorite")],
                                     closed: Some(true),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "site",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                SmolStr::new_static("site"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Describe the site's content/look.",
-                                        ),
+                                        CowStr::new_static("Describe the site's content/look."),
                                     ),
-                                    refs: vec![::jacquard_common::CowStr::new_static("#site")],
+                                    refs: vec![CowStr::new_static("#site")],
                                     closed: Some(true),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("site"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("susieProphecy")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("site"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("susieProphecy")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "susieProphecy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("susieProphecy"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "titleColors",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("TBD"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("titleColors"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("TBD")),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -730,48 +630,45 @@ pub mod state_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Site;
         type Favorite;
+        type Site;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Site = Unset;
         type Favorite = Unset;
-    }
-    ///State transition - sets the `site` field to Set
-    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSite<S> {}
-    impl<S: State> State for SetSite<S> {
-        type Site = Set<members::site>;
-        type Favorite = S::Favorite;
+        type Site = Unset;
     }
     ///State transition - sets the `favorite` field to Set
     pub struct SetFavorite<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFavorite<S> {}
     impl<S: State> State for SetFavorite<S> {
-        type Site = S::Site;
         type Favorite = Set<members::favorite>;
+        type Site = S::Site;
+    }
+    ///State transition - sets the `site` field to Set
+    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSite<S> {}
+    impl<S: State> State for SetSite<S> {
+        type Favorite = S::Favorite;
+        type Site = Set<members::site>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `site` field
-        pub struct site(());
         ///Marker type for the `favorite` field
         pub struct favorite(());
+        ///Marker type for the `site` field
+        pub struct site(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct StateBuilder<'a, S: state_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::download_darkworld::state::Favorite<'a>>,
-        ::core::option::Option<crate::download_darkworld::state::Site<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<state::Favorite<'a>>, Option<state::Site<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> State<'a> {
@@ -785,9 +682,9 @@ impl<'a> StateBuilder<'a, state_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -800,13 +697,13 @@ where
     /// Set the `favorite` field (required)
     pub fn favorite(
         mut self,
-        value: impl Into<crate::download_darkworld::state::Favorite<'a>>,
+        value: impl Into<state::Favorite<'a>>,
     ) -> StateBuilder<'a, state_state::SetFavorite<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         StateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -819,13 +716,13 @@ where
     /// Set the `site` field (required)
     pub fn site(
         mut self,
-        value: impl Into<crate::download_darkworld::state::Site<'a>>,
+        value: impl Into<state::Site<'a>>,
     ) -> StateBuilder<'a, state_state::SetSite<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         StateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -833,8 +730,8 @@ where
 impl<'a, S> StateBuilder<'a, S>
 where
     S: state_state::State,
-    S::Site: state_state::IsSet,
     S::Favorite: state_state::IsSet,
+    S::Site: state_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> State<'a> {
@@ -847,7 +744,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -894,12 +791,9 @@ pub mod site_state {
 
 /// Builder for constructing an instance of this type
 pub struct SiteBuilder<'a, S: site_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<bool>,
-        ::core::option::Option<SiteTitleColors<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<bool>, Option<SiteTitleColors<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Site<'a> {
@@ -913,9 +807,9 @@ impl<'a> SiteBuilder<'a, site_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SiteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -930,11 +824,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> SiteBuilder<'a, site_state::SetSusieProphecy<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SiteBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -971,7 +865,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

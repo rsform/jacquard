@@ -5,41 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::ConvoView;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct MuteConvo<'a> {
     #[serde(borrow)]
-    pub convo_id: jacquard_common::CowStr<'a>,
+    pub convo_id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MuteConvoOutput<'a> {
     #[serde(borrow)]
-    pub convo: crate::chat_bsky::convo::ConvoView<'a>,
+    pub convo: ConvoView<'a>,
 }
 
-/// Response type for
-///chat.bsky.convo.muteConvo
+/// Response type for chat.bsky.convo.muteConvo
 pub struct MuteConvoResponse;
 impl jacquard_common::xrpc::XrpcResp for MuteConvoResponse {
     const NSID: &'static str = "chat.bsky.convo.muteConvo";
@@ -56,8 +46,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for MuteConvo<'a> {
     type Response = MuteConvoResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.convo.muteConvo
+/// Endpoint type for chat.bsky.convo.muteConvo
 pub struct MuteConvoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MuteConvoRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.muteConvo";

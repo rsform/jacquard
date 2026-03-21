@@ -7,38 +7,46 @@
 
 pub mod get_valid_badges;
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// View of a badge record, with fields resolved for display. If the DID in issuer is not the current streamplace node, the signature field shall be required.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct BadgeView<'a> {
     #[serde(borrow)]
     pub badge_type: BadgeViewBadgeType<'a>,
     ///DID of the badge issuer.
     #[serde(borrow)]
-    pub issuer: jacquard_common::types::string::Did<'a>,
+    pub issuer: Did<'a>,
     ///DID of the badge recipient.
     #[serde(borrow)]
-    pub recipient: jacquard_common::types::string::Did<'a>,
+    pub recipient: Did<'a>,
     ///TODO: Cryptographic signature of the badge (of a place.stream.key).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub signature: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub signature: Option<CowStr<'a>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BadgeViewBadgeType<'a> {
     Mod,
     Streamer,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> BadgeViewBadgeType<'a> {
@@ -56,7 +64,7 @@ impl<'a> From<&'a str> for BadgeViewBadgeType<'a> {
         match s {
             "place.stream.badge.defs#mod" => Self::Mod,
             "place.stream.badge.defs#streamer" => Self::Streamer,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -66,7 +74,7 @@ impl<'a> From<String> for BadgeViewBadgeType<'a> {
         match s.as_str() {
             "place.stream.badge.defs#mod" => Self::Mod,
             "place.stream.badge.defs#streamer" => Self::Streamer,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -123,16 +131,8 @@ impl jacquard_common::IntoStatic for BadgeViewBadgeType<'_> {
 }
 
 /// This user is a moderator. Displayed with a sword icon.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Mod;
 impl core::fmt::Display for Mod {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -141,16 +141,8 @@ impl core::fmt::Display for Mod {
 }
 
 /// This user is the streamer. Displayed with a star icon.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Streamer;
 impl core::fmt::Display for Streamer {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -159,16 +151,8 @@ impl core::fmt::Display for Streamer {
 }
 
 /// This user is a very important person.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Vip;
 impl core::fmt::Display for Vip {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -176,19 +160,17 @@ impl core::fmt::Display for Vip {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for BadgeView<'a> {
+impl<'a> LexiconSchema for BadgeView<'a> {
     fn nsid() -> &'static str {
         "place.stream.badge.defs"
     }
     fn def_name() -> &'static str {
         "badgeView"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_place_stream_badge_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -204,63 +186,63 @@ pub mod badge_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type BadgeType;
-        type Recipient;
         type Issuer;
+        type Recipient;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type BadgeType = Unset;
-        type Recipient = Unset;
         type Issuer = Unset;
+        type Recipient = Unset;
     }
     ///State transition - sets the `badge_type` field to Set
     pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBadgeType<S> {}
     impl<S: State> State for SetBadgeType<S> {
         type BadgeType = Set<members::badge_type>;
+        type Issuer = S::Issuer;
         type Recipient = S::Recipient;
-        type Issuer = S::Issuer;
-    }
-    ///State transition - sets the `recipient` field to Set
-    pub struct SetRecipient<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecipient<S> {}
-    impl<S: State> State for SetRecipient<S> {
-        type BadgeType = S::BadgeType;
-        type Recipient = Set<members::recipient>;
-        type Issuer = S::Issuer;
     }
     ///State transition - sets the `issuer` field to Set
     pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIssuer<S> {}
     impl<S: State> State for SetIssuer<S> {
         type BadgeType = S::BadgeType;
-        type Recipient = S::Recipient;
         type Issuer = Set<members::issuer>;
+        type Recipient = S::Recipient;
+    }
+    ///State transition - sets the `recipient` field to Set
+    pub struct SetRecipient<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecipient<S> {}
+    impl<S: State> State for SetRecipient<S> {
+        type BadgeType = S::BadgeType;
+        type Issuer = S::Issuer;
+        type Recipient = Set<members::recipient>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `badge_type` field
         pub struct badge_type(());
-        ///Marker type for the `recipient` field
-        pub struct recipient(());
         ///Marker type for the `issuer` field
         pub struct issuer(());
+        ///Marker type for the `recipient` field
+        pub struct recipient(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BadgeViewBuilder<'a, S: badge_view_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<BadgeViewBadgeType<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<BadgeViewBadgeType<'a>>,
+        Option<Did<'a>>,
+        Option<Did<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> BadgeView<'a> {
@@ -274,9 +256,9 @@ impl<'a> BadgeViewBuilder<'a, badge_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BadgeViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -291,11 +273,11 @@ where
         mut self,
         value: impl Into<BadgeViewBadgeType<'a>>,
     ) -> BadgeViewBuilder<'a, badge_view_state::SetBadgeType<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         BadgeViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -308,13 +290,13 @@ where
     /// Set the `issuer` field (required)
     pub fn issuer(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> BadgeViewBuilder<'a, badge_view_state::SetIssuer<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         BadgeViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -327,31 +309,25 @@ where
     /// Set the `recipient` field (required)
     pub fn recipient(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> BadgeViewBuilder<'a, badge_view_state::SetRecipient<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         BadgeViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: badge_view_state::State> BadgeViewBuilder<'a, S> {
     /// Set the `signature` field (optional)
-    pub fn signature(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn signature(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `signature` field to an Option value (optional)
-    pub fn maybe_signature(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_signature(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -361,8 +337,8 @@ impl<'a, S> BadgeViewBuilder<'a, S>
 where
     S: badge_view_state::State,
     S::BadgeType: badge_view_state::IsSet,
-    S::Recipient: badge_view_state::IsSet,
     S::Issuer: badge_view_state::IsSet,
+    S::Recipient: badge_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BadgeView<'a> {
@@ -377,7 +353,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -392,142 +368,88 @@ where
     }
 }
 
-fn lexicon_doc_place_stream_badge_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("place.stream.badge.defs"),
-        revision: None,
-        description: None,
+fn lexicon_doc_place_stream_badge_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("place.stream.badge.defs"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("badgeView"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("badgeView"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "View of a badge record, with fields resolved for display. If the DID in issuer is not the current streamplace node, the signature field shall be required.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("badgeType"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("issuer"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("recipient")
+                            SmolStr::new_static("badgeType"),
+                            SmolStr::new_static("issuer"),
+                            SmolStr::new_static("recipient")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "badgeType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("badgeType"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("issuer"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("DID of the badge issuer."),
+                                ),
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "issuer",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("recipient"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "DID of the badge issuer.",
-                                    ),
+                                    CowStr::new_static("DID of the badge recipient."),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Did),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "recipient",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("signature"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "DID of the badge recipient.",
-                                    ),
-                                ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "signature",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "TODO: Cryptographic signature of the badge (of a place.stream.key).",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("mod"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
-                    description: None,
-                }),
+                SmolStr::new_static("mod"),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("streamer"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
-                    description: None,
-                }),
+                SmolStr::new_static("streamer"),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("vip"),
-                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
-                    description: None,
-                }),
+                SmolStr::new_static("vip"),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map
         },
+        ..Default::default()
     }
 }

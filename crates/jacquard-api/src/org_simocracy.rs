@@ -14,45 +14,47 @@ pub mod skill;
 pub mod style;
 pub mod vote;
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SpriteSettings<'a> {
     ///0=right, 1=back, 2=left, 3=front
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub current_anim_direction: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub current_anim_direction: Option<i64>,
     ///Map of part name -> {red, green, blue, alpha}
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub part_color_settings: core::option::Option<
-        jacquard_common::types::value::Data<'a>,
-    >,
+    pub part_color_settings: Option<Data<'a>>,
     ///Map of part name -> sprite path
     #[serde(borrow)]
-    pub selected_options: jacquard_common::types::value::Data<'a>,
+    pub selected_options: Data<'a>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for SpriteSettings<'a> {
+impl<'a> LexiconSchema for SpriteSettings<'a> {
     fn nsid() -> &'static str {
         "org.simocracy.defs"
     }
     fn def_name() -> &'static str {
         "spriteSettings"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_simocracy_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -91,13 +93,9 @@ pub mod sprite_settings_state {
 
 /// Builder for constructing an instance of this type
 pub struct SpriteSettingsBuilder<'a, S: sprite_settings_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<Data<'a>>, Option<Data<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SpriteSettings<'a> {
@@ -111,9 +109,9 @@ impl<'a> SpriteSettingsBuilder<'a, sprite_settings_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SpriteSettingsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -133,18 +131,12 @@ impl<'a, S: sprite_settings_state::State> SpriteSettingsBuilder<'a, S> {
 
 impl<'a, S: sprite_settings_state::State> SpriteSettingsBuilder<'a, S> {
     /// Set the `partColorSettings` field (optional)
-    pub fn part_color_settings(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn part_color_settings(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `partColorSettings` field to an Option value (optional)
-    pub fn maybe_part_color_settings(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_part_color_settings(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -158,13 +150,13 @@ where
     /// Set the `selectedOptions` field (required)
     pub fn selected_options(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> SpriteSettingsBuilder<'a, sprite_settings_state::SetSelectedOptions<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         SpriteSettingsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -186,10 +178,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> SpriteSettings<'a> {
         SpriteSettings {
             current_anim_direction: self.__unsafe_private_named.0,
@@ -200,61 +189,48 @@ where
     }
 }
 
-fn lexicon_doc_org_simocracy_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.simocracy.defs"),
-        revision: None,
-        description: None,
+fn lexicon_doc_org_simocracy_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("org.simocracy.defs"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("spriteSettings"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("selectedOptions")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("spriteSettings"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("selectedOptions")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "currentAnimDirection",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("currentAnimDirection"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "partColorSettings",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
-                                description: None,
+                            SmolStr::new_static("partColorSettings"),
+                            LexObjectProperty::Unknown(LexUnknown {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "selectedOptions",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
-                                description: None,
+                            SmolStr::new_static("selectedOptions"),
+                            LexObjectProperty::Unknown(LexUnknown {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

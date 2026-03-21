@@ -5,69 +5,68 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A forum-wide announcement
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Announcement<'a> {
     #[serde(borrow)]
-    pub body: jacquard_common::CowStr<'a>,
-    pub created_at: jacquard_common::types::string::Datetime,
-    pub expires_at: jacquard_common::types::string::Datetime,
+    pub body: CowStr<'a>,
+    pub created_at: Datetime,
+    pub expires_at: Datetime,
     #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
+    pub title: CowStr<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct AnnouncementGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Announcement<'a>,
 }
 
 impl<'a> Announcement<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, AnnouncementRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, AnnouncementRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct AnnouncementRecord;
-impl jacquard_common::xrpc::XrpcResp for AnnouncementRecord {
+impl XrpcResp for AnnouncementRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.announcement";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = AnnouncementGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<AnnouncementGetRecordOutput<'_>> for Announcement<'_> {
@@ -77,37 +76,33 @@ impl From<AnnouncementGetRecordOutput<'_>> for Announcement<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Announcement<'_> {
+impl Collection for Announcement<'_> {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.announcement";
     type Record = AnnouncementRecord;
 }
 
-impl jacquard_common::types::collection::Collection for AnnouncementRecord {
+impl Collection for AnnouncementRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.announcement";
     type Record = AnnouncementRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Announcement<'a> {
+impl<'a> LexiconSchema for Announcement<'a> {
     fn nsid() -> &'static str {
         "dev.fudgeu.experimental.atforumv1.forum.announcement"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.body;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "body",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("body"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -117,10 +112,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Announcement<'a> {
             let value = &self.body;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "body",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("body"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -130,10 +123,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Announcement<'a> {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("title"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -143,10 +134,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Announcement<'a> {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("title"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -168,8 +157,8 @@ pub mod announcement_state {
     pub trait State: sealed::Sealed {
         type Title;
         type CreatedAt;
-        type Body;
         type ExpiresAt;
+        type Body;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -177,8 +166,8 @@ pub mod announcement_state {
     impl State for Empty {
         type Title = Unset;
         type CreatedAt = Unset;
-        type Body = Unset;
         type ExpiresAt = Unset;
+        type Body = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
@@ -186,8 +175,8 @@ pub mod announcement_state {
     impl<S: State> State for SetTitle<S> {
         type Title = Set<members::title>;
         type CreatedAt = S::CreatedAt;
-        type Body = S::Body;
         type ExpiresAt = S::ExpiresAt;
+        type Body = S::Body;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -195,17 +184,8 @@ pub mod announcement_state {
     impl<S: State> State for SetCreatedAt<S> {
         type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
+        type ExpiresAt = S::ExpiresAt;
         type Body = S::Body;
-        type ExpiresAt = S::ExpiresAt;
-    }
-    ///State transition - sets the `body` field to Set
-    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBody<S> {}
-    impl<S: State> State for SetBody<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Body = Set<members::body>;
-        type ExpiresAt = S::ExpiresAt;
     }
     ///State transition - sets the `expires_at` field to Set
     pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -213,8 +193,17 @@ pub mod announcement_state {
     impl<S: State> State for SetExpiresAt<S> {
         type Title = S::Title;
         type CreatedAt = S::CreatedAt;
-        type Body = S::Body;
         type ExpiresAt = Set<members::expires_at>;
+        type Body = S::Body;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBody<S> {}
+    impl<S: State> State for SetBody<S> {
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type ExpiresAt = S::ExpiresAt;
+        type Body = Set<members::body>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -223,23 +212,23 @@ pub mod announcement_state {
         pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `body` field
-        pub struct body(());
         ///Marker type for the `expires_at` field
         pub struct expires_at(());
+        ///Marker type for the `body` field
+        pub struct body(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AnnouncementBuilder<'a, S: announcement_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Announcement<'a> {
@@ -253,9 +242,9 @@ impl<'a> AnnouncementBuilder<'a, announcement_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AnnouncementBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -268,13 +257,13 @@ where
     /// Set the `body` field (required)
     pub fn body(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> AnnouncementBuilder<'a, announcement_state::SetBody<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         AnnouncementBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -287,13 +276,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> AnnouncementBuilder<'a, announcement_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         AnnouncementBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -306,13 +295,13 @@ where
     /// Set the `expiresAt` field (required)
     pub fn expires_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> AnnouncementBuilder<'a, announcement_state::SetExpiresAt<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         AnnouncementBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -325,13 +314,13 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> AnnouncementBuilder<'a, announcement_state::SetTitle<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         AnnouncementBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -341,8 +330,8 @@ where
     S: announcement_state::State,
     S::Title: announcement_state::IsSet,
     S::CreatedAt: announcement_state::IsSet,
-    S::Body: announcement_state::IsSet,
     S::ExpiresAt: announcement_state::IsSet,
+    S::Body: announcement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Announcement<'a> {
@@ -357,7 +346,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -372,119 +361,73 @@ where
     }
 }
 
-fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement() -> jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement() -> LexiconDoc<
     'static,
 > {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "dev.fudgeu.experimental.atforumv1.forum.announcement",
-        ),
-        revision: None,
-        description: None,
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("dev.fudgeu.experimental.atforumv1.forum.announcement"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A forum-wide announcement",
-                        ),
-                    ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
+                    description: Some(CowStr::new_static("A forum-wide announcement")),
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("body"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("expiresAt")
+                                SmolStr::new_static("title"), SmolStr::new_static("body"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("expiresAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "body",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
+                                SmolStr::new_static("body"),
+                                LexObjectProperty::String(LexString {
                                     min_length: Some(1usize),
                                     max_length: Some(10000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "expiresAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("expiresAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "title",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
+                                SmolStr::new_static("title"),
+                                LexObjectProperty::String(LexString {
                                     min_length: Some(1usize),
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

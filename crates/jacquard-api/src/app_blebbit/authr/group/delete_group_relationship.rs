@@ -5,30 +5,26 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteGroupRelationship<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub relation: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub relation: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub resource: jacquard_common::CowStr<'a>,
+    pub resource: CowStr<'a>,
     #[serde(borrow)]
-    pub subject: jacquard_common::CowStr<'a>,
+    pub subject: CowStr<'a>,
 }
 
-/// Response type for
-///app.blebbit.authr.group.deleteGroupRelationship
+/// Response type for app.blebbit.authr.group.deleteGroupRelationship
 pub struct DeleteGroupRelationshipResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteGroupRelationshipResponse {
     const NSID: &'static str = "app.blebbit.authr.group.deleteGroupRelationship";
@@ -45,8 +41,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteGroupRelationship<'a> {
     type Response = DeleteGroupRelationshipResponse;
 }
 
-/// Endpoint type for
-///app.blebbit.authr.group.deleteGroupRelationship
+/// Endpoint type for app.blebbit.authr.group.deleteGroupRelationship
 pub struct DeleteGroupRelationshipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteGroupRelationshipRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.group.deleteGroupRelationship";

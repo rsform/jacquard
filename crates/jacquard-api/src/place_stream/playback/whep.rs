@@ -5,69 +5,55 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct WhepParams<'a> {
     #[serde(borrow)]
-    pub rendition: jacquard_common::CowStr<'a>,
+    pub rendition: CowStr<'a>,
     #[serde(borrow)]
-    pub streamer: jacquard_common::CowStr<'a>,
+    pub streamer: CowStr<'a>,
 }
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Whep {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct WhepOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum WhepError<'a> {
     /// This user may not play this stream.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(core::option::Option<jacquard_common::CowStr<'a>>),
+    Unauthorized(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for WhepError<'_> {
@@ -85,8 +71,7 @@ impl core::fmt::Display for WhepError<'_> {
     }
 }
 
-/// Response type for
-///place.stream.playback.whep
+/// Response type for place.stream.playback.whep
 pub struct WhepResponse;
 impl jacquard_common::xrpc::XrpcResp for WhepResponse {
     const NSID: &'static str = "place.stream.playback.whep";
@@ -133,8 +118,7 @@ impl jacquard_common::xrpc::XrpcRequest for Whep {
     }
 }
 
-/// Endpoint type for
-///place.stream.playback.whep
+/// Endpoint type for place.stream.playback.whep
 pub struct WhepRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for WhepRequest {
     const PATH: &'static str = "/xrpc/place.stream.playback.whep";
@@ -155,48 +139,45 @@ pub mod whep_params_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type Rendition;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type Rendition = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Streamer = Set<members::streamer>;
-        type Rendition = S::Rendition;
+        type Streamer = Unset;
     }
     ///State transition - sets the `rendition` field to Set
     pub struct SetRendition<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRendition<S> {}
     impl<S: State> State for SetRendition<S> {
-        type Streamer = S::Streamer;
         type Rendition = Set<members::rendition>;
+        type Streamer = S::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type Rendition = S::Rendition;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `rendition` field
         pub struct rendition(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct WhepParamsBuilder<'a, S: whep_params_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> WhepParams<'a> {
@@ -210,9 +191,9 @@ impl<'a> WhepParamsBuilder<'a, whep_params_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         WhepParamsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -225,13 +206,13 @@ where
     /// Set the `rendition` field (required)
     pub fn rendition(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> WhepParamsBuilder<'a, whep_params_state::SetRendition<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         WhepParamsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -244,13 +225,13 @@ where
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> WhepParamsBuilder<'a, whep_params_state::SetStreamer<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         WhepParamsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -258,8 +239,8 @@ where
 impl<'a, S> WhepParamsBuilder<'a, S>
 where
     S: whep_params_state::State,
-    S::Streamer: whep_params_state::IsSet,
     S::Rendition: whep_params_state::IsSet,
+    S::Streamer: whep_params_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WhepParams<'a> {

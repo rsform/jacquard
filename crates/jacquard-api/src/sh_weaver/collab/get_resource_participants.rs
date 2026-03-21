@@ -5,43 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::actor::ProfileViewBasic;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetResourceParticipants<'a> {
     #[serde(borrow)]
-    pub resource: jacquard_common::types::string::AtUri<'a>,
+    pub resource: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetResourceParticipantsOutput<'a> {
     #[serde(borrow)]
-    pub owner: crate::sh_weaver::actor::ProfileViewBasic<'a>,
+    pub owner: ProfileViewBasic<'a>,
     #[serde(borrow)]
-    pub participants: Vec<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub viewer_can_edit: core::option::Option<bool>,
+    pub participants: Vec<ProfileViewBasic<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub viewer_can_edit: Option<bool>,
 }
 
-/// Response type for
-///sh.weaver.collab.getResourceParticipants
+/// Response type for sh.weaver.collab.getResourceParticipants
 pub struct GetResourceParticipantsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetResourceParticipantsResponse {
     const NSID: &'static str = "sh.weaver.collab.getResourceParticipants";
@@ -56,8 +47,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetResourceParticipants<'a> {
     type Response = GetResourceParticipantsResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.collab.getResourceParticipants
+/// Endpoint type for sh.weaver.collab.getResourceParticipants
 pub struct GetResourceParticipantsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetResourceParticipantsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.collab.getResourceParticipants";
@@ -103,11 +93,9 @@ pub struct GetResourceParticipantsBuilder<
     'a,
     S: get_resource_participants_state::State,
 > {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetResourceParticipants<'a> {
@@ -124,9 +112,9 @@ impl<'a> GetResourceParticipantsBuilder<'a, get_resource_participants_state::Emp
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetResourceParticipantsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -139,16 +127,16 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetResourceParticipantsBuilder<
         'a,
         get_resource_participants_state::SetResource<S>,
     > {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetResourceParticipantsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

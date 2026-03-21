@@ -5,27 +5,24 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAccountSigningKey<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
     ///Did-key formatted public key
     #[serde(borrow)]
-    pub signing_key: jacquard_common::types::string::Did<'a>,
+    pub signing_key: Did<'a>,
 }
 
-/// Response type for
-///com.atproto.admin.updateAccountSigningKey
+/// Response type for com.atproto.admin.updateAccountSigningKey
 pub struct UpdateAccountSigningKeyResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateAccountSigningKeyResponse {
     const NSID: &'static str = "com.atproto.admin.updateAccountSigningKey";
@@ -42,8 +39,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountSigningKey<'a> {
     type Response = UpdateAccountSigningKeyResponse;
 }
 
-/// Endpoint type for
-///com.atproto.admin.updateAccountSigningKey
+/// Endpoint type for com.atproto.admin.updateAccountSigningKey
 pub struct UpdateAccountSigningKeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountSigningKeyRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountSigningKey";
@@ -103,12 +99,9 @@ pub struct UpdateAccountSigningKeyBuilder<
     'a,
     S: update_account_signing_key_state::State,
 > {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>, Option<Did<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateAccountSigningKey<'a> {
@@ -125,9 +118,9 @@ impl<'a> UpdateAccountSigningKeyBuilder<'a, update_account_signing_key_state::Em
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateAccountSigningKeyBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -140,16 +133,16 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> UpdateAccountSigningKeyBuilder<
         'a,
         update_account_signing_key_state::SetDid<S>,
     > {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         UpdateAccountSigningKeyBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -162,16 +155,16 @@ where
     /// Set the `signingKey` field (required)
     pub fn signing_key(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> UpdateAccountSigningKeyBuilder<
         'a,
         update_account_signing_key_state::SetSigningKey<S>,
     > {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         UpdateAccountSigningKeyBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -193,7 +186,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

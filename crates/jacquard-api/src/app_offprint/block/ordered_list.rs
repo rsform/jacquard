@@ -5,80 +5,74 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::app_offprint::block::text::Text;
+use crate::app_offprint::block::ordered_list;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListItem<'a> {
     ///Nested list items
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub children: core::option::Option<
-        Vec<crate::app_offprint::block::ordered_list::ListItem<'a>>,
-    >,
+    pub children: Option<Vec<ordered_list::ListItem<'a>>>,
     ///Text content of the list item
     #[serde(borrow)]
-    pub content: crate::app_offprint::block::text::Text<'a>,
+    pub content: Text<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct OrderedList<'a> {
     ///List items
     #[serde(borrow)]
-    pub children: Vec<crate::app_offprint::block::ordered_list::ListItem<'a>>,
-    ///Starting number for the list Defaults to `1`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub children: Vec<ordered_list::ListItem<'a>>,
+    ///Starting number for the list  Defaults to `1`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_ordered_list_start")]
-    pub start: core::option::Option<i64>,
+    pub start: Option<i64>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
+impl<'a> LexiconSchema for ListItem<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.orderedList"
     }
     fn def_name() -> &'static str {
         "listItem"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_orderedList()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for OrderedList<'a> {
+impl<'a> LexiconSchema for OrderedList<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.orderedList"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_orderedList()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -117,14 +111,9 @@ pub mod list_item_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListItemBuilder<'a, S: list_item_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<
-            Vec<crate::app_offprint::block::ordered_list::ListItem<'a>>,
-        >,
-        ::core::option::Option<crate::app_offprint::block::text::Text<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<ordered_list::ListItem<'a>>>, Option<Text<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ListItem<'a> {
@@ -138,9 +127,9 @@ impl<'a> ListItemBuilder<'a, list_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -149,9 +138,7 @@ impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
     /// Set the `children` field (optional)
     pub fn children(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::app_offprint::block::ordered_list::ListItem<'a>>>,
-        >,
+        value: impl Into<Option<Vec<ordered_list::ListItem<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -159,7 +146,7 @@ impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
     /// Set the `children` field to an Option value (optional)
     pub fn maybe_children(
         mut self,
-        value: Option<Vec<crate::app_offprint::block::ordered_list::ListItem<'a>>>,
+        value: Option<Vec<ordered_list::ListItem<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
@@ -174,13 +161,13 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<crate::app_offprint::block::text::Text<'a>>,
+        value: impl Into<Text<'a>>,
     ) -> ListItemBuilder<'a, list_item_state::SetContent<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ListItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -201,7 +188,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -214,112 +201,82 @@ where
     }
 }
 
-fn lexicon_doc_app_offprint_block_orderedList() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.offprint.block.orderedList"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_offprint_block_orderedList() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.offprint.block.orderedList"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("listItem"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("content")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("listItem"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("content")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "children",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Nested list items"),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#listItem"),
+                            SmolStr::new_static("children"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static("Nested list items")),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#listItem"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "content",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "app.offprint.block.text",
-                                ),
+                            SmolStr::new_static("content"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("app.offprint.block.text"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("children")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("main"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("children")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "children",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("List items"),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#listItem"),
+                            SmolStr::new_static("children"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static("List items")),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#listItem"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "start",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("start"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
-fn _default_ordered_list_start() -> core::option::Option<i64> {
+fn _default_ordered_list_start() -> Option<i64> {
     Some(1i64)
 }
 
@@ -357,14 +314,9 @@ pub mod ordered_list_state {
 
 /// Builder for constructing an instance of this type
 pub struct OrderedListBuilder<'a, S: ordered_list_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<
-            Vec<crate::app_offprint::block::ordered_list::ListItem<'a>>,
-        >,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<ordered_list::ListItem<'a>>>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> OrderedList<'a> {
@@ -378,9 +330,9 @@ impl<'a> OrderedListBuilder<'a, ordered_list_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         OrderedListBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -393,13 +345,13 @@ where
     /// Set the `children` field (required)
     pub fn children(
         mut self,
-        value: impl Into<Vec<crate::app_offprint::block::ordered_list::ListItem<'a>>>,
+        value: impl Into<Vec<ordered_list::ListItem<'a>>>,
     ) -> OrderedListBuilder<'a, ordered_list_state::SetChildren<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         OrderedListBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -433,7 +385,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

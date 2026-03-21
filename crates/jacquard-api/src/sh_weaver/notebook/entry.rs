@@ -5,126 +5,121 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::actor::Author;
+use crate::sh_weaver::notebook::ContentRating;
+use crate::sh_weaver::notebook::ContentWarnings;
+use crate::sh_weaver::notebook::Path;
+use crate::sh_weaver::notebook::Tags;
+use crate::sh_weaver::notebook::Title;
 /// A notebook entry
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Entry<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub authors: core::option::Option<Vec<crate::sh_weaver::actor::Author<'a>>>,
+    pub authors: Option<Vec<Author<'a>>>,
     ///The content of the notebook entry. This should be some flavor of Markdown.
     #[serde(borrow)]
-    pub content: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub content: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub content_warnings: core::option::Option<
-        crate::sh_weaver::notebook::ContentWarnings<'a>,
-    >,
+    pub content_warnings: Option<ContentWarnings<'a>>,
     ///Client-declared timestamp when this was originally created.
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///The set of images and records, if any, embedded in the notebook entry.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub embeds: core::option::Option<EntryEmbeds<'a>>,
+    pub embeds: Option<EntryEmbeds<'a>>,
     #[serde(borrow)]
-    pub path: crate::sh_weaver::notebook::Path<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub path: Path<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub rating: core::option::Option<crate::sh_weaver::notebook::ContentRating<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub rating: Option<ContentRating<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tags: core::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
+    pub tags: Option<Tags<'a>>,
     #[serde(borrow)]
-    pub title: crate::sh_weaver::notebook::Title<'a>,
+    pub title: Title<'a>,
     ///Client-declared timestamp of last modification. Used for canonicality tiebreaking in multi-author scenarios.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<Datetime>,
 }
 
 /// The set of images and records, if any, embedded in the notebook entry.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct EntryEmbeds<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub externals: core::option::Option<crate::sh_weaver::embed::external::External<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub externals: Option<crate::sh_weaver::embed::external::External<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub images: core::option::Option<crate::sh_weaver::embed::images::Images<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub images: Option<crate::sh_weaver::embed::images::Images<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub records: core::option::Option<crate::sh_weaver::embed::records::Records<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub records: Option<crate::sh_weaver::embed::records::Records<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub records_with_media: core::option::Option<
+    pub records_with_media: Option<
         Vec<crate::sh_weaver::embed::record_with_media::RecordWithMedia<'a>>,
     >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub videos: core::option::Option<crate::sh_weaver::embed::video::VideoRecord<'a>>,
+    pub videos: Option<crate::sh_weaver::embed::video::VideoRecord<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct EntryGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Entry<'a>,
 }
 
 impl<'a> Entry<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, EntryRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, EntryRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct EntryRecord;
-impl jacquard_common::xrpc::XrpcResp for EntryRecord {
+impl XrpcResp for EntryRecord {
     const NSID: &'static str = "sh.weaver.notebook.entry";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = EntryGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<EntryGetRecordOutput<'_>> for Entry<'_> {
@@ -134,305 +129,222 @@ impl From<EntryGetRecordOutput<'_>> for Entry<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Entry<'_> {
+impl Collection for Entry<'_> {
     const NSID: &'static str = "sh.weaver.notebook.entry";
     type Record = EntryRecord;
 }
 
-impl jacquard_common::types::collection::Collection for EntryRecord {
+impl Collection for EntryRecord {
     const NSID: &'static str = "sh.weaver.notebook.entry";
     type Record = EntryRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
+impl<'a> LexiconSchema for Entry<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.entry"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_entry()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for EntryEmbeds<'a> {
+impl<'a> LexiconSchema for EntryEmbeds<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.entry"
     }
     fn def_name() -> &'static str {
         "EntryEmbeds"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_entry()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_sh_weaver_notebook_entry() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("sh.weaver.notebook.entry"),
-        revision: None,
-        description: None,
+fn lexicon_doc_sh_weaver_notebook_entry() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("sh.weaver.notebook.entry"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("A notebook entry"),
-                    ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
+                    description: Some(CowStr::new_static("A notebook entry")),
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("content"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("path"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("content"),
+                                SmolStr::new_static("title"), SmolStr::new_static("path"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "authors",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "sh.weaver.actor.defs#author",
-                                        ),
+                                SmolStr::new_static("authors"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("sh.weaver.actor.defs#author"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "content",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("content"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The content of the notebook entry. This should be some flavor of Markdown.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "contentWarnings",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("contentWarnings"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "sh.weaver.notebook.defs#contentWarnings",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Client-declared timestamp when this was originally created.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "embeds",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Object(::jacquard_lexicon::lexicon::LexObject {
+                                SmolStr::new_static("embeds"),
+                                LexObjectProperty::Object(LexObject {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The set of images and records, if any, embedded in the notebook entry.",
                                         ),
                                     ),
-                                    required: None,
-                                    nullable: None,
                                     properties: {
                                         #[allow(unused_mut)]
-                                        let mut map = ::alloc::collections::BTreeMap::new();
+                                        let mut map = BTreeMap::new();
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "externals",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                                description: None,
-                                                r#ref: ::jacquard_common::CowStr::new_static(
-                                                    "sh.weaver.embed.external",
-                                                ),
+                                            SmolStr::new_static("externals"),
+                                            LexObjectProperty::Ref(LexRef {
+                                                r#ref: CowStr::new_static("sh.weaver.embed.external"),
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "images",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                                description: None,
-                                                r#ref: ::jacquard_common::CowStr::new_static(
-                                                    "sh.weaver.embed.images",
-                                                ),
+                                            SmolStr::new_static("images"),
+                                            LexObjectProperty::Ref(LexRef {
+                                                r#ref: CowStr::new_static("sh.weaver.embed.images"),
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "records",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                                description: None,
-                                                r#ref: ::jacquard_common::CowStr::new_static(
-                                                    "sh.weaver.embed.records",
-                                                ),
+                                            SmolStr::new_static("records"),
+                                            LexObjectProperty::Ref(LexRef {
+                                                r#ref: CowStr::new_static("sh.weaver.embed.records"),
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "recordsWithMedia",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                                description: None,
-                                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                                    description: None,
-                                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                            SmolStr::new_static("recordsWithMedia"),
+                                            LexObjectProperty::Array(LexArray {
+                                                items: LexArrayItem::Ref(LexRef {
+                                                    r#ref: CowStr::new_static(
                                                         "sh.weaver.embed.recordWithMedia",
                                                     ),
+                                                    ..Default::default()
                                                 }),
-                                                min_length: None,
-                                                max_length: None,
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "videos",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                                description: None,
-                                                r#ref: ::jacquard_common::CowStr::new_static(
-                                                    "sh.weaver.embed.video",
-                                                ),
+                                            SmolStr::new_static("videos"),
+                                            LexObjectProperty::Ref(LexRef {
+                                                r#ref: CowStr::new_static("sh.weaver.embed.video"),
+                                                ..Default::default()
                                             }),
                                         );
                                         map
                                     },
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "path",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "sh.weaver.notebook.defs#path",
-                                    ),
+                                SmolStr::new_static("path"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("sh.weaver.notebook.defs#path"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "rating",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("rating"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "sh.weaver.notebook.defs#contentRating",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "tags",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "sh.weaver.notebook.defs#tags",
-                                    ),
+                                SmolStr::new_static("tags"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("sh.weaver.notebook.defs#tags"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "title",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "sh.weaver.notebook.defs#title",
-                                    ),
+                                SmolStr::new_static("title"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("sh.weaver.notebook.defs#title"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "updatedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("updatedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Client-declared timestamp of last modification. Used for canonicality tiebreaking in multi-author scenarios.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -446,86 +358,86 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
-        type Path;
         type Title;
         type CreatedAt;
+        type Path;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
-        type Path = Unset;
         type Title = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Path = S::Path;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
-        type Content = S::Content;
-        type Path = Set<members::path>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
+        type Path = Unset;
+        type Content = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Content = S::Content;
-        type Path = S::Path;
         type Title = Set<members::title>;
         type CreatedAt = S::CreatedAt;
+        type Path = S::Path;
+        type Content = S::Content;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
-        type Path = S::Path;
         type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
+        type Path = S::Path;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPath<S> {}
+    impl<S: State> State for SetPath<S> {
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Path = Set<members::path>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Path = S::Path;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
-        ///Marker type for the `path` field
-        pub struct path(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `path` field
+        pub struct path(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EntryBuilder<'a, S: entry_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::sh_weaver::actor::Author<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::sh_weaver::notebook::ContentWarnings<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<EntryEmbeds<'a>>,
-        ::core::option::Option<crate::sh_weaver::notebook::Path<'a>>,
-        ::core::option::Option<crate::sh_weaver::notebook::ContentRating<'a>>,
-        ::core::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
-        ::core::option::Option<crate::sh_weaver::notebook::Title<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<Vec<Author<'a>>>,
+        Option<CowStr<'a>>,
+        Option<ContentWarnings<'a>>,
+        Option<Datetime>,
+        Option<EntryEmbeds<'a>>,
+        Option<Path<'a>>,
+        Option<ContentRating<'a>>,
+        Option<Tags<'a>>,
+        Option<Title<'a>>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Entry<'a> {
@@ -539,7 +451,7 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -552,25 +464,19 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `authors` field (optional)
-    pub fn authors(
-        mut self,
-        value: impl Into<Option<Vec<crate::sh_weaver::actor::Author<'a>>>>,
-    ) -> Self {
+    pub fn authors(mut self, value: impl Into<Option<Vec<Author<'a>>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `authors` field to an Option value (optional)
-    pub fn maybe_authors(
-        mut self,
-        value: Option<Vec<crate::sh_weaver::actor::Author<'a>>>,
-    ) -> Self {
+    pub fn maybe_authors(mut self, value: Option<Vec<Author<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -584,13 +490,13 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> EntryBuilder<'a, entry_state::SetContent<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -599,16 +505,13 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `contentWarnings` field (optional)
     pub fn content_warnings(
         mut self,
-        value: impl Into<Option<crate::sh_weaver::notebook::ContentWarnings<'a>>>,
+        value: impl Into<Option<ContentWarnings<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `contentWarnings` field to an Option value (optional)
-    pub fn maybe_content_warnings(
-        mut self,
-        value: Option<crate::sh_weaver::notebook::ContentWarnings<'a>>,
-    ) -> Self {
+    pub fn maybe_content_warnings(mut self, value: Option<ContentWarnings<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -622,13 +525,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> EntryBuilder<'a, entry_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -654,31 +557,25 @@ where
     /// Set the `path` field (required)
     pub fn path(
         mut self,
-        value: impl Into<crate::sh_weaver::notebook::Path<'a>>,
+        value: impl Into<Path<'a>>,
     ) -> EntryBuilder<'a, entry_state::SetPath<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `rating` field (optional)
-    pub fn rating(
-        mut self,
-        value: impl Into<Option<crate::sh_weaver::notebook::ContentRating<'a>>>,
-    ) -> Self {
+    pub fn rating(mut self, value: impl Into<Option<ContentRating<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `rating` field to an Option value (optional)
-    pub fn maybe_rating(
-        mut self,
-        value: Option<crate::sh_weaver::notebook::ContentRating<'a>>,
-    ) -> Self {
+    pub fn maybe_rating(mut self, value: Option<ContentRating<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -686,18 +583,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(
-        mut self,
-        value: impl Into<Option<crate::sh_weaver::notebook::Tags<'a>>>,
-    ) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Tags<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(
-        mut self,
-        value: Option<crate::sh_weaver::notebook::Tags<'a>>,
-    ) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Tags<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -711,31 +602,25 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<crate::sh_weaver::notebook::Title<'a>>,
+        value: impl Into<Title<'a>>,
     ) -> EntryBuilder<'a, entry_state::SetTitle<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
-    pub fn updated_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
-    pub fn maybe_updated_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -744,10 +629,10 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::Content: entry_state::IsSet,
-    S::Path: entry_state::IsSet,
     S::Title: entry_state::IsSet,
     S::CreatedAt: entry_state::IsSet,
+    S::Path: entry_state::IsSet,
+    S::Content: entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
@@ -768,7 +653,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

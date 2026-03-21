@@ -16,6 +16,7 @@ impl<T> Set<T> {
 /// Marker type indicating a builder field has not been set
 pub struct Unset;
 /// Trait indicating a builder field is set (has a value)
+
 #[jacquard_common::deps::codegen::rustversion::attr(
     since(1.78.0),
     diagnostic::on_unimplemented(
@@ -25,6 +26,7 @@ pub struct Unset;
 )]
 pub trait IsSet: private::Sealed {}
 /// Trait indicating a builder field is unset (no value yet)
+
 #[jacquard_common::deps::codegen::rustversion::attr(
     since(1.78.0),
     diagnostic::on_unimplemented(

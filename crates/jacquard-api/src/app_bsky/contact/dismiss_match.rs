@@ -5,55 +5,48 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DismissMatch<'a> {
     ///The subject's DID to dismiss the match with.
     #[serde(borrow)]
-    pub subject: jacquard_common::types::string::Did<'a>,
+    pub subject: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DismissMatchOutput<'a> {}
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DismissMatchError<'a> {
     #[serde(rename = "InvalidDid")]
-    InvalidDid(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidDid(Option<CowStr<'a>>),
     #[serde(rename = "InternalError")]
-    InternalError(core::option::Option<jacquard_common::CowStr<'a>>),
+    InternalError(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for DismissMatchError<'_> {
@@ -78,8 +71,7 @@ impl core::fmt::Display for DismissMatchError<'_> {
     }
 }
 
-/// Response type for
-///app.bsky.contact.dismissMatch
+/// Response type for app.bsky.contact.dismissMatch
 pub struct DismissMatchResponse;
 impl jacquard_common::xrpc::XrpcResp for DismissMatchResponse {
     const NSID: &'static str = "app.bsky.contact.dismissMatch";
@@ -96,8 +88,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DismissMatch<'a> {
     type Response = DismissMatchResponse;
 }
 
-/// Endpoint type for
-///app.bsky.contact.dismissMatch
+/// Endpoint type for app.bsky.contact.dismissMatch
 pub struct DismissMatchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DismissMatchRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.dismissMatch";
@@ -142,11 +133,9 @@ pub mod dismiss_match_state {
 
 /// Builder for constructing an instance of this type
 pub struct DismissMatchBuilder<'a, S: dismiss_match_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> DismissMatch<'a> {
@@ -160,9 +149,9 @@ impl<'a> DismissMatchBuilder<'a, dismiss_match_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DismissMatchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -175,13 +164,13 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> DismissMatchBuilder<'a, dismiss_match_state::SetSubject<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         DismissMatchBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -201,7 +190,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -5,61 +5,53 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteWebhook<'a> {
     ///The ID of the webhook to delete.
     #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
+    pub id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteWebhookOutput<'a> {
     ///Whether the webhook was successfully deleted.
     pub success: bool,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteWebhookError<'a> {
     /// The specified webhook was not found.
     #[serde(rename = "WebhookNotFound")]
-    WebhookNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    WebhookNotFound(Option<CowStr<'a>>),
     /// The authenticated user does not have access to this webhook.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(core::option::Option<jacquard_common::CowStr<'a>>),
+    Unauthorized(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteWebhookError<'_> {
@@ -84,8 +76,7 @@ impl core::fmt::Display for DeleteWebhookError<'_> {
     }
 }
 
-/// Response type for
-///place.stream.server.deleteWebhook
+/// Response type for place.stream.server.deleteWebhook
 pub struct DeleteWebhookResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteWebhookResponse {
     const NSID: &'static str = "place.stream.server.deleteWebhook";
@@ -102,8 +93,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteWebhook<'a> {
     type Response = DeleteWebhookResponse;
 }
 
-/// Endpoint type for
-///place.stream.server.deleteWebhook
+/// Endpoint type for place.stream.server.deleteWebhook
 pub struct DeleteWebhookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteWebhookRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.deleteWebhook";

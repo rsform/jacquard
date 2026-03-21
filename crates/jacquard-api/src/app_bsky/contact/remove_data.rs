@@ -5,51 +5,42 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveData<'a> {}
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveDataOutput<'a> {}
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RemoveDataError<'a> {
     #[serde(rename = "InvalidDid")]
-    InvalidDid(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidDid(Option<CowStr<'a>>),
     #[serde(rename = "InternalError")]
-    InternalError(core::option::Option<jacquard_common::CowStr<'a>>),
+    InternalError(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for RemoveDataError<'_> {
@@ -74,8 +65,7 @@ impl core::fmt::Display for RemoveDataError<'_> {
     }
 }
 
-/// Response type for
-///app.bsky.contact.removeData
+/// Response type for app.bsky.contact.removeData
 pub struct RemoveDataResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveDataResponse {
     const NSID: &'static str = "app.bsky.contact.removeData";
@@ -92,8 +82,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveData<'a> {
     type Response = RemoveDataResponse;
 }
 
-/// Endpoint type for
-///app.bsky.contact.removeData
+/// Endpoint type for app.bsky.contact.removeData
 pub struct RemoveDataRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveDataRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.removeData";

@@ -10,13 +10,14 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 use serde_with::skip_serializing_none;
 use std::collections::BTreeMap;
 
-#[derive(Debug, Serialize_repr, Deserialize_repr, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, Serialize_repr, Deserialize_repr, PartialEq, Eq, Clone, Copy, Default)]
 #[repr(u8)]
 pub enum Lexicon {
+    #[default]
     Lexicon1 = 1,
 }
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexiconDoc<'s> {
     pub lexicon: Lexicon,
     #[serde(borrow)]
@@ -29,7 +30,7 @@ pub struct LexiconDoc<'s> {
 // primitives
 
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexBoolean<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -44,7 +45,7 @@ pub struct LexBoolean<'s> {
 ///
 /// [specified]: https://atproto.com/specs/data-model#data-types
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexInteger<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -71,7 +72,7 @@ pub enum LexStringFormat {
     RecordKey,
 }
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LexString<'s> {
     #[serde(borrow)]
@@ -88,7 +89,7 @@ pub struct LexString<'s> {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexUnknown<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -96,7 +97,7 @@ pub struct LexUnknown<'s> {
 // ipld types
 
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LexBytes<'s> {
     #[serde(borrow)]
@@ -106,7 +107,7 @@ pub struct LexBytes<'s> {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexCidLink<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -115,7 +116,7 @@ pub struct LexCidLink<'s> {
 // references
 
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexRef<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -123,7 +124,7 @@ pub struct LexRef<'s> {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexRefUnion<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -134,7 +135,7 @@ pub struct LexRefUnion<'s> {
 // blobs
 
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LexBlob<'s> {
     #[serde(borrow)]
@@ -165,8 +166,15 @@ pub enum LexArrayItem<'s> {
     Ref(LexRef<'s>),
     Union(LexRefUnion<'s>),
 }
+
+impl<'s> Default for LexArrayItem<'s> {
+    fn default() -> Self {
+        LexArrayItem::Unknown(LexUnknown::default())
+    }
+}
+
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LexArray<'s> {
     #[serde(borrow)]
@@ -186,8 +194,15 @@ pub enum LexPrimitiveArrayItem<'s> {
     String(LexString<'s>),
     Unknown(LexUnknown<'s>),
 }
+
+impl<'s> Default for LexPrimitiveArrayItem<'s> {
+    fn default() -> Self {
+        LexPrimitiveArrayItem::Unknown(LexUnknown::default())
+    }
+}
+
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LexPrimitiveArray<'s> {
     #[serde(borrow)]
@@ -198,7 +213,7 @@ pub struct LexPrimitiveArray<'s> {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexToken<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -227,7 +242,7 @@ pub enum LexObjectProperty<'s> {
     Unknown(LexUnknown<'s>),
 }
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexObject<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -251,7 +266,7 @@ pub enum LexXrpcParametersProperty<'s> {
     Array(LexPrimitiveArray<'s>),
 }
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexXrpcParameters<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -270,7 +285,7 @@ pub enum LexXrpcBodySchema<'s> {
     Object(LexObject<'s>),
 }
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexXrpcBody<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -289,7 +304,7 @@ pub enum LexXrpcSubscriptionMessageSchema<'s> {
     Object(LexObject<'s>),
 }
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexXrpcSubscriptionMessage<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -297,7 +312,7 @@ pub struct LexXrpcSubscriptionMessage<'s> {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexXrpcError<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -311,7 +326,7 @@ pub enum LexXrpcQueryParameter<'s> {
     Params(LexXrpcParameters<'s>),
 }
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexXrpcQuery<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -327,7 +342,7 @@ pub enum LexXrpcProcedureParameter<'s> {
     Params(LexXrpcParameters<'s>),
 }
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexXrpcProcedure<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -343,8 +358,9 @@ pub enum LexXrpcSubscriptionParameter<'s> {
     #[serde(borrow)]
     Params(LexXrpcParameters<'s>),
 }
+
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexXrpcSubscription<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -362,8 +378,15 @@ pub enum LexRecordRecord<'s> {
     #[serde(borrow)]
     Object(LexObject<'s>),
 }
+
+impl<'s> Default for LexRecordRecord<'s> {
+    fn default() -> Self {
+        Self::Object(LexObject::default())
+    }
+}
+
 #[skip_serializing_none]
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
 pub struct LexRecord<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
@@ -414,28 +437,6 @@ pub enum LexUserType<'s> {
 
 // IntoStatic implementations for all lexicon types
 // These enable converting borrowed lexicon docs to owned 'static versions
-
-#[allow(unused)]
-macro_rules! impl_into_static_for_lex_struct {
-    ($($ty:ident),+ $(,)?) => {
-        $(
-            impl IntoStatic for $ty<'_> {
-                type Output = $ty<'static>;
-
-                fn into_static(self) -> Self::Output {
-                    let Self {
-                        $(description,)?
-                        ..$fields
-                    } = self;
-                    Self::Output {
-                        $(description: description.into_static(),)?
-                        ..$fields.into_static()
-                    }
-                }
-            }
-        )+
-    };
-}
 
 // Simpler approach: just clone and convert each field
 impl IntoStatic for Lexicon {

@@ -5,55 +5,49 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::EntryView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetEntry<'a> {
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetEntryOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::sh_weaver::notebook::EntryView<'a>,
+    pub value: EntryView<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetEntryError<'a> {
     #[serde(rename = "EntryNotFound")]
-    EntryNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    EntryNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetEntryError<'_> {
@@ -71,8 +65,7 @@ impl core::fmt::Display for GetEntryError<'_> {
     }
 }
 
-/// Response type for
-///sh.weaver.notebook.getEntry
+/// Response type for sh.weaver.notebook.getEntry
 pub struct GetEntryResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryResponse {
     const NSID: &'static str = "sh.weaver.notebook.getEntry";
@@ -87,8 +80,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntry<'a> {
     type Response = GetEntryResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notebook.getEntry
+/// Endpoint type for sh.weaver.notebook.getEntry
 pub struct GetEntryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntry";
@@ -131,11 +123,9 @@ pub mod get_entry_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetEntryBuilder<'a, S: get_entry_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetEntry<'a> {
@@ -149,9 +139,9 @@ impl<'a> GetEntryBuilder<'a, get_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -164,13 +154,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetEntryBuilder<'a, get_entry_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

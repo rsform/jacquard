@@ -5,55 +5,47 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::fm_teal::alpha::stats::ArtistView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetUserTopArtists<'a> {
     #[serde(borrow)]
-    pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub actor: AtIdentifier<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
     ///Defaults to `"30days"`.
     #[serde(default = "_default_period")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub period: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub period: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetUserTopArtistsOutput<'a> {
     #[serde(borrow)]
-    pub artists: Vec<crate::fm_teal::alpha::stats::ArtistView<'a>>,
+    pub artists: Vec<ArtistView<'a>>,
     ///Next page cursor
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
 }
 
-/// Response type for
-///fm.teal.alpha.stats.getUserTopArtists
+/// Response type for fm.teal.alpha.stats.getUserTopArtists
 pub struct GetUserTopArtistsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetUserTopArtistsResponse {
     const NSID: &'static str = "fm.teal.alpha.stats.getUserTopArtists";
@@ -68,8 +60,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetUserTopArtists<'a> {
     type Response = GetUserTopArtistsResponse;
 }
 
-/// Endpoint type for
-///fm.teal.alpha.stats.getUserTopArtists
+/// Endpoint type for fm.teal.alpha.stats.getUserTopArtists
 pub struct GetUserTopArtistsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetUserTopArtistsRequest {
     const PATH: &'static str = "/xrpc/fm.teal.alpha.stats.getUserTopArtists";
@@ -78,12 +69,12 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetUserTopArtistsRequest {
     type Response = GetUserTopArtistsResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_period() -> core::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("30days"))
+fn _default_period() -> Option<CowStr<'static>> {
+    Some(CowStr::from("30days"))
 }
 
 pub mod get_user_top_artists_state {
@@ -120,14 +111,14 @@ pub mod get_user_top_artists_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetUserTopArtistsBuilder<'a, S: get_user_top_artists_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<AtIdentifier<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetUserTopArtists<'a> {
@@ -141,9 +132,9 @@ impl<'a> GetUserTopArtistsBuilder<'a, get_user_top_artists_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetUserTopArtistsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -156,28 +147,25 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> GetUserTopArtistsBuilder<'a, get_user_top_artists_state::SetActor<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetUserTopArtistsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_user_top_artists_state::State> GetUserTopArtistsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -198,15 +186,12 @@ impl<'a, S: get_user_top_artists_state::State> GetUserTopArtistsBuilder<'a, S> {
 
 impl<'a, S: get_user_top_artists_state::State> GetUserTopArtistsBuilder<'a, S> {
     /// Set the `period` field (optional)
-    pub fn period(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn period(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `period` field to an Option value (optional)
-    pub fn maybe_period(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_period(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }

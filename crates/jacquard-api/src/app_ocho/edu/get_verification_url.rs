@@ -5,41 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetVerificationUrl<'a> {
     #[serde(borrow)]
-    pub domain: jacquard_common::CowStr<'a>,
+    pub domain: CowStr<'a>,
 }
 
 /// The intent data
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetVerificationUrlOutput<'a> {
     #[serde(borrow)]
-    pub url: jacquard_common::CowStr<'a>,
+    pub url: CowStr<'a>,
 }
 
-/// Response type for
-///app.ocho.edu.getVerificationUrl
+/// Response type for app.ocho.edu.getVerificationUrl
 pub struct GetVerificationUrlResponse;
 impl jacquard_common::xrpc::XrpcResp for GetVerificationUrlResponse {
     const NSID: &'static str = "app.ocho.edu.getVerificationUrl";
@@ -54,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetVerificationUrl<'a> {
     type Response = GetVerificationUrlResponse;
 }
 
-/// Endpoint type for
-///app.ocho.edu.getVerificationUrl
+/// Endpoint type for app.ocho.edu.getVerificationUrl
 pub struct GetVerificationUrlRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetVerificationUrlRequest {
     const PATH: &'static str = "/xrpc/app.ocho.edu.getVerificationUrl";
@@ -98,9 +86,9 @@ pub mod get_verification_url_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetVerificationUrlBuilder<'a, S: get_verification_url_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetVerificationUrl<'a> {
@@ -114,9 +102,9 @@ impl<'a> GetVerificationUrlBuilder<'a, get_verification_url_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetVerificationUrlBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -129,13 +117,13 @@ where
     /// Set the `domain` field (required)
     pub fn domain(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetVerificationUrlBuilder<'a, get_verification_url_state::SetDomain<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetVerificationUrlBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

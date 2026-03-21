@@ -5,26 +5,24 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAccountPassword<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
     #[serde(borrow)]
-    pub password: jacquard_common::CowStr<'a>,
+    pub password: CowStr<'a>,
 }
 
-/// Response type for
-///com.atproto.admin.updateAccountPassword
+/// Response type for com.atproto.admin.updateAccountPassword
 pub struct UpdateAccountPasswordResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateAccountPasswordResponse {
     const NSID: &'static str = "com.atproto.admin.updateAccountPassword";
@@ -41,8 +39,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountPassword<'a> {
     type Response = UpdateAccountPasswordResponse;
 }
 
-/// Endpoint type for
-///com.atproto.admin.updateAccountPassword
+/// Endpoint type for com.atproto.admin.updateAccountPassword
 pub struct UpdateAccountPasswordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountPasswordRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountPassword";
@@ -99,12 +96,9 @@ pub mod update_account_password_state {
 
 /// Builder for constructing an instance of this type
 pub struct UpdateAccountPasswordBuilder<'a, S: update_account_password_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateAccountPassword<'a> {
@@ -121,9 +115,9 @@ impl<'a> UpdateAccountPasswordBuilder<'a, update_account_password_state::Empty> 
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateAccountPasswordBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -136,13 +130,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> UpdateAccountPasswordBuilder<'a, update_account_password_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         UpdateAccountPasswordBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -155,16 +149,16 @@ where
     /// Set the `password` field (required)
     pub fn password(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> UpdateAccountPasswordBuilder<
         'a,
         update_account_password_state::SetPassword<S>,
     > {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         UpdateAccountPasswordBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -186,7 +180,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

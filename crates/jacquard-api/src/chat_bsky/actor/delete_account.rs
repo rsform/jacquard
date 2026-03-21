@@ -5,33 +5,20 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteAccountOutput<'a> {}
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct DeleteAccount;
-/// Response type for
-///chat.bsky.actor.deleteAccount
+/// Response type for chat.bsky.actor.deleteAccount
 pub struct DeleteAccountResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteAccountResponse {
     const NSID: &'static str = "chat.bsky.actor.deleteAccount";
@@ -48,8 +35,7 @@ impl jacquard_common::xrpc::XrpcRequest for DeleteAccount {
     type Response = DeleteAccountResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.actor.deleteAccount
+/// Endpoint type for chat.bsky.actor.deleteAccount
 pub struct DeleteAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteAccountRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.actor.deleteAccount";

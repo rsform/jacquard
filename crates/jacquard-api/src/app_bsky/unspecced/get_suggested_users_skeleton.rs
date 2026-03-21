@@ -5,55 +5,46 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedUsersSkeleton<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub category: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub category: Option<CowStr<'a>>,
     ///Defaults to `25`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub viewer: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub viewer: Option<Did<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedUsersSkeletonOutput<'a> {
     #[serde(borrow)]
-    pub dids: Vec<jacquard_common::types::string::Did<'a>>,
+    pub dids: Vec<Did<'a>>,
     ///DEPRECATED: use recIdStr instead.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub rec_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub rec_id: Option<CowStr<'a>>,
     ///Snowflake for this recommendation, use when submitting recommendation events.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub rec_id_str: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub rec_id_str: Option<CowStr<'a>>,
 }
 
-/// Response type for
-///app.bsky.unspecced.getSuggestedUsersSkeleton
+/// Response type for app.bsky.unspecced.getSuggestedUsersSkeleton
 pub struct GetSuggestedUsersSkeletonResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedUsersSkeletonResponse {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedUsersSkeleton";
@@ -68,8 +59,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedUsersSkeleton<'a> {
     type Response = GetSuggestedUsersSkeletonResponse;
 }
 
-/// Endpoint type for
-///app.bsky.unspecced.getSuggestedUsersSkeleton
+/// Endpoint type for app.bsky.unspecced.getSuggestedUsersSkeleton
 pub struct GetSuggestedUsersSkeletonRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedUsersSkeletonRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestedUsersSkeleton";
@@ -78,7 +68,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedUsersSkeletonRequest {
     type Response = GetSuggestedUsersSkeletonResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(25i64)
 }
 
@@ -106,13 +96,9 @@ pub struct GetSuggestedUsersSkeletonBuilder<
     'a,
     S: get_suggested_users_skeleton_state::State,
 > {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>, Option<Did<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetSuggestedUsersSkeleton<'a> {
@@ -131,9 +117,9 @@ impl<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSuggestedUsersSkeletonBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -143,15 +129,12 @@ impl<
     S: get_suggested_users_skeleton_state::State,
 > GetSuggestedUsersSkeletonBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
-    pub fn maybe_category(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -178,18 +161,12 @@ impl<
     S: get_suggested_users_skeleton_state::State,
 > GetSuggestedUsersSkeletonBuilder<'a, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn viewer(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_viewer(mut self, value: Option<Did<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }

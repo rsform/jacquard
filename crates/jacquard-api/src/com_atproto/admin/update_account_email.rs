@@ -5,27 +5,25 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAccountEmail<'a> {
     ///The handle or DID of the repo.
     #[serde(borrow)]
-    pub account: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub account: AtIdentifier<'a>,
     #[serde(borrow)]
-    pub email: jacquard_common::CowStr<'a>,
+    pub email: CowStr<'a>,
 }
 
-/// Response type for
-///com.atproto.admin.updateAccountEmail
+/// Response type for com.atproto.admin.updateAccountEmail
 pub struct UpdateAccountEmailResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateAccountEmailResponse {
     const NSID: &'static str = "com.atproto.admin.updateAccountEmail";
@@ -42,8 +40,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountEmail<'a> {
     type Response = UpdateAccountEmailResponse;
 }
 
-/// Endpoint type for
-///com.atproto.admin.updateAccountEmail
+/// Endpoint type for com.atproto.admin.updateAccountEmail
 pub struct UpdateAccountEmailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountEmailRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountEmail";
@@ -100,12 +97,9 @@ pub mod update_account_email_state {
 
 /// Builder for constructing an instance of this type
 pub struct UpdateAccountEmailBuilder<'a, S: update_account_email_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateAccountEmail<'a> {
@@ -119,9 +113,9 @@ impl<'a> UpdateAccountEmailBuilder<'a, update_account_email_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateAccountEmailBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -134,13 +128,13 @@ where
     /// Set the `account` field (required)
     pub fn account(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> UpdateAccountEmailBuilder<'a, update_account_email_state::SetAccount<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         UpdateAccountEmailBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -153,13 +147,13 @@ where
     /// Set the `email` field (required)
     pub fn email(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> UpdateAccountEmailBuilder<'a, update_account_email_state::SetEmail<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         UpdateAccountEmailBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -181,7 +175,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

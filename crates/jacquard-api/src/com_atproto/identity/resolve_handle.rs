@@ -5,55 +5,49 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, Handle};
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveHandle<'a> {
     #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
+    pub handle: Handle<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveHandleOutput<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ResolveHandleError<'a> {
     /// The resolution process confirmed that the handle does not resolve to any DID.
     #[serde(rename = "HandleNotFound")]
-    HandleNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    HandleNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for ResolveHandleError<'_> {
@@ -71,8 +65,7 @@ impl core::fmt::Display for ResolveHandleError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.identity.resolveHandle
+/// Response type for com.atproto.identity.resolveHandle
 pub struct ResolveHandleResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveHandleResponse {
     const NSID: &'static str = "com.atproto.identity.resolveHandle";
@@ -87,8 +80,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveHandle<'a> {
     type Response = ResolveHandleResponse;
 }
 
-/// Endpoint type for
-///com.atproto.identity.resolveHandle
+/// Endpoint type for com.atproto.identity.resolveHandle
 pub struct ResolveHandleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveHandleRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.resolveHandle";
@@ -131,11 +123,9 @@ pub mod resolve_handle_state {
 
 /// Builder for constructing an instance of this type
 pub struct ResolveHandleBuilder<'a, S: resolve_handle_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Handle<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ResolveHandle<'a> {
@@ -149,9 +139,9 @@ impl<'a> ResolveHandleBuilder<'a, resolve_handle_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ResolveHandleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -164,13 +154,13 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<jacquard_common::types::string::Handle<'a>>,
+        value: impl Into<Handle<'a>>,
     ) -> ResolveHandleBuilder<'a, resolve_handle_state::SetHandle<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ResolveHandleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

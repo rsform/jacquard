@@ -5,62 +5,56 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::types::string::{Did, Cid};
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlob<'a> {
     #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub cid: Cid<'a>,
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
 }
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlobOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetBlobError<'a> {
     #[serde(rename = "BlobNotFound")]
-    BlobNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    BlobNotFound(Option<CowStr<'a>>),
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(Option<CowStr<'a>>),
     #[serde(rename = "RepoTakendown")]
-    RepoTakendown(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoTakendown(Option<CowStr<'a>>),
     #[serde(rename = "RepoSuspended")]
-    RepoSuspended(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoSuspended(Option<CowStr<'a>>),
     #[serde(rename = "RepoDeactivated")]
-    RepoDeactivated(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoDeactivated(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetBlobError<'_> {
@@ -106,8 +100,7 @@ impl core::fmt::Display for GetBlobError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.sync.getBlob
+/// Response type for com.atproto.sync.getBlob
 pub struct GetBlobResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBlobResponse {
     const NSID: &'static str = "com.atproto.sync.getBlob";
@@ -137,8 +130,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetBlob<'a> {
     type Response = GetBlobResponse;
 }
 
-/// Endpoint type for
-///com.atproto.sync.getBlob
+/// Endpoint type for com.atproto.sync.getBlob
 pub struct GetBlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBlobRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.getBlob";
@@ -157,48 +149,45 @@ pub mod get_blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Did;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Did = S::Did;
+        type Cid = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Cid = S::Cid;
         type Did = Set<members::did>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Did = S::Did;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetBlobBuilder<'a, S: get_blob_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Cid<'a>>, Option<Did<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetBlob<'a> {
@@ -212,9 +201,9 @@ impl<'a> GetBlobBuilder<'a, get_blob_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetBlobBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -227,13 +216,13 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+        value: impl Into<Cid<'a>>,
     ) -> GetBlobBuilder<'a, get_blob_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetBlobBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -246,13 +235,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetBlobBuilder<'a, get_blob_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetBlobBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -260,8 +249,8 @@ where
 impl<'a, S> GetBlobBuilder<'a, S>
 where
     S: get_blob_state::State,
-    S::Cid: get_blob_state::IsSet,
     S::Did: get_blob_state::IsSet,
+    S::Cid: get_blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetBlob<'a> {

@@ -5,20 +5,14 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use core::marker::PhantomData;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct RequestPlcOperationSignature;
-/// Response type for
-///com.atproto.identity.requestPlcOperationSignature
+/// Response type for com.atproto.identity.requestPlcOperationSignature
 pub struct RequestPlcOperationSignatureResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestPlcOperationSignatureResponse {
     const NSID: &'static str = "com.atproto.identity.requestPlcOperationSignature";
@@ -35,8 +29,7 @@ impl jacquard_common::xrpc::XrpcRequest for RequestPlcOperationSignature {
     type Response = RequestPlcOperationSignatureResponse;
 }
 
-/// Endpoint type for
-///com.atproto.identity.requestPlcOperationSignature
+/// Endpoint type for com.atproto.identity.requestPlcOperationSignature
 pub struct RequestPlcOperationSignatureRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestPlcOperationSignatureRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.requestPlcOperationSignature";

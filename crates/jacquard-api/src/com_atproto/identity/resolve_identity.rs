@@ -5,62 +5,56 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::identity::IdentityInfo;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveIdentity<'a> {
     #[serde(borrow)]
-    pub identifier: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub identifier: AtIdentifier<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveIdentityOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::com_atproto::identity::IdentityInfo<'a>,
+    pub value: IdentityInfo<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ResolveIdentityError<'a> {
     /// The resolution process confirmed that the handle does not resolve to any DID.
     #[serde(rename = "HandleNotFound")]
-    HandleNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    HandleNotFound(Option<CowStr<'a>>),
     /// The DID resolution process confirmed that there is no current DID.
     #[serde(rename = "DidNotFound")]
-    DidNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    DidNotFound(Option<CowStr<'a>>),
     /// The DID previously existed, but has been deactivated.
     #[serde(rename = "DidDeactivated")]
-    DidDeactivated(core::option::Option<jacquard_common::CowStr<'a>>),
+    DidDeactivated(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for ResolveIdentityError<'_> {
@@ -92,8 +86,7 @@ impl core::fmt::Display for ResolveIdentityError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.identity.resolveIdentity
+/// Response type for com.atproto.identity.resolveIdentity
 pub struct ResolveIdentityResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveIdentityResponse {
     const NSID: &'static str = "com.atproto.identity.resolveIdentity";
@@ -108,8 +101,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveIdentity<'a> {
     type Response = ResolveIdentityResponse;
 }
 
-/// Endpoint type for
-///com.atproto.identity.resolveIdentity
+/// Endpoint type for com.atproto.identity.resolveIdentity
 pub struct ResolveIdentityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveIdentityRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.resolveIdentity";
@@ -152,11 +144,9 @@ pub mod resolve_identity_state {
 
 /// Builder for constructing an instance of this type
 pub struct ResolveIdentityBuilder<'a, S: resolve_identity_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ResolveIdentity<'a> {
@@ -170,9 +160,9 @@ impl<'a> ResolveIdentityBuilder<'a, resolve_identity_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ResolveIdentityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -185,13 +175,13 @@ where
     /// Set the `identifier` field (required)
     pub fn identifier(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> ResolveIdentityBuilder<'a, resolve_identity_state::SetIdentifier<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ResolveIdentityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

@@ -5,18 +5,21 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// The strategy used to authenticate fetch requests for private records in a hidden repository.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Strategy<'a> {
     /**The name that identifies the strategy. The following strategies are supported:
@@ -34,79 +37,64 @@ When fetching a private record from the hidden repository, the server will check
 Of course, many of these strategies depend on the specifics of `app.bsky.graph.follow` / `app.bsky.feed.post` or similar implementation-defined records. You might need to write some code to get support for non-bsky apps.
 */
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Strategy<'a> {
+impl<'a> LexiconSchema for Strategy<'a> {
     fn nsid() -> &'static str {
         "ooo.bsky.authfetch.strategy"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_ooo_bsky_authfetch_strategy()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_ooo_bsky_authfetch_strategy() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("ooo.bsky.authfetch.strategy"),
-        revision: None,
-        description: None,
+fn lexicon_doc_ooo_bsky_authfetch_strategy() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("ooo.bsky.authfetch.strategy"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("main"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "The strategy used to authenticate fetch requests for private records in a hidden repository.",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("name")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The name that identifies the strategy. The following strategies are supported:\n1. `nobody` - Only the author\n2. `author-follows` - Accounts the author follows\n3. `following-author` - Accounts following the author\n4. `mutuals` - Accounts that both the author follows and are following the author\n5. `mentioned` - The author, along with any accounts \"mentioned\", including in-text or via reply/embed/etc. links\n6. `threadgate` - Uses the public post's existing `app.bsky.feed.threadgate` record to determine visibility\n7. `circle` - Implementation-defined, generally a configurable per-author list of accounts\n8. `inherit` - Implementation-defined, generally used for replies, allows the set of accounts that the parent record allows, plus the author of the reply record\n\nWhen fetching a private record from the hidden repository, the server will check the record's strategy, and if the requesting account is not allowed, the server will act as if the record does not exist.\n\nOf course, many of these strategies depend on the specifics of `app.bsky.graph.follow` / `app.bsky.feed.post` or similar implementation-defined records. You might need to write some code to get support for non-bsky apps.\n",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

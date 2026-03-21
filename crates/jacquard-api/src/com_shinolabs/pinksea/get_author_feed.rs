@@ -5,45 +5,37 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_common::types::string::Datetime;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAuthorFeed<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub did: AtIdentifier<'a>,
     ///Defaults to `50`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub since: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub since: Option<Datetime>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAuthorFeedOutput<'a> {
     #[serde(borrow)]
-    pub oekaki: Vec<crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki<'a>>,
+    pub oekaki: Vec<HydratedOekaki<'a>>,
 }
 
-/// Response type for
-///com.shinolabs.pinksea.getAuthorFeed
+/// Response type for com.shinolabs.pinksea.getAuthorFeed
 pub struct GetAuthorFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAuthorFeedResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getAuthorFeed";
@@ -58,8 +50,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetAuthorFeed<'a> {
     type Response = GetAuthorFeedResponse;
 }
 
-/// Endpoint type for
-///com.shinolabs.pinksea.getAuthorFeed
+/// Endpoint type for com.shinolabs.pinksea.getAuthorFeed
 pub struct GetAuthorFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorFeedRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getAuthorFeed";
@@ -68,7 +59,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorFeedRequest {
     type Response = GetAuthorFeedResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
@@ -106,13 +97,9 @@ pub mod get_author_feed_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetAuthorFeedBuilder<'a, S: get_author_feed_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>, Option<i64>, Option<Datetime>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetAuthorFeed<'a> {
@@ -126,9 +113,9 @@ impl<'a> GetAuthorFeedBuilder<'a, get_author_feed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetAuthorFeedBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -141,13 +128,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> GetAuthorFeedBuilder<'a, get_author_feed_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetAuthorFeedBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -167,18 +154,12 @@ impl<'a, S: get_author_feed_state::State> GetAuthorFeedBuilder<'a, S> {
 
 impl<'a, S: get_author_feed_state::State> GetAuthorFeedBuilder<'a, S> {
     /// Set the `since` field (optional)
-    pub fn since(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn since(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `since` field to an Option value (optional)
-    pub fn maybe_since(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_since(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }

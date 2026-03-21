@@ -5,24 +5,21 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::actor::Preferences;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PutPreferences<'a> {
     #[serde(borrow)]
-    pub preferences: crate::app_bsky::actor::Preferences<'a>,
+    pub preferences: Preferences<'a>,
 }
 
-/// Response type for
-///app.bsky.actor.putPreferences
+/// Response type for app.bsky.actor.putPreferences
 pub struct PutPreferencesResponse;
 impl jacquard_common::xrpc::XrpcResp for PutPreferencesResponse {
     const NSID: &'static str = "app.bsky.actor.putPreferences";
@@ -39,8 +36,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for PutPreferences<'a> {
     type Response = PutPreferencesResponse;
 }
 
-/// Endpoint type for
-///app.bsky.actor.putPreferences
+/// Endpoint type for app.bsky.actor.putPreferences
 pub struct PutPreferencesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutPreferencesRequest {
     const PATH: &'static str = "/xrpc/app.bsky.actor.putPreferences";
@@ -85,11 +81,9 @@ pub mod put_preferences_state {
 
 /// Builder for constructing an instance of this type
 pub struct PutPreferencesBuilder<'a, S: put_preferences_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::app_bsky::actor::Preferences<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Preferences<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> PutPreferences<'a> {
@@ -103,9 +97,9 @@ impl<'a> PutPreferencesBuilder<'a, put_preferences_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PutPreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -118,13 +112,13 @@ where
     /// Set the `preferences` field (required)
     pub fn preferences(
         mut self,
-        value: impl Into<crate::app_bsky::actor::Preferences<'a>>,
+        value: impl Into<Preferences<'a>>,
     ) -> PutPreferencesBuilder<'a, put_preferences_state::SetPreferences<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PutPreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -144,7 +138,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

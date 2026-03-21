@@ -5,60 +5,54 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::Nsid;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::slice::stats;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionStats<'a> {
     ///Collection NSID
     #[serde(borrow)]
-    pub collection: jacquard_common::types::string::Nsid<'a>,
+    pub collection: Nsid<'a>,
     ///Number of records in this collection
     pub record_count: i64,
     ///Number of unique actors with records in this collection
     pub unique_actors: i64,
 }
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Stats<'a> {
     #[serde(borrow)]
-    pub slice: jacquard_common::CowStr<'a>,
+    pub slice: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct StatsOutput<'a> {
     ///Per-collection statistics
     #[serde(borrow)]
-    pub collection_stats: Vec<crate::network_slices::slice::stats::CollectionStats<'a>>,
+    pub collection_stats: Vec<stats::CollectionStats<'a>>,
     ///List of collection NSIDs indexed in this slice
     #[serde(borrow)]
-    pub collections: Vec<jacquard_common::types::string::Nsid<'a>>,
+    pub collections: Vec<Nsid<'a>>,
     ///Total number of unique actors indexed in this slice
     pub total_actors: i64,
     ///Total number of lexicons defined for this slice
@@ -67,25 +61,22 @@ pub struct StatsOutput<'a> {
     pub total_records: i64,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CollectionStats<'a> {
+impl<'a> LexiconSchema for CollectionStats<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice.stats"
     }
     fn def_name() -> &'static str {
         "collectionStats"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_network_slices_slice_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-/// Response type for
-///network.slices.slice.stats
+/// Response type for network.slices.slice.stats
 pub struct StatsResponse;
 impl jacquard_common::xrpc::XrpcResp for StatsResponse {
     const NSID: &'static str = "network.slices.slice.stats";
@@ -100,8 +91,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Stats<'a> {
     type Response = StatsResponse;
 }
 
-/// Endpoint type for
-///network.slices.slice.stats
+/// Endpoint type for network.slices.slice.stats
 pub struct StatsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StatsRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.stats";
@@ -120,49 +110,49 @@ pub mod collection_stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RecordCount;
         type Collection;
+        type RecordCount;
         type UniqueActors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RecordCount = Unset;
         type Collection = Unset;
+        type RecordCount = Unset;
         type UniqueActors = Unset;
-    }
-    ///State transition - sets the `record_count` field to Set
-    pub struct SetRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecordCount<S> {}
-    impl<S: State> State for SetRecordCount<S> {
-        type RecordCount = Set<members::record_count>;
-        type Collection = S::Collection;
-        type UniqueActors = S::UniqueActors;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type RecordCount = S::RecordCount;
         type Collection = Set<members::collection>;
+        type RecordCount = S::RecordCount;
+        type UniqueActors = S::UniqueActors;
+    }
+    ///State transition - sets the `record_count` field to Set
+    pub struct SetRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecordCount<S> {}
+    impl<S: State> State for SetRecordCount<S> {
+        type Collection = S::Collection;
+        type RecordCount = Set<members::record_count>;
         type UniqueActors = S::UniqueActors;
     }
     ///State transition - sets the `unique_actors` field to Set
     pub struct SetUniqueActors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUniqueActors<S> {}
     impl<S: State> State for SetUniqueActors<S> {
-        type RecordCount = S::RecordCount;
         type Collection = S::Collection;
+        type RecordCount = S::RecordCount;
         type UniqueActors = Set<members::unique_actors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record_count` field
-        pub struct record_count(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `record_count` field
+        pub struct record_count(());
         ///Marker type for the `unique_actors` field
         pub struct unique_actors(());
     }
@@ -170,13 +160,9 @@ pub mod collection_stats_state {
 
 /// Builder for constructing an instance of this type
 pub struct CollectionStatsBuilder<'a, S: collection_stats_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Nsid<'a>>, Option<i64>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CollectionStats<'a> {
@@ -190,9 +176,9 @@ impl<'a> CollectionStatsBuilder<'a, collection_stats_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CollectionStatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -205,13 +191,13 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<jacquard_common::types::string::Nsid<'a>>,
+        value: impl Into<Nsid<'a>>,
     ) -> CollectionStatsBuilder<'a, collection_stats_state::SetCollection<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CollectionStatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -226,11 +212,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CollectionStatsBuilder<'a, collection_stats_state::SetRecordCount<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CollectionStatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -245,11 +231,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CollectionStatsBuilder<'a, collection_stats_state::SetUniqueActors<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         CollectionStatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -257,8 +243,8 @@ where
 impl<'a, S> CollectionStatsBuilder<'a, S>
 where
     S: collection_stats_state::State,
-    S::RecordCount: collection_stats_state::IsSet,
     S::Collection: collection_stats_state::IsSet,
+    S::RecordCount: collection_stats_state::IsSet,
     S::UniqueActors: collection_stats_state::IsSet,
 {
     /// Build the final struct
@@ -273,7 +259,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -287,130 +273,85 @@ where
     }
 }
 
-fn lexicon_doc_network_slices_slice_stats() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("network.slices.slice.stats"),
-        revision: None,
-        description: None,
+fn lexicon_doc_network_slices_slice_stats() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("network.slices.slice.stats"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "collectionStats",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("collectionStats"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("collection"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("recordCount"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uniqueActors")
+                            SmolStr::new_static("collection"),
+                            SmolStr::new_static("recordCount"),
+                            SmolStr::new_static("uniqueActors")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "collection",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Collection NSID"),
-                                ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Nsid,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("collection"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Collection NSID")),
+                                format: Some(LexStringFormat::Nsid),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "recordCount",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("recordCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "uniqueActors",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("uniqueActors"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
-                    description: None,
+                SmolStr::new_static("main"),
+                LexUserType::XrpcQuery(LexXrpcQuery {
                     parameters: Some(
-                        ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
-                            description: None,
-                            required: Some(
-                                vec![
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static("slice")
-                                ],
-                            ),
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("slice")]),
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::alloc::collections::BTreeMap::new();
+                                let mut map = BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                        "slice",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    SmolStr::new_static("slice"),
+                                    LexXrpcParametersProperty::String(LexString {
                                         description: Some(
-                                            ::jacquard_common::CowStr::new_static(
+                                            CowStr::new_static(
                                                 "AT-URI of the slice to get statistics for",
                                             ),
                                         ),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                        ..Default::default()
                                     }),
                                 );
                                 map
                             },
+                            ..Default::default()
                         }),
                     ),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -448,9 +389,9 @@ pub mod stats_state {
 
 /// Builder for constructing an instance of this type
 pub struct StatsBuilder<'a, S: stats_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Stats<'a> {
@@ -464,9 +405,9 @@ impl<'a> StatsBuilder<'a, stats_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -479,13 +420,13 @@ where
     /// Set the `slice` field (required)
     pub fn slice(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> StatsBuilder<'a, stats_state::SetSlice<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

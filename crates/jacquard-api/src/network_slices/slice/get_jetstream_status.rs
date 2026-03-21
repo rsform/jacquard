@@ -5,35 +5,24 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetJetstreamStatus;
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetJetstreamStatusOutput<'a> {
     ///Whether Jetstream is currently connected and receiving events
     pub connected: bool,
 }
 
-/// Response type for
-///network.slices.slice.getJetstreamStatus
+/// Response type for network.slices.slice.getJetstreamStatus
 pub struct GetJetstreamStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetJetstreamStatusResponse {
     const NSID: &'static str = "network.slices.slice.getJetstreamStatus";
@@ -48,8 +37,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetJetstreamStatus {
     type Response = GetJetstreamStatusResponse;
 }
 
-/// Endpoint type for
-///network.slices.slice.getJetstreamStatus
+/// Endpoint type for network.slices.slice.getJetstreamStatus
 pub struct GetJetstreamStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetJetstreamStatusRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.getJetstreamStatus";

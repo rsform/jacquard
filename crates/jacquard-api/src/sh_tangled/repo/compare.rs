@@ -5,67 +5,60 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Compare<'a> {
     #[serde(borrow)]
-    pub repo: jacquard_common::CowStr<'a>,
+    pub repo: CowStr<'a>,
     #[serde(borrow)]
-    pub rev1: jacquard_common::CowStr<'a>,
+    pub rev1: CowStr<'a>,
     #[serde(borrow)]
-    pub rev2: jacquard_common::CowStr<'a>,
+    pub rev2: CowStr<'a>,
 }
 
 /// Compare output in application/json
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CompareOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CompareError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(Option<CowStr<'a>>),
     /// One or both revisions not found
     #[serde(rename = "RevisionNotFound")]
-    RevisionNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    RevisionNotFound(Option<CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRequest(Option<CowStr<'a>>),
     /// Failed to compare revisions
     #[serde(rename = "CompareError")]
-    CompareError(core::option::Option<jacquard_common::CowStr<'a>>),
+    CompareError(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for CompareError<'_> {
@@ -104,8 +97,7 @@ impl core::fmt::Display for CompareError<'_> {
     }
 }
 
-/// Response type for
-///sh.tangled.repo.compare
+/// Response type for sh.tangled.repo.compare
 pub struct CompareResponse;
 impl jacquard_common::xrpc::XrpcResp for CompareResponse {
     const NSID: &'static str = "sh.tangled.repo.compare";
@@ -135,8 +127,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Compare<'a> {
     type Response = CompareResponse;
 }
 
-/// Endpoint type for
-///sh.tangled.repo.compare
+/// Endpoint type for sh.tangled.repo.compare
 pub struct CompareRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CompareRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.compare";
@@ -155,63 +146,59 @@ pub mod compare_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rev1;
-        type Repo;
         type Rev2;
+        type Repo;
+        type Rev1;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rev1 = Unset;
-        type Repo = Unset;
         type Rev2 = Unset;
-    }
-    ///State transition - sets the `rev1` field to Set
-    pub struct SetRev1<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev1<S> {}
-    impl<S: State> State for SetRev1<S> {
-        type Rev1 = Set<members::rev1>;
-        type Repo = S::Repo;
-        type Rev2 = S::Rev2;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Rev1 = S::Rev1;
-        type Repo = Set<members::repo>;
-        type Rev2 = S::Rev2;
+        type Repo = Unset;
+        type Rev1 = Unset;
     }
     ///State transition - sets the `rev2` field to Set
     pub struct SetRev2<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev2<S> {}
     impl<S: State> State for SetRev2<S> {
-        type Rev1 = S::Rev1;
-        type Repo = S::Repo;
         type Rev2 = Set<members::rev2>;
+        type Repo = S::Repo;
+        type Rev1 = S::Rev1;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Rev2 = S::Rev2;
+        type Repo = Set<members::repo>;
+        type Rev1 = S::Rev1;
+    }
+    ///State transition - sets the `rev1` field to Set
+    pub struct SetRev1<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev1<S> {}
+    impl<S: State> State for SetRev1<S> {
+        type Rev2 = S::Rev2;
+        type Repo = S::Repo;
+        type Rev1 = Set<members::rev1>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rev1` field
-        pub struct rev1(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `rev2` field
         pub struct rev2(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `rev1` field
+        pub struct rev1(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CompareBuilder<'a, S: compare_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Compare<'a> {
@@ -225,9 +212,9 @@ impl<'a> CompareBuilder<'a, compare_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CompareBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -240,13 +227,13 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CompareBuilder<'a, compare_state::SetRepo<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CompareBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -259,13 +246,13 @@ where
     /// Set the `rev1` field (required)
     pub fn rev1(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CompareBuilder<'a, compare_state::SetRev1<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CompareBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -278,13 +265,13 @@ where
     /// Set the `rev2` field (required)
     pub fn rev2(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CompareBuilder<'a, compare_state::SetRev2<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         CompareBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -292,9 +279,9 @@ where
 impl<'a, S> CompareBuilder<'a, S>
 where
     S: compare_state::State,
-    S::Rev1: compare_state::IsSet,
-    S::Repo: compare_state::IsSet,
     S::Rev2: compare_state::IsSet,
+    S::Repo: compare_state::IsSet,
+    S::Rev1: compare_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Compare<'a> {

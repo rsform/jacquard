@@ -5,41 +5,33 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::fm_teal::alpha::feed::PlayView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPlay<'a> {
     #[serde(borrow)]
-    pub author_did: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub author_did: AtIdentifier<'a>,
     #[serde(borrow)]
-    pub rkey: jacquard_common::CowStr<'a>,
+    pub rkey: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPlayOutput<'a> {
     #[serde(borrow)]
-    pub play: crate::fm_teal::alpha::feed::PlayView<'a>,
+    pub play: PlayView<'a>,
 }
 
-/// Response type for
-///fm.teal.alpha.feed.getPlay
+/// Response type for fm.teal.alpha.feed.getPlay
 pub struct GetPlayResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPlayResponse {
     const NSID: &'static str = "fm.teal.alpha.feed.getPlay";
@@ -54,8 +46,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPlay<'a> {
     type Response = GetPlayResponse;
 }
 
-/// Endpoint type for
-///fm.teal.alpha.feed.getPlay
+/// Endpoint type for fm.teal.alpha.feed.getPlay
 pub struct GetPlayRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPlayRequest {
     const PATH: &'static str = "/xrpc/fm.teal.alpha.feed.getPlay";
@@ -74,48 +65,45 @@ pub mod get_play_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AuthorDid;
         type Rkey;
+        type AuthorDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AuthorDid = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `author_did` field to Set
-    pub struct SetAuthorDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthorDid<S> {}
-    impl<S: State> State for SetAuthorDid<S> {
-        type AuthorDid = Set<members::author_did>;
-        type Rkey = S::Rkey;
+        type AuthorDid = Unset;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type AuthorDid = S::AuthorDid;
         type Rkey = Set<members::rkey>;
+        type AuthorDid = S::AuthorDid;
+    }
+    ///State transition - sets the `author_did` field to Set
+    pub struct SetAuthorDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthorDid<S> {}
+    impl<S: State> State for SetAuthorDid<S> {
+        type Rkey = S::Rkey;
+        type AuthorDid = Set<members::author_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `author_did` field
-        pub struct author_did(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
+        ///Marker type for the `author_did` field
+        pub struct author_did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetPlayBuilder<'a, S: get_play_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetPlay<'a> {
@@ -129,9 +117,9 @@ impl<'a> GetPlayBuilder<'a, get_play_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetPlayBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -144,13 +132,13 @@ where
     /// Set the `authorDID` field (required)
     pub fn author_did(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> GetPlayBuilder<'a, get_play_state::SetAuthorDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetPlayBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -163,13 +151,13 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetPlayBuilder<'a, get_play_state::SetRkey<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetPlayBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -177,8 +165,8 @@ where
 impl<'a, S> GetPlayBuilder<'a, S>
 where
     S: get_play_state::State,
-    S::AuthorDid: get_play_state::IsSet,
     S::Rkey: get_play_state::IsSet,
+    S::AuthorDid: get_play_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetPlay<'a> {

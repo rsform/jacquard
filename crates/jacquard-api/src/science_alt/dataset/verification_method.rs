@@ -5,17 +5,12 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use jacquard_common::CowStr;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 /// Automated test suite verification
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct AutomatedTest;
 impl core::fmt::Display for AutomatedTest {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -24,16 +19,8 @@ impl core::fmt::Display for AutomatedTest {
 }
 
 /// Manual code review by a trusted party
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct CodeReview;
 impl core::fmt::Display for CodeReview {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -42,16 +29,8 @@ impl core::fmt::Display for CodeReview {
 }
 
 /// Machine-checkable correctness proof (Coq, Lean, etc.)
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct FormalProof;
 impl core::fmt::Display for FormalProof {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -60,13 +39,14 @@ impl core::fmt::Display for FormalProof {
 }
 
 /// Verification method identifier for lens verification records. Known values correspond to token definitions in this Lexicon. New verification methods can be added as tokens without breaking changes.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VerificationMethod<'a> {
     CodeReview,
     FormalProof,
     SignedHash,
     AutomatedTest,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> VerificationMethod<'a> {
@@ -88,7 +68,7 @@ impl<'a> From<&'a str> for VerificationMethod<'a> {
             "formalProof" => Self::FormalProof,
             "signedHash" => Self::SignedHash,
             "automatedTest" => Self::AutomatedTest,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -100,7 +80,7 @@ impl<'a> From<String> for VerificationMethod<'a> {
             "formalProof" => Self::FormalProof,
             "signedHash" => Self::SignedHash,
             "automatedTest" => Self::AutomatedTest,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -153,16 +133,8 @@ impl jacquard_common::IntoStatic for VerificationMethod<'_> {
 }
 
 /// Cryptographic signature over code hash at referenced commit
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct SignedHash;
 impl core::fmt::Display for SignedHash {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {

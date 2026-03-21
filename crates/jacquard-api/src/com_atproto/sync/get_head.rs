@@ -5,54 +5,48 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, Cid};
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetHead<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetHeadOutput<'a> {
     #[serde(borrow)]
-    pub root: jacquard_common::types::string::Cid<'a>,
+    pub root: Cid<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetHeadError<'a> {
     #[serde(rename = "HeadNotFound")]
-    HeadNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    HeadNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetHeadError<'_> {
@@ -70,8 +64,7 @@ impl core::fmt::Display for GetHeadError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.sync.getHead
+/// Response type for com.atproto.sync.getHead
 pub struct GetHeadResponse;
 impl jacquard_common::xrpc::XrpcResp for GetHeadResponse {
     const NSID: &'static str = "com.atproto.sync.getHead";
@@ -86,8 +79,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetHead<'a> {
     type Response = GetHeadResponse;
 }
 
-/// Endpoint type for
-///com.atproto.sync.getHead
+/// Endpoint type for com.atproto.sync.getHead
 pub struct GetHeadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetHeadRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.getHead";
@@ -130,11 +122,9 @@ pub mod get_head_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetHeadBuilder<'a, S: get_head_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetHead<'a> {
@@ -148,9 +138,9 @@ impl<'a> GetHeadBuilder<'a, get_head_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetHeadBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -163,13 +153,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetHeadBuilder<'a, get_head_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetHeadBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

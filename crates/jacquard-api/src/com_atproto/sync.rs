@@ -21,8 +21,11 @@ pub mod list_repos_by_collection;
 pub mod notify_of_update;
 pub mod request_crawl;
 
+
 #[cfg(feature = "streaming")]
 pub mod subscribe_repos;
+
+use jacquard_common::CowStr;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum HostStatus<'a> {
@@ -31,7 +34,7 @@ pub enum HostStatus<'a> {
     Offline,
     Throttled,
     Banned,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> HostStatus<'a> {
@@ -55,7 +58,7 @@ impl<'a> From<&'a str> for HostStatus<'a> {
             "offline" => Self::Offline,
             "throttled" => Self::Throttled,
             "banned" => Self::Banned,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -68,7 +71,7 @@ impl<'a> From<String> for HostStatus<'a> {
             "offline" => Self::Offline,
             "throttled" => Self::Throttled,
             "banned" => Self::Banned,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }

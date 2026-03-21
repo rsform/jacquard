@@ -5,30 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::ReadingProgress;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateReadingProgress<'a> {
     ///The entry the user is currently on.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub current_entry: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub current_entry: Option<AtUri<'a>>,
     #[serde(borrow)]
-    pub notebook: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub percent_complete: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub notebook: AtUri<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub percent_complete: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: core::option::Option<UpdateReadingProgressStatus<'a>>,
+    pub status: Option<UpdateReadingProgressStatus<'a>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UpdateReadingProgressStatus<'a> {
@@ -36,7 +37,7 @@ pub enum UpdateReadingProgressStatus<'a> {
     Finished,
     Abandoned,
     WantToRead,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> UpdateReadingProgressStatus<'a> {
@@ -58,7 +59,7 @@ impl<'a> From<&'a str> for UpdateReadingProgressStatus<'a> {
             "finished" => Self::Finished,
             "abandoned" => Self::Abandoned,
             "want-to-read" => Self::WantToRead,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -70,7 +71,7 @@ impl<'a> From<String> for UpdateReadingProgressStatus<'a> {
             "finished" => Self::Finished,
             "abandoned" => Self::Abandoned,
             "want-to-read" => Self::WantToRead,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -136,24 +137,16 @@ impl jacquard_common::IntoStatic for UpdateReadingProgressStatus<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateReadingProgressOutput<'a> {
     #[serde(borrow)]
-    pub progress: crate::sh_weaver::notebook::ReadingProgress<'a>,
+    pub progress: ReadingProgress<'a>,
 }
 
-/// Response type for
-///sh.weaver.notebook.updateReadingProgress
+/// Response type for sh.weaver.notebook.updateReadingProgress
 pub struct UpdateReadingProgressResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateReadingProgressResponse {
     const NSID: &'static str = "sh.weaver.notebook.updateReadingProgress";
@@ -170,8 +163,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateReadingProgress<'a> {
     type Response = UpdateReadingProgressResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notebook.updateReadingProgress
+/// Endpoint type for sh.weaver.notebook.updateReadingProgress
 pub struct UpdateReadingProgressRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateReadingProgressRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.updateReadingProgress";
@@ -216,14 +208,14 @@ pub mod update_reading_progress_state {
 
 /// Builder for constructing an instance of this type
 pub struct UpdateReadingProgressBuilder<'a, S: update_reading_progress_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<UpdateReadingProgressStatus<'a>>,
+        Option<AtUri<'a>>,
+        Option<AtUri<'a>>,
+        Option<i64>,
+        Option<UpdateReadingProgressStatus<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateReadingProgress<'a> {
@@ -240,27 +232,21 @@ impl<'a> UpdateReadingProgressBuilder<'a, update_reading_progress_state::Empty> 
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateReadingProgressBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: update_reading_progress_state::State> UpdateReadingProgressBuilder<'a, S> {
     /// Set the `currentEntry` field (optional)
-    pub fn current_entry(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn current_entry(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `currentEntry` field to an Option value (optional)
-    pub fn maybe_current_entry(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_current_entry(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -274,16 +260,16 @@ where
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> UpdateReadingProgressBuilder<
         'a,
         update_reading_progress_state::SetNotebook<S>,
     > {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         UpdateReadingProgressBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -338,7 +324,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

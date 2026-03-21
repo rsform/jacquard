@@ -5,40 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::artist::ArtistViewDetailed;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetArtist<'a> {
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetArtistOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::artist::ArtistViewDetailed<'a>,
+    pub value: ArtistViewDetailed<'a>,
 }
 
-/// Response type for
-///app.rocksky.artist.getArtist
+/// Response type for app.rocksky.artist.getArtist
 pub struct GetArtistResponse;
 impl jacquard_common::xrpc::XrpcResp for GetArtistResponse {
     const NSID: &'static str = "app.rocksky.artist.getArtist";
@@ -53,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetArtist<'a> {
     type Response = GetArtistResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.artist.getArtist
+/// Endpoint type for app.rocksky.artist.getArtist
 pub struct GetArtistRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetArtistRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.artist.getArtist";
@@ -97,11 +86,9 @@ pub mod get_artist_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetArtistBuilder<'a, S: get_artist_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetArtist<'a> {
@@ -115,9 +102,9 @@ impl<'a> GetArtistBuilder<'a, get_artist_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetArtistBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -130,13 +117,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetArtistBuilder<'a, get_artist_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetArtistBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

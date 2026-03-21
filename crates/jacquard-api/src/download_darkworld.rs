@@ -9,19 +9,20 @@ pub mod deltarune;
 pub mod site;
 pub mod state;
 
+use jacquard_common::CowStr;
 /// Identifies as female.
-pub type GenderFemale<'a> = jacquard_common::CowStr<'a>;
+pub type GenderFemale<'a> = CowStr<'a>;
 /// Identifies as male.
-pub type GenderMale<'a> = jacquard_common::CowStr<'a>;
+pub type GenderMale<'a> = CowStr<'a>;
 /// Identifies as non-binary.
-pub type GenderNonBinary<'a> = jacquard_common::CowStr<'a>;
+pub type GenderNonBinary<'a> = CowStr<'a>;
 /// Other gender identity not listed.
-pub type GenderOther<'a> = jacquard_common::CowStr<'a>;
+pub type GenderOther<'a> = CowStr<'a>;
 /// Currently questioning gender identity.
-pub type GenderQuestioning<'a> = jacquard_common::CowStr<'a>;
-pub type PronounsAny<'a> = jacquard_common::CowStr<'a>;
-pub type PronounsHeHim<'a> = jacquard_common::CowStr<'a>;
-pub type PronounsHeThey<'a> = jacquard_common::CowStr<'a>;
-pub type PronounsSheHer<'a> = jacquard_common::CowStr<'a>;
-pub type PronounsSheThey<'a> = jacquard_common::CowStr<'a>;
-pub type PronounsTheyThem<'a> = jacquard_common::CowStr<'a>;
+pub type GenderQuestioning<'a> = CowStr<'a>;
+pub type PronounsAny<'a> = CowStr<'a>;
+pub type PronounsHeHim<'a> = CowStr<'a>;
+pub type PronounsHeThey<'a> = CowStr<'a>;
+pub type PronounsSheHer<'a> = CowStr<'a>;
+pub type PronounsSheThey<'a> = CowStr<'a>;
+pub type PronounsTheyThem<'a> = CowStr<'a>;

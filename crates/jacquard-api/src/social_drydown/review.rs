@@ -5,125 +5,122 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A single wearing review of a fragrance
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Review<'a> {
     ///Final: Depth and evolution (1-5)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub complexity: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub complexity: Option<i64>,
     ///Timestamp when the review was created
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///Mid-Wear: How it smells after settling (1-5)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub drydown_rating: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub drydown_rating: Option<i64>,
     ///Elevation in meters above sea level
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub elevation: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub elevation: Option<i64>,
     ///Final: How it smells at the end (1-5)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub end_rating: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end_rating: Option<i64>,
     ///Reference to the social.drydown.fragrance record
     #[serde(borrow)]
-    pub fragrance: jacquard_common::types::string::AtUri<'a>,
+    pub fragrance: AtUri<'a>,
     ///Final: Total duration (1-5)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub longevity: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub longevity: Option<i64>,
     ///Mid-Wear: Scent bubble radius during mid-wear (1-5)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub mid_projection: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mid_projection: Option<i64>,
     ///First Impression: Immediate scent bubble radius (1-5)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub opening_projection: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_projection: Option<i64>,
     ///First Impression: How it smells immediately (1-5)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub opening_rating: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opening_rating: Option<i64>,
     ///Final: Holistic 'Gut Score' (1-5)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub overall_rating: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub overall_rating: Option<i64>,
     ///Mid-Wear: Trail left behind (1-5)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub sillage: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sillage: Option<i64>,
     ///Temperature in Celsius at Stage 1 * 10 (e.g. 225 = 22.5°C)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub stage1_temp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage1_temp: Option<i64>,
     ///Timestamp when Stage 2 was completed (for accurate temperature)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub stage2_completed_at: core::option::Option<
-        jacquard_common::types::string::Datetime,
-    >,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage2_completed_at: Option<Datetime>,
     ///Temperature in Celsius at Stage 2 * 10 (e.g. 225 = 22.5°C)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub stage2_temp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage2_temp: Option<i64>,
     ///Temperature in Celsius at Stage 3 * 10 (e.g. 225 = 22.5°C)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub stage3_temp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage3_temp: Option<i64>,
     ///Written review (max 255 graphemes)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub text: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub text: Option<CowStr<'a>>,
     ///Daily maximum UV index (0-11+)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub uv_index: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub uv_index: Option<i64>,
     ///User opted in to weather data collection
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub weather_opt_in: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weather_opt_in: Option<bool>,
     ///Calculated final score * 1000 (e.g. 4250 = 4.25)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub weighted_score: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weighted_score: Option<i64>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ReviewGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Review<'a>,
 }
 
 impl<'a> Review<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ReviewRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ReviewRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ReviewRecord;
-impl jacquard_common::xrpc::XrpcResp for ReviewRecord {
+impl XrpcResp for ReviewRecord {
     const NSID: &'static str = "social.drydown.review";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ReviewGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ReviewGetRecordOutput<'_>> for Review<'_> {
@@ -133,35 +130,31 @@ impl From<ReviewGetRecordOutput<'_>> for Review<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Review<'_> {
+impl Collection for Review<'_> {
     const NSID: &'static str = "social.drydown.review";
     type Record = ReviewRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ReviewRecord {
+impl Collection for ReviewRecord {
     const NSID: &'static str = "social.drydown.review";
     type Record = ReviewRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
+impl<'a> LexiconSchema for Review<'a> {
     fn nsid() -> &'static str {
         "social.drydown.review"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_social_drydown_review()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.complexity {
             if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "complexity",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("complexity"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -169,10 +162,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.complexity {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "complexity",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("complexity"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -180,10 +171,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.drydown_rating {
             if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "drydown_rating",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("drydown_rating"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -191,10 +180,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.drydown_rating {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "drydown_rating",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("drydown_rating"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -202,10 +189,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.end_rating {
             if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "end_rating",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("end_rating"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -213,10 +198,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.end_rating {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "end_rating",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("end_rating"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -224,10 +207,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.longevity {
             if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "longevity",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("longevity"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -235,10 +216,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.longevity {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "longevity",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("longevity"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -246,10 +225,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.mid_projection {
             if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mid_projection",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("mid_projection"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -257,10 +234,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.mid_projection {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "mid_projection",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("mid_projection"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -268,10 +243,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.opening_projection {
             if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "opening_projection",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("opening_projection"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -279,10 +252,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.opening_projection {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "opening_projection",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("opening_projection"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -290,10 +261,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.opening_rating {
             if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "opening_rating",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("opening_rating"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -301,10 +270,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.opening_rating {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "opening_rating",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("opening_rating"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -312,10 +279,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.overall_rating {
             if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "overall_rating",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("overall_rating"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -323,10 +288,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.overall_rating {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "overall_rating",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("overall_rating"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -334,10 +297,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.sillage {
             if *value > 5i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sillage",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("sillage"),
                     max: 5i64,
                     actual: *value,
                 });
@@ -345,10 +306,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.sillage {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sillage",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("sillage"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -357,10 +316,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         if let Some(ref value) = self.text {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("text"),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -368,16 +325,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.text {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 255usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "text",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("text"),
                         max: 255usize,
                         actual: count,
                     });
@@ -386,10 +337,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.uv_index {
             if *value > 11i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "uv_index",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("uv_index"),
                     max: 11i64,
                     actual: *value,
                 });
@@ -397,10 +346,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         }
         if let Some(ref value) = self.uv_index {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "uv_index",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("uv_index"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -420,66 +367,66 @@ pub mod review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Fragrance;
         type CreatedAt;
+        type Fragrance;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Fragrance = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `fragrance` field to Set
-    pub struct SetFragrance<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFragrance<S> {}
-    impl<S: State> State for SetFragrance<S> {
-        type Fragrance = Set<members::fragrance>;
-        type CreatedAt = S::CreatedAt;
+        type Fragrance = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Fragrance = S::Fragrance;
         type CreatedAt = Set<members::created_at>;
+        type Fragrance = S::Fragrance;
+    }
+    ///State transition - sets the `fragrance` field to Set
+    pub struct SetFragrance<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFragrance<S> {}
+    impl<S: State> State for SetFragrance<S> {
+        type CreatedAt = S::CreatedAt;
+        type Fragrance = Set<members::fragrance>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `fragrance` field
-        pub struct fragrance(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `fragrance` field
+        pub struct fragrance(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ReviewBuilder<'a, S: review_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<i64>,
+        Option<i64>,
+        Option<Datetime>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<AtUri<'a>>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<Datetime>,
+        Option<i64>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<bool>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Review<'a> {
@@ -493,7 +440,7 @@ impl<'a> ReviewBuilder<'a, review_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReviewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -516,7 +463,7 @@ impl<'a> ReviewBuilder<'a, review_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -542,13 +489,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ReviewBuilder<'a, review_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ReviewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -600,13 +547,13 @@ where
     /// Set the `fragrance` field (required)
     pub fn fragrance(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> ReviewBuilder<'a, review_state::SetFragrance<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         ReviewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -704,18 +651,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `stage2CompletedAt` field (optional)
-    pub fn stage2_completed_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn stage2_completed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.13 = value.into();
         self
     }
     /// Set the `stage2CompletedAt` field to an Option value (optional)
-    pub fn maybe_stage2_completed_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_stage2_completed_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.13 = value;
         self
     }
@@ -749,15 +690,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `text` field (optional)
-    pub fn text(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn text(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.16 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
-    pub fn maybe_text(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_text(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.16 = value;
         self
     }
@@ -805,8 +743,8 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
-    S::Fragrance: review_state::IsSet,
     S::CreatedAt: review_state::IsSet,
+    S::Fragrance: review_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Review<'a> {
@@ -837,7 +775,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -868,338 +806,203 @@ where
     }
 }
 
-fn lexicon_doc_social_drydown_review() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("social.drydown.review"),
-        revision: None,
-        description: None,
+fn lexicon_doc_social_drydown_review() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("social.drydown.review"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A single wearing review of a fragrance",
-                        ),
+                        CowStr::new_static("A single wearing review of a fragrance"),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("fragrance"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("fragrance"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "complexity",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("complexity"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
                                     maximum: Some(5i64),
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Timestamp when the review was created",
-                                        ),
+                                        CowStr::new_static("Timestamp when the review was created"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "drydownRating",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("drydownRating"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
                                     maximum: Some(5i64),
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "elevation",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("elevation"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "endRating",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("endRating"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
                                     maximum: Some(5i64),
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "fragrance",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("fragrance"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Reference to the social.drydown.fragrance record",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "longevity",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("longevity"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
                                     maximum: Some(5i64),
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "midProjection",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("midProjection"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
                                     maximum: Some(5i64),
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "openingProjection",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("openingProjection"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
                                     maximum: Some(5i64),
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "openingRating",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("openingRating"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
                                     maximum: Some(5i64),
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "overallRating",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("overallRating"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
                                     maximum: Some(5i64),
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sillage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("sillage"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
                                     maximum: Some(5i64),
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "stage1Temp",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("stage1Temp"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "stage2CompletedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("stage2CompletedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp when Stage 2 was completed (for accurate temperature)",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "stage2Temp",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("stage2Temp"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "stage3Temp",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("stage3Temp"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "text",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("text"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Written review (max 255 graphemes)",
-                                        ),
+                                        CowStr::new_static("Written review (max 255 graphemes)"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(3000usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(255usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "uvIndex",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("uvIndex"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
                                     maximum: Some(11i64),
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "weatherOptIn",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
+                                SmolStr::new_static("weatherOptIn"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "weightedScore",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("weightedScore"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

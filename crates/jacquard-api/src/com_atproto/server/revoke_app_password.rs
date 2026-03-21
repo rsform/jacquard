@@ -5,25 +5,21 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RevokeAppPassword<'a> {
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
 }
 
-/// Response type for
-///com.atproto.server.revokeAppPassword
+/// Response type for com.atproto.server.revokeAppPassword
 pub struct RevokeAppPasswordResponse;
 impl jacquard_common::xrpc::XrpcResp for RevokeAppPasswordResponse {
     const NSID: &'static str = "com.atproto.server.revokeAppPassword";
@@ -40,8 +36,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RevokeAppPassword<'a> {
     type Response = RevokeAppPasswordResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.revokeAppPassword
+/// Endpoint type for com.atproto.server.revokeAppPassword
 pub struct RevokeAppPasswordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RevokeAppPasswordRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.revokeAppPassword";

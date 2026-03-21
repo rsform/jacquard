@@ -5,37 +5,36 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ReviewClaim<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub approved_games: core::option::Option<
-        Vec<jacquard_common::types::string::AtUri<'a>>,
-    >,
+    pub approved_games: Option<Vec<AtUri<'a>>>,
     #[serde(borrow)]
-    pub claim: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub claim: StrongRef<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub reason: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub reason: Option<CowStr<'a>>,
     #[serde(borrow)]
     pub status: ReviewClaimStatus<'a>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReviewClaimStatus<'a> {
     Approved,
     Denied,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ReviewClaimStatus<'a> {
@@ -53,7 +52,7 @@ impl<'a> From<&'a str> for ReviewClaimStatus<'a> {
         match s {
             "approved" => Self::Approved,
             "denied" => Self::Denied,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -63,7 +62,7 @@ impl<'a> From<String> for ReviewClaimStatus<'a> {
         match s.as_str() {
             "approved" => Self::Approved,
             "denied" => Self::Denied,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -119,24 +118,16 @@ impl jacquard_common::IntoStatic for ReviewClaimStatus<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ReviewClaimOutput<'a> {
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-/// Response type for
-///games.gamesgamesgamesgames.reviewClaim
+/// Response type for games.gamesgamesgamesgames.reviewClaim
 pub struct ReviewClaimResponse;
 impl jacquard_common::xrpc::XrpcResp for ReviewClaimResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.reviewClaim";
@@ -153,8 +144,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ReviewClaim<'a> {
     type Response = ReviewClaimResponse;
 }
 
-/// Endpoint type for
-///games.gamesgamesgamesgames.reviewClaim
+/// Endpoint type for games.gamesgamesgamesgames.reviewClaim
 pub struct ReviewClaimRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ReviewClaimRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.reviewClaim";
@@ -175,50 +165,50 @@ pub mod review_claim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type Claim;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type Claim = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type Claim = S::Claim;
+        type Status = Unset;
     }
     ///State transition - sets the `claim` field to Set
     pub struct SetClaim<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClaim<S> {}
     impl<S: State> State for SetClaim<S> {
-        type Status = S::Status;
         type Claim = Set<members::claim>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Claim = S::Claim;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `claim` field
         pub struct claim(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ReviewClaimBuilder<'a, S: review_claim_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<ReviewClaimStatus<'a>>,
+        Option<Vec<AtUri<'a>>>,
+        Option<StrongRef<'a>>,
+        Option<CowStr<'a>>,
+        Option<ReviewClaimStatus<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ReviewClaim<'a> {
@@ -232,27 +222,21 @@ impl<'a> ReviewClaimBuilder<'a, review_claim_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReviewClaimBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: review_claim_state::State> ReviewClaimBuilder<'a, S> {
     /// Set the `approvedGames` field (optional)
-    pub fn approved_games(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
-    ) -> Self {
+    pub fn approved_games(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `approvedGames` field to an Option value (optional)
-    pub fn maybe_approved_games(
-        mut self,
-        value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn maybe_approved_games(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -266,28 +250,25 @@ where
     /// Set the `claim` field (required)
     pub fn claim(
         mut self,
-        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        value: impl Into<StrongRef<'a>>,
     ) -> ReviewClaimBuilder<'a, review_claim_state::SetClaim<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ReviewClaimBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: review_claim_state::State> ReviewClaimBuilder<'a, S> {
     /// Set the `reason` field (optional)
-    pub fn reason(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `reason` field to an Option value (optional)
-    pub fn maybe_reason(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_reason(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -303,11 +284,11 @@ where
         mut self,
         value: impl Into<ReviewClaimStatus<'a>>,
     ) -> ReviewClaimBuilder<'a, review_claim_state::SetStatus<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         ReviewClaimBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -315,8 +296,8 @@ where
 impl<'a, S> ReviewClaimBuilder<'a, S>
 where
     S: review_claim_state::State,
-    S::Status: review_claim_state::IsSet,
     S::Claim: review_claim_state::IsSet,
+    S::Status: review_claim_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReviewClaim<'a> {
@@ -331,7 +312,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

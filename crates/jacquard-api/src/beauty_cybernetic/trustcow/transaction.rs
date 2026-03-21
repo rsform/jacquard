@@ -5,86 +5,85 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A verified transaction between two ATProto identities that must be stored in both parties' PDS
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Transaction<'a> {
     ///Transaction amount (optional, in whatever currency applies)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub amount: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub amount: Option<CowStr<'a>>,
     ///When the transaction occurred
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///Currency code (optional, e.g. USD, EUR, BTC)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub currency: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub currency: Option<CowStr<'a>>,
     ///Description of the service or product transacted
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<CowStr<'a>>,
     ///DID of the service consumer identity
     #[serde(borrow)]
-    pub service_consumer: jacquard_common::CowStr<'a>,
+    pub service_consumer: CowStr<'a>,
     ///DID of the service provider identity
     #[serde(borrow)]
-    pub service_provider: jacquard_common::CowStr<'a>,
+    pub service_provider: CowStr<'a>,
     ///Unique identifier for this transaction, must be identical in both parties' records
     #[serde(borrow)]
-    pub transaction_id: jacquard_common::CowStr<'a>,
+    pub transaction_id: CowStr<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct TransactionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Transaction<'a>,
 }
 
 impl<'a> Transaction<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, TransactionRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, TransactionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TransactionRecord;
-impl jacquard_common::xrpc::XrpcResp for TransactionRecord {
+impl XrpcResp for TransactionRecord {
     const NSID: &'static str = "beauty.cybernetic.trustcow.transaction";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = TransactionGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<TransactionGetRecordOutput<'_>> for Transaction<'_> {
@@ -94,36 +93,32 @@ impl From<TransactionGetRecordOutput<'_>> for Transaction<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Transaction<'_> {
+impl Collection for Transaction<'_> {
     const NSID: &'static str = "beauty.cybernetic.trustcow.transaction";
     type Record = TransactionRecord;
 }
 
-impl jacquard_common::types::collection::Collection for TransactionRecord {
+impl Collection for TransactionRecord {
     const NSID: &'static str = "beauty.cybernetic.trustcow.transaction";
     type Record = TransactionRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
+impl<'a> LexiconSchema for Transaction<'a> {
     fn nsid() -> &'static str {
         "beauty.cybernetic.trustcow.transaction"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_beauty_cybernetic_trustcow_transaction()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.currency {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "currency",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("currency"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -132,10 +127,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("description"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -145,10 +138,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
             let value = &self.transaction_id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "transaction_id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("transaction_id"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -168,65 +159,65 @@ pub mod transaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ServiceProvider;
         type ServiceConsumer;
         type CreatedAt;
-        type ServiceProvider;
         type TransactionId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ServiceProvider = Unset;
         type ServiceConsumer = Unset;
         type CreatedAt = Unset;
-        type ServiceProvider = Unset;
         type TransactionId = Unset;
+    }
+    ///State transition - sets the `service_provider` field to Set
+    pub struct SetServiceProvider<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServiceProvider<S> {}
+    impl<S: State> State for SetServiceProvider<S> {
+        type ServiceProvider = Set<members::service_provider>;
+        type ServiceConsumer = S::ServiceConsumer;
+        type CreatedAt = S::CreatedAt;
+        type TransactionId = S::TransactionId;
     }
     ///State transition - sets the `service_consumer` field to Set
     pub struct SetServiceConsumer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetServiceConsumer<S> {}
     impl<S: State> State for SetServiceConsumer<S> {
+        type ServiceProvider = S::ServiceProvider;
         type ServiceConsumer = Set<members::service_consumer>;
         type CreatedAt = S::CreatedAt;
-        type ServiceProvider = S::ServiceProvider;
         type TransactionId = S::TransactionId;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type ServiceProvider = S::ServiceProvider;
         type ServiceConsumer = S::ServiceConsumer;
         type CreatedAt = Set<members::created_at>;
-        type ServiceProvider = S::ServiceProvider;
-        type TransactionId = S::TransactionId;
-    }
-    ///State transition - sets the `service_provider` field to Set
-    pub struct SetServiceProvider<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServiceProvider<S> {}
-    impl<S: State> State for SetServiceProvider<S> {
-        type ServiceConsumer = S::ServiceConsumer;
-        type CreatedAt = S::CreatedAt;
-        type ServiceProvider = Set<members::service_provider>;
         type TransactionId = S::TransactionId;
     }
     ///State transition - sets the `transaction_id` field to Set
     pub struct SetTransactionId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTransactionId<S> {}
     impl<S: State> State for SetTransactionId<S> {
+        type ServiceProvider = S::ServiceProvider;
         type ServiceConsumer = S::ServiceConsumer;
         type CreatedAt = S::CreatedAt;
-        type ServiceProvider = S::ServiceProvider;
         type TransactionId = Set<members::transaction_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `service_provider` field
+        pub struct service_provider(());
         ///Marker type for the `service_consumer` field
         pub struct service_consumer(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `service_provider` field
-        pub struct service_provider(());
         ///Marker type for the `transaction_id` field
         pub struct transaction_id(());
     }
@@ -234,17 +225,17 @@ pub mod transaction_state {
 
 /// Builder for constructing an instance of this type
 pub struct TransactionBuilder<'a, S: transaction_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Transaction<'a> {
@@ -258,24 +249,21 @@ impl<'a> TransactionBuilder<'a, transaction_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TransactionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `amount` field (optional)
-    pub fn amount(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn amount(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `amount` field to an Option value (optional)
-    pub fn maybe_amount(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_amount(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -289,28 +277,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> TransactionBuilder<'a, transaction_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         TransactionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `currency` field (optional)
-    pub fn currency(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn currency(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `currency` field to an Option value (optional)
-    pub fn maybe_currency(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_currency(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -318,18 +303,12 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -343,13 +322,13 @@ where
     /// Set the `serviceConsumer` field (required)
     pub fn service_consumer(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> TransactionBuilder<'a, transaction_state::SetServiceConsumer<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         TransactionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -362,13 +341,13 @@ where
     /// Set the `serviceProvider` field (required)
     pub fn service_provider(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> TransactionBuilder<'a, transaction_state::SetServiceProvider<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         TransactionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -381,13 +360,13 @@ where
     /// Set the `transactionId` field (required)
     pub fn transaction_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> TransactionBuilder<'a, transaction_state::SetTransactionId<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         TransactionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -395,9 +374,9 @@ where
 impl<'a, S> TransactionBuilder<'a, S>
 where
     S: transaction_state::State,
+    S::ServiceProvider: transaction_state::IsSet,
     S::ServiceConsumer: transaction_state::IsSet,
     S::CreatedAt: transaction_state::IsSet,
-    S::ServiceProvider: transaction_state::IsSet,
     S::TransactionId: transaction_state::IsSet,
 {
     /// Build the final struct
@@ -416,7 +395,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -434,196 +413,120 @@ where
     }
 }
 
-fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "beauty.cybernetic.trustcow.transaction",
-        ),
-        revision: None,
-        description: None,
+fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("beauty.cybernetic.trustcow.transaction"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A verified transaction between two ATProto identities that must be stored in both parties' PDS",
                         ),
                     ),
-                    key: None,
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("serviceProvider"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("serviceConsumer"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("transactionId"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("serviceProvider"),
+                                SmolStr::new_static("serviceConsumer"),
+                                SmolStr::new_static("transactionId"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "amount",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("amount"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Transaction amount (optional, in whatever currency applies)",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "When the transaction occurred",
-                                        ),
+                                        CowStr::new_static("When the transaction occurred"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "currency",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("currency"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Currency code (optional, e.g. USD, EUR, BTC)",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(10usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "description",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("description"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Description of the service or product transacted",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(500usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "serviceConsumer",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("serviceConsumer"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "DID of the service consumer identity",
-                                        ),
+                                        CowStr::new_static("DID of the service consumer identity"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "serviceProvider",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("serviceProvider"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "DID of the service provider identity",
-                                        ),
+                                        CowStr::new_static("DID of the service provider identity"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "transactionId",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("transactionId"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Unique identifier for this transaction, must be identical in both parties' records",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(128usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

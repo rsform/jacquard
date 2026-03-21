@@ -5,42 +5,33 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::app_ocho::plugin::Manifest;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetManifest<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
     #[serde(borrow)]
-    pub platform: jacquard_common::CowStr<'a>,
+    pub platform: CowStr<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetManifestOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_ocho::plugin::Manifest<'a>,
+    pub value: Manifest<'a>,
 }
 
-/// Response type for
-///app.ocho.plugin.getManifest
+/// Response type for app.ocho.plugin.getManifest
 pub struct GetManifestResponse;
 impl jacquard_common::xrpc::XrpcResp for GetManifestResponse {
     const NSID: &'static str = "app.ocho.plugin.getManifest";
@@ -55,8 +46,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetManifest<'a> {
     type Response = GetManifestResponse;
 }
 
-/// Endpoint type for
-///app.ocho.plugin.getManifest
+/// Endpoint type for app.ocho.plugin.getManifest
 pub struct GetManifestRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetManifestRequest {
     const PATH: &'static str = "/xrpc/app.ocho.plugin.getManifest";
@@ -75,48 +65,45 @@ pub mod get_manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Platform;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Platform = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Platform = S::Platform;
+        type Did = Unset;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlatform<S> {}
     impl<S: State> State for SetPlatform<S> {
-        type Did = S::Did;
         type Platform = Set<members::platform>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Platform = S::Platform;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `platform` field
         pub struct platform(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetManifestBuilder<'a, S: get_manifest_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetManifest<'a> {
@@ -130,9 +117,9 @@ impl<'a> GetManifestBuilder<'a, get_manifest_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetManifestBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -145,13 +132,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetManifestBuilder<'a, get_manifest_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetManifestBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -164,13 +151,13 @@ where
     /// Set the `platform` field (required)
     pub fn platform(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetManifestBuilder<'a, get_manifest_state::SetPlatform<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetManifestBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -178,8 +165,8 @@ where
 impl<'a, S> GetManifestBuilder<'a, S>
 where
     S: get_manifest_state::State,
-    S::Did: get_manifest_state::IsSet,
     S::Platform: get_manifest_state::IsSet,
+    S::Did: get_manifest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetManifest<'a> {

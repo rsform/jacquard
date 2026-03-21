@@ -5,17 +5,12 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use jacquard_common::CowStr;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 /// Appeal a previously taken moderation action
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonAppeal;
 impl core::fmt::Display for ReasonAppeal {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -24,16 +19,8 @@ impl core::fmt::Display for ReasonAppeal {
 }
 
 /// Child sexual abuse material (CSAM). These reports will be sent only be sent to the application's Moderation Authority.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonChildSafetyCsam;
 impl core::fmt::Display for ReasonChildSafetyCsam {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -42,16 +29,8 @@ impl core::fmt::Display for ReasonChildSafetyCsam {
 }
 
 /// Grooming or predatory behavior. These reports will be sent only be sent to the application's Moderation Authority.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonChildSafetyGroom;
 impl core::fmt::Display for ReasonChildSafetyGroom {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -60,16 +39,8 @@ impl core::fmt::Display for ReasonChildSafetyGroom {
 }
 
 /// Harassment or bullying of minors
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonChildSafetyHarassment;
 impl core::fmt::Display for ReasonChildSafetyHarassment {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -78,16 +49,8 @@ impl core::fmt::Display for ReasonChildSafetyHarassment {
 }
 
 /// Other child safety. These reports will be sent only be sent to the application's Moderation Authority.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonChildSafetyOther;
 impl core::fmt::Display for ReasonChildSafetyOther {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -96,16 +59,8 @@ impl core::fmt::Display for ReasonChildSafetyOther {
 }
 
 /// Privacy violation involving a minor
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonChildSafetyPrivacy;
 impl core::fmt::Display for ReasonChildSafetyPrivacy {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -114,16 +69,8 @@ impl core::fmt::Display for ReasonChildSafetyPrivacy {
 }
 
 /// Doxxing
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonHarassmentDoxxing;
 impl core::fmt::Display for ReasonHarassmentDoxxing {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -132,16 +79,8 @@ impl core::fmt::Display for ReasonHarassmentDoxxing {
 }
 
 /// Hate speech
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonHarassmentHateSpeech;
 impl core::fmt::Display for ReasonHarassmentHateSpeech {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -150,16 +89,8 @@ impl core::fmt::Display for ReasonHarassmentHateSpeech {
 }
 
 /// Other harassing or hateful content
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonHarassmentOther;
 impl core::fmt::Display for ReasonHarassmentOther {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -168,16 +99,8 @@ impl core::fmt::Display for ReasonHarassmentOther {
 }
 
 /// Targeted harassment
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonHarassmentTargeted;
 impl core::fmt::Display for ReasonHarassmentTargeted {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -186,16 +109,8 @@ impl core::fmt::Display for ReasonHarassmentTargeted {
 }
 
 /// Trolling
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonHarassmentTroll;
 impl core::fmt::Display for ReasonHarassmentTroll {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -204,16 +119,8 @@ impl core::fmt::Display for ReasonHarassmentTroll {
 }
 
 /// Fake account or bot
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonMisleadingBot;
 impl core::fmt::Display for ReasonMisleadingBot {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -222,16 +129,8 @@ impl core::fmt::Display for ReasonMisleadingBot {
 }
 
 /// False information about elections
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonMisleadingElections;
 impl core::fmt::Display for ReasonMisleadingElections {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -240,16 +139,8 @@ impl core::fmt::Display for ReasonMisleadingElections {
 }
 
 /// Impersonation
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonMisleadingImpersonation;
 impl core::fmt::Display for ReasonMisleadingImpersonation {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -258,16 +149,8 @@ impl core::fmt::Display for ReasonMisleadingImpersonation {
 }
 
 /// Other misleading content
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonMisleadingOther;
 impl core::fmt::Display for ReasonMisleadingOther {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -276,16 +159,8 @@ impl core::fmt::Display for ReasonMisleadingOther {
 }
 
 /// Scam
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonMisleadingScam;
 impl core::fmt::Display for ReasonMisleadingScam {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -294,16 +169,8 @@ impl core::fmt::Display for ReasonMisleadingScam {
 }
 
 /// Spam
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonMisleadingSpam;
 impl core::fmt::Display for ReasonMisleadingSpam {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -312,16 +179,8 @@ impl core::fmt::Display for ReasonMisleadingSpam {
 }
 
 /// An issue not included in these options
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonOther;
 impl core::fmt::Display for ReasonOther {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -330,16 +189,8 @@ impl core::fmt::Display for ReasonOther {
 }
 
 /// Banned user returning
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonRuleBanEvasion;
 impl core::fmt::Display for ReasonRuleBanEvasion {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -348,16 +199,8 @@ impl core::fmt::Display for ReasonRuleBanEvasion {
 }
 
 /// Other
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonRuleOther;
 impl core::fmt::Display for ReasonRuleOther {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -366,16 +209,8 @@ impl core::fmt::Display for ReasonRuleOther {
 }
 
 /// Promoting or selling prohibited items or services
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonRuleProhibitedSales;
 impl core::fmt::Display for ReasonRuleProhibitedSales {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -384,16 +219,8 @@ impl core::fmt::Display for ReasonRuleProhibitedSales {
 }
 
 /// Hacking or system attacks
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonRuleSiteSecurity;
 impl core::fmt::Display for ReasonRuleSiteSecurity {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -402,16 +229,8 @@ impl core::fmt::Display for ReasonRuleSiteSecurity {
 }
 
 /// Content promoting or depicting self-harm
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonSelfHarmContent;
 impl core::fmt::Display for ReasonSelfHarmContent {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -420,16 +239,8 @@ impl core::fmt::Display for ReasonSelfHarmContent {
 }
 
 /// Eating disorders
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonSelfHarmEd;
 impl core::fmt::Display for ReasonSelfHarmEd {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -438,16 +249,8 @@ impl core::fmt::Display for ReasonSelfHarmEd {
 }
 
 /// Other dangerous content
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonSelfHarmOther;
 impl core::fmt::Display for ReasonSelfHarmOther {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -456,16 +259,8 @@ impl core::fmt::Display for ReasonSelfHarmOther {
 }
 
 /// Dangerous challenges or activities
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonSelfHarmStunts;
 impl core::fmt::Display for ReasonSelfHarmStunts {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -474,16 +269,8 @@ impl core::fmt::Display for ReasonSelfHarmStunts {
 }
 
 /// Dangerous substances or drug abuse
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonSelfHarmSubstances;
 impl core::fmt::Display for ReasonSelfHarmSubstances {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -492,16 +279,8 @@ impl core::fmt::Display for ReasonSelfHarmSubstances {
 }
 
 /// Adult sexual abuse content
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonSexualAbuseContent;
 impl core::fmt::Display for ReasonSexualAbuseContent {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -510,16 +289,8 @@ impl core::fmt::Display for ReasonSexualAbuseContent {
 }
 
 /// Animal sexual abuse
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonSexualAnimal;
 impl core::fmt::Display for ReasonSexualAnimal {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -528,16 +299,8 @@ impl core::fmt::Display for ReasonSexualAnimal {
 }
 
 /// Deepfake adult content
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonSexualDeepfake;
 impl core::fmt::Display for ReasonSexualDeepfake {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -546,16 +309,8 @@ impl core::fmt::Display for ReasonSexualDeepfake {
 }
 
 /// Non-consensual intimate imagery
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonSexualNcii;
 impl core::fmt::Display for ReasonSexualNcii {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -564,16 +319,8 @@ impl core::fmt::Display for ReasonSexualNcii {
 }
 
 /// Other sexual violence content
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonSexualOther;
 impl core::fmt::Display for ReasonSexualOther {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -582,22 +329,15 @@ impl core::fmt::Display for ReasonSexualOther {
 }
 
 /// Unlabelled adult content
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonSexualUnlabeled;
 impl core::fmt::Display for ReasonSexualUnlabeled {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonSexualUnlabeled")
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReasonType<'a> {
@@ -641,7 +381,7 @@ pub enum ReasonType<'a> {
     ToolsOzoneReportDefsReasonSelfHarmStunts,
     ToolsOzoneReportDefsReasonSelfHarmSubstances,
     ToolsOzoneReportDefsReasonSelfHarmOther,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ReasonType<'a> {
@@ -895,7 +635,7 @@ impl<'a> From<&'a str> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonSelfHarmOther" => {
                 Self::ToolsOzoneReportDefsReasonSelfHarmOther
             }
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -1023,7 +763,7 @@ impl<'a> From<String> for ReasonType<'a> {
             "tools.ozone.report.defs#reasonSelfHarmOther" => {
                 Self::ToolsOzoneReportDefsReasonSelfHarmOther
             }
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -1192,16 +932,8 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
 }
 
 /// Animal welfare violations
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonViolenceAnimal;
 impl core::fmt::Display for ReasonViolenceAnimal {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -1210,16 +942,8 @@ impl core::fmt::Display for ReasonViolenceAnimal {
 }
 
 /// Extremist content. These reports will be sent only be sent to the application's Moderation Authority.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonViolenceExtremistContent;
 impl core::fmt::Display for ReasonViolenceExtremistContent {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -1228,16 +952,8 @@ impl core::fmt::Display for ReasonViolenceExtremistContent {
 }
 
 /// Glorification of violence
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonViolenceGlorification;
 impl core::fmt::Display for ReasonViolenceGlorification {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -1246,16 +962,8 @@ impl core::fmt::Display for ReasonViolenceGlorification {
 }
 
 /// Graphic violent content
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonViolenceGraphicContent;
 impl core::fmt::Display for ReasonViolenceGraphicContent {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -1264,16 +972,8 @@ impl core::fmt::Display for ReasonViolenceGraphicContent {
 }
 
 /// Other violent content
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonViolenceOther;
 impl core::fmt::Display for ReasonViolenceOther {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -1282,16 +982,8 @@ impl core::fmt::Display for ReasonViolenceOther {
 }
 
 /// Threats or incitement
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonViolenceThreats;
 impl core::fmt::Display for ReasonViolenceThreats {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -1300,16 +992,8 @@ impl core::fmt::Display for ReasonViolenceThreats {
 }
 
 /// Human trafficking
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct ReasonViolenceTrafficking;
 impl core::fmt::Display for ReasonViolenceTrafficking {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {

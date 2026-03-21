@@ -5,73 +5,67 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, Datetime};
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SetStats<'a> {
     ///RFC3339 timestamp of last pull
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub last_pull: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_pull: Option<Datetime>,
     ///RFC3339 timestamp of last push
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub last_push: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_push: Option<Datetime>,
     ///DID of the repository owner
     #[serde(borrow)]
-    pub owner_did: jacquard_common::types::string::Did<'a>,
+    pub owner_did: Did<'a>,
     ///Absolute pull count to set
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub pull_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pull_count: Option<i64>,
     ///Absolute push count to set
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub push_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub push_count: Option<i64>,
     ///Repository name
     #[serde(borrow)]
-    pub repository: jacquard_common::CowStr<'a>,
+    pub repository: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SetStatsOutput<'a> {
     ///Whether the stats were successfully updated
     pub success: bool,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SetStatsError<'a> {
     #[serde(rename = "InvalidOwner")]
-    InvalidOwner(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidOwner(Option<CowStr<'a>>),
     #[serde(rename = "InvalidRepository")]
-    InvalidRepository(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRepository(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for SetStatsError<'_> {
@@ -96,8 +90,7 @@ impl core::fmt::Display for SetStatsError<'_> {
     }
 }
 
-/// Response type for
-///io.atcr.hold.setStats
+/// Response type for io.atcr.hold.setStats
 pub struct SetStatsResponse;
 impl jacquard_common::xrpc::XrpcResp for SetStatsResponse {
     const NSID: &'static str = "io.atcr.hold.setStats";
@@ -114,8 +107,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SetStats<'a> {
     type Response = SetStatsResponse;
 }
 
-/// Endpoint type for
-///io.atcr.hold.setStats
+/// Endpoint type for io.atcr.hold.setStats
 pub struct SetStatsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SetStatsRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.setStats";
@@ -172,16 +164,16 @@ pub mod set_stats_state {
 
 /// Builder for constructing an instance of this type
 pub struct SetStatsBuilder<'a, S: set_stats_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<Did<'a>>,
+        Option<i64>,
+        Option<i64>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SetStats<'a> {
@@ -195,27 +187,21 @@ impl<'a> SetStatsBuilder<'a, set_stats_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SetStatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
     /// Set the `lastPull` field (optional)
-    pub fn last_pull(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn last_pull(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `lastPull` field to an Option value (optional)
-    pub fn maybe_last_pull(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_last_pull(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -223,18 +209,12 @@ impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
 
 impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
     /// Set the `lastPush` field (optional)
-    pub fn last_push(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn last_push(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `lastPush` field to an Option value (optional)
-    pub fn maybe_last_push(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_last_push(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -248,13 +228,13 @@ where
     /// Set the `ownerDid` field (required)
     pub fn owner_did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> SetStatsBuilder<'a, set_stats_state::SetOwnerDid<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         SetStatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -293,13 +273,13 @@ where
     /// Set the `repository` field (required)
     pub fn repository(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SetStatsBuilder<'a, set_stats_state::SetRepository<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         SetStatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -325,7 +305,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

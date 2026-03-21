@@ -5,43 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::actor::ProfileViewBasic;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetContributors<'a> {
     /// Defaults to `true`.
     #[serde(default = "_default_include_cascaded")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub include_cascaded: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_cascaded: Option<bool>,
     #[serde(borrow)]
-    pub resource: jacquard_common::types::string::AtUri<'a>,
+    pub resource: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetContributorsOutput<'a> {
     #[serde(borrow)]
-    pub contributors: Vec<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+    pub contributors: Vec<ProfileViewBasic<'a>>,
 }
 
-/// Response type for
-///sh.weaver.edit.getContributors
+/// Response type for sh.weaver.edit.getContributors
 pub struct GetContributorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetContributorsResponse {
     const NSID: &'static str = "sh.weaver.edit.getContributors";
@@ -56,8 +47,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetContributors<'a> {
     type Response = GetContributorsResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.edit.getContributors
+/// Endpoint type for sh.weaver.edit.getContributors
 pub struct GetContributorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetContributorsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.edit.getContributors";
@@ -66,7 +56,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetContributorsRequest {
     type Response = GetContributorsResponse;
 }
 
-fn _default_include_cascaded() -> core::option::Option<bool> {
+fn _default_include_cascaded() -> Option<bool> {
     Some(true)
 }
 
@@ -104,12 +94,9 @@ pub mod get_contributors_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetContributorsBuilder<'a, S: get_contributors_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<bool>, Option<AtUri<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetContributors<'a> {
@@ -123,9 +110,9 @@ impl<'a> GetContributorsBuilder<'a, get_contributors_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetContributorsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -151,13 +138,13 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetContributorsBuilder<'a, get_contributors_state::SetResource<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetContributorsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

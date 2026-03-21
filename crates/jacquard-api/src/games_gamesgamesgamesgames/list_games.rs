@@ -5,60 +5,52 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::GameSummaryView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListGames<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cursor: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub did: Option<Did<'a>>,
     ///Defaults to `20`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
     ///Defaults to `"indexed_at"`.
     #[serde(default = "_default_sort")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub sort: Option<CowStr<'a>>,
     ///Defaults to `"desc"`.
     #[serde(default = "_default_sort_direction")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort_direction: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub sort_direction: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListGamesOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub games: Vec<crate::games_gamesgamesgamesgames::GameSummaryView<'a>>,
+    pub games: Vec<GameSummaryView<'a>>,
 }
 
-/// Response type for
-///games.gamesgamesgamesgames.listGames
+/// Response type for games.gamesgamesgamesgames.listGames
 pub struct ListGamesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListGamesResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.listGames";
@@ -73,8 +65,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListGames<'a> {
     type Response = ListGamesResponse;
 }
 
-/// Endpoint type for
-///games.gamesgamesgamesgames.listGames
+/// Endpoint type for games.gamesgamesgamesgames.listGames
 pub struct ListGamesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListGamesRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.listGames";
@@ -83,16 +74,16 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListGamesRequest {
     type Response = ListGamesResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(20i64)
 }
 
-fn _default_sort() -> core::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("indexed_at"))
+fn _default_sort() -> Option<CowStr<'static>> {
+    Some(CowStr::from("indexed_at"))
 }
 
-fn _default_sort_direction() -> core::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("desc"))
+fn _default_sort_direction() -> Option<CowStr<'static>> {
+    Some(CowStr::from("desc"))
 }
 
 pub mod list_games_state {
@@ -116,15 +107,15 @@ pub mod list_games_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListGamesBuilder<'a, S: list_games_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Did<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ListGames<'a> {
@@ -138,24 +129,21 @@ impl<'a> ListGamesBuilder<'a, list_games_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListGamesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -163,18 +151,12 @@ impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
 
 impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     /// Set the `did` field (optional)
-    pub fn did(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
-    pub fn maybe_did(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_did(mut self, value: Option<Did<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -195,15 +177,12 @@ impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
 
 impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -211,18 +190,12 @@ impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
 
 impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     /// Set the `sortDirection` field (optional)
-    pub fn sort_direction(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn sort_direction(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
-    pub fn maybe_sort_direction(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_sort_direction(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }

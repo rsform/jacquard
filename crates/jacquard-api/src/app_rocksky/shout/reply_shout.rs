@@ -5,46 +5,36 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::shout::ShoutView;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ReplyShout<'a> {
     ///The content of the reply
     #[serde(borrow)]
-    pub message: jacquard_common::CowStr<'a>,
+    pub message: CowStr<'a>,
     ///The unique identifier of the shout to reply to
     #[serde(borrow)]
-    pub shout_id: jacquard_common::CowStr<'a>,
+    pub shout_id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ReplyShoutOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::shout::ShoutView<'a>,
+    pub value: ShoutView<'a>,
 }
 
-/// Response type for
-///app.rocksky.shout.replyShout
+/// Response type for app.rocksky.shout.replyShout
 pub struct ReplyShoutResponse;
 impl jacquard_common::xrpc::XrpcResp for ReplyShoutResponse {
     const NSID: &'static str = "app.rocksky.shout.replyShout";
@@ -61,8 +51,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ReplyShout<'a> {
     type Response = ReplyShoutResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.shout.replyShout
+/// Endpoint type for app.rocksky.shout.replyShout
 pub struct ReplyShoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ReplyShoutRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.replyShout";

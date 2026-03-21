@@ -5,35 +5,25 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::actor::Preferences;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPreferences;
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPreferencesOutput<'a> {
     #[serde(borrow)]
-    pub preferences: crate::app_bsky::actor::Preferences<'a>,
+    pub preferences: Preferences<'a>,
 }
 
-/// Response type for
-///app.bsky.actor.getPreferences
+/// Response type for app.bsky.actor.getPreferences
 pub struct GetPreferencesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPreferencesResponse {
     const NSID: &'static str = "app.bsky.actor.getPreferences";
@@ -48,8 +38,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetPreferences {
     type Response = GetPreferencesResponse;
 }
 
-/// Endpoint type for
-///app.bsky.actor.getPreferences
+/// Endpoint type for app.bsky.actor.getPreferences
 pub struct GetPreferencesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPreferencesRequest {
     const PATH: &'static str = "/xrpc/app.bsky.actor.getPreferences";

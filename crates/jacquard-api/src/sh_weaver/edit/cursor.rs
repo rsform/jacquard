@@ -5,67 +5,57 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::edit::cursor;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ContainerId<'a> {
     #[serde(borrow)]
     pub value: ContainerIdValue<'a>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ContainerIdValue<'a> {
     #[serde(rename = "sh.weaver.edit.cursor#normalContainerId")]
-    NormalContainerId(Box<crate::sh_weaver::edit::cursor::NormalContainerId<'a>>),
+    NormalContainerId(Box<cursor::NormalContainerId<'a>>),
     #[serde(rename = "sh.weaver.edit.cursor#rootContainerId")]
-    RootContainerId(Box<crate::sh_weaver::edit::cursor::RootContainerId<'a>>),
+    RootContainerId(Box<cursor::RootContainerId<'a>>),
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CursorSide<'a> {
     ///The side of an item the cursor is on (left = -1, right = 1, middle = 0)
     pub value: i64,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Id<'a> {
     pub counter: i64,
@@ -73,157 +63,118 @@ pub struct Id<'a> {
 }
 
 /// An edit record for a notebook.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Cursor<'a> {
     #[serde(borrow)]
-    pub container: crate::sh_weaver::edit::cursor::ContainerId<'a>,
+    pub container: cursor::ContainerId<'a>,
     #[serde(borrow)]
-    pub id: crate::sh_weaver::edit::cursor::Id<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub id: cursor::Id<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub side: core::option::Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
+    pub side: Option<cursor::CursorSide<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CursorGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Cursor<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct NormalContainerId<'a> {
     #[serde(borrow)]
-    pub container_type: jacquard_common::CowStr<'a>,
+    pub container_type: CowStr<'a>,
     pub counter: i64,
     pub peer: i64,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RootContainerId<'a> {
     #[serde(borrow)]
-    pub container_type: jacquard_common::CowStr<'a>,
+    pub container_type: CowStr<'a>,
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
 }
 
 impl<'a> Cursor<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CursorRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, CursorRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ContainerId<'a> {
+impl<'a> LexiconSchema for ContainerId<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
     fn def_name() -> &'static str {
         "containerId"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CursorSide<'a> {
+impl<'a> LexiconSchema for CursorSide<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
     fn def_name() -> &'static str {
         "cursorSide"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Id<'a> {
+impl<'a> LexiconSchema for Id<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
     fn def_name() -> &'static str {
         "id"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct CursorRecord;
-impl jacquard_common::xrpc::XrpcResp for CursorRecord {
+impl XrpcResp for CursorRecord {
     const NSID: &'static str = "sh.weaver.edit.cursor";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = CursorGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<CursorGetRecordOutput<'_>> for Cursor<'_> {
@@ -233,63 +184,57 @@ impl From<CursorGetRecordOutput<'_>> for Cursor<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Cursor<'_> {
+impl Collection for Cursor<'_> {
     const NSID: &'static str = "sh.weaver.edit.cursor";
     type Record = CursorRecord;
 }
 
-impl jacquard_common::types::collection::Collection for CursorRecord {
+impl Collection for CursorRecord {
     const NSID: &'static str = "sh.weaver.edit.cursor";
     type Record = CursorRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Cursor<'a> {
+impl<'a> LexiconSchema for Cursor<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for NormalContainerId<'a> {
+impl<'a> LexiconSchema for NormalContainerId<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
     fn def_name() -> &'static str {
         "normalContainerId"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for RootContainerId<'a> {
+impl<'a> LexiconSchema for RootContainerId<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
     fn def_name() -> &'static str {
         "rootContainerId"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -328,9 +273,9 @@ pub mod container_id_state {
 
 /// Builder for constructing an instance of this type
 pub struct ContainerIdBuilder<'a, S: container_id_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<ContainerIdValue<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<ContainerIdValue<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ContainerId<'a> {
@@ -344,9 +289,9 @@ impl<'a> ContainerIdBuilder<'a, container_id_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ContainerIdBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -361,11 +306,11 @@ where
         mut self,
         value: impl Into<ContainerIdValue<'a>>,
     ) -> ContainerIdBuilder<'a, container_id_state::SetValue<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ContainerIdBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -385,7 +330,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -397,293 +342,187 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_edit_cursor() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("sh.weaver.edit.cursor"),
-        revision: None,
-        description: None,
+fn lexicon_doc_sh_weaver_edit_cursor() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("sh.weaver.edit.cursor"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("containerId"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("containerId"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("value")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "value",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("value"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("#normalContainerId"),
-                                    ::jacquard_common::CowStr::new_static("#rootContainerId")
+                                    CowStr::new_static("#normalContainerId"),
+                                    CowStr::new_static("#rootContainerId")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("cursorSide"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("cursorSide"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("value")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "value",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("value"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("id"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("peer"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("counter")
-                        ],
+                        vec![SmolStr::new_static("peer"), SmolStr::new_static("counter")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "counter",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("counter"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "peer",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("peer"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "An edit record for a notebook.",
-                        ),
+                        CowStr::new_static("An edit record for a notebook."),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("container"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("id")
+                                SmolStr::new_static("container"), SmolStr::new_static("id")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "container",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#containerId"),
+                                SmolStr::new_static("container"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#containerId"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "id",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#id"),
+                                SmolStr::new_static("id"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#id"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "side",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#cursorSide"),
+                                SmolStr::new_static("side"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#cursorSide"),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "normalContainerId",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("normalContainerId"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("peer"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("counter"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("container_type")
+                            SmolStr::new_static("peer"), SmolStr::new_static("counter"),
+                            SmolStr::new_static("container_type")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "container_type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("container_type"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("counter"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "counter",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "peer",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("peer"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "rootContainerId",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("rootContainerId"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("container_type")
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("container_type")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "container_type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("container_type"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -721,9 +560,9 @@ pub mod cursor_side_state {
 
 /// Builder for constructing an instance of this type
 pub struct CursorSideBuilder<'a, S: cursor_side_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CursorSide<'a> {
@@ -737,9 +576,9 @@ impl<'a> CursorSideBuilder<'a, cursor_side_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CursorSideBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -754,11 +593,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CursorSideBuilder<'a, cursor_side_state::SetValue<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CursorSideBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -778,7 +617,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -836,9 +675,9 @@ pub mod id_state {
 
 /// Builder for constructing an instance of this type
 pub struct IdBuilder<'a, S: id_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>, ::core::option::Option<i64>),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Id<'a> {
@@ -852,9 +691,9 @@ impl<'a> IdBuilder<'a, id_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IdBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -869,11 +708,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> IdBuilder<'a, id_state::SetCounter<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         IdBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -885,11 +724,11 @@ where
 {
     /// Set the `peer` field (required)
     pub fn peer(mut self, value: impl Into<i64>) -> IdBuilder<'a, id_state::SetPeer<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         IdBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -911,7 +750,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -934,49 +773,49 @@ pub mod cursor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Container;
         type Id;
+        type Container;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Container = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `container` field to Set
-    pub struct SetContainer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContainer<S> {}
-    impl<S: State> State for SetContainer<S> {
-        type Container = Set<members::container>;
-        type Id = S::Id;
+        type Container = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Container = S::Container;
         type Id = Set<members::id>;
+        type Container = S::Container;
+    }
+    ///State transition - sets the `container` field to Set
+    pub struct SetContainer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContainer<S> {}
+    impl<S: State> State for SetContainer<S> {
+        type Id = S::Id;
+        type Container = Set<members::container>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `container` field
-        pub struct container(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `container` field
+        pub struct container(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CursorBuilder<'a, S: cursor_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::sh_weaver::edit::cursor::ContainerId<'a>>,
-        ::core::option::Option<crate::sh_weaver::edit::cursor::Id<'a>>,
-        ::core::option::Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
+        Option<cursor::ContainerId<'a>>,
+        Option<cursor::Id<'a>>,
+        Option<cursor::CursorSide<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Cursor<'a> {
@@ -990,9 +829,9 @@ impl<'a> CursorBuilder<'a, cursor_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CursorBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1005,13 +844,13 @@ where
     /// Set the `container` field (required)
     pub fn container(
         mut self,
-        value: impl Into<crate::sh_weaver::edit::cursor::ContainerId<'a>>,
+        value: impl Into<cursor::ContainerId<'a>>,
     ) -> CursorBuilder<'a, cursor_state::SetContainer<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CursorBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1024,31 +863,25 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<crate::sh_weaver::edit::cursor::Id<'a>>,
+        value: impl Into<cursor::Id<'a>>,
     ) -> CursorBuilder<'a, cursor_state::SetId<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CursorBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: cursor_state::State> CursorBuilder<'a, S> {
     /// Set the `side` field (optional)
-    pub fn side(
-        mut self,
-        value: impl Into<Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>>,
-    ) -> Self {
+    pub fn side(mut self, value: impl Into<Option<cursor::CursorSide<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `side` field to an Option value (optional)
-    pub fn maybe_side(
-        mut self,
-        value: Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
-    ) -> Self {
+    pub fn maybe_side(mut self, value: Option<cursor::CursorSide<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -1057,8 +890,8 @@ impl<'a, S: cursor_state::State> CursorBuilder<'a, S> {
 impl<'a, S> CursorBuilder<'a, S>
 where
     S: cursor_state::State,
-    S::Container: cursor_state::IsSet,
     S::Id: cursor_state::IsSet,
+    S::Container: cursor_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cursor<'a> {
@@ -1072,7 +905,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1096,63 +929,59 @@ pub mod normal_container_id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Peer;
         type Counter;
         type ContainerType;
+        type Peer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Peer = Unset;
         type Counter = Unset;
         type ContainerType = Unset;
-    }
-    ///State transition - sets the `peer` field to Set
-    pub struct SetPeer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPeer<S> {}
-    impl<S: State> State for SetPeer<S> {
-        type Peer = Set<members::peer>;
-        type Counter = S::Counter;
-        type ContainerType = S::ContainerType;
+        type Peer = Unset;
     }
     ///State transition - sets the `counter` field to Set
     pub struct SetCounter<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCounter<S> {}
     impl<S: State> State for SetCounter<S> {
-        type Peer = S::Peer;
         type Counter = Set<members::counter>;
         type ContainerType = S::ContainerType;
+        type Peer = S::Peer;
     }
     ///State transition - sets the `container_type` field to Set
     pub struct SetContainerType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContainerType<S> {}
     impl<S: State> State for SetContainerType<S> {
-        type Peer = S::Peer;
         type Counter = S::Counter;
         type ContainerType = Set<members::container_type>;
+        type Peer = S::Peer;
+    }
+    ///State transition - sets the `peer` field to Set
+    pub struct SetPeer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPeer<S> {}
+    impl<S: State> State for SetPeer<S> {
+        type Counter = S::Counter;
+        type ContainerType = S::ContainerType;
+        type Peer = Set<members::peer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `peer` field
-        pub struct peer(());
         ///Marker type for the `counter` field
         pub struct counter(());
         ///Marker type for the `container_type` field
         pub struct container_type(());
+        ///Marker type for the `peer` field
+        pub struct peer(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct NormalContainerIdBuilder<'a, S: normal_container_id_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> NormalContainerId<'a> {
@@ -1166,9 +995,9 @@ impl<'a> NormalContainerIdBuilder<'a, normal_container_id_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NormalContainerIdBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1181,13 +1010,13 @@ where
     /// Set the `container_type` field (required)
     pub fn container_type(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> NormalContainerIdBuilder<'a, normal_container_id_state::SetContainerType<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         NormalContainerIdBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1202,11 +1031,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> NormalContainerIdBuilder<'a, normal_container_id_state::SetCounter<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         NormalContainerIdBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1221,11 +1050,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> NormalContainerIdBuilder<'a, normal_container_id_state::SetPeer<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         NormalContainerIdBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1233,9 +1062,9 @@ where
 impl<'a, S> NormalContainerIdBuilder<'a, S>
 where
     S: normal_container_id_state::State,
-    S::Peer: normal_container_id_state::IsSet,
     S::Counter: normal_container_id_state::IsSet,
     S::ContainerType: normal_container_id_state::IsSet,
+    S::Peer: normal_container_id_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NormalContainerId<'a> {
@@ -1249,7 +1078,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

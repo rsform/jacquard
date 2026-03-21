@@ -5,47 +5,48 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, Handle};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSessionOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub active: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub active: Option<bool>,
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub did: Did<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did_doc: core::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub did_doc: Option<Data<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub email: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub email_auth_factor: core::option::Option<bool>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub email_confirmed: core::option::Option<bool>,
+    pub email: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email_auth_factor: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email_confirmed: Option<bool>,
     #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
+    pub handle: Handle<'a>,
     ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: core::option::Option<GetSessionOutputStatus<'a>>,
+    pub status: Option<GetSessionOutputStatus<'a>>,
 }
 
 /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GetSessionOutputStatus<'a> {
     Takendown,
     Suspended,
     Deactivated,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> GetSessionOutputStatus<'a> {
@@ -65,7 +66,7 @@ impl<'a> From<&'a str> for GetSessionOutputStatus<'a> {
             "takendown" => Self::Takendown,
             "suspended" => Self::Suspended,
             "deactivated" => Self::Deactivated,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -76,7 +77,7 @@ impl<'a> From<String> for GetSessionOutputStatus<'a> {
             "takendown" => Self::Takendown,
             "suspended" => Self::Suspended,
             "deactivated" => Self::Deactivated,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -136,19 +137,10 @@ impl jacquard_common::IntoStatic for GetSessionOutputStatus<'_> {
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct GetSession;
-/// Response type for
-///com.atproto.server.getSession
+/// Response type for com.atproto.server.getSession
 pub struct GetSessionResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSessionResponse {
     const NSID: &'static str = "com.atproto.server.getSession";
@@ -163,8 +155,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetSession {
     type Response = GetSessionResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.getSession
+/// Endpoint type for com.atproto.server.getSession
 pub struct GetSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSessionRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.getSession";

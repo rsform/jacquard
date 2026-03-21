@@ -5,39 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::graph::StarterPackViewBasic;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStarterPacks<'a> {
     #[serde(borrow)]
-    pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
+    pub uris: Vec<AtUri<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStarterPacksOutput<'a> {
     #[serde(borrow)]
-    pub starter_packs: Vec<crate::app_bsky::graph::StarterPackViewBasic<'a>>,
+    pub starter_packs: Vec<StarterPackViewBasic<'a>>,
 }
 
-/// Response type for
-///app.bsky.graph.getStarterPacks
+/// Response type for app.bsky.graph.getStarterPacks
 pub struct GetStarterPacksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStarterPacksResponse {
     const NSID: &'static str = "app.bsky.graph.getStarterPacks";
@@ -52,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetStarterPacks<'a> {
     type Response = GetStarterPacksResponse;
 }
 
-/// Endpoint type for
-///app.bsky.graph.getStarterPacks
+/// Endpoint type for app.bsky.graph.getStarterPacks
 pub struct GetStarterPacksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.getStarterPacks";
@@ -96,11 +86,9 @@ pub mod get_starter_packs_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetStarterPacksBuilder<'a, S: get_starter_packs_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<AtUri<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetStarterPacks<'a> {
@@ -114,9 +102,9 @@ impl<'a> GetStarterPacksBuilder<'a, get_starter_packs_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetStarterPacksBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -129,13 +117,13 @@ where
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<'a>>>,
     ) -> GetStarterPacksBuilder<'a, get_starter_packs_state::SetUris<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetStarterPacksBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

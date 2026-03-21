@@ -10,18 +10,22 @@ pub mod follow;
 pub mod like;
 pub mod podcast;
 
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::UriValue;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A podcast category from the Apple Podcasts taxonomy.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct AppleCategory<'a> {
     ///The category value. Subcategories use the format 'Category > Subcategory'.
@@ -30,6 +34,7 @@ pub struct AppleCategory<'a> {
 }
 
 /// The category value. Subcategories use the format 'Category > Subcategory'.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AppleCategoryValue<'a> {
     Arts,
@@ -142,7 +147,7 @@ pub enum AppleCategoryValue<'a> {
     TvFilmFilmInterviews,
     TvFilmFilmReviews,
     TvFilmTvReviews,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> AppleCategoryValue<'a> {
@@ -392,7 +397,7 @@ impl<'a> From<&'a str> for AppleCategoryValue<'a> {
             "TV & Film > Film Interviews" => Self::TvFilmFilmInterviews,
             "TV & Film > Film Reviews" => Self::TvFilmFilmReviews,
             "TV & Film > TV Reviews" => Self::TvFilmTvReviews,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -518,7 +523,7 @@ impl<'a> From<String> for AppleCategoryValue<'a> {
             "TV & Film > Film Interviews" => Self::TvFilmFilmInterviews,
             "TV & Film > Film Reviews" => Self::TvFilmFilmReviews,
             "TV & Film > TV Reviews" => Self::TvFilmTvReviews,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -789,92 +794,70 @@ impl jacquard_common::IntoStatic for AppleCategoryValue<'_> {
 }
 
 /// Identifies a podcast episode by its podcast GUID and feed item identifier, independent of which repository currently holds the record.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct EpisodeRef<'a> {
     ///The original feed item identifier. Must match the <guid> element of the corresponding RSS feed item.
     #[serde(borrow)]
-    pub feed_item_guid: jacquard_common::CowStr<'a>,
+    pub feed_item_guid: CowStr<'a>,
     ///URL of the podcast's RSS feed.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub feed_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub feed_url: Option<UriValue<'a>>,
     ///Podcasting 2.0 UUIDv5 GUID of the parent podcast. If the feed does not include a <podcast:guid> tag, derive it as specified in https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/tags/guid.md.
     #[serde(borrow)]
-    pub podcast_guid: jacquard_common::CowStr<'a>,
+    pub podcast_guid: CowStr<'a>,
 }
 
 /// Identifies a podcast by its Podcasting 2.0 GUID, independent of which repository currently holds the record.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct PodcastRef<'a> {
     ///URL of the podcast's RSS feed.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub feed_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub feed_url: Option<UriValue<'a>>,
     ///Podcasting 2.0 UUIDv5 GUID of the podcast. If the feed does not include a <podcast:guid> tag, derive it as specified in https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/tags/guid.md.
     #[serde(borrow)]
-    pub podcast_guid: jacquard_common::CowStr<'a>,
+    pub podcast_guid: CowStr<'a>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for AppleCategory<'a> {
+impl<'a> LexiconSchema for AppleCategory<'a> {
     fn nsid() -> &'static str {
         "org.atpodcasting.defs"
     }
     fn def_name() -> &'static str {
         "appleCategory"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_atpodcasting_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for EpisodeRef<'a> {
+impl<'a> LexiconSchema for EpisodeRef<'a> {
     fn nsid() -> &'static str {
         "org.atpodcasting.defs"
     }
     fn def_name() -> &'static str {
         "episodeRef"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_atpodcasting_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.feed_item_guid;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "feed_item_guid",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("feed_item_guid"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -884,10 +867,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for EpisodeRef<'a> {
             let value = &self.podcast_guid;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 36usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "podcast_guid",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("podcast_guid"),
                     max: 36usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -897,27 +878,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for EpisodeRef<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for PodcastRef<'a> {
+impl<'a> LexiconSchema for PodcastRef<'a> {
     fn nsid() -> &'static str {
         "org.atpodcasting.defs"
     }
     fn def_name() -> &'static str {
         "podcastRef"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_atpodcasting_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.podcast_guid;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 36usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "podcast_guid",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("podcast_guid"),
                     max: 36usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -927,211 +904,141 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PodcastRef<'a> {
     }
 }
 
-fn lexicon_doc_org_atpodcasting_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.atpodcasting.defs"),
-        revision: None,
-        description: None,
+fn lexicon_doc_org_atpodcasting_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("org.atpodcasting.defs"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("appleCategory"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("appleCategory"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A podcast category from the Apple Podcasts taxonomy.",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("value")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("value")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "value",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("value"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The category value. Subcategories use the format 'Category > Subcategory'.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("episodeRef"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("episodeRef"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Identifies a podcast episode by its podcast GUID and feed item identifier, independent of which repository currently holds the record.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("podcastGuid"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("feedItemGuid")
+                            SmolStr::new_static("podcastGuid"),
+                            SmolStr::new_static("feedItemGuid")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "feedItemGuid",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("feedItemGuid"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The original feed item identifier. Must match the <guid> element of the corresponding RSS feed item.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(2000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "feedUrl",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("feedUrl"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "URL of the podcast's RSS feed.",
-                                    ),
+                                    CowStr::new_static("URL of the podcast's RSS feed."),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "podcastGuid",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("podcastGuid"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Podcasting 2.0 UUIDv5 GUID of the parent podcast. If the feed does not include a <podcast:guid> tag, derive it as specified in https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/tags/guid.md.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(36usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("podcastRef"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("podcastRef"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Identifies a podcast by its Podcasting 2.0 GUID, independent of which repository currently holds the record.",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("podcastGuid")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("podcastGuid")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "feedUrl",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("feedUrl"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "URL of the podcast's RSS feed.",
-                                    ),
+                                    CowStr::new_static("URL of the podcast's RSS feed."),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "podcastGuid",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("podcastGuid"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Podcasting 2.0 UUIDv5 GUID of the podcast. If the feed does not include a <podcast:guid> tag, derive it as specified in https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/tags/guid.md.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(36usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

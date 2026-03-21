@@ -5,110 +5,103 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::link_bridgebeats::lookup;
 /// Result of parsing and looking up media links across supported music streaming providers.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Lookup<'a> {
     ///ISO8601 timestamp of when this lookup was performed.
-    pub looked_up_at: jacquard_common::types::string::Datetime,
+    pub looked_up_at: Datetime,
     ///Collection of lookup results from each provider that returned a match.
     #[serde(borrow)]
-    pub results: Vec<crate::link_bridgebeats::lookup::ProviderResult<'a>>,
+    pub results: Vec<lookup::ProviderResult<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct LookupGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Lookup<'a>,
 }
 
 /// Music metadata from a specific provider's API query.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ProviderResult<'a> {
     ///URL to the cover artwork image.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub art_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub art_url: Option<UriValue<'a>>,
     ///Primary artist name for the track or album artist.
     #[serde(borrow)]
-    pub artist: jacquard_common::CowStr<'a>,
+    pub artist: CowStr<'a>,
     ///ISRC (for tracks) or UPC (for albums) identifier for cross-platform matching.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub external_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub external_id: Option<CowStr<'a>>,
     ///True for albums/EPs, false for individual tracks.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub is_album: core::option::Option<bool>,
-    ///ISO3166-1 alpha-2 country code for the market/storefront. Defaults to `"us"`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_album: Option<bool>,
+    ///ISO3166-1 alpha-2 country code for the market/storefront.  Defaults to `"us"`.
     #[serde(default = "_default_provider_result_market_region")]
     #[serde(borrow)]
-    pub market_region: jacquard_common::CowStr<'a>,
+    pub market_region: CowStr<'a>,
     ///The streaming platform provider.
     #[serde(borrow)]
-    pub provider: jacquard_common::CowStr<'a>,
+    pub provider: CowStr<'a>,
     ///Official title of the track or album as listed in the provider's catalog.
     #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
+    pub title: CowStr<'a>,
     ///Direct web link to the track or album on the provider's platform.
     #[serde(borrow)]
-    pub url: jacquard_common::types::string::UriValue<'a>,
+    pub url: UriValue<'a>,
 }
 
 impl<'a> Lookup<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LookupRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, LookupRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LookupRecord;
-impl jacquard_common::xrpc::XrpcResp for LookupRecord {
+impl XrpcResp for LookupRecord {
     const NSID: &'static str = "link.bridgebeats.lookup";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = LookupGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<LookupGetRecordOutput<'_>> for Lookup<'_> {
@@ -118,37 +111,33 @@ impl From<LookupGetRecordOutput<'_>> for Lookup<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Lookup<'_> {
+impl Collection for Lookup<'_> {
     const NSID: &'static str = "link.bridgebeats.lookup";
     type Record = LookupRecord;
 }
 
-impl jacquard_common::types::collection::Collection for LookupRecord {
+impl Collection for LookupRecord {
     const NSID: &'static str = "link.bridgebeats.lookup";
     type Record = LookupRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Lookup<'a> {
+impl<'a> LexiconSchema for Lookup<'a> {
     fn nsid() -> &'static str {
         "link.bridgebeats.lookup"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_link_bridgebeats_lookup()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.results;
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "results",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("results"),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -158,10 +147,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Lookup<'a> {
             let value = &self.results;
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "results",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("results"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -171,26 +158,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Lookup<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ProviderResult<'a> {
+impl<'a> LexiconSchema for ProviderResult<'a> {
     fn nsid() -> &'static str {
         "link.bridgebeats.lookup"
     }
     fn def_name() -> &'static str {
         "providerResult"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_link_bridgebeats_lookup()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.art_url {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "art_url",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("art_url"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -200,10 +183,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ProviderResult<'a> {
             let value = &self.artist;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "artist",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("artist"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -212,10 +193,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ProviderResult<'a> {
         if let Some(ref value) = self.external_id {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "external_id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("external_id"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -225,10 +204,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ProviderResult<'a> {
             let value = &self.market_region;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "market_region",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("market_region"),
                     max: 2usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -238,10 +215,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ProviderResult<'a> {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("title"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -251,10 +226,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ProviderResult<'a> {
             let value = &self.url;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "url",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("url"),
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -274,48 +247,45 @@ pub mod lookup_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Results;
         type LookedUpAt;
+        type Results;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Results = Unset;
         type LookedUpAt = Unset;
-    }
-    ///State transition - sets the `results` field to Set
-    pub struct SetResults<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResults<S> {}
-    impl<S: State> State for SetResults<S> {
-        type Results = Set<members::results>;
-        type LookedUpAt = S::LookedUpAt;
+        type Results = Unset;
     }
     ///State transition - sets the `looked_up_at` field to Set
     pub struct SetLookedUpAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLookedUpAt<S> {}
     impl<S: State> State for SetLookedUpAt<S> {
-        type Results = S::Results;
         type LookedUpAt = Set<members::looked_up_at>;
+        type Results = S::Results;
+    }
+    ///State transition - sets the `results` field to Set
+    pub struct SetResults<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResults<S> {}
+    impl<S: State> State for SetResults<S> {
+        type LookedUpAt = S::LookedUpAt;
+        type Results = Set<members::results>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `results` field
-        pub struct results(());
         ///Marker type for the `looked_up_at` field
         pub struct looked_up_at(());
+        ///Marker type for the `results` field
+        pub struct results(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LookupBuilder<'a, S: lookup_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<Vec<crate::link_bridgebeats::lookup::ProviderResult<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Datetime>, Option<Vec<lookup::ProviderResult<'a>>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Lookup<'a> {
@@ -329,9 +299,9 @@ impl<'a> LookupBuilder<'a, lookup_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LookupBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -344,13 +314,13 @@ where
     /// Set the `lookedUpAt` field (required)
     pub fn looked_up_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> LookupBuilder<'a, lookup_state::SetLookedUpAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         LookupBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -363,13 +333,13 @@ where
     /// Set the `results` field (required)
     pub fn results(
         mut self,
-        value: impl Into<Vec<crate::link_bridgebeats::lookup::ProviderResult<'a>>>,
+        value: impl Into<Vec<lookup::ProviderResult<'a>>>,
     ) -> LookupBuilder<'a, lookup_state::SetResults<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         LookupBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -377,8 +347,8 @@ where
 impl<'a, S> LookupBuilder<'a, S>
 where
     S: lookup_state::State,
-    S::Results: lookup_state::IsSet,
     S::LookedUpAt: lookup_state::IsSet,
+    S::Results: lookup_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lookup<'a> {
@@ -391,7 +361,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -404,278 +374,190 @@ where
     }
 }
 
-fn lexicon_doc_link_bridgebeats_lookup() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("link.bridgebeats.lookup"),
-        revision: None,
-        description: None,
+fn lexicon_doc_link_bridgebeats_lookup() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("link.bridgebeats.lookup"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Result of parsing and looking up media links across supported music streaming providers.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("results"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("lookedUpAt")
+                                SmolStr::new_static("results"),
+                                SmolStr::new_static("lookedUpAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "lookedUpAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("lookedUpAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "ISO8601 timestamp of when this lookup was performed.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "results",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("results"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Collection of lookup results from each provider that returned a match.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "#providerResult",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#providerResult"),
+                                        ..Default::default()
                                     }),
                                     min_length: Some(1usize),
                                     max_length: Some(10usize),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("providerResult"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("providerResult"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Music metadata from a specific provider's API query.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("provider"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("artist"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("url"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("marketRegion")
+                            SmolStr::new_static("provider"),
+                            SmolStr::new_static("artist"), SmolStr::new_static("title"),
+                            SmolStr::new_static("url"),
+                            SmolStr::new_static("marketRegion")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "artUrl",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("artUrl"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "URL to the cover artwork image.",
-                                    ),
+                                    CowStr::new_static("URL to the cover artwork image."),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
+                                format: Some(LexStringFormat::Uri),
                                 max_length: Some(2000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "artist",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("artist"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Primary artist name for the track or album artist.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "externalId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("externalId"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "ISRC (for tracks) or UPC (for albums) identifier for cross-platform matching.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(50usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "isAlbum",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("isAlbum"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "marketRegion",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("marketRegion"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "ISO3166-1 alpha-2 country code for the market/storefront.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(2usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "provider",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("provider"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The streaming platform provider.",
-                                    ),
+                                    CowStr::new_static("The streaming platform provider."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "title",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("title"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Official title of the track or album as listed in the provider's catalog.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(500usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "url",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("url"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Direct web link to the track or album on the provider's platform.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
+                                format: Some(LexStringFormat::Uri),
                                 max_length: Some(2000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
-fn _default_provider_result_market_region() -> jacquard_common::CowStr<'static> {
-    jacquard_common::CowStr::from("us")
+fn _default_provider_result_market_region() -> CowStr<'static> {
+    CowStr::from("us")
 }
 
 pub mod provider_result_state {
@@ -690,9 +572,9 @@ pub mod provider_result_state {
     pub trait State: sealed::Sealed {
         type Provider;
         type Artist;
-        type Title;
         type Url;
         type MarketRegion;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -700,9 +582,9 @@ pub mod provider_result_state {
     impl State for Empty {
         type Provider = Unset;
         type Artist = Unset;
-        type Title = Unset;
         type Url = Unset;
         type MarketRegion = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `provider` field to Set
     pub struct SetProvider<S: State = Empty>(PhantomData<fn() -> S>);
@@ -710,9 +592,9 @@ pub mod provider_result_state {
     impl<S: State> State for SetProvider<S> {
         type Provider = Set<members::provider>;
         type Artist = S::Artist;
-        type Title = S::Title;
         type Url = S::Url;
         type MarketRegion = S::MarketRegion;
+        type Title = S::Title;
     }
     ///State transition - sets the `artist` field to Set
     pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
@@ -720,19 +602,9 @@ pub mod provider_result_state {
     impl<S: State> State for SetArtist<S> {
         type Provider = S::Provider;
         type Artist = Set<members::artist>;
+        type Url = S::Url;
+        type MarketRegion = S::MarketRegion;
         type Title = S::Title;
-        type Url = S::Url;
-        type MarketRegion = S::MarketRegion;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Provider = S::Provider;
-        type Artist = S::Artist;
-        type Title = Set<members::title>;
-        type Url = S::Url;
-        type MarketRegion = S::MarketRegion;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
@@ -740,9 +612,9 @@ pub mod provider_result_state {
     impl<S: State> State for SetUrl<S> {
         type Provider = S::Provider;
         type Artist = S::Artist;
-        type Title = S::Title;
         type Url = Set<members::url>;
         type MarketRegion = S::MarketRegion;
+        type Title = S::Title;
     }
     ///State transition - sets the `market_region` field to Set
     pub struct SetMarketRegion<S: State = Empty>(PhantomData<fn() -> S>);
@@ -750,9 +622,19 @@ pub mod provider_result_state {
     impl<S: State> State for SetMarketRegion<S> {
         type Provider = S::Provider;
         type Artist = S::Artist;
-        type Title = S::Title;
         type Url = S::Url;
         type MarketRegion = Set<members::market_region>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Provider = S::Provider;
+        type Artist = S::Artist;
+        type Url = S::Url;
+        type MarketRegion = S::MarketRegion;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -761,29 +643,29 @@ pub mod provider_result_state {
         pub struct provider(());
         ///Marker type for the `artist` field
         pub struct artist(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `url` field
         pub struct url(());
         ///Marker type for the `market_region` field
         pub struct market_region(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ProviderResultBuilder<'a, S: provider_result_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+        Option<UriValue<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<bool>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<UriValue<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ProviderResult<'a> {
@@ -797,27 +679,21 @@ impl<'a> ProviderResultBuilder<'a, provider_result_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProviderResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: provider_result_state::State> ProviderResultBuilder<'a, S> {
     /// Set the `artUrl` field (optional)
-    pub fn art_url(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn art_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `artUrl` field to an Option value (optional)
-    pub fn maybe_art_url(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_art_url(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -831,31 +707,25 @@ where
     /// Set the `artist` field (required)
     pub fn artist(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetArtist<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ProviderResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: provider_result_state::State> ProviderResultBuilder<'a, S> {
     /// Set the `externalId` field (optional)
-    pub fn external_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn external_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `externalId` field to an Option value (optional)
-    pub fn maybe_external_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_external_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -882,13 +752,13 @@ where
     /// Set the `marketRegion` field (required)
     pub fn market_region(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetMarketRegion<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         ProviderResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -901,13 +771,13 @@ where
     /// Set the `provider` field (required)
     pub fn provider(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetProvider<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         ProviderResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -920,13 +790,13 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetTitle<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         ProviderResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -939,13 +809,13 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetUrl<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         ProviderResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -955,9 +825,9 @@ where
     S: provider_result_state::State,
     S::Provider: provider_result_state::IsSet,
     S::Artist: provider_result_state::IsSet,
-    S::Title: provider_result_state::IsSet,
     S::Url: provider_result_state::IsSet,
     S::MarketRegion: provider_result_state::IsSet,
+    S::Title: provider_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProviderResult<'a> {
@@ -976,7 +846,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

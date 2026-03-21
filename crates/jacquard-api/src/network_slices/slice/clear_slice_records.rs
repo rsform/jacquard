@@ -5,44 +5,32 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ClearSliceRecords<'a> {
     ///AT-URI of the slice to clear
     #[serde(borrow)]
-    pub slice: jacquard_common::CowStr<'a>,
+    pub slice: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ClearSliceRecordsOutput<'a> {
     ///Success message
     #[serde(borrow)]
-    pub message: jacquard_common::CowStr<'a>,
+    pub message: CowStr<'a>,
 }
 
-/// Response type for
-///network.slices.slice.clearSliceRecords
+/// Response type for network.slices.slice.clearSliceRecords
 pub struct ClearSliceRecordsResponse;
 impl jacquard_common::xrpc::XrpcResp for ClearSliceRecordsResponse {
     const NSID: &'static str = "network.slices.slice.clearSliceRecords";
@@ -59,8 +47,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ClearSliceRecords<'a> {
     type Response = ClearSliceRecordsResponse;
 }
 
-/// Endpoint type for
-///network.slices.slice.clearSliceRecords
+/// Endpoint type for network.slices.slice.clearSliceRecords
 pub struct ClearSliceRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ClearSliceRecordsRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.clearSliceRecords";

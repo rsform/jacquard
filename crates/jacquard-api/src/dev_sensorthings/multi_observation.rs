@@ -5,59 +5,67 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::dev_sensorthings::datastream::UnitOfMeasurement;
+use crate::dev_sensorthings::multi_observation;
 /// A composite observation bundling multiple co-produced results from a single act of sensing. Each entry carries its own ObservedProperty, unit, and scale metadata. Use this instead of separate Observations when the results are genuinely co-produced (e.g. wave statistics from spectral processing) and have no independent existence.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MultiObservation<'a> {
     ///AT-URIs of source observations or datastreams
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub derived_from: core::option::Option<
-        Vec<jacquard_common::types::string::AtUri<'a>>,
-    >,
+    pub derived_from: Option<Vec<AtUri<'a>>>,
     ///Array of co-produced result entries
     #[serde(borrow)]
-    pub entries: Vec<
-        crate::dev_sensorthings::multi_observation::MultiObservationEntry<'a>,
-    >,
+    pub entries: Vec<multi_observation::MultiObservationEntry<'a>>,
     ///Time the phenomenon was observed. Start of interval if phenomenonTimeEnd is present.
-    pub phenomenon_time: jacquard_common::types::string::Datetime,
+    pub phenomenon_time: Datetime,
     ///End of observation interval. For wave statistics, this is the end of the burst window.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub phenomenon_time_end: core::option::Option<
-        jacquard_common::types::string::Datetime,
-    >,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub phenomenon_time_end: Option<Datetime>,
     ///Quality flag applying to the composite observation as a whole
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub result_quality: core::option::Option<MultiObservationResultQuality<'a>>,
+    pub result_quality: Option<MultiObservationResultQuality<'a>>,
     ///Time the results became available
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub result_time: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub result_time: Option<Datetime>,
     ///AT-URI of the dev.sensorthings.sensor record (the instrument or process that co-produced these results)
     #[serde(borrow)]
-    pub sensor: jacquard_common::types::string::AtUri<'a>,
+    pub sensor: AtUri<'a>,
     ///AT-URI of the dev.sensorthings.thing record
     #[serde(borrow)]
-    pub thing: jacquard_common::types::string::AtUri<'a>,
+    pub thing: AtUri<'a>,
 }
 
 /// Quality flag applying to the composite observation as a whole
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MultiObservationResultQuality<'a> {
     Good,
     Suspect,
     Missing,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> MultiObservationResultQuality<'a> {
@@ -77,7 +85,7 @@ impl<'a> From<&'a str> for MultiObservationResultQuality<'a> {
             "dev.sensorthings.quality#good" => Self::Good,
             "dev.sensorthings.quality#suspect" => Self::Suspect,
             "dev.sensorthings.quality#missing" => Self::Missing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -88,7 +96,7 @@ impl<'a> From<String> for MultiObservationResultQuality<'a> {
             "dev.sensorthings.quality#good" => Self::Good,
             "dev.sensorthings.quality#suspect" => Self::Suspect,
             "dev.sensorthings.quality#missing" => Self::Missing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -152,75 +160,55 @@ impl jacquard_common::IntoStatic for MultiObservationResultQuality<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MultiObservationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: MultiObservation<'a>,
 }
 
 /// A single result within a composite observation, fully self-describing.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MultiObservationEntry<'a> {
     ///AT-URI of the dev.sensorthings.observedProperty record
     #[serde(borrow)]
-    pub observed_property: jacquard_common::types::string::AtUri<'a>,
+    pub observed_property: AtUri<'a>,
     #[serde(borrow)]
     pub result: MultiObservationEntryResult<'a>,
     ///Quality flag for this specific entry, if different from the composite quality
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub result_quality: core::option::Option<MultiObservationEntryResultQuality<'a>>,
+    pub result_quality: Option<MultiObservationEntryResultQuality<'a>>,
     ///Scale factor for this entry's numeric result. Default 0.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub result_scale_factor: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub result_scale_factor: Option<i64>,
     #[serde(borrow)]
-    pub unit_of_measurement: crate::dev_sensorthings::datastream::UnitOfMeasurement<'a>,
+    pub unit_of_measurement: UnitOfMeasurement<'a>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum MultiObservationEntryResult<'a> {}
 /// Quality flag for this specific entry, if different from the composite quality
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MultiObservationEntryResultQuality<'a> {
     Good,
     Suspect,
     Missing,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> MultiObservationEntryResultQuality<'a> {
@@ -240,7 +228,7 @@ impl<'a> From<&'a str> for MultiObservationEntryResultQuality<'a> {
             "dev.sensorthings.quality#good" => Self::Good,
             "dev.sensorthings.quality#suspect" => Self::Suspect,
             "dev.sensorthings.quality#missing" => Self::Missing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -251,7 +239,7 @@ impl<'a> From<String> for MultiObservationEntryResultQuality<'a> {
             "dev.sensorthings.quality#good" => Self::Good,
             "dev.sensorthings.quality#suspect" => Self::Suspect,
             "dev.sensorthings.quality#missing" => Self::Missing,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -318,25 +306,21 @@ impl jacquard_common::IntoStatic for MultiObservationEntryResultQuality<'_> {
 
 impl<'a> MultiObservation<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, MultiObservationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, MultiObservationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MultiObservationRecord;
-impl jacquard_common::xrpc::XrpcResp for MultiObservationRecord {
+impl XrpcResp for MultiObservationRecord {
     const NSID: &'static str = "dev.sensorthings.multiObservation";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = MultiObservationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<MultiObservationGetRecordOutput<'_>> for MultiObservation<'_> {
@@ -346,36 +330,32 @@ impl From<MultiObservationGetRecordOutput<'_>> for MultiObservation<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for MultiObservation<'_> {
+impl Collection for MultiObservation<'_> {
     const NSID: &'static str = "dev.sensorthings.multiObservation";
     type Record = MultiObservationRecord;
 }
 
-impl jacquard_common::types::collection::Collection for MultiObservationRecord {
+impl Collection for MultiObservationRecord {
     const NSID: &'static str = "dev.sensorthings.multiObservation";
     type Record = MultiObservationRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for MultiObservation<'a> {
+impl<'a> LexiconSchema for MultiObservation<'a> {
     fn nsid() -> &'static str {
         "dev.sensorthings.multiObservation"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_dev_sensorthings_multiObservation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.derived_from {
             #[allow(unused_comparisons)]
             if value.len() > 16usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "derived_from",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("derived_from"),
                     max: 16usize,
                     actual: value.len(),
                 });
@@ -385,10 +365,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for MultiObservation<'a> {
             let value = &self.entries;
             #[allow(unused_comparisons)]
             if value.len() > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "entries",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("entries"),
                     max: 32usize,
                     actual: value.len(),
                 });
@@ -397,10 +375,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for MultiObservation<'a> {
         if let Some(ref value) = self.result_quality {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "result_quality",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("result_quality"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -410,26 +386,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for MultiObservation<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for MultiObservationEntry<'a> {
+impl<'a> LexiconSchema for MultiObservationEntry<'a> {
     fn nsid() -> &'static str {
         "dev.sensorthings.multiObservation"
     }
     fn def_name() -> &'static str {
         "multiObservationEntry"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_dev_sensorthings_multiObservation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.result_quality {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "result_quality",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("result_quality"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -449,86 +421,84 @@ pub mod multi_observation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Thing;
-        type Entries;
         type PhenomenonTime;
         type Sensor;
+        type Entries;
+        type Thing;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Thing = Unset;
-        type Entries = Unset;
         type PhenomenonTime = Unset;
         type Sensor = Unset;
-    }
-    ///State transition - sets the `thing` field to Set
-    pub struct SetThing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThing<S> {}
-    impl<S: State> State for SetThing<S> {
-        type Thing = Set<members::thing>;
-        type Entries = S::Entries;
-        type PhenomenonTime = S::PhenomenonTime;
-        type Sensor = S::Sensor;
-    }
-    ///State transition - sets the `entries` field to Set
-    pub struct SetEntries<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntries<S> {}
-    impl<S: State> State for SetEntries<S> {
-        type Thing = S::Thing;
-        type Entries = Set<members::entries>;
-        type PhenomenonTime = S::PhenomenonTime;
-        type Sensor = S::Sensor;
+        type Entries = Unset;
+        type Thing = Unset;
     }
     ///State transition - sets the `phenomenon_time` field to Set
     pub struct SetPhenomenonTime<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPhenomenonTime<S> {}
     impl<S: State> State for SetPhenomenonTime<S> {
-        type Thing = S::Thing;
-        type Entries = S::Entries;
         type PhenomenonTime = Set<members::phenomenon_time>;
         type Sensor = S::Sensor;
+        type Entries = S::Entries;
+        type Thing = S::Thing;
     }
     ///State transition - sets the `sensor` field to Set
     pub struct SetSensor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSensor<S> {}
     impl<S: State> State for SetSensor<S> {
-        type Thing = S::Thing;
-        type Entries = S::Entries;
         type PhenomenonTime = S::PhenomenonTime;
         type Sensor = Set<members::sensor>;
+        type Entries = S::Entries;
+        type Thing = S::Thing;
+    }
+    ///State transition - sets the `entries` field to Set
+    pub struct SetEntries<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntries<S> {}
+    impl<S: State> State for SetEntries<S> {
+        type PhenomenonTime = S::PhenomenonTime;
+        type Sensor = S::Sensor;
+        type Entries = Set<members::entries>;
+        type Thing = S::Thing;
+    }
+    ///State transition - sets the `thing` field to Set
+    pub struct SetThing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThing<S> {}
+    impl<S: State> State for SetThing<S> {
+        type PhenomenonTime = S::PhenomenonTime;
+        type Sensor = S::Sensor;
+        type Entries = S::Entries;
+        type Thing = Set<members::thing>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `thing` field
-        pub struct thing(());
-        ///Marker type for the `entries` field
-        pub struct entries(());
         ///Marker type for the `phenomenon_time` field
         pub struct phenomenon_time(());
         ///Marker type for the `sensor` field
         pub struct sensor(());
+        ///Marker type for the `entries` field
+        pub struct entries(());
+        ///Marker type for the `thing` field
+        pub struct thing(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MultiObservationBuilder<'a, S: multi_observation_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-        ::core::option::Option<
-            Vec<crate::dev_sensorthings::multi_observation::MultiObservationEntry<'a>>,
-        >,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<MultiObservationResultQuality<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        Option<Vec<AtUri<'a>>>,
+        Option<Vec<multi_observation::MultiObservationEntry<'a>>>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<MultiObservationResultQuality<'a>>,
+        Option<Datetime>,
+        Option<AtUri<'a>>,
+        Option<AtUri<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> MultiObservation<'a> {
@@ -542,27 +512,21 @@ impl<'a> MultiObservationBuilder<'a, multi_observation_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MultiObservationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: multi_observation_state::State> MultiObservationBuilder<'a, S> {
     /// Set the `derivedFrom` field (optional)
-    pub fn derived_from(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
-    ) -> Self {
+    pub fn derived_from(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `derivedFrom` field to an Option value (optional)
-    pub fn maybe_derived_from(
-        mut self,
-        value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn maybe_derived_from(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -576,15 +540,13 @@ where
     /// Set the `entries` field (required)
     pub fn entries(
         mut self,
-        value: impl Into<
-            Vec<crate::dev_sensorthings::multi_observation::MultiObservationEntry<'a>>,
-        >,
+        value: impl Into<Vec<multi_observation::MultiObservationEntry<'a>>>,
     ) -> MultiObservationBuilder<'a, multi_observation_state::SetEntries<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         MultiObservationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -597,31 +559,25 @@ where
     /// Set the `phenomenonTime` field (required)
     pub fn phenomenon_time(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> MultiObservationBuilder<'a, multi_observation_state::SetPhenomenonTime<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         MultiObservationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: multi_observation_state::State> MultiObservationBuilder<'a, S> {
     /// Set the `phenomenonTimeEnd` field (optional)
-    pub fn phenomenon_time_end(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn phenomenon_time_end(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `phenomenonTimeEnd` field to an Option value (optional)
-    pub fn maybe_phenomenon_time_end(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_phenomenon_time_end(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -648,18 +604,12 @@ impl<'a, S: multi_observation_state::State> MultiObservationBuilder<'a, S> {
 
 impl<'a, S: multi_observation_state::State> MultiObservationBuilder<'a, S> {
     /// Set the `resultTime` field (optional)
-    pub fn result_time(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn result_time(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `resultTime` field to an Option value (optional)
-    pub fn maybe_result_time(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_result_time(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -673,13 +623,13 @@ where
     /// Set the `sensor` field (required)
     pub fn sensor(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> MultiObservationBuilder<'a, multi_observation_state::SetSensor<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         MultiObservationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -692,13 +642,13 @@ where
     /// Set the `thing` field (required)
     pub fn thing(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> MultiObservationBuilder<'a, multi_observation_state::SetThing<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         MultiObservationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -706,10 +656,10 @@ where
 impl<'a, S> MultiObservationBuilder<'a, S>
 where
     S: multi_observation_state::State,
-    S::Thing: multi_observation_state::IsSet,
-    S::Entries: multi_observation_state::IsSet,
     S::PhenomenonTime: multi_observation_state::IsSet,
     S::Sensor: multi_observation_state::IsSet,
+    S::Entries: multi_observation_state::IsSet,
+    S::Thing: multi_observation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MultiObservation<'a> {
@@ -728,10 +678,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> MultiObservation<'a> {
         MultiObservation {
             derived_from: self.__unsafe_private_named.0,
@@ -747,339 +694,221 @@ where
     }
 }
 
-fn lexicon_doc_dev_sensorthings_multiObservation() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("dev.sensorthings.multiObservation"),
-        revision: None,
-        description: None,
+fn lexicon_doc_dev_sensorthings_multiObservation() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("dev.sensorthings.multiObservation"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A composite observation bundling multiple co-produced results from a single act of sensing. Each entry carries its own ObservedProperty, unit, and scale metadata. Use this instead of separate Observations when the results are genuinely co-produced (e.g. wave statistics from spectral processing) and have no independent existence.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("thing"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("sensor"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("phenomenonTime"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("entries")
+                                SmolStr::new_static("thing"), SmolStr::new_static("sensor"),
+                                SmolStr::new_static("phenomenonTime"),
+                                SmolStr::new_static("entries")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "derivedFrom",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("derivedFrom"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "AT-URIs of source observations or datastreams",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    items: LexArrayItem::String(LexString {
+                                        format: Some(LexStringFormat::AtUri),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(16usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "entries",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("entries"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Array of co-produced result entries",
-                                        ),
+                                        CowStr::new_static("Array of co-produced result entries"),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "#multiObservationEntry",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#multiObservationEntry"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(32usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "phenomenonTime",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("phenomenonTime"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Time the phenomenon was observed. Start of interval if phenomenonTimeEnd is present.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "phenomenonTimeEnd",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("phenomenonTimeEnd"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "End of observation interval. For wave statistics, this is the end of the burst window.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "resultQuality",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("resultQuality"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Quality flag applying to the composite observation as a whole",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(64usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "resultTime",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("resultTime"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Time the results became available",
-                                        ),
+                                        CowStr::new_static("Time the results became available"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sensor",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("sensor"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "AT-URI of the dev.sensorthings.sensor record (the instrument or process that co-produced these results)",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "thing",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("thing"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "AT-URI of the dev.sensorthings.thing record",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "multiObservationEntry",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("multiObservationEntry"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A single result within a composite observation, fully self-describing.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("observedProperty"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("unitOfMeasurement"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("result")
+                            SmolStr::new_static("observedProperty"),
+                            SmolStr::new_static("unitOfMeasurement"),
+                            SmolStr::new_static("result")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "observedProperty",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("observedProperty"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "AT-URI of the dev.sensorthings.observedProperty record",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "result",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
+                            SmolStr::new_static("result"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("dev.sensorthings.observation#numericResult"),
-                                    ::jacquard_common::CowStr::new_static("dev.sensorthings.observation#categoryResult"),
-                                    ::jacquard_common::CowStr::new_static("dev.sensorthings.observation#booleanResult"),
-                                    ::jacquard_common::CowStr::new_static("dev.sensorthings.observation#arrayResult"),
-                                    ::jacquard_common::CowStr::new_static("dev.sensorthings.observation#geoPointResult")
+                                    CowStr::new_static("dev.sensorthings.observation#numericResult"),
+                                    CowStr::new_static("dev.sensorthings.observation#categoryResult"),
+                                    CowStr::new_static("dev.sensorthings.observation#booleanResult"),
+                                    CowStr::new_static("dev.sensorthings.observation#arrayResult"),
+                                    CowStr::new_static("dev.sensorthings.observation#geoPointResult")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "resultQuality",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("resultQuality"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Quality flag for this specific entry, if different from the composite quality",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(64usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "resultScaleFactor",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("resultScaleFactor"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "unitOfMeasurement",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("unitOfMeasurement"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "dev.sensorthings.datastream#unitOfMeasurement",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1094,66 +923,64 @@ pub mod multi_observation_entry_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ObservedProperty;
-        type Result;
         type UnitOfMeasurement;
+        type Result;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ObservedProperty = Unset;
-        type Result = Unset;
         type UnitOfMeasurement = Unset;
+        type Result = Unset;
     }
     ///State transition - sets the `observed_property` field to Set
     pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
     impl<S: State> State for SetObservedProperty<S> {
         type ObservedProperty = Set<members::observed_property>;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
         type Result = S::Result;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-    }
-    ///State transition - sets the `result` field to Set
-    pub struct SetResult<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResult<S> {}
-    impl<S: State> State for SetResult<S> {
-        type ObservedProperty = S::ObservedProperty;
-        type Result = Set<members::result>;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
     }
     ///State transition - sets the `unit_of_measurement` field to Set
     pub struct SetUnitOfMeasurement<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUnitOfMeasurement<S> {}
     impl<S: State> State for SetUnitOfMeasurement<S> {
         type ObservedProperty = S::ObservedProperty;
-        type Result = S::Result;
         type UnitOfMeasurement = Set<members::unit_of_measurement>;
+        type Result = S::Result;
+    }
+    ///State transition - sets the `result` field to Set
+    pub struct SetResult<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResult<S> {}
+    impl<S: State> State for SetResult<S> {
+        type ObservedProperty = S::ObservedProperty;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type Result = Set<members::result>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `observed_property` field
         pub struct observed_property(());
-        ///Marker type for the `result` field
-        pub struct result(());
         ///Marker type for the `unit_of_measurement` field
         pub struct unit_of_measurement(());
+        ///Marker type for the `result` field
+        pub struct result(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MultiObservationEntryBuilder<'a, S: multi_observation_entry_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<MultiObservationEntryResult<'a>>,
-        ::core::option::Option<MultiObservationEntryResultQuality<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<
-            crate::dev_sensorthings::datastream::UnitOfMeasurement<'a>,
-        >,
+        Option<AtUri<'a>>,
+        Option<MultiObservationEntryResult<'a>>,
+        Option<MultiObservationEntryResultQuality<'a>>,
+        Option<i64>,
+        Option<UnitOfMeasurement<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> MultiObservationEntry<'a> {
@@ -1170,9 +997,9 @@ impl<'a> MultiObservationEntryBuilder<'a, multi_observation_entry_state::Empty> 
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MultiObservationEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1185,16 +1012,16 @@ where
     /// Set the `observedProperty` field (required)
     pub fn observed_property(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> MultiObservationEntryBuilder<
         'a,
         multi_observation_entry_state::SetObservedProperty<S>,
     > {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         MultiObservationEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1209,11 +1036,11 @@ where
         mut self,
         value: impl Into<MultiObservationEntryResult<'a>>,
     ) -> MultiObservationEntryBuilder<'a, multi_observation_entry_state::SetResult<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         MultiObservationEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1258,16 +1085,16 @@ where
     /// Set the `unitOfMeasurement` field (required)
     pub fn unit_of_measurement(
         mut self,
-        value: impl Into<crate::dev_sensorthings::datastream::UnitOfMeasurement<'a>>,
+        value: impl Into<UnitOfMeasurement<'a>>,
     ) -> MultiObservationEntryBuilder<
         'a,
         multi_observation_entry_state::SetUnitOfMeasurement<S>,
     > {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         MultiObservationEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1276,8 +1103,8 @@ impl<'a, S> MultiObservationEntryBuilder<'a, S>
 where
     S: multi_observation_entry_state::State,
     S::ObservedProperty: multi_observation_entry_state::IsSet,
-    S::Result: multi_observation_entry_state::IsSet,
     S::UnitOfMeasurement: multi_observation_entry_state::IsSet,
+    S::Result: multi_observation_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MultiObservationEntry<'a> {
@@ -1293,10 +1120,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> MultiObservationEntry<'a> {
         MultiObservationEntry {
             observed_property: self.__unsafe_private_named.0.unwrap(),

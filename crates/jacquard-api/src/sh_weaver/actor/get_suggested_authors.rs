@@ -5,41 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedAuthors {
     ///Defaults to `20`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedAuthorsOutput<'a> {
     #[serde(borrow)]
-    pub authors: Vec<jacquard_common::types::value::Data<'a>>,
+    pub authors: Vec<Data<'a>>,
 }
 
-/// Response type for
-///sh.weaver.actor.getSuggestedAuthors
+/// Response type for sh.weaver.actor.getSuggestedAuthors
 pub struct GetSuggestedAuthorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedAuthorsResponse {
     const NSID: &'static str = "sh.weaver.actor.getSuggestedAuthors";
@@ -54,8 +44,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetSuggestedAuthors {
     type Response = GetSuggestedAuthorsResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.actor.getSuggestedAuthors
+/// Endpoint type for sh.weaver.actor.getSuggestedAuthors
 pub struct GetSuggestedAuthorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedAuthorsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.actor.getSuggestedAuthors";
@@ -64,7 +53,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedAuthorsRequest {
     type Response = GetSuggestedAuthorsResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(20i64)
 }
 
@@ -89,8 +78,8 @@ pub mod get_suggested_authors_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetSuggestedAuthorsBuilder<S: get_suggested_authors_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>,),
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>,),
 }
 
 impl GetSuggestedAuthors {
@@ -104,7 +93,7 @@ impl GetSuggestedAuthorsBuilder<get_suggested_authors_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSuggestedAuthorsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
         }
     }

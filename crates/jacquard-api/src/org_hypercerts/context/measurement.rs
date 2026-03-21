@@ -5,120 +5,114 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::richtext::facet::Facet;
+use crate::app_certified::Did;
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Measurement data related to one or more records (e.g. activities, projects, etc.).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Measurement<'a> {
     ///Short comment of this measurement, suitable for previews and list views. Rich text annotations may be provided via `commentFacets`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: Option<CowStr<'a>>,
     ///Rich text annotations for `comment` (mentions, URLs, hashtags, etc).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub comment_facets: core::option::Option<
-        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
-    >,
+    pub comment_facets: Option<Vec<Facet<'a>>>,
     ///Client-declared timestamp when this record was originally created
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///The end date and time when the measurement ended. For one-time measurements, this should equal the start date.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub end_date: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end_date: Option<Datetime>,
     ///URIs to related evidence or underlying data (e.g. org.hypercerts.claim.evidence records or raw datasets)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub evidence_uri: core::option::Option<
-        Vec<jacquard_common::types::string::UriValue<'a>>,
-    >,
+    pub evidence_uri: Option<Vec<UriValue<'a>>>,
     ///Optional geographic references related to where the measurement was taken. Each referenced record must conform with the app.certified.location lexicon.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub locations: core::option::Option<
-        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    >,
+    pub locations: Option<Vec<StrongRef<'a>>>,
     ///DIDs of the entities that performed this measurement
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub measurers: core::option::Option<Vec<crate::app_certified::Did<'a>>>,
+    pub measurers: Option<Vec<Did<'a>>>,
     ///Short identifier for the measurement methodology
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub method_type: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub method_type: Option<CowStr<'a>>,
     ///URI to methodology documentation, standard protocol, or measurement procedure
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub method_uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub method_uri: Option<UriValue<'a>>,
     ///The metric being measured, e.g. forest area restored, number of users, etc.
     #[serde(borrow)]
-    pub metric: jacquard_common::CowStr<'a>,
+    pub metric: CowStr<'a>,
     ///The start date and time when the measurement began.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub start_date: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_date: Option<Datetime>,
     ///Strong references to the records this measurement refers to (e.g. activities, projects, or claims).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subjects: core::option::Option<
-        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    >,
+    pub subjects: Option<Vec<StrongRef<'a>>>,
     ///The unit of the measured value (e.g. kg CO₂e, hectares, %, index score).
     #[serde(borrow)]
-    pub unit: jacquard_common::CowStr<'a>,
+    pub unit: CowStr<'a>,
     ///The measured value as a numeric string (e.g. '1234.56')
     #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
+    pub value: CowStr<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MeasurementGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Measurement<'a>,
 }
 
 impl<'a> Measurement<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, MeasurementRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, MeasurementRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MeasurementRecord;
-impl jacquard_common::xrpc::XrpcResp for MeasurementRecord {
+impl XrpcResp for MeasurementRecord {
     const NSID: &'static str = "org.hypercerts.context.measurement";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = MeasurementGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<MeasurementGetRecordOutput<'_>> for Measurement<'_> {
@@ -128,36 +122,32 @@ impl From<MeasurementGetRecordOutput<'_>> for Measurement<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Measurement<'_> {
+impl Collection for Measurement<'_> {
     const NSID: &'static str = "org.hypercerts.context.measurement";
     type Record = MeasurementRecord;
 }
 
-impl jacquard_common::types::collection::Collection for MeasurementRecord {
+impl Collection for MeasurementRecord {
     const NSID: &'static str = "org.hypercerts.context.measurement";
     type Record = MeasurementRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
+impl<'a> LexiconSchema for Measurement<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.context.measurement"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_context_measurement()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.comment {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "comment",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("comment"),
                     max: 3000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -165,16 +155,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         }
         if let Some(ref value) = self.comment {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 300usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "comment",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("comment"),
                         max: 300usize,
                         actual: count,
                     });
@@ -184,10 +168,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         if let Some(ref value) = self.evidence_uri {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "evidence_uri",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("evidence_uri"),
                     max: 50usize,
                     actual: value.len(),
                 });
@@ -196,10 +178,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         if let Some(ref value) = self.locations {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "locations",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("locations"),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -208,10 +188,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         if let Some(ref value) = self.measurers {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "measurers",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("measurers"),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -220,10 +198,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         if let Some(ref value) = self.method_type {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "method_type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("method_type"),
                     max: 30usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -233,10 +209,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
             let value = &self.metric;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "metric",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("metric"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -245,10 +219,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
         if let Some(ref value) = self.subjects {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "subjects",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("subjects"),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -258,10 +230,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
             let value = &self.unit;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "unit",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("unit"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -271,10 +241,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
             let value = &self.value;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "value",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("value"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -294,90 +262,90 @@ pub mod measurement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Value;
-        type Metric;
         type Unit;
+        type Metric;
+        type Value;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Value = Unset;
-        type Metric = Unset;
         type Unit = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Value = S::Value;
-        type Metric = S::Metric;
-        type Unit = S::Unit;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type CreatedAt = S::CreatedAt;
-        type Value = Set<members::value>;
-        type Metric = S::Metric;
-        type Unit = S::Unit;
-    }
-    ///State transition - sets the `metric` field to Set
-    pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMetric<S> {}
-    impl<S: State> State for SetMetric<S> {
-        type CreatedAt = S::CreatedAt;
-        type Value = S::Value;
-        type Metric = Set<members::metric>;
-        type Unit = S::Unit;
+        type Metric = Unset;
+        type Value = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `unit` field to Set
     pub struct SetUnit<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUnit<S> {}
     impl<S: State> State for SetUnit<S> {
-        type CreatedAt = S::CreatedAt;
-        type Value = S::Value;
-        type Metric = S::Metric;
         type Unit = Set<members::unit>;
+        type Metric = S::Metric;
+        type Value = S::Value;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `metric` field to Set
+    pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMetric<S> {}
+    impl<S: State> State for SetMetric<S> {
+        type Unit = S::Unit;
+        type Metric = Set<members::metric>;
+        type Value = S::Value;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Unit = S::Unit;
+        type Metric = S::Metric;
+        type Value = Set<members::value>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Unit = S::Unit;
+        type Metric = S::Metric;
+        type Value = S::Value;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `value` field
-        pub struct value(());
-        ///Marker type for the `metric` field
-        pub struct metric(());
         ///Marker type for the `unit` field
         pub struct unit(());
+        ///Marker type for the `metric` field
+        pub struct metric(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MeasurementBuilder<'a, S: measurement_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
-        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        ::core::option::Option<Vec<crate::app_certified::Did<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Vec<Facet<'a>>>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<Vec<UriValue<'a>>>,
+        Option<Vec<StrongRef<'a>>>,
+        Option<Vec<Did<'a>>>,
+        Option<CowStr<'a>>,
+        Option<UriValue<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<Vec<StrongRef<'a>>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Measurement<'a> {
@@ -391,7 +359,7 @@ impl<'a> MeasurementBuilder<'a, measurement_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MeasurementBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -408,22 +376,19 @@ impl<'a> MeasurementBuilder<'a, measurement_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
-    pub fn maybe_comment(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -431,18 +396,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `commentFacets` field (optional)
-    pub fn comment_facets(
-        mut self,
-        value: impl Into<Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>>,
-    ) -> Self {
+    pub fn comment_facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `commentFacets` field to an Option value (optional)
-    pub fn maybe_comment_facets(
-        mut self,
-        value: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    ) -> Self {
+    pub fn maybe_comment_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -456,31 +415,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> MeasurementBuilder<'a, measurement_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         MeasurementBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `endDate` field (optional)
-    pub fn end_date(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `endDate` field to an Option value (optional)
-    pub fn maybe_end_date(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_end_date(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -488,18 +441,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `evidenceURI` field (optional)
-    pub fn evidence_uri(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::string::UriValue<'a>>>>,
-    ) -> Self {
+    pub fn evidence_uri(mut self, value: impl Into<Option<Vec<UriValue<'a>>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `evidenceURI` field to an Option value (optional)
-    pub fn maybe_evidence_uri(
-        mut self,
-        value: Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn maybe_evidence_uri(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -507,20 +454,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `locations` field (optional)
-    pub fn locations(
-        mut self,
-        value: impl Into<
-            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        >,
-    ) -> Self {
+    pub fn locations(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `locations` field to an Option value (optional)
-    pub fn maybe_locations(
-        mut self,
-        value: Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> Self {
+    pub fn maybe_locations(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -528,18 +467,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `measurers` field (optional)
-    pub fn measurers(
-        mut self,
-        value: impl Into<Option<Vec<crate::app_certified::Did<'a>>>>,
-    ) -> Self {
+    pub fn measurers(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `measurers` field to an Option value (optional)
-    pub fn maybe_measurers(
-        mut self,
-        value: Option<Vec<crate::app_certified::Did<'a>>>,
-    ) -> Self {
+    pub fn maybe_measurers(mut self, value: Option<Vec<Did<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -547,18 +480,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `methodType` field (optional)
-    pub fn method_type(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn method_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `methodType` field to an Option value (optional)
-    pub fn maybe_method_type(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_method_type(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -566,18 +493,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `methodURI` field (optional)
-    pub fn method_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn method_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `methodURI` field to an Option value (optional)
-    pub fn maybe_method_uri(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_method_uri(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -591,31 +512,25 @@ where
     /// Set the `metric` field (required)
     pub fn metric(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> MeasurementBuilder<'a, measurement_state::SetMetric<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         MeasurementBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `startDate` field (optional)
-    pub fn start_date(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn start_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `startDate` field to an Option value (optional)
-    pub fn maybe_start_date(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_start_date(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -623,20 +538,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `subjects` field (optional)
-    pub fn subjects(
-        mut self,
-        value: impl Into<
-            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        >,
-    ) -> Self {
+    pub fn subjects(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `subjects` field to an Option value (optional)
-    pub fn maybe_subjects(
-        mut self,
-        value: Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-    ) -> Self {
+    pub fn maybe_subjects(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
         self.__unsafe_private_named.11 = value;
         self
     }
@@ -650,13 +557,13 @@ where
     /// Set the `unit` field (required)
     pub fn unit(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> MeasurementBuilder<'a, measurement_state::SetUnit<S>> {
-        self.__unsafe_private_named.12 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.12 = Option::Some(value.into());
         MeasurementBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -669,13 +576,13 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> MeasurementBuilder<'a, measurement_state::SetValue<S>> {
-        self.__unsafe_private_named.13 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.13 = Option::Some(value.into());
         MeasurementBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -683,10 +590,10 @@ where
 impl<'a, S> MeasurementBuilder<'a, S>
 where
     S: measurement_state::State,
-    S::CreatedAt: measurement_state::IsSet,
-    S::Value: measurement_state::IsSet,
-    S::Metric: measurement_state::IsSet,
     S::Unit: measurement_state::IsSet,
+    S::Metric: measurement_state::IsSet,
+    S::Value: measurement_state::IsSet,
+    S::CreatedAt: measurement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Measurement<'a> {
@@ -711,7 +618,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -736,350 +643,233 @@ where
     }
 }
 
-fn lexicon_doc_org_hypercerts_context_measurement() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.hypercerts.context.measurement"),
-        revision: None,
-        description: None,
+fn lexicon_doc_org_hypercerts_context_measurement() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("org.hypercerts.context.measurement"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Measurement data related to one or more records (e.g. activities, projects, etc.).",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("metric"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("unit"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("value"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("metric"), SmolStr::new_static("unit"),
+                                SmolStr::new_static("value"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "comment",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("comment"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Short comment of this measurement, suitable for previews and list views. Rich text annotations may be provided via `commentFacets`.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(3000usize),
-                                    min_graphemes: None,
                                     max_graphemes: Some(300usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "commentFacets",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("commentFacets"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Rich text annotations for `comment` (mentions, URLs, hashtags, etc).",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "app.bsky.richtext.facet",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("app.bsky.richtext.facet"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Client-declared timestamp when this record was originally created",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "endDate",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("endDate"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The end date and time when the measurement ended. For one-time measurements, this should equal the start date.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "evidenceURI",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("evidenceURI"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "URIs to related evidence or underlying data (e.g. org.hypercerts.claim.evidence records or raw datasets)",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    items: LexArrayItem::String(LexString {
+                                        format: Some(LexStringFormat::Uri),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(50usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "locations",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("locations"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Optional geographic references related to where the measurement was taken. Each referenced record must conform with the app.certified.location lexicon.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "com.atproto.repo.strongRef",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(100usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "measurers",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("measurers"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "DIDs of the entities that performed this measurement",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "app.certified.defs#did",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("app.certified.defs#did"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(100usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "methodType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("methodType"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Short identifier for the measurement methodology",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(30usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "methodURI",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("methodURI"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "URI to methodology documentation, standard protocol, or measurement procedure",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Uri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "metric",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("metric"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The metric being measured, e.g. forest area restored, number of users, etc.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(500usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "startDate",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("startDate"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The start date and time when the measurement began.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "subjects",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("subjects"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Strong references to the records this measurement refers to (e.g. activities, projects, or claims).",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "com.atproto.repo.strongRef",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(100usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "unit",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("unit"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The unit of the measured value (e.g. kg CO₂e, hectares, %, index score).",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(50usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "value",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("value"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The measured value as a numeric string (e.g. '1234.56')",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(500usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

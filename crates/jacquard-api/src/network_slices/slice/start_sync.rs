@@ -5,68 +5,55 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, Nsid};
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct StartSync<'a> {
     ///List of collection NSIDs to sync (primary collections matching slice domain)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub collections: core::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    pub collections: Option<Vec<Nsid<'a>>>,
     ///List of external collection NSIDs to sync (collections outside slice domain)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub external_collections: core::option::Option<
-        Vec<jacquard_common::types::string::Nsid<'a>>,
-    >,
+    pub external_collections: Option<Vec<Nsid<'a>>>,
     ///Maximum number of records to sync per repository
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit_per_repo: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit_per_repo: Option<i64>,
     ///List of specific repository DIDs to sync from
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub repos: core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
-    ///Skip lexicon validation during sync Defaults to `false`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub repos: Option<Vec<Did<'a>>>,
+    ///Skip lexicon validation during sync  Defaults to `false`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_start_sync_skip_validation")]
-    pub skip_validation: core::option::Option<bool>,
+    pub skip_validation: Option<bool>,
     ///AT-URI of the slice to sync data into
     #[serde(borrow)]
-    pub slice: jacquard_common::CowStr<'a>,
+    pub slice: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct StartSyncOutput<'a> {
     ///UUID of the enqueued sync job
     #[serde(borrow)]
-    pub job_id: jacquard_common::CowStr<'a>,
+    pub job_id: CowStr<'a>,
     ///Success message confirming job enqueue
     #[serde(borrow)]
-    pub message: jacquard_common::CowStr<'a>,
+    pub message: CowStr<'a>,
 }
 
-/// Response type for
-///network.slices.slice.startSync
+/// Response type for network.slices.slice.startSync
 pub struct StartSyncResponse;
 impl jacquard_common::xrpc::XrpcResp for StartSyncResponse {
     const NSID: &'static str = "network.slices.slice.startSync";
@@ -83,8 +70,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for StartSync<'a> {
     type Response = StartSyncResponse;
 }
 
-/// Endpoint type for
-///network.slices.slice.startSync
+/// Endpoint type for network.slices.slice.startSync
 pub struct StartSyncRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StartSyncRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.startSync";
@@ -95,6 +81,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for StartSyncRequest {
     type Response = StartSyncResponse;
 }
 
-fn _default_start_sync_skip_validation() -> core::option::Option<bool> {
+fn _default_start_sync_skip_validation() -> Option<bool> {
     Some(false)
 }

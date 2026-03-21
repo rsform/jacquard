@@ -5,41 +5,32 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::social_clippr::feed::TagView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTagList<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub actor: core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    pub actor: Option<AtIdentifier<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTagListOutput<'a> {
     ///A list of tags and their associated details
     #[serde(borrow)]
-    pub tags: Vec<crate::social_clippr::feed::TagView<'a>>,
+    pub tags: Vec<TagView<'a>>,
 }
 
-/// Response type for
-///social.clippr.feed.getTagList
+/// Response type for social.clippr.feed.getTagList
 pub struct GetTagListResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTagListResponse {
     const NSID: &'static str = "social.clippr.feed.getTagList";
@@ -54,8 +45,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetTagList<'a> {
     type Response = GetTagListResponse;
 }
 
-/// Endpoint type for
-///social.clippr.feed.getTagList
+/// Endpoint type for social.clippr.feed.getTagList
 pub struct GetTagListRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTagListRequest {
     const PATH: &'static str = "/xrpc/social.clippr.feed.getTagList";
@@ -85,11 +75,9 @@ pub mod get_tag_list_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetTagListBuilder<'a, S: get_tag_list_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetTagList<'a> {
@@ -103,27 +91,21 @@ impl<'a> GetTagListBuilder<'a, get_tag_list_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetTagListBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_tag_list_state::State> GetTagListBuilder<'a, S> {
     /// Set the `actor` field (optional)
-    pub fn actor(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::ident::AtIdentifier<'a>>>,
-    ) -> Self {
+    pub fn actor(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `actor` field to an Option value (optional)
-    pub fn maybe_actor(
-        mut self,
-        value: Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ) -> Self {
+    pub fn maybe_actor(mut self, value: Option<AtIdentifier<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }

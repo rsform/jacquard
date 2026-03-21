@@ -5,39 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_common::types::string::Handle;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetIdentity;
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetIdentityOutput<'a> {
     ///The DID of the user.
     #[serde(borrow)]
-    pub did: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub did: AtIdentifier<'a>,
     ///The handle of the author.
     #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
+    pub handle: Handle<'a>,
 }
 
-/// Response type for
-///com.shinolabs.pinksea.getIdentity
+/// Response type for com.shinolabs.pinksea.getIdentity
 pub struct GetIdentityResponse;
 impl jacquard_common::xrpc::XrpcResp for GetIdentityResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getIdentity";
@@ -52,8 +43,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetIdentity {
     type Response = GetIdentityResponse;
 }
 
-/// Endpoint type for
-///com.shinolabs.pinksea.getIdentity
+/// Endpoint type for com.shinolabs.pinksea.getIdentity
 pub struct GetIdentityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetIdentityRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getIdentity";

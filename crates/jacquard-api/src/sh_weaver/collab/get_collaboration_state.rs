@@ -5,40 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::collab::CollaborationStateView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetCollaborationState<'a> {
     #[serde(borrow)]
-    pub resource: jacquard_common::types::string::AtUri<'a>,
+    pub resource: AtUri<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetCollaborationStateOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::sh_weaver::collab::CollaborationStateView<'a>,
+    pub value: CollaborationStateView<'a>,
 }
 
-/// Response type for
-///sh.weaver.collab.getCollaborationState
+/// Response type for sh.weaver.collab.getCollaborationState
 pub struct GetCollaborationStateResponse;
 impl jacquard_common::xrpc::XrpcResp for GetCollaborationStateResponse {
     const NSID: &'static str = "sh.weaver.collab.getCollaborationState";
@@ -53,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetCollaborationState<'a> {
     type Response = GetCollaborationStateResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.collab.getCollaborationState
+/// Endpoint type for sh.weaver.collab.getCollaborationState
 pub struct GetCollaborationStateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetCollaborationStateRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.collab.getCollaborationState";
@@ -97,11 +86,9 @@ pub mod get_collaboration_state_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetCollaborationStateBuilder<'a, S: get_collaboration_state_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetCollaborationState<'a> {
@@ -118,9 +105,9 @@ impl<'a> GetCollaborationStateBuilder<'a, get_collaboration_state_state::Empty> 
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetCollaborationStateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -133,16 +120,16 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetCollaborationStateBuilder<
         'a,
         get_collaboration_state_state::SetResource<S>,
     > {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetCollaborationStateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

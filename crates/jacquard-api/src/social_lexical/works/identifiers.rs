@@ -5,17 +5,27 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::social_lexical::works::identifiers;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Identifier<'a> {
     ///
@@ -23,20 +33,21 @@ pub struct Identifier<'a> {
     pub provider: IdentifierProvider<'a>,
     ///
     #[serde(borrow)]
-    pub provider_id: jacquard_common::CowStr<'a>,
+    pub provider_id: CowStr<'a>,
     ///
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub url: Option<UriValue<'a>>,
 }
 
 ///
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum IdentifierProvider<'a> {
     Tmdb,
     Imdb,
     Wikidata,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> IdentifierProvider<'a> {
@@ -56,7 +67,7 @@ impl<'a> From<&'a str> for IdentifierProvider<'a> {
             "tmdb" => Self::Tmdb,
             "imdb" => Self::Imdb,
             "wikidata" => Self::Wikidata,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -67,7 +78,7 @@ impl<'a> From<String> for IdentifierProvider<'a> {
             "tmdb" => Self::Tmdb,
             "imdb" => Self::Imdb,
             "wikidata" => Self::Wikidata,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -124,84 +135,64 @@ impl jacquard_common::IntoStatic for IdentifierProvider<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Identifiers<'a> {
     #[serde(borrow)]
-    pub identifiers: Vec<crate::social_lexical::works::identifiers::Identifier<'a>>,
+    pub identifiers: Vec<identifiers::Identifier<'a>>,
     ///
     #[serde(borrow)]
-    pub work: jacquard_common::types::string::AtUri<'a>,
+    pub work: AtUri<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct IdentifiersGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Identifiers<'a>,
 }
 
 impl<'a> Identifiers<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, IdentifiersRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, IdentifiersRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Identifier<'a> {
+impl<'a> LexiconSchema for Identifier<'a> {
     fn nsid() -> &'static str {
         "social.lexical.works.identifiers"
     }
     fn def_name() -> &'static str {
         "identifier"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_social_lexical_works_identifiers()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct IdentifiersRecord;
-impl jacquard_common::xrpc::XrpcResp for IdentifiersRecord {
+impl XrpcResp for IdentifiersRecord {
     const NSID: &'static str = "social.lexical.works.identifiers";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = IdentifiersGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<IdentifiersGetRecordOutput<'_>> for Identifiers<'_> {
@@ -211,37 +202,33 @@ impl From<IdentifiersGetRecordOutput<'_>> for Identifiers<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Identifiers<'_> {
+impl Collection for Identifiers<'_> {
     const NSID: &'static str = "social.lexical.works.identifiers";
     type Record = IdentifiersRecord;
 }
 
-impl jacquard_common::types::collection::Collection for IdentifiersRecord {
+impl Collection for IdentifiersRecord {
     const NSID: &'static str = "social.lexical.works.identifiers";
     type Record = IdentifiersRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Identifiers<'a> {
+impl<'a> LexiconSchema for Identifiers<'a> {
     fn nsid() -> &'static str {
         "social.lexical.works.identifiers"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_social_lexical_works_identifiers()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.identifiers;
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "identifiers",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("identifiers"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -251,155 +238,99 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Identifiers<'a> {
     }
 }
 
-fn lexicon_doc_social_lexical_works_identifiers() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("social.lexical.works.identifiers"),
-        revision: None,
-        description: None,
+fn lexicon_doc_social_lexical_works_identifiers() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("social.lexical.works.identifiers"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("identifier"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("identifier"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("provider"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("providerId")
+                            SmolStr::new_static("provider"),
+                            SmolStr::new_static("providerId")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "provider",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(""),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("provider"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("")),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "providerId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(""),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("providerId"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("")),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "url",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(""),
-                                ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("url"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("")),
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("work"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("identifiers")
+                                SmolStr::new_static("work"),
+                                SmolStr::new_static("identifiers")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "identifiers",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                        description: None,
-                                        refs: vec![
-                                            ::jacquard_common::CowStr::new_static("#identifier")
-                                        ],
+                                SmolStr::new_static("identifiers"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Union(LexRefUnion {
+                                        refs: vec![CowStr::new_static("#identifier")],
                                         closed: Some(false),
+                                        ..Default::default()
                                     }),
                                     min_length: Some(1usize),
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "work",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(""),
-                                    ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("work"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(CowStr::new_static("")),
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -413,50 +344,48 @@ pub mod identifiers_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Work;
         type Identifiers;
+        type Work;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Work = Unset;
         type Identifiers = Unset;
-    }
-    ///State transition - sets the `work` field to Set
-    pub struct SetWork<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWork<S> {}
-    impl<S: State> State for SetWork<S> {
-        type Work = Set<members::work>;
-        type Identifiers = S::Identifiers;
+        type Work = Unset;
     }
     ///State transition - sets the `identifiers` field to Set
     pub struct SetIdentifiers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIdentifiers<S> {}
     impl<S: State> State for SetIdentifiers<S> {
-        type Work = S::Work;
         type Identifiers = Set<members::identifiers>;
+        type Work = S::Work;
+    }
+    ///State transition - sets the `work` field to Set
+    pub struct SetWork<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWork<S> {}
+    impl<S: State> State for SetWork<S> {
+        type Identifiers = S::Identifiers;
+        type Work = Set<members::work>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `work` field
-        pub struct work(());
         ///Marker type for the `identifiers` field
         pub struct identifiers(());
+        ///Marker type for the `work` field
+        pub struct work(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct IdentifiersBuilder<'a, S: identifiers_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            Vec<crate::social_lexical::works::identifiers::Identifier<'a>>,
-        >,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        Option<Vec<identifiers::Identifier<'a>>>,
+        Option<AtUri<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Identifiers<'a> {
@@ -470,9 +399,9 @@ impl<'a> IdentifiersBuilder<'a, identifiers_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IdentifiersBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -485,13 +414,13 @@ where
     /// Set the `identifiers` field (required)
     pub fn identifiers(
         mut self,
-        value: impl Into<Vec<crate::social_lexical::works::identifiers::Identifier<'a>>>,
+        value: impl Into<Vec<identifiers::Identifier<'a>>>,
     ) -> IdentifiersBuilder<'a, identifiers_state::SetIdentifiers<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         IdentifiersBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -504,13 +433,13 @@ where
     /// Set the `work` field (required)
     pub fn work(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> IdentifiersBuilder<'a, identifiers_state::SetWork<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         IdentifiersBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -518,8 +447,8 @@ where
 impl<'a, S> IdentifiersBuilder<'a, S>
 where
     S: identifiers_state::State,
-    S::Work: identifiers_state::IsSet,
     S::Identifiers: identifiers_state::IsSet,
+    S::Work: identifiers_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Identifiers<'a> {
@@ -532,7 +461,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

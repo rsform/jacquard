@@ -5,61 +5,55 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::BookEntryView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBookEntry<'a> {
     ///Defaults to `0`. Min: 0.
     #[serde(default = "_default_index")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub index: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub index: Option<i64>,
     #[serde(borrow)]
-    pub notebook: jacquard_common::types::string::AtUri<'a>,
+    pub notebook: AtUri<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBookEntryOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::sh_weaver::notebook::BookEntryView<'a>,
+    pub value: BookEntryView<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetBookEntryError<'a> {
     #[serde(rename = "NotebookNotFound")]
-    NotebookNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    NotebookNotFound(Option<CowStr<'a>>),
     #[serde(rename = "EntryNotFound")]
-    EntryNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    EntryNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetBookEntryError<'_> {
@@ -84,8 +78,7 @@ impl core::fmt::Display for GetBookEntryError<'_> {
     }
 }
 
-/// Response type for
-///sh.weaver.notebook.getBookEntry
+/// Response type for sh.weaver.notebook.getBookEntry
 pub struct GetBookEntryResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBookEntryResponse {
     const NSID: &'static str = "sh.weaver.notebook.getBookEntry";
@@ -100,8 +93,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetBookEntry<'a> {
     type Response = GetBookEntryResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notebook.getBookEntry
+/// Endpoint type for sh.weaver.notebook.getBookEntry
 pub struct GetBookEntryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBookEntryRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getBookEntry";
@@ -110,7 +102,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetBookEntryRequest {
     type Response = GetBookEntryResponse;
 }
 
-fn _default_index() -> core::option::Option<i64> {
+fn _default_index() -> Option<i64> {
     Some(0i64)
 }
 
@@ -148,12 +140,9 @@ pub mod get_book_entry_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetBookEntryBuilder<'a, S: get_book_entry_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<AtUri<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetBookEntry<'a> {
@@ -167,9 +156,9 @@ impl<'a> GetBookEntryBuilder<'a, get_book_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetBookEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -195,13 +184,13 @@ where
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetBookEntryBuilder<'a, get_book_entry_state::SetNotebook<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetBookEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

@@ -5,72 +5,66 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, Tid, Cid};
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListBlobs<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
     ///Defaults to `500`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub since: core::option::Option<jacquard_common::types::string::Tid>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub since: Option<Tid>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListBlobsOutput<'a> {
     #[serde(borrow)]
-    pub cids: Vec<jacquard_common::types::string::Cid<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cids: Vec<Cid<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ListBlobsError<'a> {
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(Option<CowStr<'a>>),
     #[serde(rename = "RepoTakendown")]
-    RepoTakendown(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoTakendown(Option<CowStr<'a>>),
     #[serde(rename = "RepoSuspended")]
-    RepoSuspended(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoSuspended(Option<CowStr<'a>>),
     #[serde(rename = "RepoDeactivated")]
-    RepoDeactivated(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoDeactivated(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for ListBlobsError<'_> {
@@ -109,8 +103,7 @@ impl core::fmt::Display for ListBlobsError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.sync.listBlobs
+/// Response type for com.atproto.sync.listBlobs
 pub struct ListBlobsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListBlobsResponse {
     const NSID: &'static str = "com.atproto.sync.listBlobs";
@@ -125,8 +118,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListBlobs<'a> {
     type Response = ListBlobsResponse;
 }
 
-/// Endpoint type for
-///com.atproto.sync.listBlobs
+/// Endpoint type for com.atproto.sync.listBlobs
 pub struct ListBlobsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListBlobsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.listBlobs";
@@ -135,7 +127,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListBlobsRequest {
     type Response = ListBlobsResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(500i64)
 }
 
@@ -173,14 +165,14 @@ pub mod list_blobs_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListBlobsBuilder<'a, S: list_blobs_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Tid>,
+        Option<CowStr<'a>>,
+        Option<Did<'a>>,
+        Option<i64>,
+        Option<Tid>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ListBlobs<'a> {
@@ -194,24 +186,21 @@ impl<'a> ListBlobsBuilder<'a, list_blobs_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListBlobsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: list_blobs_state::State> ListBlobsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -225,13 +214,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> ListBlobsBuilder<'a, list_blobs_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ListBlobsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -251,18 +240,12 @@ impl<'a, S: list_blobs_state::State> ListBlobsBuilder<'a, S> {
 
 impl<'a, S: list_blobs_state::State> ListBlobsBuilder<'a, S> {
     /// Set the `since` field (optional)
-    pub fn since(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Tid>>,
-    ) -> Self {
+    pub fn since(mut self, value: impl Into<Option<Tid>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `since` field to an Option value (optional)
-    pub fn maybe_since(
-        mut self,
-        value: Option<jacquard_common::types::string::Tid>,
-    ) -> Self {
+    pub fn maybe_since(mut self, value: Option<Tid>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }

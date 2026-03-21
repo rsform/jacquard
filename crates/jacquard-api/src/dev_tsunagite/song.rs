@@ -5,92 +5,93 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A song included in a game hosting leaderboards via Tsunagite.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Song<'a> {
     ///The name of the composer of this song. Translations will typically be listed alongside the default.
     #[serde(borrow)]
-    pub composer: jacquard_common::types::value::Data<'a>,
+    pub composer: Data<'a>,
     ///The game(s) this song is included in.
     #[serde(borrow)]
-    pub game: Vec<jacquard_common::types::string::AtUri<'a>>,
+    pub game: Vec<AtUri<'a>>,
     ///The genre this song belongs to.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub genre: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub genre: Option<Data<'a>>,
     ///The jacket or banner art of this song, for display in UI.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub jacket: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub jacket: Option<BlobRef<'a>>,
     ///The name of the jacket artist for this song.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub jacket_artist: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub jacket_artist: Option<Data<'a>>,
     ///The source this song is from - an album, competition, other game, etc.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub source: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub source: Option<Data<'a>>,
     ///The human-readable subtitle of this song.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subtitle: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub subtitle: Option<Data<'a>>,
     ///The human-readable title of this song in UI. Translations will typically be listed alongside the default.
     #[serde(borrow)]
-    pub title: jacquard_common::types::value::Data<'a>,
+    pub title: Data<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SongGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Song<'a>,
 }
 
 impl<'a> Song<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, SongRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, SongRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct SongRecord;
-impl jacquard_common::xrpc::XrpcResp for SongRecord {
+impl XrpcResp for SongRecord {
     const NSID: &'static str = "dev.tsunagite.song";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = SongGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<SongGetRecordOutput<'_>> for Song<'_> {
@@ -100,37 +101,33 @@ impl From<SongGetRecordOutput<'_>> for Song<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Song<'_> {
+impl Collection for Song<'_> {
     const NSID: &'static str = "dev.tsunagite.song";
     type Record = SongRecord;
 }
 
-impl jacquard_common::types::collection::Collection for SongRecord {
+impl Collection for SongRecord {
     const NSID: &'static str = "dev.tsunagite.song";
     type Record = SongRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Song<'a> {
+impl<'a> LexiconSchema for Song<'a> {
     fn nsid() -> &'static str {
         "dev.tsunagite.song"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_dev_tsunagite_song()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.jacket {
             {
                 let size = value.blob().size;
                 if size > 8000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "jacket",
-                        ),
+                    return Err(ConstraintError::BlobTooLarge {
+                        path: ValidationPath::from_field("jacket"),
                         max: 8000000usize,
                         actual: size,
                     });
@@ -160,10 +157,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Song<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "jacket",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("jacket"),
                         accepted: vec![
                             "image/png".to_string(), "image/jpeg".to_string(),
                             "image/jxl".to_string(), "image/webp".to_string()
@@ -187,68 +182,68 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Composer;
         type Game;
         type Title;
-        type Composer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Composer = Unset;
         type Game = Unset;
         type Title = Unset;
-        type Composer = Unset;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
-        type Game = Set<members::game>;
-        type Title = S::Title;
-        type Composer = S::Composer;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Game = S::Game;
-        type Title = Set<members::title>;
-        type Composer = S::Composer;
     }
     ///State transition - sets the `composer` field to Set
     pub struct SetComposer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetComposer<S> {}
     impl<S: State> State for SetComposer<S> {
+        type Composer = Set<members::composer>;
         type Game = S::Game;
         type Title = S::Title;
-        type Composer = Set<members::composer>;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGame<S> {}
+    impl<S: State> State for SetGame<S> {
+        type Composer = S::Composer;
+        type Game = Set<members::game>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Composer = S::Composer;
+        type Game = S::Game;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `composer` field
+        pub struct composer(());
         ///Marker type for the `game` field
         pub struct game(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `composer` field
-        pub struct composer(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SongBuilder<'a, S: song_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        Option<Data<'a>>,
+        Option<Vec<AtUri<'a>>>,
+        Option<Data<'a>>,
+        Option<BlobRef<'a>>,
+        Option<Data<'a>>,
+        Option<Data<'a>>,
+        Option<Data<'a>>,
+        Option<Data<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Song<'a> {
@@ -262,9 +257,9 @@ impl<'a> SongBuilder<'a, song_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SongBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -277,13 +272,13 @@ where
     /// Set the `composer` field (required)
     pub fn composer(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> SongBuilder<'a, song_state::SetComposer<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SongBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -296,31 +291,25 @@ where
     /// Set the `game` field (required)
     pub fn game(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<'a>>>,
     ) -> SongBuilder<'a, song_state::SetGame<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         SongBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `genre` field (optional)
-    pub fn genre(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn genre(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_genre(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -328,18 +317,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
 
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `jacket` field (optional)
-    pub fn jacket(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
-    ) -> Self {
+    pub fn jacket(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `jacket` field to an Option value (optional)
-    pub fn maybe_jacket(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_jacket(mut self, value: Option<BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -347,18 +330,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
 
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `jacketArtist` field (optional)
-    pub fn jacket_artist(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn jacket_artist(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `jacketArtist` field to an Option value (optional)
-    pub fn maybe_jacket_artist(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_jacket_artist(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -366,18 +343,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
 
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `source` field (optional)
-    pub fn source(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn source(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
-    pub fn maybe_source(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_source(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -385,18 +356,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
 
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `subtitle` field (optional)
-    pub fn subtitle(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn subtitle(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `subtitle` field to an Option value (optional)
-    pub fn maybe_subtitle(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_subtitle(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -410,13 +375,13 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> SongBuilder<'a, song_state::SetTitle<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         SongBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -424,9 +389,9 @@ where
 impl<'a, S> SongBuilder<'a, S>
 where
     S: song_state::State,
+    S::Composer: song_state::IsSet,
     S::Game: song_state::IsSet,
     S::Title: song_state::IsSet,
-    S::Composer: song_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Song<'a> {
@@ -445,10 +410,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Song<'a> {
         Song {
             composer: self.__unsafe_private_named.0.unwrap(),
@@ -464,150 +426,108 @@ where
     }
 }
 
-fn lexicon_doc_dev_tsunagite_song() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("dev.tsunagite.song"),
-        revision: None,
-        description: None,
+fn lexicon_doc_dev_tsunagite_song() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("dev.tsunagite.song"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A song included in a game hosting leaderboards via Tsunagite.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("game"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("composer")
+                                SmolStr::new_static("game"), SmolStr::new_static("title"),
+                                SmolStr::new_static("composer")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "composer",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "dev.tsunagite.translatable",
-                                    ),
+                                SmolStr::new_static("composer"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("dev.tsunagite.translatable"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "game",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("game"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "The game(s) this song is included in.",
-                                        ),
+                                        CowStr::new_static("The game(s) this song is included in."),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                    items: LexArrayItem::String(LexString {
                                         description: Some(
-                                            ::jacquard_common::CowStr::new_static(
+                                            CowStr::new_static(
                                                 "All URIs must point to records of type `dev.tsunagite.game`.",
                                             ),
                                         ),
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                        format: Some(LexStringFormat::AtUri),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "genre",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "dev.tsunagite.translatable",
-                                    ),
+                                SmolStr::new_static("genre"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("dev.tsunagite.translatable"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "jacket",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                    description: None,
-                                    accept: None,
-                                    max_size: None,
+                                SmolStr::new_static("jacket"),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("jacketArtist"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("dev.tsunagite.translatable"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "jacketArtist",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "dev.tsunagite.translatable",
-                                    ),
+                                SmolStr::new_static("source"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("dev.tsunagite.translatable"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "source",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "dev.tsunagite.translatable",
-                                    ),
+                                SmolStr::new_static("subtitle"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("dev.tsunagite.translatable"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "subtitle",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "dev.tsunagite.translatable",
-                                    ),
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "title",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "dev.tsunagite.translatable",
-                                    ),
+                                SmolStr::new_static("title"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("dev.tsunagite.translatable"),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

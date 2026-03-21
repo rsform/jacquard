@@ -5,40 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::stats::StatsView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStats<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub did: AtIdentifier<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStatsOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::stats::StatsView<'a>,
+    pub value: StatsView<'a>,
 }
 
-/// Response type for
-///app.rocksky.stats.getStats
+/// Response type for app.rocksky.stats.getStats
 pub struct GetStatsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStatsResponse {
     const NSID: &'static str = "app.rocksky.stats.getStats";
@@ -53,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetStats<'a> {
     type Response = GetStatsResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.stats.getStats
+/// Endpoint type for app.rocksky.stats.getStats
 pub struct GetStatsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStatsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.stats.getStats";
@@ -97,11 +86,9 @@ pub mod get_stats_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetStatsBuilder<'a, S: get_stats_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetStats<'a> {
@@ -115,9 +102,9 @@ impl<'a> GetStatsBuilder<'a, get_stats_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetStatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -130,13 +117,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> GetStatsBuilder<'a, get_stats_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetStatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

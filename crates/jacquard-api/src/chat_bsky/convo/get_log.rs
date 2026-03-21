@@ -5,78 +5,71 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::LogAcceptConvo;
+use crate::chat_bsky::convo::LogAddReaction;
+use crate::chat_bsky::convo::LogBeginConvo;
+use crate::chat_bsky::convo::LogCreateMessage;
+use crate::chat_bsky::convo::LogDeleteMessage;
+use crate::chat_bsky::convo::LogLeaveConvo;
+use crate::chat_bsky::convo::LogMuteConvo;
+use crate::chat_bsky::convo::LogReadMessage;
+use crate::chat_bsky::convo::LogRemoveReaction;
+use crate::chat_bsky::convo::LogUnmuteConvo;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLog<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLogOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
     pub logs: Vec<GetLogOutputLogsItem<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetLogOutputLogsItem<'a> {
     #[serde(rename = "chat.bsky.convo.defs#logBeginConvo")]
-    LogBeginConvo(Box<crate::chat_bsky::convo::LogBeginConvo<'a>>),
+    LogBeginConvo(Box<LogBeginConvo<'a>>),
     #[serde(rename = "chat.bsky.convo.defs#logAcceptConvo")]
-    LogAcceptConvo(Box<crate::chat_bsky::convo::LogAcceptConvo<'a>>),
+    LogAcceptConvo(Box<LogAcceptConvo<'a>>),
     #[serde(rename = "chat.bsky.convo.defs#logLeaveConvo")]
-    LogLeaveConvo(Box<crate::chat_bsky::convo::LogLeaveConvo<'a>>),
+    LogLeaveConvo(Box<LogLeaveConvo<'a>>),
     #[serde(rename = "chat.bsky.convo.defs#logMuteConvo")]
-    LogMuteConvo(Box<crate::chat_bsky::convo::LogMuteConvo<'a>>),
+    LogMuteConvo(Box<LogMuteConvo<'a>>),
     #[serde(rename = "chat.bsky.convo.defs#logUnmuteConvo")]
-    LogUnmuteConvo(Box<crate::chat_bsky::convo::LogUnmuteConvo<'a>>),
+    LogUnmuteConvo(Box<LogUnmuteConvo<'a>>),
     #[serde(rename = "chat.bsky.convo.defs#logCreateMessage")]
-    LogCreateMessage(Box<crate::chat_bsky::convo::LogCreateMessage<'a>>),
+    LogCreateMessage(Box<LogCreateMessage<'a>>),
     #[serde(rename = "chat.bsky.convo.defs#logDeleteMessage")]
-    LogDeleteMessage(Box<crate::chat_bsky::convo::LogDeleteMessage<'a>>),
+    LogDeleteMessage(Box<LogDeleteMessage<'a>>),
     #[serde(rename = "chat.bsky.convo.defs#logReadMessage")]
-    LogReadMessage(Box<crate::chat_bsky::convo::LogReadMessage<'a>>),
+    LogReadMessage(Box<LogReadMessage<'a>>),
     #[serde(rename = "chat.bsky.convo.defs#logAddReaction")]
-    LogAddReaction(Box<crate::chat_bsky::convo::LogAddReaction<'a>>),
+    LogAddReaction(Box<LogAddReaction<'a>>),
     #[serde(rename = "chat.bsky.convo.defs#logRemoveReaction")]
-    LogRemoveReaction(Box<crate::chat_bsky::convo::LogRemoveReaction<'a>>),
+    LogRemoveReaction(Box<LogRemoveReaction<'a>>),
 }
 
-/// Response type for
-///chat.bsky.convo.getLog
+/// Response type for chat.bsky.convo.getLog
 pub struct GetLogResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLogResponse {
     const NSID: &'static str = "chat.bsky.convo.getLog";
@@ -91,8 +84,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetLog<'a> {
     type Response = GetLogResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.convo.getLog
+/// Endpoint type for chat.bsky.convo.getLog
 pub struct GetLogRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLogRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.getLog";
@@ -122,9 +114,9 @@ pub mod get_log_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetLogBuilder<'a, S: get_log_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetLog<'a> {
@@ -138,24 +130,21 @@ impl<'a> GetLogBuilder<'a, get_log_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetLogBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_log_state::State> GetLogBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }

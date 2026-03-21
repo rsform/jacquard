@@ -5,73 +5,74 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::io_atcr::hold::complete_upload;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CompleteUpload<'a> {
     ///Final blob digest (e.g., sha256:abc123...)
     #[serde(borrow)]
-    pub digest: jacquard_common::CowStr<'a>,
+    pub digest: CowStr<'a>,
     ///List of uploaded parts with their ETags
     #[serde(borrow)]
-    pub parts: Vec<crate::io_atcr::hold::complete_upload::PartInfo<'a>>,
+    pub parts: Vec<complete_upload::PartInfo<'a>>,
     ///Upload session ID from initiateUpload
     #[serde(borrow)]
-    pub upload_id: jacquard_common::CowStr<'a>,
+    pub upload_id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CompleteUploadOutput<'a> {
     ///The digest of the completed blob
     #[serde(borrow)]
-    pub digest: jacquard_common::CowStr<'a>,
+    pub digest: CowStr<'a>,
     ///Always 'completed' on success
     #[serde(borrow)]
-    pub status: jacquard_common::CowStr<'a>,
+    pub status: CowStr<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CompleteUploadError<'a> {
     #[serde(rename = "InvalidUploadId")]
-    InvalidUploadId(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidUploadId(Option<CowStr<'a>>),
     #[serde(rename = "InvalidDigest")]
-    InvalidDigest(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidDigest(Option<CowStr<'a>>),
     #[serde(rename = "MissingParts")]
-    MissingParts(core::option::Option<jacquard_common::CowStr<'a>>),
+    MissingParts(Option<CowStr<'a>>),
     #[serde(rename = "CompletionFailed")]
-    CompletionFailed(core::option::Option<jacquard_common::CowStr<'a>>),
+    CompletionFailed(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for CompleteUploadError<'_> {
@@ -111,27 +112,19 @@ impl core::fmt::Display for CompleteUploadError<'_> {
 }
 
 /// Information about a completed upload part
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PartInfo<'a> {
     ///ETag returned when the part was uploaded
     #[serde(borrow)]
-    pub etag: jacquard_common::CowStr<'a>,
+    pub etag: CowStr<'a>,
     ///Part sequence number (1-indexed)
     pub part_number: i64,
 }
 
-/// Response type for
-///io.atcr.hold.completeUpload
+/// Response type for io.atcr.hold.completeUpload
 pub struct CompleteUploadResponse;
 impl jacquard_common::xrpc::XrpcResp for CompleteUploadResponse {
     const NSID: &'static str = "io.atcr.hold.completeUpload";
@@ -148,8 +141,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CompleteUpload<'a> {
     type Response = CompleteUploadResponse;
 }
 
-/// Endpoint type for
-///io.atcr.hold.completeUpload
+/// Endpoint type for io.atcr.hold.completeUpload
 pub struct CompleteUploadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CompleteUploadRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.completeUpload";
@@ -160,27 +152,23 @@ impl jacquard_common::xrpc::XrpcEndpoint for CompleteUploadRequest {
     type Response = CompleteUploadResponse;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for PartInfo<'a> {
+impl<'a> LexiconSchema for PartInfo<'a> {
     fn nsid() -> &'static str {
         "io.atcr.hold.completeUpload"
     }
     fn def_name() -> &'static str {
         "partInfo"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_io_atcr_hold_completeUpload()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.etag;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "etag",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("etag"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -189,10 +177,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for PartInfo<'a> {
         {
             let value = &self.part_number;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "part_number",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("part_number"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -212,63 +198,63 @@ pub mod complete_upload_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type UploadId;
         type Digest;
         type Parts;
-        type UploadId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type UploadId = Unset;
         type Digest = Unset;
         type Parts = Unset;
-        type UploadId = Unset;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Digest = Set<members::digest>;
-        type Parts = S::Parts;
-        type UploadId = S::UploadId;
-    }
-    ///State transition - sets the `parts` field to Set
-    pub struct SetParts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParts<S> {}
-    impl<S: State> State for SetParts<S> {
-        type Digest = S::Digest;
-        type Parts = Set<members::parts>;
-        type UploadId = S::UploadId;
     }
     ///State transition - sets the `upload_id` field to Set
     pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUploadId<S> {}
     impl<S: State> State for SetUploadId<S> {
+        type UploadId = Set<members::upload_id>;
         type Digest = S::Digest;
         type Parts = S::Parts;
-        type UploadId = Set<members::upload_id>;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type UploadId = S::UploadId;
+        type Digest = Set<members::digest>;
+        type Parts = S::Parts;
+    }
+    ///State transition - sets the `parts` field to Set
+    pub struct SetParts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParts<S> {}
+    impl<S: State> State for SetParts<S> {
+        type UploadId = S::UploadId;
+        type Digest = S::Digest;
+        type Parts = Set<members::parts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `upload_id` field
+        pub struct upload_id(());
         ///Marker type for the `digest` field
         pub struct digest(());
         ///Marker type for the `parts` field
         pub struct parts(());
-        ///Marker type for the `upload_id` field
-        pub struct upload_id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CompleteUploadBuilder<'a, S: complete_upload_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::io_atcr::hold::complete_upload::PartInfo<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Vec<complete_upload::PartInfo<'a>>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CompleteUpload<'a> {
@@ -282,9 +268,9 @@ impl<'a> CompleteUploadBuilder<'a, complete_upload_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CompleteUploadBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -297,13 +283,13 @@ where
     /// Set the `digest` field (required)
     pub fn digest(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CompleteUploadBuilder<'a, complete_upload_state::SetDigest<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CompleteUploadBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -316,13 +302,13 @@ where
     /// Set the `parts` field (required)
     pub fn parts(
         mut self,
-        value: impl Into<Vec<crate::io_atcr::hold::complete_upload::PartInfo<'a>>>,
+        value: impl Into<Vec<complete_upload::PartInfo<'a>>>,
     ) -> CompleteUploadBuilder<'a, complete_upload_state::SetParts<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CompleteUploadBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -335,13 +321,13 @@ where
     /// Set the `uploadId` field (required)
     pub fn upload_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CompleteUploadBuilder<'a, complete_upload_state::SetUploadId<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         CompleteUploadBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -349,9 +335,9 @@ where
 impl<'a, S> CompleteUploadBuilder<'a, S>
 where
     S: complete_upload_state::State,
+    S::UploadId: complete_upload_state::IsSet,
     S::Digest: complete_upload_state::IsSet,
     S::Parts: complete_upload_state::IsSet,
-    S::UploadId: complete_upload_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CompleteUpload<'a> {
@@ -365,7 +351,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -389,48 +375,45 @@ pub mod part_info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Etag;
         type PartNumber;
+        type Etag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Etag = Unset;
         type PartNumber = Unset;
-    }
-    ///State transition - sets the `etag` field to Set
-    pub struct SetEtag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEtag<S> {}
-    impl<S: State> State for SetEtag<S> {
-        type Etag = Set<members::etag>;
-        type PartNumber = S::PartNumber;
+        type Etag = Unset;
     }
     ///State transition - sets the `part_number` field to Set
     pub struct SetPartNumber<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPartNumber<S> {}
     impl<S: State> State for SetPartNumber<S> {
-        type Etag = S::Etag;
         type PartNumber = Set<members::part_number>;
+        type Etag = S::Etag;
+    }
+    ///State transition - sets the `etag` field to Set
+    pub struct SetEtag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEtag<S> {}
+    impl<S: State> State for SetEtag<S> {
+        type PartNumber = S::PartNumber;
+        type Etag = Set<members::etag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `etag` field
-        pub struct etag(());
         ///Marker type for the `part_number` field
         pub struct part_number(());
+        ///Marker type for the `etag` field
+        pub struct etag(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PartInfoBuilder<'a, S: part_info_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> PartInfo<'a> {
@@ -444,9 +427,9 @@ impl<'a> PartInfoBuilder<'a, part_info_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PartInfoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -459,13 +442,13 @@ where
     /// Set the `etag` field (required)
     pub fn etag(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> PartInfoBuilder<'a, part_info_state::SetEtag<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PartInfoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -480,11 +463,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PartInfoBuilder<'a, part_info_state::SetPartNumber<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         PartInfoBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -492,8 +475,8 @@ where
 impl<'a, S> PartInfoBuilder<'a, S>
 where
     S: part_info_state::State,
-    S::Etag: part_info_state::IsSet,
     S::PartNumber: part_info_state::IsSet,
+    S::Etag: part_info_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PartInfo<'a> {
@@ -506,7 +489,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -519,166 +502,120 @@ where
     }
 }
 
-fn lexicon_doc_io_atcr_hold_completeUpload() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("io.atcr.hold.completeUpload"),
-        revision: None,
-        description: None,
+fn lexicon_doc_io_atcr_hold_completeUpload() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("io.atcr.hold.completeUpload"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
-                    description: None,
-                    parameters: None,
-                    input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
-                        description: None,
-                        encoding: ::jacquard_common::CowStr::new_static(
-                            "application/json",
-                        ),
+                SmolStr::new_static("main"),
+                LexUserType::XrpcProcedure(LexXrpcProcedure {
+                    input: Some(LexXrpcBody {
+                        encoding: CowStr::new_static("application/json"),
                         schema: Some(
-                            ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
-                                description: None,
+                            LexXrpcBodySchema::Object(LexObject {
                                 required: Some(
                                     vec![
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("uploadId"),
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("digest"),
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("parts")
+                                        SmolStr::new_static("uploadId"),
+                                        SmolStr::new_static("digest"), SmolStr::new_static("parts")
                                     ],
                                 ),
-                                nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
-                                    let mut map = ::alloc::collections::BTreeMap::new();
+                                    let mut map = BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "digest",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        SmolStr::new_static("digest"),
+                                        LexObjectProperty::String(LexString {
                                             description: Some(
-                                                ::jacquard_common::CowStr::new_static(
+                                                CowStr::new_static(
                                                     "Final blob digest (e.g., sha256:abc123...)",
                                                 ),
                                             ),
-                                            format: None,
-                                            default: None,
-                                            min_length: None,
                                             max_length: Some(128usize),
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "parts",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                        SmolStr::new_static("parts"),
+                                        LexObjectProperty::Array(LexArray {
                                             description: Some(
-                                                ::jacquard_common::CowStr::new_static(
+                                                CowStr::new_static(
                                                     "List of uploaded parts with their ETags",
                                                 ),
                                             ),
-                                            items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                                description: None,
-                                                r#ref: ::jacquard_common::CowStr::new_static("#partInfo"),
+                                            items: LexArrayItem::Ref(LexRef {
+                                                r#ref: CowStr::new_static("#partInfo"),
+                                                ..Default::default()
                                             }),
-                                            min_length: None,
-                                            max_length: None,
+                                            ..Default::default()
                                         }),
                                     );
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "uploadId",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        SmolStr::new_static("uploadId"),
+                                        LexObjectProperty::String(LexString {
                                             description: Some(
-                                                ::jacquard_common::CowStr::new_static(
-                                                    "Upload session ID from initiateUpload",
-                                                ),
+                                                CowStr::new_static("Upload session ID from initiateUpload"),
                                             ),
-                                            format: None,
-                                            default: None,
-                                            min_length: None,
                                             max_length: Some(256usize),
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                            ..Default::default()
                                         }),
                                     );
                                     map
                                 },
+                                ..Default::default()
                             }),
                         ),
+                        ..Default::default()
                     }),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("partInfo"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("partInfo"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Information about a completed upload part",
-                        ),
+                        CowStr::new_static("Information about a completed upload part"),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("partNumber"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("etag")
+                            SmolStr::new_static("partNumber"),
+                            SmolStr::new_static("etag")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "etag",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("etag"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "ETag returned when the part was uploaded",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(256usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "partNumber",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("partNumber"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

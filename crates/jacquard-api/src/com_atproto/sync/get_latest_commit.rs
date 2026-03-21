@@ -5,61 +5,55 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, Tid, Cid};
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLatestCommit<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLatestCommitOutput<'a> {
     #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    pub rev: jacquard_common::types::string::Tid,
+    pub cid: Cid<'a>,
+    pub rev: Tid,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetLatestCommitError<'a> {
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(Option<CowStr<'a>>),
     #[serde(rename = "RepoTakendown")]
-    RepoTakendown(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoTakendown(Option<CowStr<'a>>),
     #[serde(rename = "RepoSuspended")]
-    RepoSuspended(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoSuspended(Option<CowStr<'a>>),
     #[serde(rename = "RepoDeactivated")]
-    RepoDeactivated(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoDeactivated(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetLatestCommitError<'_> {
@@ -98,8 +92,7 @@ impl core::fmt::Display for GetLatestCommitError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.sync.getLatestCommit
+/// Response type for com.atproto.sync.getLatestCommit
 pub struct GetLatestCommitResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLatestCommitResponse {
     const NSID: &'static str = "com.atproto.sync.getLatestCommit";
@@ -114,8 +107,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetLatestCommit<'a> {
     type Response = GetLatestCommitResponse;
 }
 
-/// Endpoint type for
-///com.atproto.sync.getLatestCommit
+/// Endpoint type for com.atproto.sync.getLatestCommit
 pub struct GetLatestCommitRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLatestCommitRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.getLatestCommit";
@@ -158,11 +150,9 @@ pub mod get_latest_commit_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetLatestCommitBuilder<'a, S: get_latest_commit_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetLatestCommit<'a> {
@@ -176,9 +166,9 @@ impl<'a> GetLatestCommitBuilder<'a, get_latest_commit_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetLatestCommitBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -191,13 +181,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetLatestCommitBuilder<'a, get_latest_commit_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetLatestCommitBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

@@ -5,34 +5,22 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ExportRepoOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct ExportRepo;
-/// Response type for
-///ooo.bsky.authfetch.exportRepo
+/// Response type for ooo.bsky.authfetch.exportRepo
 pub struct ExportRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for ExportRepoResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.exportRepo";
@@ -62,8 +50,7 @@ impl jacquard_common::xrpc::XrpcRequest for ExportRepo {
     type Response = ExportRepoResponse;
 }
 
-/// Endpoint type for
-///ooo.bsky.authfetch.exportRepo
+/// Endpoint type for ooo.bsky.authfetch.exportRepo
 pub struct ExportRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ExportRepoRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.exportRepo";

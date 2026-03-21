@@ -5,229 +5,182 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, RecordKey, Rkey};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::dev_tsunagite::types::Indexable;
+use crate::dev_tsunagite::game;
 /// A closed set of indexable named values.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Enum<'a> {
     ///The internal ID of this component, limited to the RecordKey characterset.
     #[serde(borrow)]
-    pub id: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub id: RecordKey<Rkey<'a>>,
     ///The human-readable name of this component in UI.
     #[serde(borrow)]
-    pub name: jacquard_common::types::value::Data<'a>,
+    pub name: Data<'a>,
     ///The allowed values for this enum to take.
     #[serde(borrow)]
-    pub values: Vec<crate::dev_tsunagite::types::Indexable<'a>>,
+    pub values: Vec<Indexable<'a>>,
 }
 
 /// A record describing a game hosting leaderboards via Tsunagite.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Game<'a> {
     ///The default component for leaderboard sorting.
     #[serde(borrow)]
-    pub default_component: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub default_component: RecordKey<Rkey<'a>>,
     ///An array of usable input methods for the game. Optional if the game only has one input method or doesn't separate leaderboards by method.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub input_methods: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub input_methods: Option<Vec<CowStr<'a>>>,
     ///The obtainable judgments during gameplay.
     #[serde(borrow)]
-    pub judgments: Vec<crate::dev_tsunagite::types::Indexable<'a>>,
+    pub judgments: Vec<Indexable<'a>>,
     ///The logo of the game, for display in UI.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub logo: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub logo: Option<BlobRef<'a>>,
     ///An array of playable game modes with different gameplay configurations. Optional if the game only has one mode.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub modes: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub modes: Option<Vec<CowStr<'a>>>,
     ///The human-readable name of the game, for display in UI.
     #[serde(borrow)]
-    pub name: jacquard_common::types::value::Data<'a>,
+    pub name: Data<'a>,
     ///All the components of a score in the game, including grades, lamps, EX score, and whatever other constructs are used.
     #[serde(borrow)]
     pub score_components: Vec<GameScoreComponentsItem<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GameScoreComponentsItem<'a> {
     #[serde(rename = "dev.tsunagite.game#enum")]
-    Enum(Box<crate::dev_tsunagite::game::Enum<'a>>),
+    Enum(Box<game::Enum<'a>>),
     #[serde(rename = "dev.tsunagite.game#points")]
-    Points(Box<crate::dev_tsunagite::game::Points<'a>>),
+    Points(Box<game::Points<'a>>),
     #[serde(rename = "dev.tsunagite.game#percentage")]
-    Percentage(Box<crate::dev_tsunagite::game::Percentage<'a>>),
+    Percentage(Box<game::Percentage<'a>>),
     #[serde(rename = "dev.tsunagite.game#text")]
-    Text(Box<crate::dev_tsunagite::game::Text<'a>>),
+    Text(Box<game::Text<'a>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GameGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Game<'a>,
 }
 
 /// A percentage score with customizable precision.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Percentage<'a> {
     ///The internal ID of this component, limited to the RecordKey characterset.
     #[serde(borrow)]
-    pub id: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
-    ///The maximum allowed percentage for this score. Defaults to `100`.
+    pub id: RecordKey<Rkey<'a>>,
+    ///The maximum allowed percentage for this score.  Defaults to `100`.
     #[serde(default = "_default_percentage_maximum")]
     pub maximum: i64,
     ///The human-readable name of this component in UI.
     #[serde(borrow)]
-    pub name: jacquard_common::types::value::Data<'a>,
-    ///The number of decimal places to include in the percentage. Defaults to `2`.
+    pub name: Data<'a>,
+    ///The number of decimal places to include in the percentage.  Defaults to `2`.
     #[serde(default = "_default_percentage_precision")]
     pub precision: i64,
 }
 
 /// An integer point score, with or without a cap.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Points<'a> {
     ///The internal ID of this component, limited to the RecordKey characterset.
     #[serde(borrow)]
-    pub id: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub id: RecordKey<Rkey<'a>>,
     ///The maximum allowed value for this score.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub maximum: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maximum: Option<i64>,
     ///The human-readable name of this component in UI.
     #[serde(borrow)]
-    pub name: jacquard_common::types::value::Data<'a>,
+    pub name: Data<'a>,
 }
 
 /// A fallback component for displaying arbitrary text.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Text<'a> {
     ///The internal ID of this component, limited to the RecordKey characterset.
     #[serde(borrow)]
-    pub id: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub id: RecordKey<Rkey<'a>>,
     ///The human-readable name of this component in UI.
     #[serde(borrow)]
-    pub name: jacquard_common::types::value::Data<'a>,
+    pub name: Data<'a>,
 }
 
 impl<'a> Game<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, GameRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, GameRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Enum<'a> {
+impl<'a> LexiconSchema for Enum<'a> {
     fn nsid() -> &'static str {
         "dev.tsunagite.game"
     }
     fn def_name() -> &'static str {
         "enum"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_dev_tsunagite_game()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("id"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -237,10 +190,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Enum<'a> {
             let value = &self.id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("id"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -251,13 +202,14 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Enum<'a> {
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct GameRecord;
-impl jacquard_common::xrpc::XrpcResp for GameRecord {
+impl XrpcResp for GameRecord {
     const NSID: &'static str = "dev.tsunagite.game";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = GameGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<GameGetRecordOutput<'_>> for Game<'_> {
@@ -267,37 +219,33 @@ impl From<GameGetRecordOutput<'_>> for Game<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Game<'_> {
+impl Collection for Game<'_> {
     const NSID: &'static str = "dev.tsunagite.game";
     type Record = GameRecord;
 }
 
-impl jacquard_common::types::collection::Collection for GameRecord {
+impl Collection for GameRecord {
     const NSID: &'static str = "dev.tsunagite.game";
     type Record = GameRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Game<'a> {
+impl<'a> LexiconSchema for Game<'a> {
     fn nsid() -> &'static str {
         "dev.tsunagite.game"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_dev_tsunagite_game()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.logo {
             {
                 let size = value.blob().size;
                 if size > 8000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "logo",
-                        ),
+                    return Err(ConstraintError::BlobTooLarge {
+                        path: ValidationPath::from_field("logo"),
                         max: 8000000usize,
                         actual: size,
                     });
@@ -327,10 +275,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Game<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "logo",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("logo"),
                         accepted: vec![
                             "image/png".to_string(), "image/jpeg".to_string(),
                             "image/jxl".to_string(), "image/webp".to_string()
@@ -344,27 +290,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Game<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Percentage<'a> {
+impl<'a> LexiconSchema for Percentage<'a> {
     fn nsid() -> &'static str {
         "dev.tsunagite.game"
     }
     fn def_name() -> &'static str {
         "percentage"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_dev_tsunagite_game()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("id"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -374,10 +316,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Percentage<'a> {
             let value = &self.id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("id"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -387,27 +327,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Percentage<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Points<'a> {
+impl<'a> LexiconSchema for Points<'a> {
     fn nsid() -> &'static str {
         "dev.tsunagite.game"
     }
     fn def_name() -> &'static str {
         "points"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_dev_tsunagite_game()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("id"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -417,10 +353,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Points<'a> {
             let value = &self.id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("id"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -430,27 +364,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Points<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Text<'a> {
+impl<'a> LexiconSchema for Text<'a> {
     fn nsid() -> &'static str {
         "dev.tsunagite.game"
     }
     fn def_name() -> &'static str {
         "text"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_dev_tsunagite_game()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("id"),
                     max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -460,10 +390,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Text<'a> {
             let value = &self.id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("id"),
                     min: 1usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -533,17 +461,13 @@ pub mod enum_state {
 
 /// Builder for constructing an instance of this type
 pub struct EnumBuilder<'a, S: enum_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<Vec<crate::dev_tsunagite::types::Indexable<'a>>>,
+        Option<RecordKey<Rkey<'a>>>,
+        Option<Data<'a>>,
+        Option<Vec<Indexable<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Enum<'a> {
@@ -557,9 +481,9 @@ impl<'a> EnumBuilder<'a, enum_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EnumBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -572,17 +496,13 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
+        value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> EnumBuilder<'a, enum_state::SetId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         EnumBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -595,13 +515,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> EnumBuilder<'a, enum_state::SetName<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         EnumBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -614,13 +534,13 @@ where
     /// Set the `values` field (required)
     pub fn values(
         mut self,
-        value: impl Into<Vec<crate::dev_tsunagite::types::Indexable<'a>>>,
+        value: impl Into<Vec<Indexable<'a>>>,
     ) -> EnumBuilder<'a, enum_state::SetValues<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         EnumBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -644,10 +564,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Enum<'a> {
         Enum {
             id: self.__unsafe_private_named.0.unwrap(),
@@ -658,470 +575,336 @@ where
     }
 }
 
-fn lexicon_doc_dev_tsunagite_game() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("dev.tsunagite.game"),
-        revision: None,
-        description: None,
+fn lexicon_doc_dev_tsunagite_game() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("dev.tsunagite.game"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("enum"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("enum"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A closed set of indexable named values.",
-                        ),
+                        CowStr::new_static("A closed set of indexable named values."),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("values")
+                            SmolStr::new_static("name"), SmolStr::new_static("id"),
+                            SmolStr::new_static("values")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("id"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The internal ID of this component, limited to the RecordKey characterset.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::RecordKey,
-                                ),
-                                default: None,
+                                format: Some(LexStringFormat::RecordKey),
                                 min_length: Some(1usize),
                                 max_length: Some(32usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "dev.tsunagite.translatable",
-                                ),
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("dev.tsunagite.translatable"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "values",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("values"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The allowed values for this enum to take.",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "dev.tsunagite.types#indexable",
-                                    ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("dev.tsunagite.types#indexable"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A record describing a game hosting leaderboards via Tsunagite.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("judgments"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("scoreComponents"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("defaultComponent")
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("judgments"),
+                                SmolStr::new_static("scoreComponents"),
+                                SmolStr::new_static("defaultComponent")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "defaultComponent",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("defaultComponent"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The default component for leaderboard sorting.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::RecordKey,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::RecordKey),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "inputMethods",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("inputMethods"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "An array of usable input methods for the game. Optional if the game only has one input method or doesn't separate leaderboards by method.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                    items: LexArrayItem::String(LexString {
                                         description: Some(
-                                            ::jacquard_common::CowStr::new_static(
-                                                "Can be tokens or raw strings.",
-                                            ),
+                                            CowStr::new_static("Can be tokens or raw strings."),
                                         ),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "judgments",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("judgments"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The obtainable judgments during gameplay.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "dev.tsunagite.types#indexable",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("dev.tsunagite.types#indexable"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "logo",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                    description: None,
-                                    accept: None,
-                                    max_size: None,
-                                }),
+                                SmolStr::new_static("logo"),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "modes",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("modes"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "An array of playable game modes with different gameplay configurations. Optional if the game only has one mode.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                    items: LexArrayItem::String(LexString {
                                         description: Some(
-                                            ::jacquard_common::CowStr::new_static(
-                                                "Can be tokens or raw strings.",
-                                            ),
+                                            CowStr::new_static("Can be tokens or raw strings."),
                                         ),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "dev.tsunagite.translatable",
-                                    ),
+                                SmolStr::new_static("name"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("dev.tsunagite.translatable"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "scoreComponents",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("scoreComponents"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "All the components of a score in the game, including grades, lamps, EX score, and whatever other constructs are used.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                        description: None,
+                                    items: LexArrayItem::Union(LexRefUnion {
                                         refs: vec![
-                                            ::jacquard_common::CowStr::new_static("#enum"),
-                                            ::jacquard_common::CowStr::new_static("#points"),
-                                            ::jacquard_common::CowStr::new_static("#percentage"),
-                                            ::jacquard_common::CowStr::new_static("#text")
+                                            CowStr::new_static("#enum"), CowStr::new_static("#points"),
+                                            CowStr::new_static("#percentage"),
+                                            CowStr::new_static("#text")
                                         ],
-                                        closed: None,
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("percentage"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("percentage"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A percentage score with customizable precision.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("maximum"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("precision")
+                            SmolStr::new_static("name"), SmolStr::new_static("id"),
+                            SmolStr::new_static("maximum"),
+                            SmolStr::new_static("precision")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("id"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The internal ID of this component, limited to the RecordKey characterset.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::RecordKey,
-                                ),
-                                default: None,
+                                format: Some(LexStringFormat::RecordKey),
                                 min_length: Some(1usize),
                                 max_length: Some(32usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maximum",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("maximum"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "dev.tsunagite.translatable",
-                                ),
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("dev.tsunagite.translatable"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "precision",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("precision"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("points"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("points"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "An integer point score, with or without a cap.",
                         ),
                     ),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id")
-                        ],
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("id")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("id"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The internal ID of this component, limited to the RecordKey characterset.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::RecordKey,
-                                ),
-                                default: None,
+                                format: Some(LexStringFormat::RecordKey),
                                 min_length: Some(1usize),
                                 max_length: Some(32usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "maximum",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("maximum"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "dev.tsunagite.translatable",
-                                ),
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("dev.tsunagite.translatable"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("text"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("text"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A fallback component for displaying arbitrary text.",
                         ),
                     ),
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id")
-                        ],
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("id")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("id"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The internal ID of this component, limited to the RecordKey characterset.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::RecordKey,
-                                ),
-                                default: None,
+                                format: Some(LexStringFormat::RecordKey),
                                 min_length: Some(1usize),
                                 max_length: Some(32usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "dev.tsunagite.translatable",
-                                ),
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("dev.tsunagite.translatable"),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1135,65 +918,65 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DefaultComponent;
         type Name;
         type Judgments;
+        type DefaultComponent;
         type ScoreComponents;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DefaultComponent = Unset;
         type Name = Unset;
         type Judgments = Unset;
+        type DefaultComponent = Unset;
         type ScoreComponents = Unset;
-    }
-    ///State transition - sets the `default_component` field to Set
-    pub struct SetDefaultComponent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDefaultComponent<S> {}
-    impl<S: State> State for SetDefaultComponent<S> {
-        type DefaultComponent = Set<members::default_component>;
-        type Name = S::Name;
-        type Judgments = S::Judgments;
-        type ScoreComponents = S::ScoreComponents;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type DefaultComponent = S::DefaultComponent;
         type Name = Set<members::name>;
         type Judgments = S::Judgments;
+        type DefaultComponent = S::DefaultComponent;
         type ScoreComponents = S::ScoreComponents;
     }
     ///State transition - sets the `judgments` field to Set
     pub struct SetJudgments<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetJudgments<S> {}
     impl<S: State> State for SetJudgments<S> {
-        type DefaultComponent = S::DefaultComponent;
         type Name = S::Name;
         type Judgments = Set<members::judgments>;
+        type DefaultComponent = S::DefaultComponent;
+        type ScoreComponents = S::ScoreComponents;
+    }
+    ///State transition - sets the `default_component` field to Set
+    pub struct SetDefaultComponent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDefaultComponent<S> {}
+    impl<S: State> State for SetDefaultComponent<S> {
+        type Name = S::Name;
+        type Judgments = S::Judgments;
+        type DefaultComponent = Set<members::default_component>;
         type ScoreComponents = S::ScoreComponents;
     }
     ///State transition - sets the `score_components` field to Set
     pub struct SetScoreComponents<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScoreComponents<S> {}
     impl<S: State> State for SetScoreComponents<S> {
-        type DefaultComponent = S::DefaultComponent;
         type Name = S::Name;
         type Judgments = S::Judgments;
+        type DefaultComponent = S::DefaultComponent;
         type ScoreComponents = Set<members::score_components>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `default_component` field
-        pub struct default_component(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `judgments` field
         pub struct judgments(());
+        ///Marker type for the `default_component` field
+        pub struct default_component(());
         ///Marker type for the `score_components` field
         pub struct score_components(());
     }
@@ -1201,21 +984,17 @@ pub mod game_state {
 
 /// Builder for constructing an instance of this type
 pub struct GameBuilder<'a, S: game_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<crate::dev_tsunagite::types::Indexable<'a>>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<Vec<GameScoreComponentsItem<'a>>>,
+        Option<RecordKey<Rkey<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<Indexable<'a>>>,
+        Option<BlobRef<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Data<'a>>,
+        Option<Vec<GameScoreComponentsItem<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Game<'a> {
@@ -1229,9 +1008,9 @@ impl<'a> GameBuilder<'a, game_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GameBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1244,35 +1023,25 @@ where
     /// Set the `defaultComponent` field (required)
     pub fn default_component(
         mut self,
-        value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
+        value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> GameBuilder<'a, game_state::SetDefaultComponent<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `inputMethods` field (optional)
-    pub fn input_methods(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn input_methods(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `inputMethods` field to an Option value (optional)
-    pub fn maybe_input_methods(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_input_methods(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -1286,31 +1055,25 @@ where
     /// Set the `judgments` field (required)
     pub fn judgments(
         mut self,
-        value: impl Into<Vec<crate::dev_tsunagite::types::Indexable<'a>>>,
+        value: impl Into<Vec<Indexable<'a>>>,
     ) -> GameBuilder<'a, game_state::SetJudgments<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `logo` field (optional)
-    pub fn logo(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
-    ) -> Self {
+    pub fn logo(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `logo` field to an Option value (optional)
-    pub fn maybe_logo(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_logo(mut self, value: Option<BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -1318,18 +1081,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `modes` field (optional)
-    pub fn modes(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
-    ) -> Self {
+    pub fn modes(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `modes` field to an Option value (optional)
-    pub fn maybe_modes(
-        mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_modes(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -1343,13 +1100,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> GameBuilder<'a, game_state::SetName<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1364,11 +1121,11 @@ where
         mut self,
         value: impl Into<Vec<GameScoreComponentsItem<'a>>>,
     ) -> GameBuilder<'a, game_state::SetScoreComponents<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1376,9 +1133,9 @@ where
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
-    S::DefaultComponent: game_state::IsSet,
     S::Name: game_state::IsSet,
     S::Judgments: game_state::IsSet,
+    S::DefaultComponent: game_state::IsSet,
     S::ScoreComponents: game_state::IsSet,
 {
     /// Build the final struct
@@ -1397,10 +1154,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Game<'a> {
         Game {
             default_component: self.__unsafe_private_named.0.unwrap(),
@@ -1433,84 +1187,80 @@ pub mod percentage_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type Precision;
         type Name;
+        type Precision;
         type Maximum;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type Precision = Unset;
         type Name = Unset;
+        type Precision = Unset;
         type Maximum = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Precision = S::Precision;
-        type Name = S::Name;
-        type Maximum = S::Maximum;
-    }
-    ///State transition - sets the `precision` field to Set
-    pub struct SetPrecision<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPrecision<S> {}
-    impl<S: State> State for SetPrecision<S> {
-        type Id = S::Id;
-        type Precision = Set<members::precision>;
-        type Name = S::Name;
-        type Maximum = S::Maximum;
+        type Id = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Id = S::Id;
-        type Precision = S::Precision;
         type Name = Set<members::name>;
+        type Precision = S::Precision;
         type Maximum = S::Maximum;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `precision` field to Set
+    pub struct SetPrecision<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPrecision<S> {}
+    impl<S: State> State for SetPrecision<S> {
+        type Name = S::Name;
+        type Precision = Set<members::precision>;
+        type Maximum = S::Maximum;
+        type Id = S::Id;
     }
     ///State transition - sets the `maximum` field to Set
     pub struct SetMaximum<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMaximum<S> {}
     impl<S: State> State for SetMaximum<S> {
-        type Id = S::Id;
-        type Precision = S::Precision;
         type Name = S::Name;
+        type Precision = S::Precision;
         type Maximum = Set<members::maximum>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Name = S::Name;
+        type Precision = S::Precision;
+        type Maximum = S::Maximum;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `precision` field
-        pub struct precision(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `precision` field
+        pub struct precision(());
         ///Marker type for the `maximum` field
         pub struct maximum(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PercentageBuilder<'a, S: percentage_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<i64>,
+        Option<RecordKey<Rkey<'a>>>,
+        Option<i64>,
+        Option<Data<'a>>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Percentage<'a> {
@@ -1524,9 +1274,9 @@ impl<'a> PercentageBuilder<'a, percentage_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PercentageBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1539,17 +1289,13 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
+        value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> PercentageBuilder<'a, percentage_state::SetId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PercentageBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1564,11 +1310,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PercentageBuilder<'a, percentage_state::SetMaximum<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         PercentageBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1581,13 +1327,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> PercentageBuilder<'a, percentage_state::SetName<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         PercentageBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1602,11 +1348,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PercentageBuilder<'a, percentage_state::SetPrecision<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         PercentageBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1614,10 +1360,10 @@ where
 impl<'a, S> PercentageBuilder<'a, S>
 where
     S: percentage_state::State,
-    S::Id: percentage_state::IsSet,
-    S::Precision: percentage_state::IsSet,
     S::Name: percentage_state::IsSet,
+    S::Precision: percentage_state::IsSet,
     S::Maximum: percentage_state::IsSet,
+    S::Id: percentage_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Percentage<'a> {
@@ -1632,10 +1378,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Percentage<'a> {
         Percentage {
             id: self.__unsafe_private_named.0.unwrap(),
@@ -1693,17 +1436,9 @@ pub mod points_state {
 
 /// Builder for constructing an instance of this type
 pub struct PointsBuilder<'a, S: points_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<RecordKey<Rkey<'a>>>, Option<i64>, Option<Data<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Points<'a> {
@@ -1717,9 +1452,9 @@ impl<'a> PointsBuilder<'a, points_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PointsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1732,17 +1467,13 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
+        value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> PointsBuilder<'a, points_state::SetId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PointsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1768,13 +1499,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> PointsBuilder<'a, points_state::SetName<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         PointsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1797,10 +1528,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Points<'a> {
         Points {
             id: self.__unsafe_private_named.0.unwrap(),
@@ -1821,52 +1549,45 @@ pub mod text_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Id;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Id = S::Id;
+        type Name = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Name = S::Name;
         type Id = Set<members::id>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Id = S::Id;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TextBuilder<'a, S: text_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<RecordKey<Rkey<'a>>>, Option<Data<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Text<'a> {
@@ -1880,9 +1601,9 @@ impl<'a> TextBuilder<'a, text_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TextBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1895,17 +1616,13 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
+        value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> TextBuilder<'a, text_state::SetId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         TextBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1918,13 +1635,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> TextBuilder<'a, text_state::SetName<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         TextBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1932,8 +1649,8 @@ where
 impl<'a, S> TextBuilder<'a, S>
 where
     S: text_state::State,
-    S::Name: text_state::IsSet,
     S::Id: text_state::IsSet,
+    S::Name: text_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Text<'a> {
@@ -1946,10 +1663,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Text<'a> {
         Text {
             id: self.__unsafe_private_named.0.unwrap(),

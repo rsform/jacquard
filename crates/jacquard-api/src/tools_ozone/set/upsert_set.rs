@@ -5,42 +5,32 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use core::marker::PhantomData;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::set::Set;
+use crate::tools_ozone::set::SetView;
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpsertSet<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::tools_ozone::set::Set<'a>,
+    pub value: Set<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpsertSetOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::tools_ozone::set::SetView<'a>,
+    pub value: SetView<'a>,
 }
 
-/// Response type for
-///tools.ozone.set.upsertSet
+/// Response type for tools.ozone.set.upsertSet
 pub struct UpsertSetResponse;
 impl jacquard_common::xrpc::XrpcResp for UpsertSetResponse {
     const NSID: &'static str = "tools.ozone.set.upsertSet";
@@ -57,8 +47,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpsertSet<'a> {
     type Response = UpsertSetResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.set.upsertSet
+/// Endpoint type for tools.ozone.set.upsertSet
 pub struct UpsertSetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpsertSetRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.set.upsertSet";

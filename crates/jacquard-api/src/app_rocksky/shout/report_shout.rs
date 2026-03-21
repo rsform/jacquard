@@ -5,47 +5,37 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::shout::ShoutView;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ReportShout<'a> {
     ///The reason for reporting the shout
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub reason: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub reason: Option<CowStr<'a>>,
     ///The unique identifier of the shout to report
     #[serde(borrow)]
-    pub shout_id: jacquard_common::CowStr<'a>,
+    pub shout_id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ReportShoutOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::shout::ShoutView<'a>,
+    pub value: ShoutView<'a>,
 }
 
-/// Response type for
-///app.rocksky.shout.reportShout
+/// Response type for app.rocksky.shout.reportShout
 pub struct ReportShoutResponse;
 impl jacquard_common::xrpc::XrpcResp for ReportShoutResponse {
     const NSID: &'static str = "app.rocksky.shout.reportShout";
@@ -62,8 +52,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ReportShout<'a> {
     type Response = ReportShoutResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.shout.reportShout
+/// Endpoint type for app.rocksky.shout.reportShout
 pub struct ReportShoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ReportShoutRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.reportShout";

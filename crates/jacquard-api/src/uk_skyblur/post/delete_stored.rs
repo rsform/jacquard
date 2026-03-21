@@ -5,43 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteStored<'a> {
     ///AT URI of the post to delete. The URI must include the logged-in user's DID in the format at://did...
     #[serde(borrow)]
-    pub uri: jacquard_common::CowStr<'a>,
+    pub uri: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteStoredOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub success: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub success: Option<bool>,
 }
 
-/// Response type for
-///uk.skyblur.post.deleteStored
+/// Response type for uk.skyblur.post.deleteStored
 pub struct DeleteStoredResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteStoredResponse {
     const NSID: &'static str = "uk.skyblur.post.deleteStored";
@@ -58,8 +46,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteStored<'a> {
     type Response = DeleteStoredResponse;
 }
 
-/// Endpoint type for
-///uk.skyblur.post.deleteStored
+/// Endpoint type for uk.skyblur.post.deleteStored
 pub struct DeleteStoredRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteStoredRequest {
     const PATH: &'static str = "/xrpc/uk.skyblur.post.deleteStored";

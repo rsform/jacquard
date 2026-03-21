@@ -5,26 +5,22 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::Datetime;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DeactivateAccount<'a> {
     ///A recommendation to server as to how long they should hold onto the deactivated account before deleting.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub delete_after: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub delete_after: Option<Datetime>,
 }
 
-/// Response type for
-///com.atproto.server.deactivateAccount
+/// Response type for com.atproto.server.deactivateAccount
 pub struct DeactivateAccountResponse;
 impl jacquard_common::xrpc::XrpcResp for DeactivateAccountResponse {
     const NSID: &'static str = "com.atproto.server.deactivateAccount";
@@ -41,8 +37,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeactivateAccount<'a> {
     type Response = DeactivateAccountResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.deactivateAccount
+/// Endpoint type for com.atproto.server.deactivateAccount
 pub struct DeactivateAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeactivateAccountRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.deactivateAccount";

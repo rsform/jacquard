@@ -5,50 +5,40 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SwapLaunchToken<'a> {
     #[serde(borrow)]
-    pub launch_token: jacquard_common::CowStr<'a>,
+    pub launch_token: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct SwapLaunchTokenOutput<'a> {
     ///The did of the user
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did: core::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub did: Option<Did<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub handle: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub handle: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub token: jacquard_common::CowStr<'a>,
+    pub token: CowStr<'a>,
 }
 
-/// Response type for
-///app.ocho.server.swapLaunchToken
+/// Response type for app.ocho.server.swapLaunchToken
 pub struct SwapLaunchTokenResponse;
 impl jacquard_common::xrpc::XrpcResp for SwapLaunchTokenResponse {
     const NSID: &'static str = "app.ocho.server.swapLaunchToken";
@@ -63,8 +53,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SwapLaunchToken<'a> {
     type Response = SwapLaunchTokenResponse;
 }
 
-/// Endpoint type for
-///app.ocho.server.swapLaunchToken
+/// Endpoint type for app.ocho.server.swapLaunchToken
 pub struct SwapLaunchTokenRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SwapLaunchTokenRequest {
     const PATH: &'static str = "/xrpc/app.ocho.server.swapLaunchToken";
@@ -107,9 +96,9 @@ pub mod swap_launch_token_state {
 
 /// Builder for constructing an instance of this type
 pub struct SwapLaunchTokenBuilder<'a, S: swap_launch_token_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SwapLaunchToken<'a> {
@@ -123,9 +112,9 @@ impl<'a> SwapLaunchTokenBuilder<'a, swap_launch_token_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SwapLaunchTokenBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -138,13 +127,13 @@ where
     /// Set the `launchToken` field (required)
     pub fn launch_token(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SwapLaunchTokenBuilder<'a, swap_launch_token_state::SetLaunchToken<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SwapLaunchTokenBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

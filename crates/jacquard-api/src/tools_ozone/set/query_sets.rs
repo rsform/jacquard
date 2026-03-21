@@ -5,60 +5,51 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::set::SetView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct QuerySets<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub name_prefix: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub name_prefix: Option<CowStr<'a>>,
     ///Defaults to `"name"`.
     #[serde(default = "_default_sort_by")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort_by: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub sort_by: Option<CowStr<'a>>,
     ///Defaults to `"asc"`.
     #[serde(default = "_default_sort_direction")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort_direction: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub sort_direction: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct QuerySetsOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub sets: Vec<crate::tools_ozone::set::SetView<'a>>,
+    pub sets: Vec<SetView<'a>>,
 }
 
-/// Response type for
-///tools.ozone.set.querySets
+/// Response type for tools.ozone.set.querySets
 pub struct QuerySetsResponse;
 impl jacquard_common::xrpc::XrpcResp for QuerySetsResponse {
     const NSID: &'static str = "tools.ozone.set.querySets";
@@ -73,8 +64,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for QuerySets<'a> {
     type Response = QuerySetsResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.set.querySets
+/// Endpoint type for tools.ozone.set.querySets
 pub struct QuerySetsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QuerySetsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.set.querySets";
@@ -83,16 +73,16 @@ impl jacquard_common::xrpc::XrpcEndpoint for QuerySetsRequest {
     type Response = QuerySetsResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_sort_by() -> core::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("name"))
+fn _default_sort_by() -> Option<CowStr<'static>> {
+    Some(CowStr::from("name"))
 }
 
-fn _default_sort_direction() -> core::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("asc"))
+fn _default_sort_direction() -> Option<CowStr<'static>> {
+    Some(CowStr::from("asc"))
 }
 
 pub mod query_sets_state {
@@ -116,15 +106,15 @@ pub mod query_sets_state {
 
 /// Builder for constructing an instance of this type
 pub struct QuerySetsBuilder<'a, S: query_sets_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> QuerySets<'a> {
@@ -138,24 +128,21 @@ impl<'a> QuerySetsBuilder<'a, query_sets_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         QuerySetsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -176,18 +163,12 @@ impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
 
 impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
     /// Set the `namePrefix` field (optional)
-    pub fn name_prefix(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn name_prefix(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `namePrefix` field to an Option value (optional)
-    pub fn maybe_name_prefix(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_name_prefix(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -195,15 +176,12 @@ impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
 
 impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
     /// Set the `sortBy` field (optional)
-    pub fn sort_by(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn sort_by(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `sortBy` field to an Option value (optional)
-    pub fn maybe_sort_by(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_sort_by(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -211,18 +189,12 @@ impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
 
 impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
     /// Set the `sortDirection` field (optional)
-    pub fn sort_direction(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn sort_direction(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
-    pub fn maybe_sort_direction(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_sort_direction(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }

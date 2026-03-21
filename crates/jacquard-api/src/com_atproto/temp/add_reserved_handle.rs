@@ -5,38 +5,26 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct AddReservedHandle<'a> {
     #[serde(borrow)]
-    pub handle: jacquard_common::CowStr<'a>,
+    pub handle: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct AddReservedHandleOutput<'a> {}
-/// Response type for
-///com.atproto.temp.addReservedHandle
+/// Response type for com.atproto.temp.addReservedHandle
 pub struct AddReservedHandleResponse;
 impl jacquard_common::xrpc::XrpcResp for AddReservedHandleResponse {
     const NSID: &'static str = "com.atproto.temp.addReservedHandle";
@@ -53,8 +41,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for AddReservedHandle<'a> {
     type Response = AddReservedHandleResponse;
 }
 
-/// Endpoint type for
-///com.atproto.temp.addReservedHandle
+/// Endpoint type for com.atproto.temp.addReservedHandle
 pub struct AddReservedHandleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddReservedHandleRequest {
     const PATH: &'static str = "/xrpc/com.atproto.temp.addReservedHandle";

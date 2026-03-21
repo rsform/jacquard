@@ -5,43 +5,32 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetApikeys {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub offset: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub offset: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetApikeysOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub api_keys: core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub api_keys: Option<Vec<Data<'a>>>,
 }
 
-/// Response type for
-///app.rocksky.apikey.getApikeys
+/// Response type for app.rocksky.apikey.getApikeys
 pub struct GetApikeysResponse;
 impl jacquard_common::xrpc::XrpcResp for GetApikeysResponse {
     const NSID: &'static str = "app.rocksky.apikey.getApikeys";
@@ -56,8 +45,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetApikeys {
     type Response = GetApikeysResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.apikey.getApikeys
+/// Endpoint type for app.rocksky.apikey.getApikeys
 pub struct GetApikeysRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetApikeysRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.apikey.getApikeys";
@@ -87,8 +75,8 @@ pub mod get_apikeys_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetApikeysBuilder<S: get_apikeys_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>, ::core::option::Option<i64>),
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<i64>),
 }
 
 impl GetApikeys {
@@ -102,7 +90,7 @@ impl GetApikeysBuilder<get_apikeys_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetApikeysBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
         }
     }

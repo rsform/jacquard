@@ -5,60 +5,54 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DenyTeleport<'a> {
     ///The URI of the teleport record to deny.
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DenyTeleportOutput<'a> {
     ///Whether the teleport was successfully denied.
     pub success: bool,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DenyTeleportError<'a> {
     /// The specified teleport was not found.
     #[serde(rename = "TeleportNotFound")]
-    TeleportNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    TeleportNotFound(Option<CowStr<'a>>),
     /// The authenticated user is not the target of this teleport.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(core::option::Option<jacquard_common::CowStr<'a>>),
+    Unauthorized(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for DenyTeleportError<'_> {
@@ -83,8 +77,7 @@ impl core::fmt::Display for DenyTeleportError<'_> {
     }
 }
 
-/// Response type for
-///place.stream.live.denyTeleport
+/// Response type for place.stream.live.denyTeleport
 pub struct DenyTeleportResponse;
 impl jacquard_common::xrpc::XrpcResp for DenyTeleportResponse {
     const NSID: &'static str = "place.stream.live.denyTeleport";
@@ -101,8 +94,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DenyTeleport<'a> {
     type Response = DenyTeleportResponse;
 }
 
-/// Endpoint type for
-///place.stream.live.denyTeleport
+/// Endpoint type for place.stream.live.denyTeleport
 pub struct DenyTeleportRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DenyTeleportRequest {
     const PATH: &'static str = "/xrpc/place.stream.live.denyTeleport";
@@ -147,11 +139,9 @@ pub mod deny_teleport_state {
 
 /// Builder for constructing an instance of this type
 pub struct DenyTeleportBuilder<'a, S: deny_teleport_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> DenyTeleport<'a> {
@@ -165,9 +155,9 @@ impl<'a> DenyTeleportBuilder<'a, deny_teleport_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DenyTeleportBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -180,13 +170,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> DenyTeleportBuilder<'a, deny_teleport_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         DenyTeleportBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -206,7 +196,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

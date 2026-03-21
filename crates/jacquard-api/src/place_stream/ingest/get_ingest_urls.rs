@@ -5,45 +5,38 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::ingest::Ingest;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetIngestUrls;
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetIngestUrlsOutput<'a> {
     #[serde(borrow)]
-    pub ingests: Vec<crate::place_stream::ingest::Ingest<'a>>,
+    pub ingests: Vec<Ingest<'a>>,
 }
+
 
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetIngestUrlsError<'a> {}
@@ -55,8 +48,7 @@ impl core::fmt::Display for GetIngestUrlsError<'_> {
     }
 }
 
-/// Response type for
-///place.stream.ingest.getIngestUrls
+/// Response type for place.stream.ingest.getIngestUrls
 pub struct GetIngestUrlsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetIngestUrlsResponse {
     const NSID: &'static str = "place.stream.ingest.getIngestUrls";
@@ -71,8 +63,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetIngestUrls {
     type Response = GetIngestUrlsResponse;
 }
 
-/// Endpoint type for
-///place.stream.ingest.getIngestUrls
+/// Endpoint type for place.stream.ingest.getIngestUrls
 pub struct GetIngestUrlsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetIngestUrlsRequest {
     const PATH: &'static str = "/xrpc/place.stream.ingest.getIngestUrls";

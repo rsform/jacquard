@@ -5,40 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::types::string::Did;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLaunchAsset<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
     #[serde(borrow)]
-    pub platform: jacquard_common::CowStr<'a>,
+    pub platform: CowStr<'a>,
 }
 
 /// The launch asset for the plugin, which is the main JavaScript bundle.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLaunchAssetOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-/// Response type for
-///app.ocho.plugin.getLaunchAsset
+/// Response type for app.ocho.plugin.getLaunchAsset
 pub struct GetLaunchAssetResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLaunchAssetResponse {
     const NSID: &'static str = "app.ocho.plugin.getLaunchAsset";
@@ -68,8 +59,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetLaunchAsset<'a> {
     type Response = GetLaunchAssetResponse;
 }
 
-/// Endpoint type for
-///app.ocho.plugin.getLaunchAsset
+/// Endpoint type for app.ocho.plugin.getLaunchAsset
 pub struct GetLaunchAssetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLaunchAssetRequest {
     const PATH: &'static str = "/xrpc/app.ocho.plugin.getLaunchAsset";
@@ -124,12 +114,9 @@ pub mod get_launch_asset_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetLaunchAssetBuilder<'a, S: get_launch_asset_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetLaunchAsset<'a> {
@@ -143,9 +130,9 @@ impl<'a> GetLaunchAssetBuilder<'a, get_launch_asset_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetLaunchAssetBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -158,13 +145,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetLaunchAssetBuilder<'a, get_launch_asset_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetLaunchAssetBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -177,13 +164,13 @@ where
     /// Set the `platform` field (required)
     pub fn platform(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetLaunchAssetBuilder<'a, get_launch_asset_state::SetPlatform<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetLaunchAssetBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

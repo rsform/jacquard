@@ -5,40 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::social_showcase::ItemView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetItem<'a> {
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetItemOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::social_showcase::ItemView<'a>,
+    pub value: ItemView<'a>,
 }
 
-/// Response type for
-///social.showcase.library.getItem
+/// Response type for social.showcase.library.getItem
 pub struct GetItemResponse;
 impl jacquard_common::xrpc::XrpcResp for GetItemResponse {
     const NSID: &'static str = "social.showcase.library.getItem";
@@ -53,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetItem<'a> {
     type Response = GetItemResponse;
 }
 
-/// Endpoint type for
-///social.showcase.library.getItem
+/// Endpoint type for social.showcase.library.getItem
 pub struct GetItemRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetItemRequest {
     const PATH: &'static str = "/xrpc/social.showcase.library.getItem";
@@ -97,11 +86,9 @@ pub mod get_item_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetItemBuilder<'a, S: get_item_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetItem<'a> {
@@ -115,9 +102,9 @@ impl<'a> GetItemBuilder<'a, get_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -130,13 +117,13 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetItemBuilder<'a, get_item_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetItemBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

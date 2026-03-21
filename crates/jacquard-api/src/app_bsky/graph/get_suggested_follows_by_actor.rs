@@ -5,50 +5,42 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::actor::ProfileView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedFollowsByActor<'a> {
     #[serde(borrow)]
-    pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub actor: AtIdentifier<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedFollowsByActorOutput<'a> {
-    ///DEPRECATED, unused. Previously: if true, response has fallen-back to generic results, and is not scoped using relativeToDid Defaults to `false`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    ///DEPRECATED, unused. Previously: if true, response has fallen-back to generic results, and is not scoped using relativeToDid  Defaults to `false`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_get_suggested_follows_by_actor_output_is_fallback")]
-    pub is_fallback: core::option::Option<bool>,
+    pub is_fallback: Option<bool>,
     ///DEPRECATED: use recIdStr instead.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub rec_id: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rec_id: Option<i64>,
     ///Snowflake for this recommendation, use when submitting recommendation events.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub rec_id_str: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub rec_id_str: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub suggestions: Vec<crate::app_bsky::actor::ProfileView<'a>>,
+    pub suggestions: Vec<ProfileView<'a>>,
 }
 
-/// Response type for
-///app.bsky.graph.getSuggestedFollowsByActor
+/// Response type for app.bsky.graph.getSuggestedFollowsByActor
 pub struct GetSuggestedFollowsByActorResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedFollowsByActorResponse {
     const NSID: &'static str = "app.bsky.graph.getSuggestedFollowsByActor";
@@ -63,8 +55,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedFollowsByActor<'a> {
     type Response = GetSuggestedFollowsByActorResponse;
 }
 
-/// Endpoint type for
-///app.bsky.graph.getSuggestedFollowsByActor
+/// Endpoint type for app.bsky.graph.getSuggestedFollowsByActor
 pub struct GetSuggestedFollowsByActorRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedFollowsByActorRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.getSuggestedFollowsByActor";
@@ -110,11 +101,9 @@ pub struct GetSuggestedFollowsByActorBuilder<
     'a,
     S: get_suggested_follows_by_actor_state::State,
 > {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetSuggestedFollowsByActor<'a> {
@@ -133,9 +122,9 @@ impl<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSuggestedFollowsByActorBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -148,16 +137,16 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> GetSuggestedFollowsByActorBuilder<
         'a,
         get_suggested_follows_by_actor_state::SetActor<S>,
     > {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetSuggestedFollowsByActorBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -175,8 +164,6 @@ where
     }
 }
 
-fn _default_get_suggested_follows_by_actor_output_is_fallback() -> core::option::Option<
-    bool,
-> {
+fn _default_get_suggested_follows_by_actor_output_is_fallback() -> Option<bool> {
     Some(false)
 }

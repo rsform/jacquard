@@ -9,8 +9,8 @@ use quote::quote;
 use std::collections::BTreeMap;
 
 use super::CodeGenerator;
-use super::utils::{known_value_to_variant_name, make_ident, value_to_variant_name};
 use super::prettify::GeneratedCode;
+use super::utils::{known_value_to_variant_name, make_ident, value_to_variant_name};
 
 /// Enum variant kind for IntoStatic generation
 #[derive(Debug, Clone)]
@@ -49,9 +49,14 @@ impl<'c> CodeGenerator<'c> {
                         let union_name =
                             self.generate_field_type_name(nsid, parent_type_name, field_name, "");
                         let refs: Vec<_> = union.refs.iter().cloned().collect();
-                        nested.push(
-                            self.generate_union(nsid, &union_name, &refs, None, union.closed, resolved)?,
-                        );
+                        nested.push(self.generate_union(
+                            nsid,
+                            &union_name,
+                            &refs,
+                            None,
+                            union.closed,
+                            resolved,
+                        )?);
                     }
                 }
                 LexObjectProperty::Object(nested_obj) if include_nested_objects => {
@@ -70,9 +75,14 @@ impl<'c> CodeGenerator<'c> {
                                 "Item",
                             );
                             let refs: Vec<_> = union.refs.iter().cloned().collect();
-                            nested.push(
-                                self.generate_union(nsid, &union_name, &refs, None, union.closed, resolved)?,
-                            );
+                            nested.push(self.generate_union(
+                                nsid,
+                                &union_name,
+                                &refs,
+                                None,
+                                union.closed,
+                                resolved,
+                            )?);
                         }
                     }
                 }
@@ -113,7 +123,8 @@ impl<'c> CodeGenerator<'c> {
                 let manual_default = self.generate_manual_default(&type_name, obj, resolved);
 
                 let derive_attr = resolved.derive_standard();
-                let lexicon_attr = resolved.attribute_tokens(&super::prettify::ExternalImport::LexiconAttr);
+                let lexicon_attr =
+                    resolved.attribute_tokens(&super::prettify::ExternalImport::LexiconAttr);
                 let struct_def = quote! {
                     #doc
                     #lexicon_attr
@@ -128,6 +139,7 @@ impl<'c> CodeGenerator<'c> {
                 let builder = if has_builder {
                     let ctx = super::builder_gen::BuilderGenContext::from_object(
                         self, nsid, &type_name, obj, true, // records always have lifetime
+                        resolved,
                     );
                     ctx.generate()
                 } else {
@@ -135,7 +147,8 @@ impl<'c> CodeGenerator<'c> {
                 };
 
                 // Generate union types and nested object types for this record
-                let unions = self.generate_nested_types(nsid, &type_name, &obj.properties, true, resolved)?;
+                let unions =
+                    self.generate_nested_types(nsid, &type_name, &obj.properties, true, resolved)?;
 
                 // Generate typed GetRecordOutput wrapper
                 let output_type_name = format!("{}GetRecordOutput", type_name);
@@ -145,6 +158,7 @@ impl<'c> CodeGenerator<'c> {
                 let is_none_path = resolved.option_is_none_path();
                 let cid_type = resolved.type_tokens(&super::prettify::CommonType::Cid);
                 let at_uri_type = resolved.type_tokens(&super::prettify::CommonType::AtUri);
+                let option_cid = resolved.option_type(cid_type);
                 let output_wrapper = quote! {
                     /// Typed wrapper for GetRecord response with this collection's record type.
                     #derive_attr
@@ -152,7 +166,7 @@ impl<'c> CodeGenerator<'c> {
                     pub struct #output_type_ident<'a> {
                         #[serde(skip_serializing_if = #is_none_path)]
                         #[serde(borrow)]
-                        pub cid: core::option::Option<#cid_type>,
+                        pub cid: #option_cid,
                         #[serde(borrow)]
                         pub uri: #at_uri_type,
                         #[serde(borrow)]
@@ -165,18 +179,24 @@ impl<'c> CodeGenerator<'c> {
                 let record_marker_ident =
                     syn::Ident::new(&record_marker_name, proc_macro2::Span::call_site());
 
-                let ser_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Serialize);
-                let de_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Deserialize);
+                let ser_path =
+                    resolved.external_type_tokens(&super::prettify::ExternalImport::Serialize);
+                let de_path =
+                    resolved.external_type_tokens(&super::prettify::ExternalImport::Deserialize);
+                let xrpc_resp_path =
+                    resolved.external_type_tokens(&super::prettify::ExternalImport::XrpcResp);
+                let record_error_type =
+                    resolved.type_tokens_with_lifetime(&super::prettify::CommonType::RecordError, "de");
                 let record_marker = quote! {
                     /// Marker type for deserializing records from this collection.
                     #[derive(Debug, #ser_path, #de_path)]
                     pub struct #record_marker_ident;
 
-                    impl jacquard_common::xrpc::XrpcResp for #record_marker_ident {
+                    impl #xrpc_resp_path for #record_marker_ident {
                         const NSID: &'static str = #nsid;
                         const ENCODING: &'static str = "application/json";
                         type Output<'de> = #output_type_ident<'de>;
-                        type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+                        type Err<'de> = #record_error_type;
                     }
 
 
@@ -191,8 +211,9 @@ impl<'c> CodeGenerator<'c> {
                 };
 
                 // Generate Collection trait impl.
+                let collection_path = resolved.type_path(&super::prettify::CommonType::Collection);
                 let collection_impl = quote! {
-                    impl jacquard_common::types::collection::Collection for #ident<'_> {
+                    impl #collection_path for #ident<'_> {
                         const NSID: &'static str = #nsid;
                         type Record = #record_marker_ident;
                     }
@@ -200,7 +221,7 @@ impl<'c> CodeGenerator<'c> {
 
                 // Generate collection impl for the marker struct to drive fetch_record().
                 let collection_marker_impl = quote! {
-                    impl jacquard_common::types::collection::Collection for #record_marker_ident {
+                    impl #collection_path for #record_marker_ident {
                         const NSID: &'static str = #nsid;
                         type Record = #record_marker_ident;
                     }
@@ -229,10 +250,14 @@ impl<'c> CodeGenerator<'c> {
 
                 let cowstr_type = resolved.type_tokens(&super::prettify::CommonType::CowStr);
                 let at_uri_path = resolved.type_path(&super::prettify::CommonType::AtUri);
+                let record_uri_path =
+                    resolved.external_type_tokens(&super::prettify::ExternalImport::RecordUri);
+                let uri_error_path =
+                    resolved.external_type_tokens(&super::prettify::ExternalImport::UriError);
                 let inherent_impls = quote! {
                     impl<'a> #ident<'a> {
-                        pub fn uri(uri: impl Into<#cowstr_type>) -> Result<jacquard_common::types::uri::RecordUri<'a, #record_marker_ident>, jacquard_common::types::uri::UriError> {
-                            jacquard_common::types::uri::RecordUri::try_from_uri(#at_uri_path::new_cow(uri.into())?)
+                        pub fn uri(uri: impl Into<#cowstr_type>) -> Result<#record_uri_path<'a, #record_marker_ident>, #uri_error_path> {
+                            #record_uri_path::try_from_uri(#at_uri_path::new_cow(uri.into())?)
                         }
                     }
                 };
@@ -316,6 +341,7 @@ impl<'c> CodeGenerator<'c> {
         let builder = if has_builder {
             let ctx = super::builder_gen::BuilderGenContext::from_object(
                 self, nsid, &type_name, obj, true, // objects always have lifetime
+                resolved,
             );
             ctx.generate()
         } else {
@@ -323,7 +349,8 @@ impl<'c> CodeGenerator<'c> {
         };
 
         // Generate union types and nested object types for this object.
-        let nested_items = self.generate_nested_types(nsid, &type_name, &obj.properties, true, resolved)?;
+        let nested_items =
+            self.generate_nested_types(nsid, &type_name, &obj.properties, true, resolved)?;
 
         // Merge nested type buckets into parent buckets.
         let mut nested_type_defs = TokenStream::new();
@@ -430,7 +457,7 @@ impl<'c> CodeGenerator<'c> {
         let rust_type = if !is_optional {
             rust_type
         } else {
-            quote! { core::option::Option<#rust_type> }
+            resolved.option_type(rust_type)
         };
 
         // Extract description from field type.
@@ -449,14 +476,17 @@ impl<'c> CodeGenerator<'c> {
         };
 
         // Extract schema default and generate companion function + serde attr.
-        let (default_doc, serde_default_attr, default_fn) =
-            self.extract_field_default(parent_type_name, field_name, field_type, is_optional, resolved);
+        let (default_doc, serde_default_attr, default_fn) = self.extract_field_default(
+            parent_type_name,
+            field_name,
+            field_type,
+            is_optional,
+            resolved,
+        );
 
         // Combine description with default doc suffix.
         let combined_desc = match (description, &default_doc) {
-            (Some(desc), Some(def_doc)) => {
-                Some(format!("{} {}", desc.as_ref(), def_doc))
-            }
+            (Some(desc), Some(def_doc)) => Some(format!("{} {}", desc.as_ref(), def_doc)),
             (Some(desc), None) => Some(desc.as_ref().to_string()),
             (None, Some(def_doc)) => Some(def_doc.clone()),
             (None, None) => None,
@@ -528,13 +558,14 @@ impl<'c> CodeGenerator<'c> {
         match field_type {
             LexObjectProperty::Boolean(b) if b.default.is_some() => {
                 let v = b.default.unwrap();
-                let doc = format!("Defaults to `{}`.", v);
+                let doc = format!(" Defaults to `{}`.", v);
                 if is_optional {
+                    let opt_bool = resolved.option_type(quote! { bool });
                     (
                         Some(doc),
                         Some(serde_attr),
                         Some(quote! {
-                            fn #fn_ident() -> core::option::Option<bool> { Some(#v) }
+                            fn #fn_ident() -> #opt_bool { Some(#v) }
                         }),
                     )
                 } else {
@@ -549,13 +580,14 @@ impl<'c> CodeGenerator<'c> {
             }
             LexObjectProperty::Integer(i) if i.default.is_some() => {
                 let v = i.default.unwrap();
-                let doc = format!("Defaults to `{}`.", v);
+                let doc = format!(" Defaults to `{}`.", v);
                 if is_optional {
+                    let opt_i64 = resolved.option_type(quote! { i64 });
                     (
                         Some(doc),
                         Some(serde_attr),
                         Some(quote! {
-                            fn #fn_ident() -> core::option::Option<i64> { Some(#v) }
+                            fn #fn_ident() -> #opt_i64 { Some(#v) }
                         }),
                     )
                 } else {
@@ -570,14 +602,15 @@ impl<'c> CodeGenerator<'c> {
             }
             LexObjectProperty::String(s) if s.default.is_some() && s.known_values.is_none() => {
                 let v = s.default.as_ref().unwrap().as_ref();
-                let doc = format!("Defaults to `\"{}\"`.", v);
+                let doc = format!(" Defaults to `\"{}\"`.", v);
                 let cowstr_path = resolved.type_path(&super::prettify::CommonType::CowStr);
                 if is_optional {
+                    let opt_cowstr = resolved.option_type(quote! { #cowstr_path<'static> });
                     (
                         Some(doc),
                         Some(serde_attr),
                         Some(quote! {
-                            fn #fn_ident() -> core::option::Option<#cowstr_path<'static>> {
+                            fn #fn_ident() -> #opt_cowstr {
                                 Some(#cowstr_path::from(#v))
                             }
                         }),
@@ -612,9 +645,10 @@ impl<'c> CodeGenerator<'c> {
 
         // Check if any field actually has a schema default. If none do,
         // the existing derive(Default) is sufficient.
-        let any_schema_default = obj.properties.values().any(|p| {
-            super::builder_heuristics::has_schema_default(p)
-        });
+        let any_schema_default = obj
+            .properties
+            .values()
+            .any(|p| super::builder_heuristics::has_schema_default(p));
         if !any_schema_default {
             return None;
         }
@@ -713,7 +747,8 @@ impl<'c> CodeGenerator<'c> {
         let derive_attr = resolved.derive_standard();
 
         let enum_def = if is_open {
-            let open_union_attr = resolved.attribute_tokens(&super::prettify::ExternalImport::OpenUnion);
+            let open_union_attr =
+                resolved.attribute_tokens(&super::prettify::ExternalImport::OpenUnion);
             quote! {
                 #doc
                 #open_union_attr

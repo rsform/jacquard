@@ -5,73 +5,67 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetArchive<'a> {
     ///Defaults to `"tar.gz"`.
     #[serde(default = "_default_format")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub format: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub format: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub prefix: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub prefix: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub r#ref: jacquard_common::CowStr<'a>,
+    pub r#ref: CowStr<'a>,
     #[serde(borrow)]
-    pub repo: jacquard_common::types::string::AtUri<'a>,
+    pub repo: AtUri<'a>,
 }
 
 /// Binary archive data
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetArchiveOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetArchiveError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(Option<CowStr<'a>>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    RefNotFound(Option<CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRequest(Option<CowStr<'a>>),
     /// Failed to create archive
     #[serde(rename = "ArchiveError")]
-    ArchiveError(core::option::Option<jacquard_common::CowStr<'a>>),
+    ArchiveError(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetArchiveError<'_> {
@@ -110,8 +104,7 @@ impl core::fmt::Display for GetArchiveError<'_> {
     }
 }
 
-/// Response type for
-///sh.tangled.git.temp.getArchive
+/// Response type for sh.tangled.git.temp.getArchive
 pub struct GetArchiveResponse;
 impl jacquard_common::xrpc::XrpcResp for GetArchiveResponse {
     const NSID: &'static str = "sh.tangled.git.temp.getArchive";
@@ -141,8 +134,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetArchive<'a> {
     type Response = GetArchiveResponse;
 }
 
-/// Endpoint type for
-///sh.tangled.git.temp.getArchive
+/// Endpoint type for sh.tangled.git.temp.getArchive
 pub struct GetArchiveRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetArchiveRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.getArchive";
@@ -151,8 +143,8 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetArchiveRequest {
     type Response = GetArchiveResponse;
 }
 
-fn _default_format() -> core::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("tar.gz"))
+fn _default_format() -> Option<CowStr<'static>> {
+    Some(CowStr::from("tar.gz"))
 }
 
 pub mod get_archive_state {
@@ -201,14 +193,14 @@ pub mod get_archive_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetArchiveBuilder<'a, S: get_archive_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<AtUri<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetArchive<'a> {
@@ -222,24 +214,21 @@ impl<'a> GetArchiveBuilder<'a, get_archive_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetArchiveBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_archive_state::State> GetArchiveBuilder<'a, S> {
     /// Set the `format` field (optional)
-    pub fn format(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn format(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `format` field to an Option value (optional)
-    pub fn maybe_format(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_format(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -247,15 +236,12 @@ impl<'a, S: get_archive_state::State> GetArchiveBuilder<'a, S> {
 
 impl<'a, S: get_archive_state::State> GetArchiveBuilder<'a, S> {
     /// Set the `prefix` field (optional)
-    pub fn prefix(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn prefix(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `prefix` field to an Option value (optional)
-    pub fn maybe_prefix(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_prefix(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -269,13 +255,13 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetArchiveBuilder<'a, get_archive_state::SetRef<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         GetArchiveBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -288,13 +274,13 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetArchiveBuilder<'a, get_archive_state::SetRepo<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         GetArchiveBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

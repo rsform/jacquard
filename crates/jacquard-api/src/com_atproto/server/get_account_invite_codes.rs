@@ -5,60 +5,54 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::server::InviteCode;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountInviteCodes {
     /// Defaults to `true`.
     #[serde(default = "_default_create_available")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub create_available: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub create_available: Option<bool>,
     /// Defaults to `true`.
     #[serde(default = "_default_include_used")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub include_used: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_used: Option<bool>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountInviteCodesOutput<'a> {
     #[serde(borrow)]
-    pub codes: Vec<crate::com_atproto::server::InviteCode<'a>>,
+    pub codes: Vec<InviteCode<'a>>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetAccountInviteCodesError<'a> {
     #[serde(rename = "DuplicateCreate")]
-    DuplicateCreate(core::option::Option<jacquard_common::CowStr<'a>>),
+    DuplicateCreate(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetAccountInviteCodesError<'_> {
@@ -76,8 +70,7 @@ impl core::fmt::Display for GetAccountInviteCodesError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.server.getAccountInviteCodes
+/// Response type for com.atproto.server.getAccountInviteCodes
 pub struct GetAccountInviteCodesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAccountInviteCodesResponse {
     const NSID: &'static str = "com.atproto.server.getAccountInviteCodes";
@@ -92,8 +85,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetAccountInviteCodes {
     type Response = GetAccountInviteCodesResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.getAccountInviteCodes
+/// Endpoint type for com.atproto.server.getAccountInviteCodes
 pub struct GetAccountInviteCodesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInviteCodesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.getAccountInviteCodes";
@@ -102,11 +94,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInviteCodesRequest {
     type Response = GetAccountInviteCodesResponse;
 }
 
-fn _default_create_available() -> core::option::Option<bool> {
+fn _default_create_available() -> Option<bool> {
     Some(true)
 }
 
-fn _default_include_used() -> core::option::Option<bool> {
+fn _default_include_used() -> Option<bool> {
     Some(true)
 }
 
@@ -131,8 +123,8 @@ pub mod get_account_invite_codes_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetAccountInviteCodesBuilder<S: get_account_invite_codes_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<bool>, ::core::option::Option<bool>),
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<bool>, Option<bool>),
 }
 
 impl GetAccountInviteCodes {
@@ -146,7 +138,7 @@ impl GetAccountInviteCodesBuilder<get_account_invite_codes_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetAccountInviteCodesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
         }
     }

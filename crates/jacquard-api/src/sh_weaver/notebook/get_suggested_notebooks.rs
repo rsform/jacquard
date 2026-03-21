@@ -5,101 +5,82 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::actor::ProfileViewBasic;
+use crate::sh_weaver::graph::ListView;
+use crate::sh_weaver::notebook::NotebookView;
+use crate::sh_weaver::notebook::get_suggested_notebooks;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedNotebooks {
     ///Defaults to `20`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedNotebooksOutput<'a> {
     #[serde(borrow)]
-    pub notebooks: Vec<
-        crate::sh_weaver::notebook::get_suggested_notebooks::SuggestedNotebook<'a>,
-    >,
+    pub notebooks: Vec<get_suggested_notebooks::SuggestedNotebook<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SuggestedNotebook<'a> {
     #[serde(borrow)]
-    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
+    pub notebook: NotebookView<'a>,
     #[serde(borrow)]
-    pub reason: crate::sh_weaver::notebook::get_suggested_notebooks::SuggestionReason<
-        'a,
-    >,
+    pub reason: get_suggested_notebooks::SuggestionReason<'a>,
     ///Appview-computed relevance score.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub score: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub score: Option<i64>,
 }
 
 /// Why this notebook was suggested.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct SuggestionReason<'a> {
     ///If followed-author, the author.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub related_author: core::option::Option<
-        crate::sh_weaver::actor::ProfileViewBasic<'a>,
-    >,
+    pub related_author: Option<ProfileViewBasic<'a>>,
     ///If from-list, the list it's from.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub related_list: core::option::Option<crate::sh_weaver::graph::ListView<'a>>,
+    pub related_list: Option<ListView<'a>>,
     ///If similar-to-X, the notebook it's similar to.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub related_notebook: core::option::Option<
-        crate::sh_weaver::notebook::NotebookView<'a>,
-    >,
+    pub related_notebook: Option<NotebookView<'a>>,
     ///Tags that matched.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub related_tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub related_tags: Option<Vec<CowStr<'a>>>,
     #[serde(borrow)]
     pub r#type: SuggestionReasonType<'a>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SuggestionReasonType<'a> {
@@ -110,7 +91,7 @@ pub enum SuggestionReasonType<'a> {
     PopularInTag,
     Trending,
     FromList,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> SuggestionReasonType<'a> {
@@ -138,7 +119,7 @@ impl<'a> From<&'a str> for SuggestionReasonType<'a> {
             "popular-in-tag" => Self::PopularInTag,
             "trending" => Self::Trending,
             "from-list" => Self::FromList,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -153,7 +134,7 @@ impl<'a> From<String> for SuggestionReasonType<'a> {
             "popular-in-tag" => Self::PopularInTag,
             "trending" => Self::Trending,
             "from-list" => Self::FromList,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -216,8 +197,7 @@ impl jacquard_common::IntoStatic for SuggestionReasonType<'_> {
     }
 }
 
-/// Response type for
-///sh.weaver.notebook.getSuggestedNotebooks
+/// Response type for sh.weaver.notebook.getSuggestedNotebooks
 pub struct GetSuggestedNotebooksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedNotebooksResponse {
     const NSID: &'static str = "sh.weaver.notebook.getSuggestedNotebooks";
@@ -232,8 +212,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetSuggestedNotebooks {
     type Response = GetSuggestedNotebooksResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notebook.getSuggestedNotebooks
+/// Endpoint type for sh.weaver.notebook.getSuggestedNotebooks
 pub struct GetSuggestedNotebooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedNotebooksRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getSuggestedNotebooks";
@@ -242,41 +221,37 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedNotebooksRequest {
     type Response = GetSuggestedNotebooksResponse;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for SuggestedNotebook<'a> {
+impl<'a> LexiconSchema for SuggestedNotebook<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.getSuggestedNotebooks"
     }
     fn def_name() -> &'static str {
         "suggestedNotebook"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for SuggestionReason<'a> {
+impl<'a> LexiconSchema for SuggestionReason<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.getSuggestedNotebooks"
     }
     fn def_name() -> &'static str {
         "suggestionReason"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(20i64)
 }
 
@@ -301,8 +276,8 @@ pub mod get_suggested_notebooks_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetSuggestedNotebooksBuilder<S: get_suggested_notebooks_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>,),
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>,),
 }
 
 impl GetSuggestedNotebooks {
@@ -316,7 +291,7 @@ impl GetSuggestedNotebooksBuilder<get_suggested_notebooks_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSuggestedNotebooksBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
         }
     }
@@ -393,15 +368,13 @@ pub mod suggested_notebook_state {
 
 /// Builder for constructing an instance of this type
 pub struct SuggestedNotebookBuilder<'a, S: suggested_notebook_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::sh_weaver::notebook::NotebookView<'a>>,
-        ::core::option::Option<
-            crate::sh_weaver::notebook::get_suggested_notebooks::SuggestionReason<'a>,
-        >,
-        ::core::option::Option<i64>,
+        Option<NotebookView<'a>>,
+        Option<get_suggested_notebooks::SuggestionReason<'a>>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SuggestedNotebook<'a> {
@@ -415,9 +388,9 @@ impl<'a> SuggestedNotebookBuilder<'a, suggested_notebook_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SuggestedNotebookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -430,13 +403,13 @@ where
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
-        value: impl Into<crate::sh_weaver::notebook::NotebookView<'a>>,
+        value: impl Into<NotebookView<'a>>,
     ) -> SuggestedNotebookBuilder<'a, suggested_notebook_state::SetNotebook<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SuggestedNotebookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -449,15 +422,13 @@ where
     /// Set the `reason` field (required)
     pub fn reason(
         mut self,
-        value: impl Into<
-            crate::sh_weaver::notebook::get_suggested_notebooks::SuggestionReason<'a>,
-        >,
+        value: impl Into<get_suggested_notebooks::SuggestionReason<'a>>,
     ) -> SuggestedNotebookBuilder<'a, suggested_notebook_state::SetReason<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         SuggestedNotebookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -493,7 +464,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -507,203 +478,133 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "sh.weaver.notebook.getSuggestedNotebooks",
-        ),
-        revision: None,
-        description: None,
+fn lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("sh.weaver.notebook.getSuggestedNotebooks"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
-                    description: None,
+                SmolStr::new_static("main"),
+                LexUserType::XrpcQuery(LexXrpcQuery {
                     parameters: Some(
-                        ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
-                            description: None,
-                            required: None,
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::alloc::collections::BTreeMap::new();
+                                let mut map = BTreeMap::new();
                                 map.insert(
-                                    ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                        "limit",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
                                     }),
                                 );
                                 map
                             },
+                            ..Default::default()
                         }),
                     ),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "suggestedNotebook",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("suggestedNotebook"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("notebook"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("reason")
+                            SmolStr::new_static("notebook"),
+                            SmolStr::new_static("reason")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "notebook",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("notebook"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "sh.weaver.notebook.defs#notebookView",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "reason",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#suggestionReason",
-                                ),
+                            SmolStr::new_static("reason"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#suggestionReason"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "score",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("score"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "suggestionReason",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("suggestionReason"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Why this notebook was suggested.",
-                        ),
+                        CowStr::new_static("Why this notebook was suggested."),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("type")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("type")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "relatedAuthor",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("relatedAuthor"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "sh.weaver.actor.defs#profileViewBasic",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "relatedList",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "sh.weaver.graph.defs#listView",
-                                ),
+                            SmolStr::new_static("relatedList"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("sh.weaver.graph.defs#listView"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "relatedNotebook",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
+                            SmolStr::new_static("relatedNotebook"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
                                     "sh.weaver.notebook.defs#notebookView",
                                 ),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "relatedTags",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Tags that matched."),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                            SmolStr::new_static("relatedTags"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static("Tags that matched.")),
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

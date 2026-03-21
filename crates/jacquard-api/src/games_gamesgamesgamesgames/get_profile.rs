@@ -5,75 +5,57 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::ActorProfileDetailView;
+use crate::games_gamesgamesgamesgames::OrgProfileDetailView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfile<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub handle: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub handle: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfileOutput<'a> {
     ///The resolved ATProto handle for display.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub handle: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub handle: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub profile: core::option::Option<GetProfileOutputProfile<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub profile: Option<GetProfileOutputProfile<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub profile_type: core::option::Option<GetProfileOutputProfileType<'a>>,
+    pub profile_type: Option<GetProfileOutputProfileType<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetProfileOutputProfile<'a> {
     #[serde(rename = "games.gamesgamesgamesgames.defs#actorProfileDetailView")]
-    ActorProfileDetailView(
-        Box<crate::games_gamesgamesgamesgames::ActorProfileDetailView<'a>>,
-    ),
+    ActorProfileDetailView(Box<ActorProfileDetailView<'a>>),
     #[serde(rename = "games.gamesgamesgamesgames.defs#orgProfileDetailView")]
-    OrgProfileDetailView(
-        Box<crate::games_gamesgamesgamesgames::OrgProfileDetailView<'a>>,
-    ),
+    OrgProfileDetailView(Box<OrgProfileDetailView<'a>>),
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GetProfileOutputProfileType<'a> {
     Actor,
     Org,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> GetProfileOutputProfileType<'a> {
@@ -91,7 +73,7 @@ impl<'a> From<&'a str> for GetProfileOutputProfileType<'a> {
         match s {
             "actor" => Self::Actor,
             "org" => Self::Org,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -101,7 +83,7 @@ impl<'a> From<String> for GetProfileOutputProfileType<'a> {
         match s.as_str() {
             "actor" => Self::Actor,
             "org" => Self::Org,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -159,8 +141,7 @@ impl jacquard_common::IntoStatic for GetProfileOutputProfileType<'_> {
     }
 }
 
-/// Response type for
-///games.gamesgamesgamesgames.getProfile
+/// Response type for games.gamesgamesgamesgames.getProfile
 pub struct GetProfileResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfileResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.getProfile";
@@ -175,8 +156,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfile<'a> {
     type Response = GetProfileResponse;
 }
 
-/// Endpoint type for
-///games.gamesgamesgamesgames.getProfile
+/// Endpoint type for games.gamesgamesgamesgames.getProfile
 pub struct GetProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfileRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.getProfile";
@@ -206,9 +186,9 @@ pub mod get_profile_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetProfileBuilder<'a, S: get_profile_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetProfile<'a> {
@@ -222,24 +202,21 @@ impl<'a> GetProfileBuilder<'a, get_profile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetProfileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_profile_state::State> GetProfileBuilder<'a, S> {
     /// Set the `handle` field (optional)
-    pub fn handle(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn handle(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `handle` field to an Option value (optional)
-    pub fn maybe_handle(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_handle(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }

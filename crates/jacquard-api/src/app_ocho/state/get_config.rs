@@ -5,49 +5,48 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetConfigOutput<'a> {
     ///The token for the InstantDB account
     #[serde(borrow)]
-    pub account_token: jacquard_common::CowStr<'a>,
+    pub account_token: CowStr<'a>,
     ///The InstantDB admin token
     #[serde(borrow)]
-    pub admin_token: jacquard_common::CowStr<'a>,
+    pub admin_token: CowStr<'a>,
     ///The App ID
     #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
+    pub id: CowStr<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetConfigError<'a> {
     #[serde(rename = "InvalidID")]
-    InvalidId(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidId(Option<CowStr<'a>>),
     #[serde(rename = "InvalidServiceAuth")]
-    InvalidServiceAuth(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidServiceAuth(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetConfigError<'_> {
@@ -73,19 +72,10 @@ impl core::fmt::Display for GetConfigError<'_> {
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct GetConfig;
-/// Response type for
-///app.ocho.state.getConfig
+/// Response type for app.ocho.state.getConfig
 pub struct GetConfigResponse;
 impl jacquard_common::xrpc::XrpcResp for GetConfigResponse {
     const NSID: &'static str = "app.ocho.state.getConfig";
@@ -100,8 +90,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetConfig {
     type Response = GetConfigResponse;
 }
 
-/// Endpoint type for
-///app.ocho.state.getConfig
+/// Endpoint type for app.ocho.state.getConfig
 pub struct GetConfigRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetConfigRequest {
     const PATH: &'static str = "/xrpc/app.ocho.state.getConfig";

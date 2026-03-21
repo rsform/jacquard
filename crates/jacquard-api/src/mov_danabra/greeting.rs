@@ -5,44 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Greeting<'a> {
     ///Name to greet.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GreetingOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
+    pub value: Response<'a>,
 }
 
-/// Response type for
-///mov.danabra.Greeting
+/// Response type for mov.danabra.Greeting
 pub struct GreetingResponse;
 impl jacquard_common::xrpc::XrpcResp for GreetingResponse {
     const NSID: &'static str = "mov.danabra.Greeting";
@@ -59,8 +49,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Greeting<'a> {
     type Response = GreetingResponse;
 }
 
-/// Endpoint type for
-///mov.danabra.Greeting
+/// Endpoint type for mov.danabra.Greeting
 pub struct GreetingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GreetingRequest {
     const PATH: &'static str = "/xrpc/mov.danabra.Greeting";

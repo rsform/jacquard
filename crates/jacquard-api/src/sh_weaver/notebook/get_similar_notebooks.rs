@@ -5,43 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSimilarNotebooks<'a> {
     ///Defaults to `10`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
     #[serde(borrow)]
-    pub notebook: jacquard_common::types::string::AtUri<'a>,
+    pub notebook: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSimilarNotebooksOutput<'a> {
     #[serde(borrow)]
-    pub notebooks: Vec<jacquard_common::types::value::Data<'a>>,
+    pub notebooks: Vec<Data<'a>>,
 }
 
-/// Response type for
-///sh.weaver.notebook.getSimilarNotebooks
+/// Response type for sh.weaver.notebook.getSimilarNotebooks
 pub struct GetSimilarNotebooksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSimilarNotebooksResponse {
     const NSID: &'static str = "sh.weaver.notebook.getSimilarNotebooks";
@@ -56,8 +47,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSimilarNotebooks<'a> {
     type Response = GetSimilarNotebooksResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notebook.getSimilarNotebooks
+/// Endpoint type for sh.weaver.notebook.getSimilarNotebooks
 pub struct GetSimilarNotebooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSimilarNotebooksRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getSimilarNotebooks";
@@ -66,7 +56,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSimilarNotebooksRequest {
     type Response = GetSimilarNotebooksResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(10i64)
 }
 
@@ -104,12 +94,9 @@ pub mod get_similar_notebooks_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetSimilarNotebooksBuilder<'a, S: get_similar_notebooks_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<AtUri<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetSimilarNotebooks<'a> {
@@ -123,9 +110,9 @@ impl<'a> GetSimilarNotebooksBuilder<'a, get_similar_notebooks_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSimilarNotebooksBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -151,13 +138,13 @@ where
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetSimilarNotebooksBuilder<'a, get_similar_notebooks_state::SetNotebook<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetSimilarNotebooksBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

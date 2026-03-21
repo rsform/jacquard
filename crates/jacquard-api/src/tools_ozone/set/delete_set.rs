@@ -5,55 +5,46 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteSet<'a> {
     ///Name of the set to delete
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteSetOutput<'a> {}
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteSetError<'a> {
     /// set with the given name does not exist
     #[serde(rename = "SetNotFound")]
-    SetNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    SetNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteSetError<'_> {
@@ -71,8 +62,7 @@ impl core::fmt::Display for DeleteSetError<'_> {
     }
 }
 
-/// Response type for
-///tools.ozone.set.deleteSet
+/// Response type for tools.ozone.set.deleteSet
 pub struct DeleteSetResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteSetResponse {
     const NSID: &'static str = "tools.ozone.set.deleteSet";
@@ -89,8 +79,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteSet<'a> {
     type Response = DeleteSetResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.set.deleteSet
+/// Endpoint type for tools.ozone.set.deleteSet
 pub struct DeleteSetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteSetRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.set.deleteSet";

@@ -5,63 +5,55 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, Datetime};
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::moderation::ScheduledActionView;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListScheduledActions<'a> {
     ///Cursor for pagination
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     ///Filter actions scheduled to execute before this time
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub ends_before: core::option::Option<jacquard_common::types::string::Datetime>,
-    ///Maximum number of results to return Defaults to `50`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ends_before: Option<Datetime>,
+    ///Maximum number of results to return  Defaults to `50`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_list_scheduled_actions_limit")]
-    pub limit: core::option::Option<i64>,
+    pub limit: Option<i64>,
     ///Filter actions scheduled to execute after this time
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub starts_after: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub starts_after: Option<Datetime>,
     ///Filter actions by status
     #[serde(borrow)]
-    pub statuses: Vec<jacquard_common::CowStr<'a>>,
+    pub statuses: Vec<CowStr<'a>>,
     ///Filter actions for specific DID subjects
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subjects: core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    pub subjects: Option<Vec<Did<'a>>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListScheduledActionsOutput<'a> {
     #[serde(borrow)]
-    pub actions: Vec<crate::tools_ozone::moderation::ScheduledActionView<'a>>,
+    pub actions: Vec<ScheduledActionView<'a>>,
     ///Cursor for next page of results
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
 }
 
-/// Response type for
-///tools.ozone.moderation.listScheduledActions
+/// Response type for tools.ozone.moderation.listScheduledActions
 pub struct ListScheduledActionsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListScheduledActionsResponse {
     const NSID: &'static str = "tools.ozone.moderation.listScheduledActions";
@@ -78,8 +70,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ListScheduledActions<'a> {
     type Response = ListScheduledActionsResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.moderation.listScheduledActions
+/// Endpoint type for tools.ozone.moderation.listScheduledActions
 pub struct ListScheduledActionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListScheduledActionsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.listScheduledActions";
@@ -90,7 +81,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListScheduledActionsRequest {
     type Response = ListScheduledActionsResponse;
 }
 
-fn _default_list_scheduled_actions_limit() -> core::option::Option<i64> {
+fn _default_list_scheduled_actions_limit() -> Option<i64> {
     Some(50i64)
 }
 
@@ -128,16 +119,16 @@ pub mod list_scheduled_actions_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListScheduledActionsBuilder<'a, S: list_scheduled_actions_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<i64>,
+        Option<Datetime>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<Did<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ListScheduledActions<'a> {
@@ -154,24 +145,21 @@ impl<'a> ListScheduledActionsBuilder<'a, list_scheduled_actions_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListScheduledActionsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -179,18 +167,12 @@ impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a,
 
 impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a, S> {
     /// Set the `endsBefore` field (optional)
-    pub fn ends_before(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn ends_before(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `endsBefore` field to an Option value (optional)
-    pub fn maybe_ends_before(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_ends_before(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -211,18 +193,12 @@ impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a,
 
 impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a, S> {
     /// Set the `startsAfter` field (optional)
-    pub fn starts_after(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn starts_after(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `startsAfter` field to an Option value (optional)
-    pub fn maybe_starts_after(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_starts_after(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -236,31 +212,25 @@ where
     /// Set the `statuses` field (required)
     pub fn statuses(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> ListScheduledActionsBuilder<'a, list_scheduled_actions_state::SetStatuses<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         ListScheduledActionsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a, S> {
     /// Set the `subjects` field (optional)
-    pub fn subjects(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::string::Did<'a>>>>,
-    ) -> Self {
+    pub fn subjects(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `subjects` field to an Option value (optional)
-    pub fn maybe_subjects(
-        mut self,
-        value: Option<Vec<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn maybe_subjects(mut self, value: Option<Vec<Did<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -286,7 +256,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

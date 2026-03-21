@@ -11,41 +11,45 @@ pub mod deck;
 pub mod richtext;
 pub mod social;
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::UriValue;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// Reference to a Magic: The Gathering card with printing and oracle identifiers.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CardRef<'a> {
     /**Oracle card URI (oracle:<uuid>) - for external indexing.
 Derived from scryfallUri; on conflict, scryfallUri takes precedence.*/
     #[serde(borrow)]
-    pub oracle_uri: jacquard_common::types::string::UriValue<'a>,
+    pub oracle_uri: UriValue<'a>,
     ///Scryfall printing URI (scry:<uuid>) - authoritative identifier
     #[serde(borrow)]
-    pub scryfall_uri: jacquard_common::types::string::UriValue<'a>,
+    pub scryfall_uri: UriValue<'a>,
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CardRef<'a> {
+impl<'a> LexiconSchema for CardRef<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.defs"
     }
     fn def_name() -> &'static str {
         "cardRef"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -60,48 +64,45 @@ pub mod card_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ScryfallUri;
         type OracleUri;
+        type ScryfallUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ScryfallUri = Unset;
         type OracleUri = Unset;
-    }
-    ///State transition - sets the `scryfall_uri` field to Set
-    pub struct SetScryfallUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScryfallUri<S> {}
-    impl<S: State> State for SetScryfallUri<S> {
-        type ScryfallUri = Set<members::scryfall_uri>;
-        type OracleUri = S::OracleUri;
+        type ScryfallUri = Unset;
     }
     ///State transition - sets the `oracle_uri` field to Set
     pub struct SetOracleUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOracleUri<S> {}
     impl<S: State> State for SetOracleUri<S> {
-        type ScryfallUri = S::ScryfallUri;
         type OracleUri = Set<members::oracle_uri>;
+        type ScryfallUri = S::ScryfallUri;
+    }
+    ///State transition - sets the `scryfall_uri` field to Set
+    pub struct SetScryfallUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScryfallUri<S> {}
+    impl<S: State> State for SetScryfallUri<S> {
+        type OracleUri = S::OracleUri;
+        type ScryfallUri = Set<members::scryfall_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scryfall_uri` field
-        pub struct scryfall_uri(());
         ///Marker type for the `oracle_uri` field
         pub struct oracle_uri(());
+        ///Marker type for the `scryfall_uri` field
+        pub struct scryfall_uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CardRefBuilder<'a, S: card_ref_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<UriValue<'a>>, Option<UriValue<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CardRef<'a> {
@@ -115,9 +116,9 @@ impl<'a> CardRefBuilder<'a, card_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CardRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -130,13 +131,13 @@ where
     /// Set the `oracleUri` field (required)
     pub fn oracle_uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> CardRefBuilder<'a, card_ref_state::SetOracleUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CardRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -149,13 +150,13 @@ where
     /// Set the `scryfallUri` field (required)
     pub fn scryfall_uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> CardRefBuilder<'a, card_ref_state::SetScryfallUri<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CardRefBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -163,8 +164,8 @@ where
 impl<'a, S> CardRefBuilder<'a, S>
 where
     S: card_ref_state::State,
-    S::ScryfallUri: card_ref_state::IsSet,
     S::OracleUri: card_ref_state::IsSet,
+    S::ScryfallUri: card_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CardRef<'a> {
@@ -177,7 +178,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -190,83 +191,64 @@ where
     }
 }
 
-fn lexicon_doc_com_deckbelcher_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("com.deckbelcher.defs"),
-        revision: None,
-        description: None,
+fn lexicon_doc_com_deckbelcher_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("com.deckbelcher.defs"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("cardRef"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("cardRef"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Reference to a Magic: The Gathering card with printing and oracle identifiers.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("scryfallUri"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("oracleUri")
+                            SmolStr::new_static("scryfallUri"),
+                            SmolStr::new_static("oracleUri")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "oracleUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("oracleUri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Oracle card URI (oracle:<uuid>) - for external indexing.\nDerived from scryfallUri; on conflict, scryfallUri takes precedence.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "scryfallUri",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("scryfallUri"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Scryfall printing URI (scry:<uuid>) - authoritative identifier",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

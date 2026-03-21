@@ -5,77 +5,70 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, Handle};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSession<'a> {
     ///When true, instead of throwing error for takendown accounts, a valid response with a narrow scoped token will be returned
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub allow_takendown: core::option::Option<bool>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub allow_takendown: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub auth_factor_token: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub auth_factor_token: Option<CowStr<'a>>,
     ///Handle or other identifier supported by the server for the authenticating user.
     #[serde(borrow)]
-    pub identifier: jacquard_common::CowStr<'a>,
+    pub identifier: CowStr<'a>,
     #[serde(borrow)]
-    pub password: jacquard_common::CowStr<'a>,
+    pub password: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSessionOutput<'a> {
     #[serde(borrow)]
-    pub access_jwt: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub active: core::option::Option<bool>,
+    pub access_jwt: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub active: Option<bool>,
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub did: Did<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did_doc: core::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub did_doc: Option<Data<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub email: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub email_auth_factor: core::option::Option<bool>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub email_confirmed: core::option::Option<bool>,
+    pub email: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email_auth_factor: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email_confirmed: Option<bool>,
     #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
+    pub handle: Handle<'a>,
     #[serde(borrow)]
-    pub refresh_jwt: jacquard_common::CowStr<'a>,
+    pub refresh_jwt: CowStr<'a>,
     ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: core::option::Option<CreateSessionOutputStatus<'a>>,
+    pub status: Option<CreateSessionOutputStatus<'a>>,
 }
 
 /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CreateSessionOutputStatus<'a> {
     Takendown,
     Suspended,
     Deactivated,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> CreateSessionOutputStatus<'a> {
@@ -95,7 +88,7 @@ impl<'a> From<&'a str> for CreateSessionOutputStatus<'a> {
             "takendown" => Self::Takendown,
             "suspended" => Self::Suspended,
             "deactivated" => Self::Deactivated,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -106,7 +99,7 @@ impl<'a> From<String> for CreateSessionOutputStatus<'a> {
             "takendown" => Self::Takendown,
             "suspended" => Self::Suspended,
             "deactivated" => Self::Deactivated,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -167,25 +160,27 @@ impl jacquard_common::IntoStatic for CreateSessionOutputStatus<'_> {
     }
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateSessionError<'a> {
     #[serde(rename = "AccountTakedown")]
-    AccountTakedown(core::option::Option<jacquard_common::CowStr<'a>>),
+    AccountTakedown(Option<CowStr<'a>>),
     #[serde(rename = "AuthFactorTokenRequired")]
-    AuthFactorTokenRequired(core::option::Option<jacquard_common::CowStr<'a>>),
+    AuthFactorTokenRequired(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for CreateSessionError<'_> {
@@ -210,8 +205,7 @@ impl core::fmt::Display for CreateSessionError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.server.createSession
+/// Response type for com.atproto.server.createSession
 pub struct CreateSessionResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateSessionResponse {
     const NSID: &'static str = "com.atproto.server.createSession";
@@ -228,8 +222,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateSession<'a> {
     type Response = CreateSessionResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.createSession
+/// Endpoint type for com.atproto.server.createSession
 pub struct CreateSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateSessionRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.createSession";

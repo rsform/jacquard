@@ -5,38 +5,29 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::video::JobStatus;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UploadVideo {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UploadVideoOutput<'a> {
     #[serde(borrow)]
-    pub job_status: crate::app_bsky::video::JobStatus<'a>,
+    pub job_status: JobStatus<'a>,
 }
 
-/// Response type for
-///app.bsky.video.uploadVideo
+/// Response type for app.bsky.video.uploadVideo
 pub struct UploadVideoResponse;
 impl jacquard_common::xrpc::XrpcResp for UploadVideoResponse {
     const NSID: &'static str = "app.bsky.video.uploadVideo";
@@ -68,8 +59,7 @@ impl jacquard_common::xrpc::XrpcRequest for UploadVideo {
     }
 }
 
-/// Endpoint type for
-///app.bsky.video.uploadVideo
+/// Endpoint type for app.bsky.video.uploadVideo
 pub struct UploadVideoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UploadVideoRequest {
     const PATH: &'static str = "/xrpc/app.bsky.video.uploadVideo";

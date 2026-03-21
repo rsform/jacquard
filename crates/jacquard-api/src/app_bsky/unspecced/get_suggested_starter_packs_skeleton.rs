@@ -5,44 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::{Did, AtUri};
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedStarterPacksSkeleton<'a> {
     ///Defaults to `10`. Min: 1. Max: 25.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub viewer: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub viewer: Option<Did<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedStarterPacksSkeletonOutput<'a> {
     #[serde(borrow)]
-    pub starter_packs: Vec<jacquard_common::types::string::AtUri<'a>>,
+    pub starter_packs: Vec<AtUri<'a>>,
 }
 
-/// Response type for
-///app.bsky.unspecced.getSuggestedStarterPacksSkeleton
+/// Response type for app.bsky.unspecced.getSuggestedStarterPacksSkeleton
 pub struct GetSuggestedStarterPacksSkeletonResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedStarterPacksSkeletonResponse {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedStarterPacksSkeleton";
@@ -57,8 +47,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestedStarterPacksSkeleton
     type Response = GetSuggestedStarterPacksSkeletonResponse;
 }
 
-/// Endpoint type for
-///app.bsky.unspecced.getSuggestedStarterPacksSkeleton
+/// Endpoint type for app.bsky.unspecced.getSuggestedStarterPacksSkeleton
 pub struct GetSuggestedStarterPacksSkeletonRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedStarterPacksSkeletonRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestedStarterPacksSkeleton";
@@ -67,7 +56,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedStarterPacksSkeletonReq
     type Response = GetSuggestedStarterPacksSkeletonResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(10i64)
 }
 
@@ -95,12 +84,9 @@ pub struct GetSuggestedStarterPacksSkeletonBuilder<
     'a,
     S: get_suggested_starter_packs_skeleton_state::State,
 > {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<Did<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetSuggestedStarterPacksSkeleton<'a> {
@@ -122,9 +108,9 @@ impl<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSuggestedStarterPacksSkeletonBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -150,18 +136,12 @@ impl<
     S: get_suggested_starter_packs_skeleton_state::State,
 > GetSuggestedStarterPacksSkeletonBuilder<'a, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn viewer(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_viewer(mut self, value: Option<Did<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }

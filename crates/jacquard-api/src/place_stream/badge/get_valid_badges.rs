@@ -5,40 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::badge::BadgeView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetValidBadges<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub streamer: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub streamer: Option<Did<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetValidBadgesOutput<'a> {
     #[serde(borrow)]
-    pub badges: Vec<crate::place_stream::badge::BadgeView<'a>>,
+    pub badges: Vec<BadgeView<'a>>,
 }
 
-/// Response type for
-///place.stream.badge.getValidBadges
+/// Response type for place.stream.badge.getValidBadges
 pub struct GetValidBadgesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetValidBadgesResponse {
     const NSID: &'static str = "place.stream.badge.getValidBadges";
@@ -53,8 +44,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetValidBadges<'a> {
     type Response = GetValidBadgesResponse;
 }
 
-/// Endpoint type for
-///place.stream.badge.getValidBadges
+/// Endpoint type for place.stream.badge.getValidBadges
 pub struct GetValidBadgesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetValidBadgesRequest {
     const PATH: &'static str = "/xrpc/place.stream.badge.getValidBadges";
@@ -84,11 +74,9 @@ pub mod get_valid_badges_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetValidBadgesBuilder<'a, S: get_valid_badges_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetValidBadges<'a> {
@@ -102,27 +90,21 @@ impl<'a> GetValidBadgesBuilder<'a, get_valid_badges_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetValidBadgesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_valid_badges_state::State> GetValidBadgesBuilder<'a, S> {
     /// Set the `streamer` field (optional)
-    pub fn streamer(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn streamer(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `streamer` field to an Option value (optional)
-    pub fn maybe_streamer(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_streamer(mut self, value: Option<Did<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }

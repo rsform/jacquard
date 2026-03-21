@@ -5,88 +5,88 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::blue__2048::SyncStatus;
 /// A declaration of a at://2048 player's stats over the course of their playtime
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Stats<'a> {
-    ///Average score across all games Defaults to `0`.
+    ///Average score across all games  Defaults to `0`.
     #[serde(default = "_default_stats_average_score")]
     pub average_score: i64,
-    pub created_at: jacquard_common::types::string::Datetime,
-    ///Total numbers of games the user has played Defaults to `0`.
+    pub created_at: Datetime,
+    ///Total numbers of games the user has played  Defaults to `0`.
     #[serde(default = "_default_stats_games_played")]
     pub games_played: i64,
-    ///The highest number block the player has fround. example 128, 256, etc Defaults to `0`.
+    ///The highest number block the player has fround. example 128, 256, etc  Defaults to `0`.
     #[serde(default = "_default_stats_highest_number_block")]
     pub highest_number_block: i64,
-    ///The highest score the user has gotten in a game Defaults to `0`.
+    ///The highest score the user has gotten in a game  Defaults to `0`.
     #[serde(default = "_default_stats_highest_score")]
     pub highest_score: i64,
-    ///The smallest number of moves to get the 2048 block Defaults to `0`.
+    ///The smallest number of moves to get the 2048 block  Defaults to `0`.
     #[serde(default = "_default_stats_least_moves_to_find_twenty_forty_eight")]
     pub least_moves_to_find_twenty_forty_eight: i64,
     ///The sync status of this record with the users AT Protocol repo.
     #[serde(borrow)]
-    pub sync_status: crate::blue__2048::SyncStatus<'a>,
-    ///Times the 2048 block has been found also count as wins Defaults to `0`.
+    pub sync_status: SyncStatus<'a>,
+    ///Times the 2048 block has been found also count as wins  Defaults to `0`.
     #[serde(default = "_default_stats_times_twenty_forty_eight_been_found")]
     pub times_twenty_forty_eight_been_found: i64,
-    ///Total score across all games Defaults to `0`.
+    ///Total score across all games  Defaults to `0`.
     #[serde(default = "_default_stats_total_score")]
     pub total_score: i64,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct StatsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Stats<'a>,
 }
 
 impl<'a> Stats<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StatsRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, StatsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct StatsRecord;
-impl jacquard_common::xrpc::XrpcResp for StatsRecord {
+impl XrpcResp for StatsRecord {
     const NSID: &'static str = "blue.2048.player.stats";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = StatsGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
@@ -96,29 +96,27 @@ impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Stats<'_> {
+impl Collection for Stats<'_> {
     const NSID: &'static str = "blue.2048.player.stats";
     type Record = StatsRecord;
 }
 
-impl jacquard_common::types::collection::Collection for StatsRecord {
+impl Collection for StatsRecord {
     const NSID: &'static str = "blue.2048.player.stats";
     type Record = StatsRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
+impl<'a> LexiconSchema for Stats<'a> {
     fn nsid() -> &'static str {
         "blue.2048.player.stats"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_blue_2048_player_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -161,117 +159,71 @@ pub mod stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TimesTwentyFortyEightBeenFound;
-        type CreatedAt;
-        type HighestNumberBlock;
-        type TotalScore;
         type GamesPlayed;
-        type HighestScore;
-        type LeastMovesToFindTwentyFortyEight;
-        type SyncStatus;
+        type HighestNumberBlock;
         type AverageScore;
+        type LeastMovesToFindTwentyFortyEight;
+        type HighestScore;
+        type TimesTwentyFortyEightBeenFound;
+        type TotalScore;
+        type CreatedAt;
+        type SyncStatus;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TimesTwentyFortyEightBeenFound = Unset;
-        type CreatedAt = Unset;
-        type HighestNumberBlock = Unset;
-        type TotalScore = Unset;
         type GamesPlayed = Unset;
-        type HighestScore = Unset;
-        type LeastMovesToFindTwentyFortyEight = Unset;
-        type SyncStatus = Unset;
+        type HighestNumberBlock = Unset;
         type AverageScore = Unset;
-    }
-    ///State transition - sets the `times_twenty_forty_eight_been_found` field to Set
-    pub struct SetTimesTwentyFortyEightBeenFound<S: State = Empty>(
-        PhantomData<fn() -> S>,
-    );
-    impl<S: State> sealed::Sealed for SetTimesTwentyFortyEightBeenFound<S> {}
-    impl<S: State> State for SetTimesTwentyFortyEightBeenFound<S> {
-        type TimesTwentyFortyEightBeenFound = Set<
-            members::times_twenty_forty_eight_been_found,
-        >;
-        type CreatedAt = S::CreatedAt;
-        type HighestNumberBlock = S::HighestNumberBlock;
-        type TotalScore = S::TotalScore;
-        type GamesPlayed = S::GamesPlayed;
-        type HighestScore = S::HighestScore;
-        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type SyncStatus = S::SyncStatus;
-        type AverageScore = S::AverageScore;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
-        type CreatedAt = Set<members::created_at>;
-        type HighestNumberBlock = S::HighestNumberBlock;
-        type TotalScore = S::TotalScore;
-        type GamesPlayed = S::GamesPlayed;
-        type HighestScore = S::HighestScore;
-        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type SyncStatus = S::SyncStatus;
-        type AverageScore = S::AverageScore;
-    }
-    ///State transition - sets the `highest_number_block` field to Set
-    pub struct SetHighestNumberBlock<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHighestNumberBlock<S> {}
-    impl<S: State> State for SetHighestNumberBlock<S> {
-        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
-        type CreatedAt = S::CreatedAt;
-        type HighestNumberBlock = Set<members::highest_number_block>;
-        type TotalScore = S::TotalScore;
-        type GamesPlayed = S::GamesPlayed;
-        type HighestScore = S::HighestScore;
-        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type SyncStatus = S::SyncStatus;
-        type AverageScore = S::AverageScore;
-    }
-    ///State transition - sets the `total_score` field to Set
-    pub struct SetTotalScore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalScore<S> {}
-    impl<S: State> State for SetTotalScore<S> {
-        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
-        type CreatedAt = S::CreatedAt;
-        type HighestNumberBlock = S::HighestNumberBlock;
-        type TotalScore = Set<members::total_score>;
-        type GamesPlayed = S::GamesPlayed;
-        type HighestScore = S::HighestScore;
-        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type SyncStatus = S::SyncStatus;
-        type AverageScore = S::AverageScore;
+        type LeastMovesToFindTwentyFortyEight = Unset;
+        type HighestScore = Unset;
+        type TimesTwentyFortyEightBeenFound = Unset;
+        type TotalScore = Unset;
+        type CreatedAt = Unset;
+        type SyncStatus = Unset;
     }
     ///State transition - sets the `games_played` field to Set
     pub struct SetGamesPlayed<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGamesPlayed<S> {}
     impl<S: State> State for SetGamesPlayed<S> {
-        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
-        type CreatedAt = S::CreatedAt;
-        type HighestNumberBlock = S::HighestNumberBlock;
-        type TotalScore = S::TotalScore;
         type GamesPlayed = Set<members::games_played>;
-        type HighestScore = S::HighestScore;
-        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type SyncStatus = S::SyncStatus;
-        type AverageScore = S::AverageScore;
-    }
-    ///State transition - sets the `highest_score` field to Set
-    pub struct SetHighestScore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHighestScore<S> {}
-    impl<S: State> State for SetHighestScore<S> {
-        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
-        type CreatedAt = S::CreatedAt;
         type HighestNumberBlock = S::HighestNumberBlock;
-        type TotalScore = S::TotalScore;
-        type GamesPlayed = S::GamesPlayed;
-        type HighestScore = Set<members::highest_score>;
-        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type SyncStatus = S::SyncStatus;
         type AverageScore = S::AverageScore;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type HighestScore = S::HighestScore;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type TotalScore = S::TotalScore;
+        type CreatedAt = S::CreatedAt;
+        type SyncStatus = S::SyncStatus;
+    }
+    ///State transition - sets the `highest_number_block` field to Set
+    pub struct SetHighestNumberBlock<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHighestNumberBlock<S> {}
+    impl<S: State> State for SetHighestNumberBlock<S> {
+        type GamesPlayed = S::GamesPlayed;
+        type HighestNumberBlock = Set<members::highest_number_block>;
+        type AverageScore = S::AverageScore;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type HighestScore = S::HighestScore;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type TotalScore = S::TotalScore;
+        type CreatedAt = S::CreatedAt;
+        type SyncStatus = S::SyncStatus;
+    }
+    ///State transition - sets the `average_score` field to Set
+    pub struct SetAverageScore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAverageScore<S> {}
+    impl<S: State> State for SetAverageScore<S> {
+        type GamesPlayed = S::GamesPlayed;
+        type HighestNumberBlock = S::HighestNumberBlock;
+        type AverageScore = Set<members::average_score>;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type HighestScore = S::HighestScore;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type TotalScore = S::TotalScore;
+        type CreatedAt = S::CreatedAt;
+        type SyncStatus = S::SyncStatus;
     }
     ///State transition - sets the `least_moves_to_find_twenty_forty_eight` field to Set
     pub struct SetLeastMovesToFindTwentyFortyEight<S: State = Empty>(
@@ -279,85 +231,131 @@ pub mod stats_state {
     );
     impl<S: State> sealed::Sealed for SetLeastMovesToFindTwentyFortyEight<S> {}
     impl<S: State> State for SetLeastMovesToFindTwentyFortyEight<S> {
-        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
-        type CreatedAt = S::CreatedAt;
-        type HighestNumberBlock = S::HighestNumberBlock;
-        type TotalScore = S::TotalScore;
         type GamesPlayed = S::GamesPlayed;
-        type HighestScore = S::HighestScore;
+        type HighestNumberBlock = S::HighestNumberBlock;
+        type AverageScore = S::AverageScore;
         type LeastMovesToFindTwentyFortyEight = Set<
             members::least_moves_to_find_twenty_forty_eight,
         >;
+        type HighestScore = S::HighestScore;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type TotalScore = S::TotalScore;
+        type CreatedAt = S::CreatedAt;
         type SyncStatus = S::SyncStatus;
+    }
+    ///State transition - sets the `highest_score` field to Set
+    pub struct SetHighestScore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHighestScore<S> {}
+    impl<S: State> State for SetHighestScore<S> {
+        type GamesPlayed = S::GamesPlayed;
+        type HighestNumberBlock = S::HighestNumberBlock;
         type AverageScore = S::AverageScore;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type HighestScore = Set<members::highest_score>;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type TotalScore = S::TotalScore;
+        type CreatedAt = S::CreatedAt;
+        type SyncStatus = S::SyncStatus;
+    }
+    ///State transition - sets the `times_twenty_forty_eight_been_found` field to Set
+    pub struct SetTimesTwentyFortyEightBeenFound<S: State = Empty>(
+        PhantomData<fn() -> S>,
+    );
+    impl<S: State> sealed::Sealed for SetTimesTwentyFortyEightBeenFound<S> {}
+    impl<S: State> State for SetTimesTwentyFortyEightBeenFound<S> {
+        type GamesPlayed = S::GamesPlayed;
+        type HighestNumberBlock = S::HighestNumberBlock;
+        type AverageScore = S::AverageScore;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type HighestScore = S::HighestScore;
+        type TimesTwentyFortyEightBeenFound = Set<
+            members::times_twenty_forty_eight_been_found,
+        >;
+        type TotalScore = S::TotalScore;
+        type CreatedAt = S::CreatedAt;
+        type SyncStatus = S::SyncStatus;
+    }
+    ///State transition - sets the `total_score` field to Set
+    pub struct SetTotalScore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalScore<S> {}
+    impl<S: State> State for SetTotalScore<S> {
+        type GamesPlayed = S::GamesPlayed;
+        type HighestNumberBlock = S::HighestNumberBlock;
+        type AverageScore = S::AverageScore;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type HighestScore = S::HighestScore;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type TotalScore = Set<members::total_score>;
+        type CreatedAt = S::CreatedAt;
+        type SyncStatus = S::SyncStatus;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type GamesPlayed = S::GamesPlayed;
+        type HighestNumberBlock = S::HighestNumberBlock;
+        type AverageScore = S::AverageScore;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type HighestScore = S::HighestScore;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type TotalScore = S::TotalScore;
+        type CreatedAt = Set<members::created_at>;
+        type SyncStatus = S::SyncStatus;
     }
     ///State transition - sets the `sync_status` field to Set
     pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
     impl<S: State> State for SetSyncStatus<S> {
-        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
-        type CreatedAt = S::CreatedAt;
-        type HighestNumberBlock = S::HighestNumberBlock;
-        type TotalScore = S::TotalScore;
         type GamesPlayed = S::GamesPlayed;
-        type HighestScore = S::HighestScore;
-        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type SyncStatus = Set<members::sync_status>;
+        type HighestNumberBlock = S::HighestNumberBlock;
         type AverageScore = S::AverageScore;
-    }
-    ///State transition - sets the `average_score` field to Set
-    pub struct SetAverageScore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAverageScore<S> {}
-    impl<S: State> State for SetAverageScore<S> {
-        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
-        type CreatedAt = S::CreatedAt;
-        type HighestNumberBlock = S::HighestNumberBlock;
-        type TotalScore = S::TotalScore;
-        type GamesPlayed = S::GamesPlayed;
-        type HighestScore = S::HighestScore;
         type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
-        type SyncStatus = S::SyncStatus;
-        type AverageScore = Set<members::average_score>;
+        type HighestScore = S::HighestScore;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type TotalScore = S::TotalScore;
+        type CreatedAt = S::CreatedAt;
+        type SyncStatus = Set<members::sync_status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `times_twenty_forty_eight_been_found` field
-        pub struct times_twenty_forty_eight_been_found(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `highest_number_block` field
-        pub struct highest_number_block(());
-        ///Marker type for the `total_score` field
-        pub struct total_score(());
         ///Marker type for the `games_played` field
         pub struct games_played(());
-        ///Marker type for the `highest_score` field
-        pub struct highest_score(());
-        ///Marker type for the `least_moves_to_find_twenty_forty_eight` field
-        pub struct least_moves_to_find_twenty_forty_eight(());
-        ///Marker type for the `sync_status` field
-        pub struct sync_status(());
+        ///Marker type for the `highest_number_block` field
+        pub struct highest_number_block(());
         ///Marker type for the `average_score` field
         pub struct average_score(());
+        ///Marker type for the `least_moves_to_find_twenty_forty_eight` field
+        pub struct least_moves_to_find_twenty_forty_eight(());
+        ///Marker type for the `highest_score` field
+        pub struct highest_score(());
+        ///Marker type for the `times_twenty_forty_eight_been_found` field
+        pub struct times_twenty_forty_eight_been_found(());
+        ///Marker type for the `total_score` field
+        pub struct total_score(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `sync_status` field
+        pub struct sync_status(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct StatsBuilder<'a, S: stats_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<crate::blue__2048::SyncStatus<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
+        Option<i64>,
+        Option<Datetime>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<SyncStatus<'a>>,
+        Option<i64>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Stats<'a> {
@@ -371,7 +369,7 @@ impl<'a> StatsBuilder<'a, stats_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -383,7 +381,7 @@ impl<'a> StatsBuilder<'a, stats_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -398,11 +396,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> StatsBuilder<'a, stats_state::SetAverageScore<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -415,13 +413,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> StatsBuilder<'a, stats_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -436,11 +434,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> StatsBuilder<'a, stats_state::SetGamesPlayed<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -455,11 +453,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> StatsBuilder<'a, stats_state::SetHighestNumberBlock<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -474,11 +472,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> StatsBuilder<'a, stats_state::SetHighestScore<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -493,11 +491,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> StatsBuilder<'a, stats_state::SetLeastMovesToFindTwentyFortyEight<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -510,13 +508,13 @@ where
     /// Set the `syncStatus` field (required)
     pub fn sync_status(
         mut self,
-        value: impl Into<crate::blue__2048::SyncStatus<'a>>,
+        value: impl Into<SyncStatus<'a>>,
     ) -> StatsBuilder<'a, stats_state::SetSyncStatus<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -531,11 +529,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> StatsBuilder<'a, stats_state::SetTimesTwentyFortyEightBeenFound<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -550,11 +548,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> StatsBuilder<'a, stats_state::SetTotalScore<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -562,15 +560,15 @@ where
 impl<'a, S> StatsBuilder<'a, S>
 where
     S: stats_state::State,
-    S::TimesTwentyFortyEightBeenFound: stats_state::IsSet,
-    S::CreatedAt: stats_state::IsSet,
-    S::HighestNumberBlock: stats_state::IsSet,
-    S::TotalScore: stats_state::IsSet,
     S::GamesPlayed: stats_state::IsSet,
-    S::HighestScore: stats_state::IsSet,
-    S::LeastMovesToFindTwentyFortyEight: stats_state::IsSet,
-    S::SyncStatus: stats_state::IsSet,
+    S::HighestNumberBlock: stats_state::IsSet,
     S::AverageScore: stats_state::IsSet,
+    S::LeastMovesToFindTwentyFortyEight: stats_state::IsSet,
+    S::HighestScore: stats_state::IsSet,
+    S::TimesTwentyFortyEightBeenFound: stats_state::IsSet,
+    S::TotalScore: stats_state::IsSet,
+    S::CreatedAt: stats_state::IsSet,
+    S::SyncStatus: stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Stats<'a> {
@@ -593,7 +591,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -616,171 +614,107 @@ where
     }
 }
 
-fn lexicon_doc_blue_2048_player_stats() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("blue.2048.player.stats"),
-        revision: None,
-        description: None,
+fn lexicon_doc_blue_2048_player_stats() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("blue.2048.player.stats"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A declaration of a at://2048 player's stats over the course of their playtime",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("literal:self")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("highestScore"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("gamesPlayed"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("totalScore"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("highestNumberBlock"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("timesTwentyFortyEightBeenFound"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("leastMovesToFindTwentyFortyEight"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("averageScore"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("syncStatus"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("highestScore"),
+                                SmolStr::new_static("gamesPlayed"),
+                                SmolStr::new_static("totalScore"),
+                                SmolStr::new_static("highestNumberBlock"),
+                                SmolStr::new_static("timesTwentyFortyEightBeenFound"),
+                                SmolStr::new_static("leastMovesToFindTwentyFortyEight"),
+                                SmolStr::new_static("averageScore"),
+                                SmolStr::new_static("syncStatus"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "averageScore",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("averageScore"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "gamesPlayed",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("gamesPlayed"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "highestNumberBlock",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("highestNumberBlock"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "highestScore",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("highestScore"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "leastMovesToFindTwentyFortyEight",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("leastMovesToFindTwentyFortyEight"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "syncStatus",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "blue.2048.defs#syncStatus",
-                                    ),
+                                SmolStr::new_static("syncStatus"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("blue.2048.defs#syncStatus"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "timesTwentyFortyEightBeenFound",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("timesTwentyFortyEightBeenFound"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "totalScore",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("totalScore"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

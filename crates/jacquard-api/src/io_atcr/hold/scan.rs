@@ -5,17 +5,28 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// Vulnerability scan results for a container manifest. Stored in the hold's embedded PDS. Record key is deterministic: the manifest digest hex without the 'sha256:' prefix, so re-scans upsert the existing record.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Scan<'a> {
     ///Count of critical severity vulnerabilities
@@ -26,76 +37,63 @@ pub struct Scan<'a> {
     pub low: i64,
     ///AT-URI of the scanned manifest (e.g., at://did:plc:xyz/io.atcr.manifest/abc123...)
     #[serde(borrow)]
-    pub manifest: jacquard_common::types::string::AtUri<'a>,
+    pub manifest: AtUri<'a>,
     ///Count of medium severity vulnerabilities
     pub medium: i64,
     ///Repository name (e.g., myapp)
     #[serde(borrow)]
-    pub repository: jacquard_common::CowStr<'a>,
+    pub repository: CowStr<'a>,
     ///SBOM blob (SPDX JSON format) uploaded to the hold's blob storage
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sbom_blob: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub sbom_blob: Option<BlobRef<'a>>,
     ///RFC3339 timestamp of when the scan completed
-    pub scanned_at: jacquard_common::types::string::Datetime,
+    pub scanned_at: Datetime,
     ///Version of the scanner that produced this result (e.g., atcr-scanner-v1.0.0)
     #[serde(borrow)]
-    pub scanner_version: jacquard_common::CowStr<'a>,
+    pub scanner_version: CowStr<'a>,
     ///Total vulnerability count
     pub total: i64,
     ///DID of the image owner
     #[serde(borrow)]
-    pub user_did: jacquard_common::types::string::Did<'a>,
+    pub user_did: Did<'a>,
     ///Grype vulnerability report blob (JSON) with full CVE details
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub vuln_report_blob: core::option::Option<
-        jacquard_common::types::blob::BlobRef<'a>,
-    >,
+    pub vuln_report_blob: Option<BlobRef<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ScanGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Scan<'a>,
 }
 
 impl<'a> Scan<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ScanRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ScanRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ScanRecord;
-impl jacquard_common::xrpc::XrpcResp for ScanRecord {
+impl XrpcResp for ScanRecord {
     const NSID: &'static str = "io.atcr.hold.scan";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ScanGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ScanGetRecordOutput<'_>> for Scan<'_> {
@@ -105,36 +103,32 @@ impl From<ScanGetRecordOutput<'_>> for Scan<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Scan<'_> {
+impl Collection for Scan<'_> {
     const NSID: &'static str = "io.atcr.hold.scan";
     type Record = ScanRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ScanRecord {
+impl Collection for ScanRecord {
     const NSID: &'static str = "io.atcr.hold.scan";
     type Record = ScanRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Scan<'a> {
+impl<'a> LexiconSchema for Scan<'a> {
     fn nsid() -> &'static str {
         "io.atcr.hold.scan"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_io_atcr_hold_scan()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.critical;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "critical",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("critical"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -143,10 +137,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Scan<'a> {
         {
             let value = &self.high;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "high",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("high"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -155,10 +147,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Scan<'a> {
         {
             let value = &self.low;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "low",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("low"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -167,10 +157,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Scan<'a> {
         {
             let value = &self.medium;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "medium",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("medium"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -180,10 +168,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Scan<'a> {
             let value = &self.repository;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "repository",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("repository"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -207,10 +193,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Scan<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "sbom_blob",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("sbom_blob"),
                         accepted: vec!["application/spdx+json".to_string()],
                         actual: mime.to_string(),
                     });
@@ -221,10 +205,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Scan<'a> {
             let value = &self.scanner_version;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "scanner_version",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("scanner_version"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -233,10 +215,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Scan<'a> {
         {
             let value = &self.total;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("total"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -260,10 +240,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Scan<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "vuln_report_blob",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("vuln_report_blob"),
                         accepted: vec![
                             "application/vnd.atcr.vulnerabilities+json".to_string()
                         ],
@@ -286,226 +264,226 @@ pub mod scan_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Low;
-        type Manifest;
-        type Medium;
-        type Total;
-        type Repository;
         type High;
-        type Critical;
-        type ScannerVersion;
+        type Manifest;
         type ScannedAt;
         type UserDid;
+        type Critical;
+        type Low;
+        type Medium;
+        type Total;
+        type ScannerVersion;
+        type Repository;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Low = Unset;
-        type Manifest = Unset;
-        type Medium = Unset;
-        type Total = Unset;
-        type Repository = Unset;
         type High = Unset;
-        type Critical = Unset;
-        type ScannerVersion = Unset;
+        type Manifest = Unset;
         type ScannedAt = Unset;
         type UserDid = Unset;
-    }
-    ///State transition - sets the `low` field to Set
-    pub struct SetLow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLow<S> {}
-    impl<S: State> State for SetLow<S> {
-        type Low = Set<members::low>;
-        type Manifest = S::Manifest;
-        type Medium = S::Medium;
-        type Total = S::Total;
-        type Repository = S::Repository;
-        type High = S::High;
-        type Critical = S::Critical;
-        type ScannerVersion = S::ScannerVersion;
-        type ScannedAt = S::ScannedAt;
-        type UserDid = S::UserDid;
-    }
-    ///State transition - sets the `manifest` field to Set
-    pub struct SetManifest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetManifest<S> {}
-    impl<S: State> State for SetManifest<S> {
-        type Low = S::Low;
-        type Manifest = Set<members::manifest>;
-        type Medium = S::Medium;
-        type Total = S::Total;
-        type Repository = S::Repository;
-        type High = S::High;
-        type Critical = S::Critical;
-        type ScannerVersion = S::ScannerVersion;
-        type ScannedAt = S::ScannedAt;
-        type UserDid = S::UserDid;
-    }
-    ///State transition - sets the `medium` field to Set
-    pub struct SetMedium<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMedium<S> {}
-    impl<S: State> State for SetMedium<S> {
-        type Low = S::Low;
-        type Manifest = S::Manifest;
-        type Medium = Set<members::medium>;
-        type Total = S::Total;
-        type Repository = S::Repository;
-        type High = S::High;
-        type Critical = S::Critical;
-        type ScannerVersion = S::ScannerVersion;
-        type ScannedAt = S::ScannedAt;
-        type UserDid = S::UserDid;
-    }
-    ///State transition - sets the `total` field to Set
-    pub struct SetTotal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotal<S> {}
-    impl<S: State> State for SetTotal<S> {
-        type Low = S::Low;
-        type Manifest = S::Manifest;
-        type Medium = S::Medium;
-        type Total = Set<members::total>;
-        type Repository = S::Repository;
-        type High = S::High;
-        type Critical = S::Critical;
-        type ScannerVersion = S::ScannerVersion;
-        type ScannedAt = S::ScannedAt;
-        type UserDid = S::UserDid;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type Low = S::Low;
-        type Manifest = S::Manifest;
-        type Medium = S::Medium;
-        type Total = S::Total;
-        type Repository = Set<members::repository>;
-        type High = S::High;
-        type Critical = S::Critical;
-        type ScannerVersion = S::ScannerVersion;
-        type ScannedAt = S::ScannedAt;
-        type UserDid = S::UserDid;
+        type Critical = Unset;
+        type Low = Unset;
+        type Medium = Unset;
+        type Total = Unset;
+        type ScannerVersion = Unset;
+        type Repository = Unset;
     }
     ///State transition - sets the `high` field to Set
     pub struct SetHigh<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHigh<S> {}
     impl<S: State> State for SetHigh<S> {
-        type Low = S::Low;
-        type Manifest = S::Manifest;
-        type Medium = S::Medium;
-        type Total = S::Total;
-        type Repository = S::Repository;
         type High = Set<members::high>;
-        type Critical = S::Critical;
-        type ScannerVersion = S::ScannerVersion;
+        type Manifest = S::Manifest;
         type ScannedAt = S::ScannedAt;
         type UserDid = S::UserDid;
-    }
-    ///State transition - sets the `critical` field to Set
-    pub struct SetCritical<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCritical<S> {}
-    impl<S: State> State for SetCritical<S> {
+        type Critical = S::Critical;
         type Low = S::Low;
-        type Manifest = S::Manifest;
         type Medium = S::Medium;
         type Total = S::Total;
-        type Repository = S::Repository;
-        type High = S::High;
-        type Critical = Set<members::critical>;
         type ScannerVersion = S::ScannerVersion;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `manifest` field to Set
+    pub struct SetManifest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetManifest<S> {}
+    impl<S: State> State for SetManifest<S> {
+        type High = S::High;
+        type Manifest = Set<members::manifest>;
         type ScannedAt = S::ScannedAt;
         type UserDid = S::UserDid;
-    }
-    ///State transition - sets the `scanner_version` field to Set
-    pub struct SetScannerVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScannerVersion<S> {}
-    impl<S: State> State for SetScannerVersion<S> {
+        type Critical = S::Critical;
         type Low = S::Low;
-        type Manifest = S::Manifest;
         type Medium = S::Medium;
         type Total = S::Total;
+        type ScannerVersion = S::ScannerVersion;
         type Repository = S::Repository;
-        type High = S::High;
-        type Critical = S::Critical;
-        type ScannerVersion = Set<members::scanner_version>;
-        type ScannedAt = S::ScannedAt;
-        type UserDid = S::UserDid;
     }
     ///State transition - sets the `scanned_at` field to Set
     pub struct SetScannedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScannedAt<S> {}
     impl<S: State> State for SetScannedAt<S> {
-        type Low = S::Low;
-        type Manifest = S::Manifest;
-        type Medium = S::Medium;
-        type Total = S::Total;
-        type Repository = S::Repository;
         type High = S::High;
-        type Critical = S::Critical;
-        type ScannerVersion = S::ScannerVersion;
+        type Manifest = S::Manifest;
         type ScannedAt = Set<members::scanned_at>;
         type UserDid = S::UserDid;
+        type Critical = S::Critical;
+        type Low = S::Low;
+        type Medium = S::Medium;
+        type Total = S::Total;
+        type ScannerVersion = S::ScannerVersion;
+        type Repository = S::Repository;
     }
     ///State transition - sets the `user_did` field to Set
     pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUserDid<S> {}
     impl<S: State> State for SetUserDid<S> {
-        type Low = S::Low;
-        type Manifest = S::Manifest;
-        type Medium = S::Medium;
-        type Total = S::Total;
-        type Repository = S::Repository;
         type High = S::High;
-        type Critical = S::Critical;
-        type ScannerVersion = S::ScannerVersion;
+        type Manifest = S::Manifest;
         type ScannedAt = S::ScannedAt;
         type UserDid = Set<members::user_did>;
+        type Critical = S::Critical;
+        type Low = S::Low;
+        type Medium = S::Medium;
+        type Total = S::Total;
+        type ScannerVersion = S::ScannerVersion;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `critical` field to Set
+    pub struct SetCritical<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCritical<S> {}
+    impl<S: State> State for SetCritical<S> {
+        type High = S::High;
+        type Manifest = S::Manifest;
+        type ScannedAt = S::ScannedAt;
+        type UserDid = S::UserDid;
+        type Critical = Set<members::critical>;
+        type Low = S::Low;
+        type Medium = S::Medium;
+        type Total = S::Total;
+        type ScannerVersion = S::ScannerVersion;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `low` field to Set
+    pub struct SetLow<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLow<S> {}
+    impl<S: State> State for SetLow<S> {
+        type High = S::High;
+        type Manifest = S::Manifest;
+        type ScannedAt = S::ScannedAt;
+        type UserDid = S::UserDid;
+        type Critical = S::Critical;
+        type Low = Set<members::low>;
+        type Medium = S::Medium;
+        type Total = S::Total;
+        type ScannerVersion = S::ScannerVersion;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `medium` field to Set
+    pub struct SetMedium<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMedium<S> {}
+    impl<S: State> State for SetMedium<S> {
+        type High = S::High;
+        type Manifest = S::Manifest;
+        type ScannedAt = S::ScannedAt;
+        type UserDid = S::UserDid;
+        type Critical = S::Critical;
+        type Low = S::Low;
+        type Medium = Set<members::medium>;
+        type Total = S::Total;
+        type ScannerVersion = S::ScannerVersion;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `total` field to Set
+    pub struct SetTotal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotal<S> {}
+    impl<S: State> State for SetTotal<S> {
+        type High = S::High;
+        type Manifest = S::Manifest;
+        type ScannedAt = S::ScannedAt;
+        type UserDid = S::UserDid;
+        type Critical = S::Critical;
+        type Low = S::Low;
+        type Medium = S::Medium;
+        type Total = Set<members::total>;
+        type ScannerVersion = S::ScannerVersion;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `scanner_version` field to Set
+    pub struct SetScannerVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScannerVersion<S> {}
+    impl<S: State> State for SetScannerVersion<S> {
+        type High = S::High;
+        type Manifest = S::Manifest;
+        type ScannedAt = S::ScannedAt;
+        type UserDid = S::UserDid;
+        type Critical = S::Critical;
+        type Low = S::Low;
+        type Medium = S::Medium;
+        type Total = S::Total;
+        type ScannerVersion = Set<members::scanner_version>;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type High = S::High;
+        type Manifest = S::Manifest;
+        type ScannedAt = S::ScannedAt;
+        type UserDid = S::UserDid;
+        type Critical = S::Critical;
+        type Low = S::Low;
+        type Medium = S::Medium;
+        type Total = S::Total;
+        type ScannerVersion = S::ScannerVersion;
+        type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `low` field
-        pub struct low(());
-        ///Marker type for the `manifest` field
-        pub struct manifest(());
-        ///Marker type for the `medium` field
-        pub struct medium(());
-        ///Marker type for the `total` field
-        pub struct total(());
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `high` field
         pub struct high(());
-        ///Marker type for the `critical` field
-        pub struct critical(());
-        ///Marker type for the `scanner_version` field
-        pub struct scanner_version(());
+        ///Marker type for the `manifest` field
+        pub struct manifest(());
         ///Marker type for the `scanned_at` field
         pub struct scanned_at(());
         ///Marker type for the `user_did` field
         pub struct user_did(());
+        ///Marker type for the `critical` field
+        pub struct critical(());
+        ///Marker type for the `low` field
+        pub struct low(());
+        ///Marker type for the `medium` field
+        pub struct medium(());
+        ///Marker type for the `total` field
+        pub struct total(());
+        ///Marker type for the `scanner_version` field
+        pub struct scanner_version(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ScanBuilder<'a, S: scan_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        Option<i64>,
+        Option<i64>,
+        Option<i64>,
+        Option<AtUri<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<BlobRef<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<Did<'a>>,
+        Option<BlobRef<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Scan<'a> {
@@ -519,7 +497,7 @@ impl<'a> ScanBuilder<'a, scan_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ScanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -534,7 +512,7 @@ impl<'a> ScanBuilder<'a, scan_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -549,11 +527,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScanBuilder<'a, scan_state::SetCritical<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ScanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -568,11 +546,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScanBuilder<'a, scan_state::SetHigh<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ScanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -587,11 +565,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScanBuilder<'a, scan_state::SetLow<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         ScanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -604,13 +582,13 @@ where
     /// Set the `manifest` field (required)
     pub fn manifest(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> ScanBuilder<'a, scan_state::SetManifest<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         ScanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -625,11 +603,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScanBuilder<'a, scan_state::SetMedium<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         ScanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -642,31 +620,25 @@ where
     /// Set the `repository` field (required)
     pub fn repository(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ScanBuilder<'a, scan_state::SetRepository<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         ScanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: scan_state::State> ScanBuilder<'a, S> {
     /// Set the `sbomBlob` field (optional)
-    pub fn sbom_blob(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
-    ) -> Self {
+    pub fn sbom_blob(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `sbomBlob` field to an Option value (optional)
-    pub fn maybe_sbom_blob(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_sbom_blob(mut self, value: Option<BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -680,13 +652,13 @@ where
     /// Set the `scannedAt` field (required)
     pub fn scanned_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ScanBuilder<'a, scan_state::SetScannedAt<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         ScanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -699,13 +671,13 @@ where
     /// Set the `scannerVersion` field (required)
     pub fn scanner_version(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ScanBuilder<'a, scan_state::SetScannerVersion<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         ScanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -720,11 +692,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScanBuilder<'a, scan_state::SetTotal<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = Option::Some(value.into());
         ScanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -737,31 +709,25 @@ where
     /// Set the `userDid` field (required)
     pub fn user_did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> ScanBuilder<'a, scan_state::SetUserDid<S>> {
-        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.10 = Option::Some(value.into());
         ScanBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: scan_state::State> ScanBuilder<'a, S> {
     /// Set the `vulnReportBlob` field (optional)
-    pub fn vuln_report_blob(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
-    ) -> Self {
+    pub fn vuln_report_blob(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
         self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `vulnReportBlob` field to an Option value (optional)
-    pub fn maybe_vuln_report_blob(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_vuln_report_blob(mut self, value: Option<BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.11 = value;
         self
     }
@@ -770,16 +736,16 @@ impl<'a, S: scan_state::State> ScanBuilder<'a, S> {
 impl<'a, S> ScanBuilder<'a, S>
 where
     S: scan_state::State,
-    S::Low: scan_state::IsSet,
-    S::Manifest: scan_state::IsSet,
-    S::Medium: scan_state::IsSet,
-    S::Total: scan_state::IsSet,
-    S::Repository: scan_state::IsSet,
     S::High: scan_state::IsSet,
-    S::Critical: scan_state::IsSet,
-    S::ScannerVersion: scan_state::IsSet,
+    S::Manifest: scan_state::IsSet,
     S::ScannedAt: scan_state::IsSet,
     S::UserDid: scan_state::IsSet,
+    S::Critical: scan_state::IsSet,
+    S::Low: scan_state::IsSet,
+    S::Medium: scan_state::IsSet,
+    S::Total: scan_state::IsSet,
+    S::ScannerVersion: scan_state::IsSet,
+    S::Repository: scan_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Scan<'a> {
@@ -802,7 +768,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -825,245 +791,149 @@ where
     }
 }
 
-fn lexicon_doc_io_atcr_hold_scan() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("io.atcr.hold.scan"),
-        revision: None,
-        description: None,
+fn lexicon_doc_io_atcr_hold_scan() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("io.atcr.hold.scan"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Vulnerability scan results for a container manifest. Stored in the hold's embedded PDS. Record key is deterministic: the manifest digest hex without the 'sha256:' prefix, so re-scans upsert the existing record.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("manifest"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("repository"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("userDid"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("critical"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("high"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("medium"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("low"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("total"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("scannerVersion"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("scannedAt")
+                                SmolStr::new_static("manifest"),
+                                SmolStr::new_static("repository"),
+                                SmolStr::new_static("userDid"),
+                                SmolStr::new_static("critical"),
+                                SmolStr::new_static("high"), SmolStr::new_static("medium"),
+                                SmolStr::new_static("low"), SmolStr::new_static("total"),
+                                SmolStr::new_static("scannerVersion"),
+                                SmolStr::new_static("scannedAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "critical",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("critical"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "high",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("high"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "low",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("low"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "manifest",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("manifest"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "AT-URI of the scanned manifest (e.g., at://did:plc:xyz/io.atcr.manifest/abc123...)",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "medium",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("medium"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "repository",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("repository"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Repository name (e.g., myapp)",
-                                        ),
+                                        CowStr::new_static("Repository name (e.g., myapp)"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(256usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "sbomBlob",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                    description: None,
-                                    accept: None,
-                                    max_size: None,
-                                }),
+                                SmolStr::new_static("sbomBlob"),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "scannedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("scannedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "RFC3339 timestamp of when the scan completed",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "scannerVersion",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("scannerVersion"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Version of the scanner that produced this result (e.g., atcr-scanner-v1.0.0)",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(64usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "total",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("total"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "userDid",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("userDid"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "DID of the image owner",
-                                        ),
+                                        CowStr::new_static("DID of the image owner"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "vulnReportBlob",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                    description: None,
-                                    accept: None,
-                                    max_size: None,
-                                }),
+                                SmolStr::new_static("vulnReportBlob"),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

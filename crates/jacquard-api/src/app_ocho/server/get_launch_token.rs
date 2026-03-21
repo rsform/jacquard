@@ -5,40 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLaunchToken<'a> {
     #[serde(borrow)]
-    pub aud: jacquard_common::types::string::Did<'a>,
+    pub aud: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLaunchTokenOutput<'a> {
     #[serde(borrow)]
-    pub token: jacquard_common::CowStr<'a>,
+    pub token: CowStr<'a>,
 }
 
-/// Response type for
-///app.ocho.server.getLaunchToken
+/// Response type for app.ocho.server.getLaunchToken
 pub struct GetLaunchTokenResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLaunchTokenResponse {
     const NSID: &'static str = "app.ocho.server.getLaunchToken";
@@ -53,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetLaunchToken<'a> {
     type Response = GetLaunchTokenResponse;
 }
 
-/// Endpoint type for
-///app.ocho.server.getLaunchToken
+/// Endpoint type for app.ocho.server.getLaunchToken
 pub struct GetLaunchTokenRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLaunchTokenRequest {
     const PATH: &'static str = "/xrpc/app.ocho.server.getLaunchToken";
@@ -97,11 +86,9 @@ pub mod get_launch_token_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetLaunchTokenBuilder<'a, S: get_launch_token_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetLaunchToken<'a> {
@@ -115,9 +102,9 @@ impl<'a> GetLaunchTokenBuilder<'a, get_launch_token_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetLaunchTokenBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -130,13 +117,13 @@ where
     /// Set the `aud` field (required)
     pub fn aud(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetLaunchTokenBuilder<'a, get_launch_token_state::SetAud<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetLaunchTokenBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

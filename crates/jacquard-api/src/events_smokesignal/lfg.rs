@@ -5,90 +5,83 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A Looking For Group record that broadcasts interest in finding activity partners within a geographic area.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Lfg<'a> {
     ///Whether the LFG is currently active and visible to others.
     pub active: bool,
     ///Record creation timestamp.
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///When the LFG expires and is no longer visible.
-    pub ends_at: jacquard_common::types::string::Datetime,
+    pub ends_at: Datetime,
     ///The geographic location for activity partner matching.
     #[serde(borrow)]
     pub location: LfgLocation<'a>,
     ///When the LFG becomes active.
-    pub starts_at: jacquard_common::types::string::Datetime,
+    pub starts_at: Datetime,
     ///Interest tags for matching with events and other users.
     #[serde(borrow)]
-    pub tags: Vec<jacquard_common::CowStr<'a>>,
+    pub tags: Vec<CowStr<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum LfgLocation<'a> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct LfgGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Lfg<'a>,
 }
 
 impl<'a> Lfg<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, LfgRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, LfgRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LfgRecord;
-impl jacquard_common::xrpc::XrpcResp for LfgRecord {
+impl XrpcResp for LfgRecord {
     const NSID: &'static str = "events.smokesignal.lfg";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = LfgGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<LfgGetRecordOutput<'_>> for Lfg<'_> {
@@ -98,37 +91,33 @@ impl From<LfgGetRecordOutput<'_>> for Lfg<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Lfg<'_> {
+impl Collection for Lfg<'_> {
     const NSID: &'static str = "events.smokesignal.lfg";
     type Record = LfgRecord;
 }
 
-impl jacquard_common::types::collection::Collection for LfgRecord {
+impl Collection for LfgRecord {
     const NSID: &'static str = "events.smokesignal.lfg";
     type Record = LfgRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Lfg<'a> {
+impl<'a> LexiconSchema for Lfg<'a> {
     fn nsid() -> &'static str {
         "events.smokesignal.lfg"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_events_smokesignal_lfg()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.tags;
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("tags"),
                     max: 10usize,
                     actual: value.len(),
                 });
@@ -138,10 +127,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Lfg<'a> {
             let value = &self.tags;
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "tags",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("tags"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -161,10 +148,10 @@ pub mod lfg_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Active;
         type Tags;
         type StartsAt;
         type EndsAt;
-        type Active;
         type Location;
         type CreatedAt;
     }
@@ -172,21 +159,32 @@ pub mod lfg_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Active = Unset;
         type Tags = Unset;
         type StartsAt = Unset;
         type EndsAt = Unset;
-        type Active = Unset;
         type Location = Unset;
         type CreatedAt = Unset;
+    }
+    ///State transition - sets the `active` field to Set
+    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActive<S> {}
+    impl<S: State> State for SetActive<S> {
+        type Active = Set<members::active>;
+        type Tags = S::Tags;
+        type StartsAt = S::StartsAt;
+        type EndsAt = S::EndsAt;
+        type Location = S::Location;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `tags` field to Set
     pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTags<S> {}
     impl<S: State> State for SetTags<S> {
+        type Active = S::Active;
         type Tags = Set<members::tags>;
         type StartsAt = S::StartsAt;
         type EndsAt = S::EndsAt;
-        type Active = S::Active;
         type Location = S::Location;
         type CreatedAt = S::CreatedAt;
     }
@@ -194,10 +192,10 @@ pub mod lfg_state {
     pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartsAt<S> {}
     impl<S: State> State for SetStartsAt<S> {
+        type Active = S::Active;
         type Tags = S::Tags;
         type StartsAt = Set<members::starts_at>;
         type EndsAt = S::EndsAt;
-        type Active = S::Active;
         type Location = S::Location;
         type CreatedAt = S::CreatedAt;
     }
@@ -205,21 +203,10 @@ pub mod lfg_state {
     pub struct SetEndsAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEndsAt<S> {}
     impl<S: State> State for SetEndsAt<S> {
+        type Active = S::Active;
         type Tags = S::Tags;
         type StartsAt = S::StartsAt;
         type EndsAt = Set<members::ends_at>;
-        type Active = S::Active;
-        type Location = S::Location;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `active` field to Set
-    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActive<S> {}
-    impl<S: State> State for SetActive<S> {
-        type Tags = S::Tags;
-        type StartsAt = S::StartsAt;
-        type EndsAt = S::EndsAt;
-        type Active = Set<members::active>;
         type Location = S::Location;
         type CreatedAt = S::CreatedAt;
     }
@@ -227,10 +214,10 @@ pub mod lfg_state {
     pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLocation<S> {}
     impl<S: State> State for SetLocation<S> {
+        type Active = S::Active;
         type Tags = S::Tags;
         type StartsAt = S::StartsAt;
         type EndsAt = S::EndsAt;
-        type Active = S::Active;
         type Location = Set<members::location>;
         type CreatedAt = S::CreatedAt;
     }
@@ -238,24 +225,24 @@ pub mod lfg_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type Active = S::Active;
         type Tags = S::Tags;
         type StartsAt = S::StartsAt;
         type EndsAt = S::EndsAt;
-        type Active = S::Active;
         type Location = S::Location;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `active` field
+        pub struct active(());
         ///Marker type for the `tags` field
         pub struct tags(());
         ///Marker type for the `starts_at` field
         pub struct starts_at(());
         ///Marker type for the `ends_at` field
         pub struct ends_at(());
-        ///Marker type for the `active` field
-        pub struct active(());
         ///Marker type for the `location` field
         pub struct location(());
         ///Marker type for the `created_at` field
@@ -265,16 +252,16 @@ pub mod lfg_state {
 
 /// Builder for constructing an instance of this type
 pub struct LfgBuilder<'a, S: lfg_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<LfgLocation<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        Option<bool>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<LfgLocation<'a>>,
+        Option<Datetime>,
+        Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Lfg<'a> {
@@ -288,9 +275,9 @@ impl<'a> LfgBuilder<'a, lfg_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LfgBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -305,11 +292,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> LfgBuilder<'a, lfg_state::SetActive<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         LfgBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -322,13 +309,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> LfgBuilder<'a, lfg_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         LfgBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -341,13 +328,13 @@ where
     /// Set the `endsAt` field (required)
     pub fn ends_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> LfgBuilder<'a, lfg_state::SetEndsAt<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         LfgBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -362,11 +349,11 @@ where
         mut self,
         value: impl Into<LfgLocation<'a>>,
     ) -> LfgBuilder<'a, lfg_state::SetLocation<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         LfgBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -379,13 +366,13 @@ where
     /// Set the `startsAt` field (required)
     pub fn starts_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> LfgBuilder<'a, lfg_state::SetStartsAt<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         LfgBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -398,13 +385,13 @@ where
     /// Set the `tags` field (required)
     pub fn tags(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> LfgBuilder<'a, lfg_state::SetTags<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         LfgBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -412,10 +399,10 @@ where
 impl<'a, S> LfgBuilder<'a, S>
 where
     S: lfg_state::State,
+    S::Active: lfg_state::IsSet,
     S::Tags: lfg_state::IsSet,
     S::StartsAt: lfg_state::IsSet,
     S::EndsAt: lfg_state::IsSet,
-    S::Active: lfg_state::IsSet,
     S::Location: lfg_state::IsSet,
     S::CreatedAt: lfg_state::IsSet,
 {
@@ -434,10 +421,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Lfg<'a> {
         Lfg {
             active: self.__unsafe_private_named.0.unwrap(),
@@ -451,169 +435,119 @@ where
     }
 }
 
-fn lexicon_doc_events_smokesignal_lfg() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("events.smokesignal.lfg"),
-        revision: None,
-        description: None,
+fn lexicon_doc_events_smokesignal_lfg() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("events.smokesignal.lfg"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A Looking For Group record that broadcasts interest in finding activity partners within a geographic area.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("location"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("tags"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("startsAt"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("endsAt"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("active")
+                                SmolStr::new_static("location"),
+                                SmolStr::new_static("tags"),
+                                SmolStr::new_static("startsAt"),
+                                SmolStr::new_static("endsAt"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("active")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "active",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
+                                SmolStr::new_static("active"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Record creation timestamp.",
-                                        ),
+                                        CowStr::new_static("Record creation timestamp."),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "endsAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("endsAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "When the LFG expires and is no longer visible.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "location",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                SmolStr::new_static("location"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The geographic location for activity partner matching.",
                                         ),
                                     ),
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("community.lexicon.location#geo"),
-                                        ::jacquard_common::CowStr::new_static("community.lexicon.location#hthree")
+                                        CowStr::new_static("community.lexicon.location#geo"),
+                                        CowStr::new_static("community.lexicon.location#hthree")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "startsAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("startsAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "When the LFG becomes active.",
-                                        ),
+                                        CowStr::new_static("When the LFG becomes active."),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "tags",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("tags"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Interest tags for matching with events and other users.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
+                                    items: LexArrayItem::String(LexString {
                                         max_length: Some(64usize),
-                                        min_graphemes: None,
                                         max_graphemes: Some(64usize),
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                        ..Default::default()
                                     }),
                                     min_length: Some(1usize),
                                     max_length: Some(10usize),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

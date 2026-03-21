@@ -5,67 +5,69 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::Datetime;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::app_chronosky::plan::redeem_ticket;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RedeemTicket<'a> {
     ///Ticket redemption code
     #[serde(borrow)]
-    pub code: jacquard_common::CowStr<'a>,
+    pub code: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RedeemTicketOutput<'a> {
     #[serde(borrow)]
-    pub assignment: crate::app_chronosky::plan::redeem_ticket::RedeemedAssignment<'a>,
+    pub assignment: redeem_ticket::RedeemedAssignment<'a>,
     ///Success message
     #[serde(borrow)]
-    pub message: jacquard_common::CowStr<'a>,
+    pub message: CowStr<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RedeemTicketError<'a> {
     /// Ticket code not found
     #[serde(rename = "TicketNotFound")]
-    TicketNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    TicketNotFound(Option<CowStr<'a>>),
     /// Ticket has already been redeemed
     #[serde(rename = "TicketAlreadyRedeemed")]
-    TicketAlreadyRedeemed(core::option::Option<jacquard_common::CowStr<'a>>),
+    TicketAlreadyRedeemed(Option<CowStr<'a>>),
     /// Ticket has expired
     #[serde(rename = "TicketExpired")]
-    TicketExpired(core::option::Option<jacquard_common::CowStr<'a>>),
+    TicketExpired(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for RedeemTicketError<'_> {
@@ -98,35 +100,27 @@ impl core::fmt::Display for RedeemTicketError<'_> {
 }
 
 /// Redeemed plan assignment.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RedeemedAssignment<'a> {
     ///Plan activation timestamp
-    pub activated_at: jacquard_common::types::string::Datetime,
+    pub activated_at: Datetime,
     ///Plan expiration timestamp
-    pub expires_at: jacquard_common::types::string::Datetime,
+    pub expires_at: Datetime,
     ///Plan assignment ID
     #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
+    pub id: CowStr<'a>,
     ///Plan ID
     #[serde(borrow)]
-    pub plan_id: jacquard_common::CowStr<'a>,
+    pub plan_id: CowStr<'a>,
     ///Plan assignment status
     #[serde(borrow)]
-    pub status: jacquard_common::CowStr<'a>,
+    pub status: CowStr<'a>,
 }
 
-/// Response type for
-///app.chronosky.plan.redeemTicket
+/// Response type for app.chronosky.plan.redeemTicket
 pub struct RedeemTicketResponse;
 impl jacquard_common::xrpc::XrpcResp for RedeemTicketResponse {
     const NSID: &'static str = "app.chronosky.plan.redeemTicket";
@@ -143,8 +137,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RedeemTicket<'a> {
     type Response = RedeemTicketResponse;
 }
 
-/// Endpoint type for
-///app.chronosky.plan.redeemTicket
+/// Endpoint type for app.chronosky.plan.redeemTicket
 pub struct RedeemTicketRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RedeemTicketRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.plan.redeemTicket";
@@ -155,27 +148,23 @@ impl jacquard_common::xrpc::XrpcEndpoint for RedeemTicketRequest {
     type Response = RedeemTicketResponse;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for RedeemedAssignment<'a> {
+impl<'a> LexiconSchema for RedeemedAssignment<'a> {
     fn nsid() -> &'static str {
         "app.chronosky.plan.redeemTicket"
     }
     fn def_name() -> &'static str {
         "redeemedAssignment"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_chronosky_plan_redeemTicket()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("id"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -185,10 +174,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RedeemedAssignment<'a> {
             let value = &self.plan_id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "plan_id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("plan_id"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -198,10 +185,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RedeemedAssignment<'a> {
             let value = &self.status;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "status",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("status"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -222,98 +207,98 @@ pub mod redeemed_assignment_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ExpiresAt;
+        type Id;
+        type Status;
         type ActivatedAt;
         type PlanId;
-        type Status;
-        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ExpiresAt = Unset;
+        type Id = Unset;
+        type Status = Unset;
         type ActivatedAt = Unset;
         type PlanId = Unset;
-        type Status = Unset;
-        type Id = Unset;
     }
     ///State transition - sets the `expires_at` field to Set
     pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
     impl<S: State> State for SetExpiresAt<S> {
         type ExpiresAt = Set<members::expires_at>;
+        type Id = S::Id;
+        type Status = S::Status;
         type ActivatedAt = S::ActivatedAt;
         type PlanId = S::PlanId;
-        type Status = S::Status;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `activated_at` field to Set
-    pub struct SetActivatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActivatedAt<S> {}
-    impl<S: State> State for SetActivatedAt<S> {
-        type ExpiresAt = S::ExpiresAt;
-        type ActivatedAt = Set<members::activated_at>;
-        type PlanId = S::PlanId;
-        type Status = S::Status;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `plan_id` field to Set
-    pub struct SetPlanId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlanId<S> {}
-    impl<S: State> State for SetPlanId<S> {
-        type ExpiresAt = S::ExpiresAt;
-        type ActivatedAt = S::ActivatedAt;
-        type PlanId = Set<members::plan_id>;
-        type Status = S::Status;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type ExpiresAt = S::ExpiresAt;
-        type ActivatedAt = S::ActivatedAt;
-        type PlanId = S::PlanId;
-        type Status = Set<members::status>;
-        type Id = S::Id;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
         type ExpiresAt = S::ExpiresAt;
+        type Id = Set<members::id>;
+        type Status = S::Status;
         type ActivatedAt = S::ActivatedAt;
         type PlanId = S::PlanId;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type ExpiresAt = S::ExpiresAt;
+        type Id = S::Id;
+        type Status = Set<members::status>;
+        type ActivatedAt = S::ActivatedAt;
+        type PlanId = S::PlanId;
+    }
+    ///State transition - sets the `activated_at` field to Set
+    pub struct SetActivatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActivatedAt<S> {}
+    impl<S: State> State for SetActivatedAt<S> {
+        type ExpiresAt = S::ExpiresAt;
+        type Id = S::Id;
         type Status = S::Status;
-        type Id = Set<members::id>;
+        type ActivatedAt = Set<members::activated_at>;
+        type PlanId = S::PlanId;
+    }
+    ///State transition - sets the `plan_id` field to Set
+    pub struct SetPlanId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlanId<S> {}
+    impl<S: State> State for SetPlanId<S> {
+        type ExpiresAt = S::ExpiresAt;
+        type Id = S::Id;
+        type Status = S::Status;
+        type ActivatedAt = S::ActivatedAt;
+        type PlanId = Set<members::plan_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `expires_at` field
         pub struct expires_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `status` field
+        pub struct status(());
         ///Marker type for the `activated_at` field
         pub struct activated_at(());
         ///Marker type for the `plan_id` field
         pub struct plan_id(());
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `id` field
-        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RedeemedAssignmentBuilder<'a, S: redeemed_assignment_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> RedeemedAssignment<'a> {
@@ -327,9 +312,9 @@ impl<'a> RedeemedAssignmentBuilder<'a, redeemed_assignment_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RedeemedAssignmentBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -342,13 +327,13 @@ where
     /// Set the `activatedAt` field (required)
     pub fn activated_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> RedeemedAssignmentBuilder<'a, redeemed_assignment_state::SetActivatedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         RedeemedAssignmentBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -361,13 +346,13 @@ where
     /// Set the `expiresAt` field (required)
     pub fn expires_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> RedeemedAssignmentBuilder<'a, redeemed_assignment_state::SetExpiresAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         RedeemedAssignmentBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -380,13 +365,13 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RedeemedAssignmentBuilder<'a, redeemed_assignment_state::SetId<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         RedeemedAssignmentBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -399,13 +384,13 @@ where
     /// Set the `planId` field (required)
     pub fn plan_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RedeemedAssignmentBuilder<'a, redeemed_assignment_state::SetPlanId<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         RedeemedAssignmentBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -418,13 +403,13 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RedeemedAssignmentBuilder<'a, redeemed_assignment_state::SetStatus<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         RedeemedAssignmentBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -433,10 +418,10 @@ impl<'a, S> RedeemedAssignmentBuilder<'a, S>
 where
     S: redeemed_assignment_state::State,
     S::ExpiresAt: redeemed_assignment_state::IsSet,
+    S::Id: redeemed_assignment_state::IsSet,
+    S::Status: redeemed_assignment_state::IsSet,
     S::ActivatedAt: redeemed_assignment_state::IsSet,
     S::PlanId: redeemed_assignment_state::IsSet,
-    S::Status: redeemed_assignment_state::IsSet,
-    S::Id: redeemed_assignment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RedeemedAssignment<'a> {
@@ -452,7 +437,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -468,199 +453,118 @@ where
     }
 }
 
-fn lexicon_doc_app_chronosky_plan_redeemTicket() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.chronosky.plan.redeemTicket"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_chronosky_plan_redeemTicket() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.chronosky.plan.redeemTicket"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
-                    description: None,
-                    parameters: None,
-                    input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
-                        description: None,
-                        encoding: ::jacquard_common::CowStr::new_static(
-                            "application/json",
-                        ),
+                SmolStr::new_static("main"),
+                LexUserType::XrpcProcedure(LexXrpcProcedure {
+                    input: Some(LexXrpcBody {
+                        encoding: CowStr::new_static("application/json"),
                         schema: Some(
-                            ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
-                                description: None,
-                                required: Some(
-                                    vec![
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static("code")
-                                    ],
-                                ),
-                                nullable: None,
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(vec![SmolStr::new_static("code")]),
                                 properties: {
                                     #[allow(unused_mut)]
-                                    let mut map = ::alloc::collections::BTreeMap::new();
+                                    let mut map = BTreeMap::new();
                                     map.insert(
-                                        ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                            "code",
-                                        ),
-                                        ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                        SmolStr::new_static("code"),
+                                        LexObjectProperty::String(LexString {
                                             description: Some(
-                                                ::jacquard_common::CowStr::new_static(
-                                                    "Ticket redemption code",
-                                                ),
+                                                CowStr::new_static("Ticket redemption code"),
                                             ),
-                                            format: None,
-                                            default: None,
                                             min_length: Some(1usize),
                                             max_length: Some(100usize),
-                                            min_graphemes: None,
-                                            max_graphemes: None,
-                                            r#enum: None,
-                                            r#const: None,
-                                            known_values: None,
+                                            ..Default::default()
                                         }),
                                     );
                                     map
                                 },
+                                ..Default::default()
                             }),
                         ),
+                        ..Default::default()
                     }),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "redeemedAssignment",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Redeemed plan assignment.",
-                        ),
-                    ),
+                SmolStr::new_static("redeemedAssignment"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Redeemed plan assignment.")),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("planId"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("activatedAt"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("expiresAt"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("status")
+                            SmolStr::new_static("id"), SmolStr::new_static("planId"),
+                            SmolStr::new_static("activatedAt"),
+                            SmolStr::new_static("expiresAt"),
+                            SmolStr::new_static("status")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "activatedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("activatedAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Plan activation timestamp",
-                                    ),
+                                    CowStr::new_static("Plan activation timestamp"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
+                                format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "expiresAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("expiresAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Plan expiration timestamp",
-                                    ),
+                                    CowStr::new_static("Plan expiration timestamp"),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
+                                format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("id"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Plan assignment ID"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("id"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Plan assignment ID")),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "planId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static("Plan ID"),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("planId"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Plan ID")),
                                 max_length: Some(100usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "status",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("status"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Plan assignment status",
-                                    ),
+                                    CowStr::new_static("Plan assignment status"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(20usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

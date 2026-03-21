@@ -5,39 +5,29 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct IsVerified<'a> {
     #[serde(borrow)]
-    pub domain: jacquard_common::CowStr<'a>,
+    pub domain: CowStr<'a>,
 }
 
 /// Whether the user is verified on that domain
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct IsVerifiedOutput<'a> {
     pub verified: bool,
 }
 
-/// Response type for
-///app.ocho.edu.isVerified
+/// Response type for app.ocho.edu.isVerified
 pub struct IsVerifiedResponse;
 impl jacquard_common::xrpc::XrpcResp for IsVerifiedResponse {
     const NSID: &'static str = "app.ocho.edu.isVerified";
@@ -52,8 +42,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for IsVerified<'a> {
     type Response = IsVerifiedResponse;
 }
 
-/// Endpoint type for
-///app.ocho.edu.isVerified
+/// Endpoint type for app.ocho.edu.isVerified
 pub struct IsVerifiedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for IsVerifiedRequest {
     const PATH: &'static str = "/xrpc/app.ocho.edu.isVerified";
@@ -96,9 +85,9 @@ pub mod is_verified_state {
 
 /// Builder for constructing an instance of this type
 pub struct IsVerifiedBuilder<'a, S: is_verified_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> IsVerified<'a> {
@@ -112,9 +101,9 @@ impl<'a> IsVerifiedBuilder<'a, is_verified_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IsVerifiedBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -127,13 +116,13 @@ where
     /// Set the `domain` field (required)
     pub fn domain(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> IsVerifiedBuilder<'a, is_verified_state::SetDomain<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         IsVerifiedBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

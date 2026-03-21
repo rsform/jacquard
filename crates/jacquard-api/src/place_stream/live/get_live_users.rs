@@ -5,47 +5,35 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::Datetime;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::livestream::LivestreamView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLiveUsers {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub before: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub before: Option<Datetime>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLiveUsersOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub streams: core::option::Option<
-        Vec<crate::place_stream::livestream::LivestreamView<'a>>,
-    >,
+    pub streams: Option<Vec<LivestreamView<'a>>>,
 }
 
-/// Response type for
-///place.stream.live.getLiveUsers
+/// Response type for place.stream.live.getLiveUsers
 pub struct GetLiveUsersResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLiveUsersResponse {
     const NSID: &'static str = "place.stream.live.getLiveUsers";
@@ -60,8 +48,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetLiveUsers {
     type Response = GetLiveUsersResponse;
 }
 
-/// Endpoint type for
-///place.stream.live.getLiveUsers
+/// Endpoint type for place.stream.live.getLiveUsers
 pub struct GetLiveUsersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLiveUsersRequest {
     const PATH: &'static str = "/xrpc/place.stream.live.getLiveUsers";
@@ -70,7 +57,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetLiveUsersRequest {
     type Response = GetLiveUsersResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
@@ -95,11 +82,8 @@ pub mod get_live_users_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetLiveUsersBuilder<S: get_live_users_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<i64>,
-    ),
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Datetime>, Option<i64>),
 }
 
 impl GetLiveUsers {
@@ -113,7 +97,7 @@ impl GetLiveUsersBuilder<get_live_users_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetLiveUsersBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
         }
     }
@@ -121,18 +105,12 @@ impl GetLiveUsersBuilder<get_live_users_state::Empty> {
 
 impl<S: get_live_users_state::State> GetLiveUsersBuilder<S> {
     /// Set the `before` field (optional)
-    pub fn before(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn before(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `before` field to an Option value (optional)
-    pub fn maybe_before(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_before(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }

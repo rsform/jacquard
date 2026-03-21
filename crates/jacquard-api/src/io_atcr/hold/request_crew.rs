@@ -5,66 +5,57 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RequestCrew<'a> {
     ///Requested permissions (default: ['blob:read', 'blob:write'])
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub permissions: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    ///Requested role (default: 'member') Defaults to `"member"`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub permissions: Option<Vec<CowStr<'a>>>,
+    ///Requested role (default: 'member')  Defaults to `"member"`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_request_crew_role")]
     #[serde(borrow)]
-    pub role: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub role: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RequestCrewOutput<'a> {
     ///CID of the crew record
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     ///Human-readable status message
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: Option<CowStr<'a>>,
     ///Result status
     #[serde(borrow)]
     pub status: RequestCrewOutputStatus<'a>,
     ///AT-URI of the crew record (if created or already exists)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: Option<AtUri<'a>>,
 }
 
 /// Result status
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RequestCrewOutputStatus<'a> {
     Created,
     AlreadyMember,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> RequestCrewOutputStatus<'a> {
@@ -82,7 +73,7 @@ impl<'a> From<&'a str> for RequestCrewOutputStatus<'a> {
         match s {
             "created" => Self::Created,
             "already_member" => Self::AlreadyMember,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -92,7 +83,7 @@ impl<'a> From<String> for RequestCrewOutputStatus<'a> {
         match s.as_str() {
             "created" => Self::Created,
             "already_member" => Self::AlreadyMember,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -152,25 +143,27 @@ impl jacquard_common::IntoStatic for RequestCrewOutputStatus<'_> {
     }
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RequestCrewError<'a> {
     #[serde(rename = "AuthRequired")]
-    AuthRequired(core::option::Option<jacquard_common::CowStr<'a>>),
+    AuthRequired(Option<CowStr<'a>>),
     #[serde(rename = "RegistrationDisabled")]
-    RegistrationDisabled(core::option::Option<jacquard_common::CowStr<'a>>),
+    RegistrationDisabled(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for RequestCrewError<'_> {
@@ -195,8 +188,7 @@ impl core::fmt::Display for RequestCrewError<'_> {
     }
 }
 
-/// Response type for
-///io.atcr.hold.requestCrew
+/// Response type for io.atcr.hold.requestCrew
 pub struct RequestCrewResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestCrewResponse {
     const NSID: &'static str = "io.atcr.hold.requestCrew";
@@ -213,8 +205,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RequestCrew<'a> {
     type Response = RequestCrewResponse;
 }
 
-/// Endpoint type for
-///io.atcr.hold.requestCrew
+/// Endpoint type for io.atcr.hold.requestCrew
 pub struct RequestCrewRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestCrewRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.requestCrew";
@@ -225,8 +216,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for RequestCrewRequest {
     type Response = RequestCrewResponse;
 }
 
-fn _default_request_crew_role() -> core::option::Option<
-    jacquard_common::CowStr<'static>,
-> {
-    Some(jacquard_common::CowStr::from("member"))
+fn _default_request_crew_role() -> Option<CowStr<'static>> {
+    Some(CowStr::from("member"))
 }

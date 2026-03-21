@@ -5,40 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetToken<'a> {
     #[serde(borrow)]
-    pub aud: jacquard_common::types::string::Did<'a>,
+    pub aud: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTokenOutput<'a> {
     #[serde(borrow)]
-    pub token: jacquard_common::CowStr<'a>,
+    pub token: CowStr<'a>,
 }
 
-/// Response type for
-///app.ocho.server.getToken
+/// Response type for app.ocho.server.getToken
 pub struct GetTokenResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTokenResponse {
     const NSID: &'static str = "app.ocho.server.getToken";
@@ -53,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetToken<'a> {
     type Response = GetTokenResponse;
 }
 
-/// Endpoint type for
-///app.ocho.server.getToken
+/// Endpoint type for app.ocho.server.getToken
 pub struct GetTokenRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTokenRequest {
     const PATH: &'static str = "/xrpc/app.ocho.server.getToken";
@@ -97,11 +86,9 @@ pub mod get_token_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetTokenBuilder<'a, S: get_token_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetToken<'a> {
@@ -115,9 +102,9 @@ impl<'a> GetTokenBuilder<'a, get_token_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetTokenBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -130,13 +117,13 @@ where
     /// Set the `aud` field (required)
     pub fn aud(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetTokenBuilder<'a, get_token_state::SetAud<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetTokenBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

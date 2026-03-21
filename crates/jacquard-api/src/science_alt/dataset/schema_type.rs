@@ -5,17 +5,12 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use jacquard_common::CowStr;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 /// JSON Schema Draft 7 format for sample type definitions. When schemaType is 'jsonSchema', the schema field must contain an object conforming to science.alt.dataset.schema#jsonSchemaFormat.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct JsonSchema;
 impl core::fmt::Display for JsonSchema {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -24,10 +19,11 @@ impl core::fmt::Display for JsonSchema {
 }
 
 /// Schema type identifier for atdata sample definitions. Known values correspond to token definitions in this Lexicon. New schema types can be added as tokens without breaking changes.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SchemaType<'a> {
     JsonSchema,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> SchemaType<'a> {
@@ -43,7 +39,7 @@ impl<'a> From<&'a str> for SchemaType<'a> {
     fn from(s: &'a str) -> Self {
         match s {
             "jsonSchema" => Self::JsonSchema,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -52,7 +48,7 @@ impl<'a> From<String> for SchemaType<'a> {
     fn from(s: String) -> Self {
         match s.as_str() {
             "jsonSchema" => Self::JsonSchema,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }

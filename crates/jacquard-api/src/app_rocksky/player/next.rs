@@ -5,36 +5,24 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct NextParams<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub player_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub player_id: Option<CowStr<'a>>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct Next;
-/// Response type for
-///app.rocksky.player.next
+/// Response type for app.rocksky.player.next
 pub struct NextResponse;
 impl jacquard_common::xrpc::XrpcResp for NextResponse {
     const NSID: &'static str = "app.rocksky.player.next";
@@ -51,8 +39,7 @@ impl jacquard_common::xrpc::XrpcRequest for Next {
     type Response = NextResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.player.next
+/// Endpoint type for app.rocksky.player.next
 pub struct NextRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for NextRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.player.next";
@@ -84,9 +71,9 @@ pub mod next_params_state {
 
 /// Builder for constructing an instance of this type
 pub struct NextParamsBuilder<'a, S: next_params_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> NextParams<'a> {
@@ -100,27 +87,21 @@ impl<'a> NextParamsBuilder<'a, next_params_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NextParamsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: next_params_state::State> NextParamsBuilder<'a, S> {
     /// Set the `playerId` field (optional)
-    pub fn player_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn player_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `playerId` field to an Option value (optional)
-    pub fn maybe_player_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_player_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }

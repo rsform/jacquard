@@ -5,25 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::open_union]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteSessionError<'a> {
     #[serde(rename = "InvalidToken")]
-    InvalidToken(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidToken(Option<CowStr<'a>>),
     #[serde(rename = "ExpiredToken")]
-    ExpiredToken(core::option::Option<jacquard_common::CowStr<'a>>),
+    ExpiredToken(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteSessionError<'_> {
@@ -49,19 +55,10 @@ impl core::fmt::Display for DeleteSessionError<'_> {
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct DeleteSession;
-/// Response type for
-///com.atproto.server.deleteSession
+/// Response type for com.atproto.server.deleteSession
 pub struct DeleteSessionResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteSessionResponse {
     const NSID: &'static str = "com.atproto.server.deleteSession";
@@ -78,8 +75,7 @@ impl jacquard_common::xrpc::XrpcRequest for DeleteSession {
     type Response = DeleteSessionResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.deleteSession
+/// Endpoint type for com.atproto.server.deleteSession
 pub struct DeleteSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteSessionRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.deleteSession";

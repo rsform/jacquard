@@ -5,37 +5,26 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_chronosky::plan::get_assignment::PlanAssignment;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListAssignmentsOutput<'a> {
     ///List of plan assignments
     #[serde(borrow)]
-    pub assignments: Vec<crate::app_chronosky::plan::get_assignment::PlanAssignment<'a>>,
+    pub assignments: Vec<PlanAssignment<'a>>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct ListAssignments;
-/// Response type for
-///app.chronosky.plan.listAssignments
+/// Response type for app.chronosky.plan.listAssignments
 pub struct ListAssignmentsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListAssignmentsResponse {
     const NSID: &'static str = "app.chronosky.plan.listAssignments";
@@ -50,8 +39,7 @@ impl jacquard_common::xrpc::XrpcRequest for ListAssignments {
     type Response = ListAssignmentsResponse;
 }
 
-/// Endpoint type for
-///app.chronosky.plan.listAssignments
+/// Endpoint type for app.chronosky.plan.listAssignments
 pub struct ListAssignmentsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListAssignmentsRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.plan.listAssignments";

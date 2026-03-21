@@ -5,42 +5,33 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Missing<'a> {
     ///Path segments identifying what is missing
     #[serde(borrow)]
-    pub path: Vec<jacquard_common::CowStr<'a>>,
+    pub path: Vec<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct MissingOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
+    pub value: Response<'a>,
 }
 
-/// Response type for
-///at.inlay.Missing
+/// Response type for at.inlay.Missing
 pub struct MissingResponse;
 impl jacquard_common::xrpc::XrpcResp for MissingResponse {
     const NSID: &'static str = "at.inlay.Missing";
@@ -57,8 +48,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Missing<'a> {
     type Response = MissingResponse;
 }
 
-/// Endpoint type for
-///at.inlay.Missing
+/// Endpoint type for at.inlay.Missing
 pub struct MissingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MissingRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Missing";
@@ -103,9 +93,9 @@ pub mod missing_state {
 
 /// Builder for constructing an instance of this type
 pub struct MissingBuilder<'a, S: missing_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<CowStr<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Missing<'a> {
@@ -119,9 +109,9 @@ impl<'a> MissingBuilder<'a, missing_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MissingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -134,13 +124,13 @@ where
     /// Set the `path` field (required)
     pub fn path(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> MissingBuilder<'a, missing_state::SetPath<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         MissingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -160,7 +150,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

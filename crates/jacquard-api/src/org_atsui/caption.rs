@@ -5,41 +5,32 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Caption<'a> {
     #[serde(borrow)]
-    pub children: jacquard_common::types::value::Data<'a>,
+    pub children: Data<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CaptionOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
+    pub value: Response<'a>,
 }
 
-/// Response type for
-///org.atsui.Caption
+/// Response type for org.atsui.Caption
 pub struct CaptionResponse;
 impl jacquard_common::xrpc::XrpcResp for CaptionResponse {
     const NSID: &'static str = "org.atsui.Caption";
@@ -56,8 +47,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Caption<'a> {
     type Response = CaptionResponse;
 }
 
-/// Endpoint type for
-///org.atsui.Caption
+/// Endpoint type for org.atsui.Caption
 pub struct CaptionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CaptionRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Caption";
@@ -102,11 +92,9 @@ pub mod caption_state {
 
 /// Builder for constructing an instance of this type
 pub struct CaptionBuilder<'a, S: caption_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Data<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Caption<'a> {
@@ -120,9 +108,9 @@ impl<'a> CaptionBuilder<'a, caption_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CaptionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -135,13 +123,13 @@ where
     /// Set the `children` field (required)
     pub fn children(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> CaptionBuilder<'a, caption_state::SetChildren<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CaptionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -161,10 +149,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Caption<'a> {
         Caption {
             children: self.__unsafe_private_named.0.unwrap(),

@@ -5,48 +5,47 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ConfirmEmail<'a> {
     #[serde(borrow)]
-    pub email: jacquard_common::CowStr<'a>,
+    pub email: CowStr<'a>,
     #[serde(borrow)]
-    pub token: jacquard_common::CowStr<'a>,
+    pub token: CowStr<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ConfirmEmailError<'a> {
     #[serde(rename = "AccountNotFound")]
-    AccountNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    AccountNotFound(Option<CowStr<'a>>),
     #[serde(rename = "ExpiredToken")]
-    ExpiredToken(core::option::Option<jacquard_common::CowStr<'a>>),
+    ExpiredToken(Option<CowStr<'a>>),
     #[serde(rename = "InvalidToken")]
-    InvalidToken(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidToken(Option<CowStr<'a>>),
     #[serde(rename = "InvalidEmail")]
-    InvalidEmail(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidEmail(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for ConfirmEmailError<'_> {
@@ -85,8 +84,7 @@ impl core::fmt::Display for ConfirmEmailError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.server.confirmEmail
+/// Response type for com.atproto.server.confirmEmail
 pub struct ConfirmEmailResponse;
 impl jacquard_common::xrpc::XrpcResp for ConfirmEmailResponse {
     const NSID: &'static str = "com.atproto.server.confirmEmail";
@@ -103,8 +101,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ConfirmEmail<'a> {
     type Response = ConfirmEmailResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.confirmEmail
+/// Endpoint type for com.atproto.server.confirmEmail
 pub struct ConfirmEmailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ConfirmEmailRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.confirmEmail";

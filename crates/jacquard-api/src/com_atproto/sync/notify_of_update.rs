@@ -5,26 +5,22 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct NotifyOfUpdate<'a> {
     ///Hostname of the current service (usually a PDS) that is notifying of update.
     #[serde(borrow)]
-    pub hostname: jacquard_common::CowStr<'a>,
+    pub hostname: CowStr<'a>,
 }
 
-/// Response type for
-///com.atproto.sync.notifyOfUpdate
+/// Response type for com.atproto.sync.notifyOfUpdate
 pub struct NotifyOfUpdateResponse;
 impl jacquard_common::xrpc::XrpcResp for NotifyOfUpdateResponse {
     const NSID: &'static str = "com.atproto.sync.notifyOfUpdate";
@@ -41,8 +37,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for NotifyOfUpdate<'a> {
     type Response = NotifyOfUpdateResponse;
 }
 
-/// Endpoint type for
-///com.atproto.sync.notifyOfUpdate
+/// Endpoint type for com.atproto.sync.notifyOfUpdate
 pub struct NotifyOfUpdateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for NotifyOfUpdateRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.notifyOfUpdate";

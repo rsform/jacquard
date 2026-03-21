@@ -5,46 +5,39 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, Tid};
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRepoStatus<'a> {
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRepoStatusOutput<'a> {
     pub active: bool,
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
     ///Optional field, the current rev of the repo, if active=true
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub rev: core::option::Option<jacquard_common::types::string::Tid>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rev: Option<Tid>,
     ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: core::option::Option<GetRepoStatusOutputStatus<'a>>,
+    pub status: Option<GetRepoStatusOutputStatus<'a>>,
 }
 
 /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GetRepoStatusOutputStatus<'a> {
     Takendown,
@@ -53,7 +46,7 @@ pub enum GetRepoStatusOutputStatus<'a> {
     Deactivated,
     Desynchronized,
     Throttled,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> GetRepoStatusOutputStatus<'a> {
@@ -79,7 +72,7 @@ impl<'a> From<&'a str> for GetRepoStatusOutputStatus<'a> {
             "deactivated" => Self::Deactivated,
             "desynchronized" => Self::Desynchronized,
             "throttled" => Self::Throttled,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -93,7 +86,7 @@ impl<'a> From<String> for GetRepoStatusOutputStatus<'a> {
             "deactivated" => Self::Deactivated,
             "desynchronized" => Self::Desynchronized,
             "throttled" => Self::Throttled,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -159,23 +152,25 @@ impl jacquard_common::IntoStatic for GetRepoStatusOutputStatus<'_> {
     }
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetRepoStatusError<'a> {
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetRepoStatusError<'_> {
@@ -193,8 +188,7 @@ impl core::fmt::Display for GetRepoStatusError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.sync.getRepoStatus
+/// Response type for com.atproto.sync.getRepoStatus
 pub struct GetRepoStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRepoStatusResponse {
     const NSID: &'static str = "com.atproto.sync.getRepoStatus";
@@ -209,8 +203,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepoStatus<'a> {
     type Response = GetRepoStatusResponse;
 }
 
-/// Endpoint type for
-///com.atproto.sync.getRepoStatus
+/// Endpoint type for com.atproto.sync.getRepoStatus
 pub struct GetRepoStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRepoStatusRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.getRepoStatus";
@@ -253,11 +246,9 @@ pub mod get_repo_status_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetRepoStatusBuilder<'a, S: get_repo_status_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetRepoStatus<'a> {
@@ -271,9 +262,9 @@ impl<'a> GetRepoStatusBuilder<'a, get_repo_status_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetRepoStatusBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -286,13 +277,13 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetRepoStatusBuilder<'a, get_repo_status_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetRepoStatusBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

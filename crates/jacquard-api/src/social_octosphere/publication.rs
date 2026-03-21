@@ -5,57 +5,65 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// Scientific publication record bridged from Octopus.ac via Octosphere. Represents a single version of an Octopus publication.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Publication<'a> {
     ///Public Octopus URL for the publication version.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub canonical_url: core::option::Option<
-        jacquard_common::types::string::UriValue<'a>,
-    >,
+    pub canonical_url: Option<UriValue<'a>>,
     ///List of citation strings extracted from references.
     #[serde(borrow)]
-    pub citations: Vec<jacquard_common::CowStr<'a>>,
+    pub citations: Vec<CowStr<'a>>,
     ///Raw HTML content body.
     #[serde(borrow)]
-    pub content_html: jacquard_common::CowStr<'a>,
+    pub content_html: CowStr<'a>,
     ///Plain text content for compact consumption.
     #[serde(borrow)]
-    pub content_text: jacquard_common::CowStr<'a>,
+    pub content_text: CowStr<'a>,
     ///ISO timestamp of when the publication was created in Octopus.
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///Publication version DOI URL, if present.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub doi: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub doi: Option<UriValue<'a>>,
     ///Publication ids that link to this record.
     #[serde(borrow)]
-    pub linked_from: Vec<jacquard_common::CowStr<'a>>,
+    pub linked_from: Vec<CowStr<'a>>,
     ///Publication ids this record links to.
     #[serde(borrow)]
-    pub linked_to: Vec<jacquard_common::CowStr<'a>>,
+    pub linked_to: Vec<CowStr<'a>>,
     ///Octopus publication id (UUID).
     #[serde(borrow)]
-    pub octopus_id: jacquard_common::CowStr<'a>,
+    pub octopus_id: CowStr<'a>,
     ///ORCID of the publication owner (if available).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub owner_orcid: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub owner_orcid: Option<CowStr<'a>>,
     ///Publication id this peer review references, if applicable.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub peer_review_of: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub peer_review_of: Option<CowStr<'a>>,
     ///Octopus publication type.
     #[serde(borrow)]
     pub publication_type: PublicationPublicationType<'a>,
@@ -64,15 +72,16 @@ pub struct Publication<'a> {
     pub status: PublicationStatus<'a>,
     ///Publication title.
     #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
+    pub title: CowStr<'a>,
     ///ISO timestamp of when the publication was last updated in Octopus.
-    pub updated_at: jacquard_common::types::string::Datetime,
+    pub updated_at: Datetime,
     ///Octopus publication version id (UUID).
     #[serde(borrow)]
-    pub version_id: jacquard_common::CowStr<'a>,
+    pub version_id: CowStr<'a>,
 }
 
 /// Octopus publication type.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PublicationPublicationType<'a> {
     ResearchProblem,
@@ -83,7 +92,7 @@ pub enum PublicationPublicationType<'a> {
     RealWorldApplication,
     Data,
     PeerReview,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> PublicationPublicationType<'a> {
@@ -113,7 +122,7 @@ impl<'a> From<&'a str> for PublicationPublicationType<'a> {
             "REAL_WORLD_APPLICATION" => Self::RealWorldApplication,
             "DATA" => Self::Data,
             "PEER_REVIEW" => Self::PeerReview,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -129,7 +138,7 @@ impl<'a> From<String> for PublicationPublicationType<'a> {
             "REAL_WORLD_APPLICATION" => Self::RealWorldApplication,
             "DATA" => Self::Data,
             "PEER_REVIEW" => Self::PeerReview,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -204,12 +213,13 @@ impl jacquard_common::IntoStatic for PublicationPublicationType<'_> {
 }
 
 /// Octopus publication status (expected LIVE).
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PublicationStatus<'a> {
     Live,
     Draft,
     Archived,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> PublicationStatus<'a> {
@@ -229,7 +239,7 @@ impl<'a> From<&'a str> for PublicationStatus<'a> {
             "LIVE" => Self::Live,
             "DRAFT" => Self::Draft,
             "ARCHIVED" => Self::Archived,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -240,7 +250,7 @@ impl<'a> From<String> for PublicationStatus<'a> {
             "LIVE" => Self::Live,
             "DRAFT" => Self::Draft,
             "ARCHIVED" => Self::Archived,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -298,47 +308,36 @@ impl jacquard_common::IntoStatic for PublicationStatus<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PublicationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Publication<'a>,
 }
 
 impl<'a> Publication<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PublicationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, PublicationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PublicationRecord;
-impl jacquard_common::xrpc::XrpcResp for PublicationRecord {
+impl XrpcResp for PublicationRecord {
     const NSID: &'static str = "social.octosphere.publication";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = PublicationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<PublicationGetRecordOutput<'_>> for Publication<'_> {
@@ -348,37 +347,33 @@ impl From<PublicationGetRecordOutput<'_>> for Publication<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Publication<'_> {
+impl Collection for Publication<'_> {
     const NSID: &'static str = "social.octosphere.publication";
     type Record = PublicationRecord;
 }
 
-impl jacquard_common::types::collection::Collection for PublicationRecord {
+impl Collection for PublicationRecord {
     const NSID: &'static str = "social.octosphere.publication";
     type Record = PublicationRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
+impl<'a> LexiconSchema for Publication<'a> {
     fn nsid() -> &'static str {
         "social.octosphere.publication"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_social_octosphere_publication()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("title"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -398,292 +393,292 @@ pub mod publication_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PublicationType;
-        type ContentText;
-        type CreatedAt;
-        type Status;
-        type ContentHtml;
-        type LinkedTo;
-        type OctopusId;
-        type VersionId;
-        type Title;
         type Citations;
-        type LinkedFrom;
+        type LinkedTo;
+        type VersionId;
+        type Status;
         type UpdatedAt;
+        type LinkedFrom;
+        type CreatedAt;
+        type ContentHtml;
+        type ContentText;
+        type PublicationType;
+        type OctopusId;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PublicationType = Unset;
-        type ContentText = Unset;
-        type CreatedAt = Unset;
-        type Status = Unset;
-        type ContentHtml = Unset;
-        type LinkedTo = Unset;
-        type OctopusId = Unset;
-        type VersionId = Unset;
-        type Title = Unset;
         type Citations = Unset;
-        type LinkedFrom = Unset;
+        type LinkedTo = Unset;
+        type VersionId = Unset;
+        type Status = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `publication_type` field to Set
-    pub struct SetPublicationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublicationType<S> {}
-    impl<S: State> State for SetPublicationType<S> {
-        type PublicationType = Set<members::publication_type>;
-        type ContentText = S::ContentText;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type OctopusId = S::OctopusId;
-        type VersionId = S::VersionId;
-        type Title = S::Title;
-        type Citations = S::Citations;
-        type LinkedFrom = S::LinkedFrom;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `content_text` field to Set
-    pub struct SetContentText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContentText<S> {}
-    impl<S: State> State for SetContentText<S> {
-        type PublicationType = S::PublicationType;
-        type ContentText = Set<members::content_text>;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type OctopusId = S::OctopusId;
-        type VersionId = S::VersionId;
-        type Title = S::Title;
-        type Citations = S::Citations;
-        type LinkedFrom = S::LinkedFrom;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type PublicationType = S::PublicationType;
-        type ContentText = S::ContentText;
-        type CreatedAt = Set<members::created_at>;
-        type Status = S::Status;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type OctopusId = S::OctopusId;
-        type VersionId = S::VersionId;
-        type Title = S::Title;
-        type Citations = S::Citations;
-        type LinkedFrom = S::LinkedFrom;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type PublicationType = S::PublicationType;
-        type ContentText = S::ContentText;
-        type CreatedAt = S::CreatedAt;
-        type Status = Set<members::status>;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type OctopusId = S::OctopusId;
-        type VersionId = S::VersionId;
-        type Title = S::Title;
-        type Citations = S::Citations;
-        type LinkedFrom = S::LinkedFrom;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `content_html` field to Set
-    pub struct SetContentHtml<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContentHtml<S> {}
-    impl<S: State> State for SetContentHtml<S> {
-        type PublicationType = S::PublicationType;
-        type ContentText = S::ContentText;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type ContentHtml = Set<members::content_html>;
-        type LinkedTo = S::LinkedTo;
-        type OctopusId = S::OctopusId;
-        type VersionId = S::VersionId;
-        type Title = S::Title;
-        type Citations = S::Citations;
-        type LinkedFrom = S::LinkedFrom;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `linked_to` field to Set
-    pub struct SetLinkedTo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLinkedTo<S> {}
-    impl<S: State> State for SetLinkedTo<S> {
-        type PublicationType = S::PublicationType;
-        type ContentText = S::ContentText;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = Set<members::linked_to>;
-        type OctopusId = S::OctopusId;
-        type VersionId = S::VersionId;
-        type Title = S::Title;
-        type Citations = S::Citations;
-        type LinkedFrom = S::LinkedFrom;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `octopus_id` field to Set
-    pub struct SetOctopusId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOctopusId<S> {}
-    impl<S: State> State for SetOctopusId<S> {
-        type PublicationType = S::PublicationType;
-        type ContentText = S::ContentText;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type OctopusId = Set<members::octopus_id>;
-        type VersionId = S::VersionId;
-        type Title = S::Title;
-        type Citations = S::Citations;
-        type LinkedFrom = S::LinkedFrom;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `version_id` field to Set
-    pub struct SetVersionId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersionId<S> {}
-    impl<S: State> State for SetVersionId<S> {
-        type PublicationType = S::PublicationType;
-        type ContentText = S::ContentText;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type OctopusId = S::OctopusId;
-        type VersionId = Set<members::version_id>;
-        type Title = S::Title;
-        type Citations = S::Citations;
-        type LinkedFrom = S::LinkedFrom;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type PublicationType = S::PublicationType;
-        type ContentText = S::ContentText;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type OctopusId = S::OctopusId;
-        type VersionId = S::VersionId;
-        type Title = Set<members::title>;
-        type Citations = S::Citations;
-        type LinkedFrom = S::LinkedFrom;
-        type UpdatedAt = S::UpdatedAt;
+        type LinkedFrom = Unset;
+        type CreatedAt = Unset;
+        type ContentHtml = Unset;
+        type ContentText = Unset;
+        type PublicationType = Unset;
+        type OctopusId = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `citations` field to Set
     pub struct SetCitations<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCitations<S> {}
     impl<S: State> State for SetCitations<S> {
-        type PublicationType = S::PublicationType;
-        type ContentText = S::ContentText;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type OctopusId = S::OctopusId;
-        type VersionId = S::VersionId;
-        type Title = S::Title;
         type Citations = Set<members::citations>;
-        type LinkedFrom = S::LinkedFrom;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `linked_from` field to Set
-    pub struct SetLinkedFrom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLinkedFrom<S> {}
-    impl<S: State> State for SetLinkedFrom<S> {
-        type PublicationType = S::PublicationType;
-        type ContentText = S::ContentText;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type ContentHtml = S::ContentHtml;
         type LinkedTo = S::LinkedTo;
-        type OctopusId = S::OctopusId;
         type VersionId = S::VersionId;
-        type Title = S::Title;
-        type Citations = S::Citations;
-        type LinkedFrom = Set<members::linked_from>;
+        type Status = S::Status;
         type UpdatedAt = S::UpdatedAt;
+        type LinkedFrom = S::LinkedFrom;
+        type CreatedAt = S::CreatedAt;
+        type ContentHtml = S::ContentHtml;
+        type ContentText = S::ContentText;
+        type PublicationType = S::PublicationType;
+        type OctopusId = S::OctopusId;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `linked_to` field to Set
+    pub struct SetLinkedTo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLinkedTo<S> {}
+    impl<S: State> State for SetLinkedTo<S> {
+        type Citations = S::Citations;
+        type LinkedTo = Set<members::linked_to>;
+        type VersionId = S::VersionId;
+        type Status = S::Status;
+        type UpdatedAt = S::UpdatedAt;
+        type LinkedFrom = S::LinkedFrom;
+        type CreatedAt = S::CreatedAt;
+        type ContentHtml = S::ContentHtml;
+        type ContentText = S::ContentText;
+        type PublicationType = S::PublicationType;
+        type OctopusId = S::OctopusId;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `version_id` field to Set
+    pub struct SetVersionId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersionId<S> {}
+    impl<S: State> State for SetVersionId<S> {
+        type Citations = S::Citations;
+        type LinkedTo = S::LinkedTo;
+        type VersionId = Set<members::version_id>;
+        type Status = S::Status;
+        type UpdatedAt = S::UpdatedAt;
+        type LinkedFrom = S::LinkedFrom;
+        type CreatedAt = S::CreatedAt;
+        type ContentHtml = S::ContentHtml;
+        type ContentText = S::ContentText;
+        type PublicationType = S::PublicationType;
+        type OctopusId = S::OctopusId;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Citations = S::Citations;
+        type LinkedTo = S::LinkedTo;
+        type VersionId = S::VersionId;
+        type Status = Set<members::status>;
+        type UpdatedAt = S::UpdatedAt;
+        type LinkedFrom = S::LinkedFrom;
+        type CreatedAt = S::CreatedAt;
+        type ContentHtml = S::ContentHtml;
+        type ContentText = S::ContentText;
+        type PublicationType = S::PublicationType;
+        type OctopusId = S::OctopusId;
+        type Title = S::Title;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type PublicationType = S::PublicationType;
-        type ContentText = S::ContentText;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type OctopusId = S::OctopusId;
-        type VersionId = S::VersionId;
-        type Title = S::Title;
         type Citations = S::Citations;
-        type LinkedFrom = S::LinkedFrom;
+        type LinkedTo = S::LinkedTo;
+        type VersionId = S::VersionId;
+        type Status = S::Status;
         type UpdatedAt = Set<members::updated_at>;
+        type LinkedFrom = S::LinkedFrom;
+        type CreatedAt = S::CreatedAt;
+        type ContentHtml = S::ContentHtml;
+        type ContentText = S::ContentText;
+        type PublicationType = S::PublicationType;
+        type OctopusId = S::OctopusId;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `linked_from` field to Set
+    pub struct SetLinkedFrom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLinkedFrom<S> {}
+    impl<S: State> State for SetLinkedFrom<S> {
+        type Citations = S::Citations;
+        type LinkedTo = S::LinkedTo;
+        type VersionId = S::VersionId;
+        type Status = S::Status;
+        type UpdatedAt = S::UpdatedAt;
+        type LinkedFrom = Set<members::linked_from>;
+        type CreatedAt = S::CreatedAt;
+        type ContentHtml = S::ContentHtml;
+        type ContentText = S::ContentText;
+        type PublicationType = S::PublicationType;
+        type OctopusId = S::OctopusId;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Citations = S::Citations;
+        type LinkedTo = S::LinkedTo;
+        type VersionId = S::VersionId;
+        type Status = S::Status;
+        type UpdatedAt = S::UpdatedAt;
+        type LinkedFrom = S::LinkedFrom;
+        type CreatedAt = Set<members::created_at>;
+        type ContentHtml = S::ContentHtml;
+        type ContentText = S::ContentText;
+        type PublicationType = S::PublicationType;
+        type OctopusId = S::OctopusId;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `content_html` field to Set
+    pub struct SetContentHtml<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContentHtml<S> {}
+    impl<S: State> State for SetContentHtml<S> {
+        type Citations = S::Citations;
+        type LinkedTo = S::LinkedTo;
+        type VersionId = S::VersionId;
+        type Status = S::Status;
+        type UpdatedAt = S::UpdatedAt;
+        type LinkedFrom = S::LinkedFrom;
+        type CreatedAt = S::CreatedAt;
+        type ContentHtml = Set<members::content_html>;
+        type ContentText = S::ContentText;
+        type PublicationType = S::PublicationType;
+        type OctopusId = S::OctopusId;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `content_text` field to Set
+    pub struct SetContentText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContentText<S> {}
+    impl<S: State> State for SetContentText<S> {
+        type Citations = S::Citations;
+        type LinkedTo = S::LinkedTo;
+        type VersionId = S::VersionId;
+        type Status = S::Status;
+        type UpdatedAt = S::UpdatedAt;
+        type LinkedFrom = S::LinkedFrom;
+        type CreatedAt = S::CreatedAt;
+        type ContentHtml = S::ContentHtml;
+        type ContentText = Set<members::content_text>;
+        type PublicationType = S::PublicationType;
+        type OctopusId = S::OctopusId;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `publication_type` field to Set
+    pub struct SetPublicationType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPublicationType<S> {}
+    impl<S: State> State for SetPublicationType<S> {
+        type Citations = S::Citations;
+        type LinkedTo = S::LinkedTo;
+        type VersionId = S::VersionId;
+        type Status = S::Status;
+        type UpdatedAt = S::UpdatedAt;
+        type LinkedFrom = S::LinkedFrom;
+        type CreatedAt = S::CreatedAt;
+        type ContentHtml = S::ContentHtml;
+        type ContentText = S::ContentText;
+        type PublicationType = Set<members::publication_type>;
+        type OctopusId = S::OctopusId;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `octopus_id` field to Set
+    pub struct SetOctopusId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOctopusId<S> {}
+    impl<S: State> State for SetOctopusId<S> {
+        type Citations = S::Citations;
+        type LinkedTo = S::LinkedTo;
+        type VersionId = S::VersionId;
+        type Status = S::Status;
+        type UpdatedAt = S::UpdatedAt;
+        type LinkedFrom = S::LinkedFrom;
+        type CreatedAt = S::CreatedAt;
+        type ContentHtml = S::ContentHtml;
+        type ContentText = S::ContentText;
+        type PublicationType = S::PublicationType;
+        type OctopusId = Set<members::octopus_id>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Citations = S::Citations;
+        type LinkedTo = S::LinkedTo;
+        type VersionId = S::VersionId;
+        type Status = S::Status;
+        type UpdatedAt = S::UpdatedAt;
+        type LinkedFrom = S::LinkedFrom;
+        type CreatedAt = S::CreatedAt;
+        type ContentHtml = S::ContentHtml;
+        type ContentText = S::ContentText;
+        type PublicationType = S::PublicationType;
+        type OctopusId = S::OctopusId;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `publication_type` field
-        pub struct publication_type(());
-        ///Marker type for the `content_text` field
-        pub struct content_text(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `content_html` field
-        pub struct content_html(());
-        ///Marker type for the `linked_to` field
-        pub struct linked_to(());
-        ///Marker type for the `octopus_id` field
-        pub struct octopus_id(());
-        ///Marker type for the `version_id` field
-        pub struct version_id(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `citations` field
         pub struct citations(());
-        ///Marker type for the `linked_from` field
-        pub struct linked_from(());
+        ///Marker type for the `linked_to` field
+        pub struct linked_to(());
+        ///Marker type for the `version_id` field
+        pub struct version_id(());
+        ///Marker type for the `status` field
+        pub struct status(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `linked_from` field
+        pub struct linked_from(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `content_html` field
+        pub struct content_html(());
+        ///Marker type for the `content_text` field
+        pub struct content_text(());
+        ///Marker type for the `publication_type` field
+        pub struct publication_type(());
+        ///Marker type for the `octopus_id` field
+        pub struct octopus_id(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PublicationBuilder<'a, S: publication_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<PublicationPublicationType<'a>>,
-        ::core::option::Option<PublicationStatus<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<UriValue<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<UriValue<'a>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<CowStr<'a>>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<PublicationPublicationType<'a>>,
+        Option<PublicationStatus<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Publication<'a> {
@@ -697,7 +692,7 @@ impl<'a> PublicationBuilder<'a, publication_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PublicationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -716,25 +711,19 @@ impl<'a> PublicationBuilder<'a, publication_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `canonicalUrl` field (optional)
-    pub fn canonical_url(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn canonical_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `canonicalUrl` field to an Option value (optional)
-    pub fn maybe_canonical_url(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_canonical_url(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -748,13 +737,13 @@ where
     /// Set the `citations` field (required)
     pub fn citations(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> PublicationBuilder<'a, publication_state::SetCitations<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         PublicationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -767,13 +756,13 @@ where
     /// Set the `contentHtml` field (required)
     pub fn content_html(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> PublicationBuilder<'a, publication_state::SetContentHtml<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         PublicationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -786,13 +775,13 @@ where
     /// Set the `contentText` field (required)
     pub fn content_text(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> PublicationBuilder<'a, publication_state::SetContentText<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         PublicationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -805,31 +794,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> PublicationBuilder<'a, publication_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         PublicationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `doi` field (optional)
-    pub fn doi(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn doi(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `doi` field to an Option value (optional)
-    pub fn maybe_doi(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_doi(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -843,13 +826,13 @@ where
     /// Set the `linkedFrom` field (required)
     pub fn linked_from(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> PublicationBuilder<'a, publication_state::SetLinkedFrom<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         PublicationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -862,13 +845,13 @@ where
     /// Set the `linkedTo` field (required)
     pub fn linked_to(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> PublicationBuilder<'a, publication_state::SetLinkedTo<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         PublicationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -881,31 +864,25 @@ where
     /// Set the `octopusId` field (required)
     pub fn octopus_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> PublicationBuilder<'a, publication_state::SetOctopusId<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         PublicationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `ownerOrcid` field (optional)
-    pub fn owner_orcid(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn owner_orcid(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `ownerOrcid` field to an Option value (optional)
-    pub fn maybe_owner_orcid(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_owner_orcid(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -913,18 +890,12 @@ impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
 
 impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `peerReviewOf` field (optional)
-    pub fn peer_review_of(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn peer_review_of(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `peerReviewOf` field to an Option value (optional)
-    pub fn maybe_peer_review_of(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_peer_review_of(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.10 = value;
         self
     }
@@ -940,11 +911,11 @@ where
         mut self,
         value: impl Into<PublicationPublicationType<'a>>,
     ) -> PublicationBuilder<'a, publication_state::SetPublicationType<S>> {
-        self.__unsafe_private_named.11 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.11 = Option::Some(value.into());
         PublicationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -959,11 +930,11 @@ where
         mut self,
         value: impl Into<PublicationStatus<'a>>,
     ) -> PublicationBuilder<'a, publication_state::SetStatus<S>> {
-        self.__unsafe_private_named.12 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.12 = Option::Some(value.into());
         PublicationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -976,13 +947,13 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> PublicationBuilder<'a, publication_state::SetTitle<S>> {
-        self.__unsafe_private_named.13 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.13 = Option::Some(value.into());
         PublicationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -995,13 +966,13 @@ where
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> PublicationBuilder<'a, publication_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.14 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.14 = Option::Some(value.into());
         PublicationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1014,13 +985,13 @@ where
     /// Set the `versionId` field (required)
     pub fn version_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> PublicationBuilder<'a, publication_state::SetVersionId<S>> {
-        self.__unsafe_private_named.15 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.15 = Option::Some(value.into());
         PublicationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1028,18 +999,18 @@ where
 impl<'a, S> PublicationBuilder<'a, S>
 where
     S: publication_state::State,
-    S::PublicationType: publication_state::IsSet,
-    S::ContentText: publication_state::IsSet,
-    S::CreatedAt: publication_state::IsSet,
-    S::Status: publication_state::IsSet,
-    S::ContentHtml: publication_state::IsSet,
-    S::LinkedTo: publication_state::IsSet,
-    S::OctopusId: publication_state::IsSet,
-    S::VersionId: publication_state::IsSet,
-    S::Title: publication_state::IsSet,
     S::Citations: publication_state::IsSet,
-    S::LinkedFrom: publication_state::IsSet,
+    S::LinkedTo: publication_state::IsSet,
+    S::VersionId: publication_state::IsSet,
+    S::Status: publication_state::IsSet,
     S::UpdatedAt: publication_state::IsSet,
+    S::LinkedFrom: publication_state::IsSet,
+    S::CreatedAt: publication_state::IsSet,
+    S::ContentHtml: publication_state::IsSet,
+    S::ContentText: publication_state::IsSet,
+    S::PublicationType: publication_state::IsSet,
+    S::OctopusId: publication_state::IsSet,
+    S::Title: publication_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Publication<'a> {
@@ -1066,7 +1037,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1093,410 +1064,229 @@ where
     }
 }
 
-fn lexicon_doc_social_octosphere_publication() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("social.octosphere.publication"),
-        revision: None,
-        description: None,
+fn lexicon_doc_social_octosphere_publication() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("social.octosphere.publication"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Scientific publication record bridged from Octopus.ac via Octosphere. Represents a single version of an Octopus publication.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("octopusId"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("versionId"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("publicationType"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("status"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("contentHtml"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("contentText"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("citations"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("linkedTo"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("linkedFrom"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
+                                SmolStr::new_static("octopusId"),
+                                SmolStr::new_static("versionId"),
+                                SmolStr::new_static("publicationType"),
+                                SmolStr::new_static("title"), SmolStr::new_static("status"),
+                                SmolStr::new_static("contentHtml"),
+                                SmolStr::new_static("contentText"),
+                                SmolStr::new_static("citations"),
+                                SmolStr::new_static("linkedTo"),
+                                SmolStr::new_static("linkedFrom"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("updatedAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "canonicalUrl",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("canonicalUrl"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Public Octopus URL for the publication version.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Uri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "citations",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("citations"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "List of citation strings extracted from references.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    items: LexArrayItem::String(LexString {
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "contentHtml",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("contentHtml"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Raw HTML content body.",
-                                        ),
+                                        CowStr::new_static("Raw HTML content body."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "contentText",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("contentText"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Plain text content for compact consumption.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "ISO timestamp of when the publication was created in Octopus.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "doi",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("doi"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Publication version DOI URL, if present.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Uri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "linkedFrom",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("linkedFrom"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Publication ids that link to this record.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    items: LexArrayItem::String(LexString {
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "linkedTo",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("linkedTo"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Publication ids this record links to.",
-                                        ),
+                                        CowStr::new_static("Publication ids this record links to."),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                    items: LexArrayItem::String(LexString {
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "octopusId",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("octopusId"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Octopus publication id (UUID).",
-                                        ),
+                                        CowStr::new_static("Octopus publication id (UUID)."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "ownerOrcid",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("ownerOrcid"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "ORCID of the publication owner (if available).",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "peerReviewOf",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("peerReviewOf"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Publication id this peer review references, if applicable.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "publicationType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("publicationType"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Octopus publication type.",
-                                        ),
+                                        CowStr::new_static("Octopus publication type."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "status",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("status"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Octopus publication status (expected LIVE).",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "title",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static("Publication title."),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("title"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(CowStr::new_static("Publication title.")),
                                     max_length: Some(1000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "updatedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("updatedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "ISO timestamp of when the publication was last updated in Octopus.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "versionId",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("versionId"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Octopus publication version id (UUID).",
-                                        ),
+                                        CowStr::new_static("Octopus publication version id (UUID)."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

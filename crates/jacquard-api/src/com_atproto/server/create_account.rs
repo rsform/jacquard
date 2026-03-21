@@ -5,107 +5,102 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, Handle};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateAccount<'a> {
     ///Pre-existing atproto DID, being imported to a new account.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did: core::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub did: Option<Did<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub email: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub email: Option<CowStr<'a>>,
     ///Requested handle for the account.
     #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub handle: Handle<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub invite_code: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub invite_code: Option<CowStr<'a>>,
     ///Initial account password. May need to meet instance-specific password strength requirements.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub password: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub password: Option<CowStr<'a>>,
     ///A signed DID PLC operation to be submitted as part of importing an existing account to this instance. NOTE: this optional field may be updated when full account migration is implemented.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub plc_op: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub plc_op: Option<Data<'a>>,
     ///DID PLC rotation key (aka, recovery key) to be included in PLC creation operation.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub recovery_key: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub recovery_key: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub verification_code: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub verification_code: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub verification_phone: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub verification_phone: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateAccountOutput<'a> {
     #[serde(borrow)]
-    pub access_jwt: jacquard_common::CowStr<'a>,
+    pub access_jwt: CowStr<'a>,
     ///The DID of the new account.
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: Did<'a>,
     ///Complete DID document.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did_doc: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub did_doc: Option<Data<'a>>,
     #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
+    pub handle: Handle<'a>,
     #[serde(borrow)]
-    pub refresh_jwt: jacquard_common::CowStr<'a>,
+    pub refresh_jwt: CowStr<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateAccountError<'a> {
     #[serde(rename = "InvalidHandle")]
-    InvalidHandle(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidHandle(Option<CowStr<'a>>),
     #[serde(rename = "InvalidPassword")]
-    InvalidPassword(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidPassword(Option<CowStr<'a>>),
     #[serde(rename = "InvalidInviteCode")]
-    InvalidInviteCode(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidInviteCode(Option<CowStr<'a>>),
     #[serde(rename = "HandleNotAvailable")]
-    HandleNotAvailable(core::option::Option<jacquard_common::CowStr<'a>>),
+    HandleNotAvailable(Option<CowStr<'a>>),
     #[serde(rename = "UnsupportedDomain")]
-    UnsupportedDomain(core::option::Option<jacquard_common::CowStr<'a>>),
+    UnsupportedDomain(Option<CowStr<'a>>),
     #[serde(rename = "UnresolvableDid")]
-    UnresolvableDid(core::option::Option<jacquard_common::CowStr<'a>>),
+    UnresolvableDid(Option<CowStr<'a>>),
     #[serde(rename = "IncompatibleDidDoc")]
-    IncompatibleDidDoc(core::option::Option<jacquard_common::CowStr<'a>>),
+    IncompatibleDidDoc(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for CreateAccountError<'_> {
@@ -165,8 +160,7 @@ impl core::fmt::Display for CreateAccountError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.server.createAccount
+/// Response type for com.atproto.server.createAccount
 pub struct CreateAccountResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateAccountResponse {
     const NSID: &'static str = "com.atproto.server.createAccount";
@@ -183,8 +177,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateAccount<'a> {
     type Response = CreateAccountResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.createAccount
+/// Endpoint type for com.atproto.server.createAccount
 pub struct CreateAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateAccountRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.createAccount";
@@ -229,19 +222,19 @@ pub mod create_account_state {
 
 /// Builder for constructing an instance of this type
 pub struct CreateAccountBuilder<'a, S: create_account_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<Did<'a>>,
+        Option<CowStr<'a>>,
+        Option<Handle<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Data<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CreateAccount<'a> {
@@ -255,7 +248,7 @@ impl<'a> CreateAccountBuilder<'a, create_account_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateAccountBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -267,25 +260,19 @@ impl<'a> CreateAccountBuilder<'a, create_account_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `did` field (optional)
-    pub fn did(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
-    ) -> Self {
+    pub fn did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
-    pub fn maybe_did(
-        mut self,
-        value: Option<jacquard_common::types::string::Did<'a>>,
-    ) -> Self {
+    pub fn maybe_did(mut self, value: Option<Did<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -293,15 +280,12 @@ impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
 
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `email` field (optional)
-    pub fn email(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn email(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
-    pub fn maybe_email(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_email(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -315,31 +299,25 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<jacquard_common::types::string::Handle<'a>>,
+        value: impl Into<Handle<'a>>,
     ) -> CreateAccountBuilder<'a, create_account_state::SetHandle<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         CreateAccountBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `inviteCode` field (optional)
-    pub fn invite_code(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn invite_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `inviteCode` field to an Option value (optional)
-    pub fn maybe_invite_code(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_invite_code(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -347,15 +325,12 @@ impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
 
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `password` field (optional)
-    pub fn password(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn password(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `password` field to an Option value (optional)
-    pub fn maybe_password(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_password(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -363,18 +338,12 @@ impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
 
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `plcOp` field (optional)
-    pub fn plc_op(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
+    pub fn plc_op(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `plcOp` field to an Option value (optional)
-    pub fn maybe_plc_op(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
+    pub fn maybe_plc_op(mut self, value: Option<Data<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -382,18 +351,12 @@ impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
 
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `recoveryKey` field (optional)
-    pub fn recovery_key(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn recovery_key(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `recoveryKey` field to an Option value (optional)
-    pub fn maybe_recovery_key(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_recovery_key(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -401,18 +364,12 @@ impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
 
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `verificationCode` field (optional)
-    pub fn verification_code(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn verification_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `verificationCode` field to an Option value (optional)
-    pub fn maybe_verification_code(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_verification_code(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -420,18 +377,12 @@ impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
 
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `verificationPhone` field (optional)
-    pub fn verification_phone(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn verification_phone(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `verificationPhone` field to an Option value (optional)
-    pub fn maybe_verification_phone(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_verification_phone(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.8 = value;
         self
     }
@@ -460,10 +411,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> CreateAccount<'a> {
         CreateAccount {
             did: self.__unsafe_private_named.0,

@@ -5,37 +5,46 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::Datetime;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A structured, machine-evaluable work scope definition using CEL (Common Expression Language). Tags referenced in the expression correspond to org.hypercerts.workscope.tag keys. See https://github.com/google/cel-spec. Note: this is intentionally type 'object' (not 'record') so it can be directly embedded inline in union types (e.g., activity.workScope) without requiring a separate collection or strongRef indirection.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Cel<'a> {
     ///Client-declared timestamp when this expression was originally created.
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///A CEL expression encoding the work scope conditions. Example: scope.hasAll(['mangrove_restoration', 'environmental_education']) && location.country == 'KE'
     #[serde(borrow)]
-    pub expression: jacquard_common::CowStr<'a>,
+    pub expression: CowStr<'a>,
     ///Strong references to org.hypercerts.workscope.tag records used in the expression. Enables fast indexing by AT-URI and provides referential integrity to the underlying tag records.
     #[serde(borrow)]
-    pub used_tags: Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub used_tags: Vec<StrongRef<'a>>,
     ///CEL context schema version.
     #[serde(borrow)]
     pub version: CelVersion<'a>,
 }
 
 /// CEL context schema version.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CelVersion<'a> {
     V1,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> CelVersion<'a> {
@@ -51,7 +60,7 @@ impl<'a> From<&'a str> for CelVersion<'a> {
     fn from(s: &'a str) -> Self {
         match s {
             "v1" => Self::V1,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -60,7 +69,7 @@ impl<'a> From<String> for CelVersion<'a> {
     fn from(s: String) -> Self {
         match s.as_str() {
             "v1" => Self::V1,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -115,27 +124,23 @@ impl jacquard_common::IntoStatic for CelVersion<'_> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Cel<'a> {
+impl<'a> LexiconSchema for Cel<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.workscope.cel"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_workscope_cel()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.expression;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "expression",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("expression"),
                     max: 10000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -144,16 +149,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Cel<'a> {
         {
             let value = &self.expression;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 5000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "expression",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("expression"),
                         max: 5000usize,
                         actual: count,
                     });
@@ -164,10 +163,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Cel<'a> {
             let value = &self.used_tags;
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "used_tags",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("used_tags"),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -177,10 +174,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Cel<'a> {
             let value = &self.version;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 16usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "version",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("version"),
                     max: 16usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -200,80 +195,80 @@ pub mod cel_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Version;
+        type UsedTags;
         type Expression;
         type CreatedAt;
-        type UsedTags;
+        type Version;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Version = Unset;
+        type UsedTags = Unset;
         type Expression = Unset;
         type CreatedAt = Unset;
-        type UsedTags = Unset;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type Version = Set<members::version>;
-        type Expression = S::Expression;
-        type CreatedAt = S::CreatedAt;
-        type UsedTags = S::UsedTags;
-    }
-    ///State transition - sets the `expression` field to Set
-    pub struct SetExpression<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExpression<S> {}
-    impl<S: State> State for SetExpression<S> {
-        type Version = S::Version;
-        type Expression = Set<members::expression>;
-        type CreatedAt = S::CreatedAt;
-        type UsedTags = S::UsedTags;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Version = S::Version;
-        type Expression = S::Expression;
-        type CreatedAt = Set<members::created_at>;
-        type UsedTags = S::UsedTags;
+        type Version = Unset;
     }
     ///State transition - sets the `used_tags` field to Set
     pub struct SetUsedTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUsedTags<S> {}
     impl<S: State> State for SetUsedTags<S> {
-        type Version = S::Version;
+        type UsedTags = Set<members::used_tags>;
         type Expression = S::Expression;
         type CreatedAt = S::CreatedAt;
-        type UsedTags = Set<members::used_tags>;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `expression` field to Set
+    pub struct SetExpression<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExpression<S> {}
+    impl<S: State> State for SetExpression<S> {
+        type UsedTags = S::UsedTags;
+        type Expression = Set<members::expression>;
+        type CreatedAt = S::CreatedAt;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type UsedTags = S::UsedTags;
+        type Expression = S::Expression;
+        type CreatedAt = Set<members::created_at>;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersion<S> {}
+    impl<S: State> State for SetVersion<S> {
+        type UsedTags = S::UsedTags;
+        type Expression = S::Expression;
+        type CreatedAt = S::CreatedAt;
+        type Version = Set<members::version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `version` field
-        pub struct version(());
+        ///Marker type for the `used_tags` field
+        pub struct used_tags(());
         ///Marker type for the `expression` field
         pub struct expression(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `used_tags` field
-        pub struct used_tags(());
+        ///Marker type for the `version` field
+        pub struct version(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CelBuilder<'a, S: cel_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
-        ::core::option::Option<CelVersion<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<Vec<StrongRef<'a>>>,
+        Option<CelVersion<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Cel<'a> {
@@ -287,9 +282,9 @@ impl<'a> CelBuilder<'a, cel_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CelBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -302,13 +297,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> CelBuilder<'a, cel_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CelBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -321,13 +316,13 @@ where
     /// Set the `expression` field (required)
     pub fn expression(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CelBuilder<'a, cel_state::SetExpression<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CelBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -340,13 +335,13 @@ where
     /// Set the `usedTags` field (required)
     pub fn used_tags(
         mut self,
-        value: impl Into<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        value: impl Into<Vec<StrongRef<'a>>>,
     ) -> CelBuilder<'a, cel_state::SetUsedTags<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         CelBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -361,11 +356,11 @@ where
         mut self,
         value: impl Into<CelVersion<'a>>,
     ) -> CelBuilder<'a, cel_state::SetVersion<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         CelBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -373,10 +368,10 @@ where
 impl<'a, S> CelBuilder<'a, S>
 where
     S: cel_state::State,
-    S::Version: cel_state::IsSet,
+    S::UsedTags: cel_state::IsSet,
     S::Expression: cel_state::IsSet,
     S::CreatedAt: cel_state::IsSet,
-    S::UsedTags: cel_state::IsSet,
+    S::Version: cel_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cel<'a> {
@@ -391,7 +386,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -406,126 +401,93 @@ where
     }
 }
 
-fn lexicon_doc_org_hypercerts_workscope_cel() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.hypercerts.workscope.cel"),
-        revision: None,
-        description: None,
+fn lexicon_doc_org_hypercerts_workscope_cel() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("org.hypercerts.workscope.cel"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("main"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A structured, machine-evaluable work scope definition using CEL (Common Expression Language). Tags referenced in the expression correspond to org.hypercerts.workscope.tag keys. See https://github.com/google/cel-spec. Note: this is intentionally type 'object' (not 'record') so it can be directly embedded inline in union types (e.g., activity.workScope) without requiring a separate collection or strongRef indirection.",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("expression"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("usedTags"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("version"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                            SmolStr::new_static("expression"),
+                            SmolStr::new_static("usedTags"),
+                            SmolStr::new_static("version"),
+                            SmolStr::new_static("createdAt")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "createdAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("createdAt"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Client-declared timestamp when this expression was originally created.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "expression",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("expression"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "A CEL expression encoding the work scope conditions. Example: scope.hasAll(['mangrove_restoration', 'environmental_education']) && location.country == 'KE'",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(10000usize),
-                                min_graphemes: None,
                                 max_graphemes: Some(5000usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "usedTags",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("usedTags"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Strong references to org.hypercerts.workscope.tag records used in the expression. Enables fast indexing by AT-URI and provides referential integrity to the underlying tag records.",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "com.atproto.repo.strongRef",
-                                    ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
                                 max_length: Some(100usize),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "version",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("version"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "CEL context schema version.",
-                                    ),
+                                    CowStr::new_static("CEL context schema version."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(16usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

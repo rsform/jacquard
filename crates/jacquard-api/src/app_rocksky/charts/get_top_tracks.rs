@@ -5,49 +5,39 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::Datetime;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::song::SongViewBasic;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTopTracks {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub end_date: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end_date: Option<Datetime>,
     ///(min: 1)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
     ///(min: 0)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub offset: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub start_date: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub offset: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_date: Option<Datetime>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTopTracksOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tracks: core::option::Option<Vec<crate::app_rocksky::song::SongViewBasic<'a>>>,
+    pub tracks: Option<Vec<SongViewBasic<'a>>>,
 }
 
-/// Response type for
-///app.rocksky.charts.getTopTracks
+/// Response type for app.rocksky.charts.getTopTracks
 pub struct GetTopTracksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTopTracksResponse {
     const NSID: &'static str = "app.rocksky.charts.getTopTracks";
@@ -62,8 +52,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetTopTracks {
     type Response = GetTopTracksResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.charts.getTopTracks
+/// Endpoint type for app.rocksky.charts.getTopTracks
 pub struct GetTopTracksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTopTracksRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.charts.getTopTracks";
@@ -93,12 +82,12 @@ pub mod get_top_tracks_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetTopTracksBuilder<S: get_top_tracks_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<Datetime>,
+        Option<i64>,
+        Option<i64>,
+        Option<Datetime>,
     ),
 }
 
@@ -113,7 +102,7 @@ impl GetTopTracksBuilder<get_top_tracks_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetTopTracksBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
         }
     }
@@ -121,18 +110,12 @@ impl GetTopTracksBuilder<get_top_tracks_state::Empty> {
 
 impl<S: get_top_tracks_state::State> GetTopTracksBuilder<S> {
     /// Set the `endDate` field (optional)
-    pub fn end_date(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `endDate` field to an Option value (optional)
-    pub fn maybe_end_date(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_end_date(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -166,18 +149,12 @@ impl<S: get_top_tracks_state::State> GetTopTracksBuilder<S> {
 
 impl<S: get_top_tracks_state::State> GetTopTracksBuilder<S> {
     /// Set the `startDate` field (optional)
-    pub fn start_date(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn start_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `startDate` field to an Option value (optional)
-    pub fn maybe_start_date(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_start_date(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }

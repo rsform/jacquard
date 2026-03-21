@@ -5,134 +5,125 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// A colour palette for notebook theming
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ColourScheme<'a> {
     #[serde(borrow)]
     pub colours: ColourSchemeColours<'a>,
     ///Human-readable name for the colour scheme
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///Whether this is a dark or light colour scheme
     #[serde(borrow)]
-    pub variant: jacquard_common::CowStr<'a>,
+    pub variant: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ColourSchemeColours<'a> {
     ///Primary background for page/frame
     #[serde(borrow)]
-    pub base: jacquard_common::CowStr<'a>,
+    pub base: CowStr<'a>,
     ///Border/divider colour
     #[serde(borrow)]
-    pub border: jacquard_common::CowStr<'a>,
+    pub border: CowStr<'a>,
     ///Emphasized text (bold, important)
     #[serde(borrow)]
-    pub emphasis: jacquard_common::CowStr<'a>,
+    pub emphasis: CowStr<'a>,
     ///Error state colour
     #[serde(borrow)]
-    pub error: jacquard_common::CowStr<'a>,
+    pub error: CowStr<'a>,
     ///Selection/highlight colour
     #[serde(borrow)]
-    pub highlight: jacquard_common::CowStr<'a>,
+    pub highlight: CowStr<'a>,
     ///Hyperlink colour
     #[serde(borrow)]
-    pub link: jacquard_common::CowStr<'a>,
+    pub link: CowStr<'a>,
     ///De-emphasized text (disabled, metadata)
     #[serde(borrow)]
-    pub muted: jacquard_common::CowStr<'a>,
+    pub muted: CowStr<'a>,
     ///Tertiary background for popovers/dialogs
     #[serde(borrow)]
-    pub overlay: jacquard_common::CowStr<'a>,
+    pub overlay: CowStr<'a>,
     ///Primary brand/accent colour
     #[serde(borrow)]
-    pub primary: jacquard_common::CowStr<'a>,
+    pub primary: CowStr<'a>,
     ///Secondary accent colour
     #[serde(borrow)]
-    pub secondary: jacquard_common::CowStr<'a>,
+    pub secondary: CowStr<'a>,
     ///Medium emphasis text (comments, labels)
     #[serde(borrow)]
-    pub subtle: jacquard_common::CowStr<'a>,
+    pub subtle: CowStr<'a>,
     ///Success state colour
     #[serde(borrow)]
-    pub success: jacquard_common::CowStr<'a>,
+    pub success: CowStr<'a>,
     ///Secondary background for panels/cards
     #[serde(borrow)]
-    pub surface: jacquard_common::CowStr<'a>,
+    pub surface: CowStr<'a>,
     ///Tertiary accent colour
     #[serde(borrow)]
-    pub tertiary: jacquard_common::CowStr<'a>,
+    pub tertiary: CowStr<'a>,
     ///Primary readable text colour
     #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
+    pub text: CowStr<'a>,
     ///Warning state colour
     #[serde(borrow)]
-    pub warning: jacquard_common::CowStr<'a>,
+    pub warning: CowStr<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ColourSchemeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: ColourScheme<'a>,
 }
 
 impl<'a> ColourScheme<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ColourSchemeRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ColourSchemeRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ColourSchemeRecord;
-impl jacquard_common::xrpc::XrpcResp for ColourSchemeRecord {
+impl XrpcResp for ColourSchemeRecord {
     const NSID: &'static str = "sh.weaver.notebook.colourScheme";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ColourSchemeGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ColourSchemeGetRecordOutput<'_>> for ColourScheme<'_> {
@@ -142,497 +133,278 @@ impl From<ColourSchemeGetRecordOutput<'_>> for ColourScheme<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for ColourScheme<'_> {
+impl Collection for ColourScheme<'_> {
     const NSID: &'static str = "sh.weaver.notebook.colourScheme";
     type Record = ColourSchemeRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ColourSchemeRecord {
+impl Collection for ColourSchemeRecord {
     const NSID: &'static str = "sh.weaver.notebook.colourScheme";
     type Record = ColourSchemeRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ColourScheme<'a> {
+impl<'a> LexiconSchema for ColourScheme<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.colourScheme"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_colourScheme()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ColourSchemeColours<'a> {
+impl<'a> LexiconSchema for ColourSchemeColours<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.colourScheme"
     }
     fn def_name() -> &'static str {
         "ColourSchemeColours"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_colourScheme()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_sh_weaver_notebook_colourScheme() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("sh.weaver.notebook.colourScheme"),
-        revision: None,
-        description: None,
+fn lexicon_doc_sh_weaver_notebook_colourScheme() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("sh.weaver.notebook.colourScheme"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "A colour palette for notebook theming",
-                        ),
+                        CowStr::new_static("A colour palette for notebook theming"),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("variant"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("colours")
+                                SmolStr::new_static("name"), SmolStr::new_static("variant"),
+                                SmolStr::new_static("colours")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "colours",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Object(::jacquard_lexicon::lexicon::LexObject {
-                                    description: None,
+                                SmolStr::new_static("colours"),
+                                LexObjectProperty::Object(LexObject {
                                     required: Some(
                                         vec![
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("base"),
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("surface"),
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("overlay"),
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("text"),
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("muted"),
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("subtle"),
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("emphasis"),
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("primary"),
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("secondary"),
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("tertiary"),
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("error"),
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("warning"),
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("success"),
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("border"),
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("link"),
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static("highlight")
+                                            SmolStr::new_static("base"), SmolStr::new_static("surface"),
+                                            SmolStr::new_static("overlay"), SmolStr::new_static("text"),
+                                            SmolStr::new_static("muted"), SmolStr::new_static("subtle"),
+                                            SmolStr::new_static("emphasis"),
+                                            SmolStr::new_static("primary"),
+                                            SmolStr::new_static("secondary"),
+                                            SmolStr::new_static("tertiary"),
+                                            SmolStr::new_static("error"),
+                                            SmolStr::new_static("warning"),
+                                            SmolStr::new_static("success"),
+                                            SmolStr::new_static("border"), SmolStr::new_static("link"),
+                                            SmolStr::new_static("highlight")
                                         ],
                                     ),
-                                    nullable: None,
                                     properties: {
                                         #[allow(unused_mut)]
-                                        let mut map = ::alloc::collections::BTreeMap::new();
+                                        let mut map = BTreeMap::new();
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "base",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            SmolStr::new_static("base"),
+                                            LexObjectProperty::String(LexString {
                                                 description: Some(
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "Primary background for page/frame",
-                                                    ),
+                                                    CowStr::new_static("Primary background for page/frame"),
                                                 ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "border",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            SmolStr::new_static("border"),
+                                            LexObjectProperty::String(LexString {
                                                 description: Some(
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "Border/divider colour",
-                                                    ),
+                                                    CowStr::new_static("Border/divider colour"),
                                                 ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "emphasis",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            SmolStr::new_static("emphasis"),
+                                            LexObjectProperty::String(LexString {
                                                 description: Some(
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "Emphasized text (bold, important)",
-                                                    ),
+                                                    CowStr::new_static("Emphasized text (bold, important)"),
                                                 ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "error",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                                description: Some(
-                                                    ::jacquard_common::CowStr::new_static("Error state colour"),
-                                                ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                            SmolStr::new_static("error"),
+                                            LexObjectProperty::String(LexString {
+                                                description: Some(CowStr::new_static("Error state colour")),
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "highlight",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            SmolStr::new_static("highlight"),
+                                            LexObjectProperty::String(LexString {
                                                 description: Some(
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "Selection/highlight colour",
-                                                    ),
+                                                    CowStr::new_static("Selection/highlight colour"),
                                                 ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "link",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                                description: Some(
-                                                    ::jacquard_common::CowStr::new_static("Hyperlink colour"),
-                                                ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                            SmolStr::new_static("link"),
+                                            LexObjectProperty::String(LexString {
+                                                description: Some(CowStr::new_static("Hyperlink colour")),
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "muted",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            SmolStr::new_static("muted"),
+                                            LexObjectProperty::String(LexString {
                                                 description: Some(
-                                                    ::jacquard_common::CowStr::new_static(
+                                                    CowStr::new_static(
                                                         "De-emphasized text (disabled, metadata)",
                                                     ),
                                                 ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "overlay",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            SmolStr::new_static("overlay"),
+                                            LexObjectProperty::String(LexString {
                                                 description: Some(
-                                                    ::jacquard_common::CowStr::new_static(
+                                                    CowStr::new_static(
                                                         "Tertiary background for popovers/dialogs",
                                                     ),
                                                 ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "primary",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            SmolStr::new_static("primary"),
+                                            LexObjectProperty::String(LexString {
                                                 description: Some(
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "Primary brand/accent colour",
-                                                    ),
+                                                    CowStr::new_static("Primary brand/accent colour"),
                                                 ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "secondary",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            SmolStr::new_static("secondary"),
+                                            LexObjectProperty::String(LexString {
                                                 description: Some(
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "Secondary accent colour",
-                                                    ),
+                                                    CowStr::new_static("Secondary accent colour"),
                                                 ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "subtle",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            SmolStr::new_static("subtle"),
+                                            LexObjectProperty::String(LexString {
                                                 description: Some(
-                                                    ::jacquard_common::CowStr::new_static(
+                                                    CowStr::new_static(
                                                         "Medium emphasis text (comments, labels)",
                                                     ),
                                                 ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "success",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            SmolStr::new_static("success"),
+                                            LexObjectProperty::String(LexString {
                                                 description: Some(
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "Success state colour",
-                                                    ),
+                                                    CowStr::new_static("Success state colour"),
                                                 ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "surface",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            SmolStr::new_static("surface"),
+                                            LexObjectProperty::String(LexString {
                                                 description: Some(
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "Secondary background for panels/cards",
-                                                    ),
+                                                    CowStr::new_static("Secondary background for panels/cards"),
                                                 ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "tertiary",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            SmolStr::new_static("tertiary"),
+                                            LexObjectProperty::String(LexString {
                                                 description: Some(
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "Tertiary accent colour",
-                                                    ),
+                                                    CowStr::new_static("Tertiary accent colour"),
                                                 ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "text",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            SmolStr::new_static("text"),
+                                            LexObjectProperty::String(LexString {
                                                 description: Some(
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "Primary readable text colour",
-                                                    ),
+                                                    CowStr::new_static("Primary readable text colour"),
                                                 ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                                ..Default::default()
                                             }),
                                         );
                                         map.insert(
-                                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                                "warning",
-                                            ),
-                                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                            SmolStr::new_static("warning"),
+                                            LexObjectProperty::String(LexString {
                                                 description: Some(
-                                                    ::jacquard_common::CowStr::new_static(
-                                                        "Warning state colour",
-                                                    ),
+                                                    CowStr::new_static("Warning state colour"),
                                                 ),
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
+                                                ..Default::default()
                                             }),
                                         );
                                         map
                                     },
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("name"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Human-readable name for the colour scheme",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "variant",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("variant"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Whether this is a dark or light colour scheme",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -646,63 +418,63 @@ pub mod colour_scheme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Colours;
         type Name;
         type Variant;
-        type Colours;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Colours = Unset;
         type Name = Unset;
         type Variant = Unset;
-        type Colours = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Variant = S::Variant;
-        type Colours = S::Colours;
-    }
-    ///State transition - sets the `variant` field to Set
-    pub struct SetVariant<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVariant<S> {}
-    impl<S: State> State for SetVariant<S> {
-        type Name = S::Name;
-        type Variant = Set<members::variant>;
-        type Colours = S::Colours;
     }
     ///State transition - sets the `colours` field to Set
     pub struct SetColours<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetColours<S> {}
     impl<S: State> State for SetColours<S> {
+        type Colours = Set<members::colours>;
         type Name = S::Name;
         type Variant = S::Variant;
-        type Colours = Set<members::colours>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Colours = S::Colours;
+        type Name = Set<members::name>;
+        type Variant = S::Variant;
+    }
+    ///State transition - sets the `variant` field to Set
+    pub struct SetVariant<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVariant<S> {}
+    impl<S: State> State for SetVariant<S> {
+        type Colours = S::Colours;
+        type Name = S::Name;
+        type Variant = Set<members::variant>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `colours` field
+        pub struct colours(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `variant` field
         pub struct variant(());
-        ///Marker type for the `colours` field
-        pub struct colours(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ColourSchemeBuilder<'a, S: colour_scheme_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<ColourSchemeColours<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<ColourSchemeColours<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ColourScheme<'a> {
@@ -716,9 +488,9 @@ impl<'a> ColourSchemeBuilder<'a, colour_scheme_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ColourSchemeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -733,11 +505,11 @@ where
         mut self,
         value: impl Into<ColourSchemeColours<'a>>,
     ) -> ColourSchemeBuilder<'a, colour_scheme_state::SetColours<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ColourSchemeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -750,13 +522,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ColourSchemeBuilder<'a, colour_scheme_state::SetName<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ColourSchemeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -769,13 +541,13 @@ where
     /// Set the `variant` field (required)
     pub fn variant(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ColourSchemeBuilder<'a, colour_scheme_state::SetVariant<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         ColourSchemeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -783,9 +555,9 @@ where
 impl<'a, S> ColourSchemeBuilder<'a, S>
 where
     S: colour_scheme_state::State,
+    S::Colours: colour_scheme_state::IsSet,
     S::Name: colour_scheme_state::IsSet,
     S::Variant: colour_scheme_state::IsSet,
-    S::Colours: colour_scheme_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ColourScheme<'a> {
@@ -799,7 +571,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

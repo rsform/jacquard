@@ -5,44 +5,34 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::shout::ShoutView;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateShout<'a> {
     ///The content of the shout
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateShoutOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::shout::ShoutView<'a>,
+    pub value: ShoutView<'a>,
 }
 
-/// Response type for
-///app.rocksky.shout.createShout
+/// Response type for app.rocksky.shout.createShout
 pub struct CreateShoutResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateShoutResponse {
     const NSID: &'static str = "app.rocksky.shout.createShout";
@@ -59,8 +49,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateShout<'a> {
     type Response = CreateShoutResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.shout.createShout
+/// Endpoint type for app.rocksky.shout.createShout
 pub struct CreateShoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateShoutRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.createShout";

@@ -5,70 +5,64 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateGate<'a> {
     ///The AT-URI of the chat message to hide.
     #[serde(borrow)]
-    pub message_uri: jacquard_common::types::string::AtUri<'a>,
+    pub message_uri: AtUri<'a>,
     ///The DID of the streamer.
     #[serde(borrow)]
-    pub streamer: jacquard_common::types::string::Did<'a>,
+    pub streamer: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateGateOutput<'a> {
     ///The CID of the created gate record.
     #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub cid: Cid<'a>,
     ///The AT-URI of the created gate record.
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateGateError<'a> {
     /// The request lacks valid authentication credentials.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(core::option::Option<jacquard_common::CowStr<'a>>),
+    Unauthorized(Option<CowStr<'a>>),
     /// The caller does not have permission to hide messages for this streamer.
     #[serde(rename = "Forbidden")]
-    Forbidden(core::option::Option<jacquard_common::CowStr<'a>>),
+    Forbidden(Option<CowStr<'a>>),
     /// The streamer's OAuth session could not be found or is invalid.
     #[serde(rename = "SessionNotFound")]
-    SessionNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    SessionNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for CreateGateError<'_> {
@@ -100,8 +94,7 @@ impl core::fmt::Display for CreateGateError<'_> {
     }
 }
 
-/// Response type for
-///place.stream.moderation.createGate
+/// Response type for place.stream.moderation.createGate
 pub struct CreateGateResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateGateResponse {
     const NSID: &'static str = "place.stream.moderation.createGate";
@@ -118,8 +111,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateGate<'a> {
     type Response = CreateGateResponse;
 }
 
-/// Endpoint type for
-///place.stream.moderation.createGate
+/// Endpoint type for place.stream.moderation.createGate
 pub struct CreateGateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateGateRequest {
     const PATH: &'static str = "/xrpc/place.stream.moderation.createGate";
@@ -176,12 +168,9 @@ pub mod create_gate_state {
 
 /// Builder for constructing an instance of this type
 pub struct CreateGateBuilder<'a, S: create_gate_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>, Option<Did<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CreateGate<'a> {
@@ -195,9 +184,9 @@ impl<'a> CreateGateBuilder<'a, create_gate_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateGateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -210,13 +199,13 @@ where
     /// Set the `messageUri` field (required)
     pub fn message_uri(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> CreateGateBuilder<'a, create_gate_state::SetMessageUri<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CreateGateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -229,13 +218,13 @@ where
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> CreateGateBuilder<'a, create_gate_state::SetStreamer<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CreateGateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -257,7 +246,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

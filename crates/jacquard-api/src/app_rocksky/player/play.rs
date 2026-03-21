@@ -5,36 +5,24 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayParams<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub player_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub player_id: Option<CowStr<'a>>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct Play;
-/// Response type for
-///app.rocksky.player.play
+/// Response type for app.rocksky.player.play
 pub struct PlayResponse;
 impl jacquard_common::xrpc::XrpcResp for PlayResponse {
     const NSID: &'static str = "app.rocksky.player.play";
@@ -51,8 +39,7 @@ impl jacquard_common::xrpc::XrpcRequest for Play {
     type Response = PlayResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.player.play
+/// Endpoint type for app.rocksky.player.play
 pub struct PlayRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PlayRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.player.play";
@@ -84,9 +71,9 @@ pub mod play_params_state {
 
 /// Builder for constructing an instance of this type
 pub struct PlayParamsBuilder<'a, S: play_params_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> PlayParams<'a> {
@@ -100,27 +87,21 @@ impl<'a> PlayParamsBuilder<'a, play_params_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PlayParamsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: play_params_state::State> PlayParamsBuilder<'a, S> {
     /// Set the `playerId` field (optional)
-    pub fn player_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn player_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `playerId` field to an Option value (optional)
-    pub fn maybe_player_id(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_player_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }

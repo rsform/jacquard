@@ -5,61 +5,56 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
 /// Binary image data. Supported formats: JPEG, PNG, WebP, GIF. Maximum size: 1MB (1,000,000 bytes).
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UploadBlob {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UploadBlobOutput<'a> {
     ///Blob reference object that can be used in post embeds (app.bsky.embed.images).
     #[serde(borrow)]
-    pub blob: jacquard_common::types::blob::BlobRef<'a>,
+    pub blob: BlobRef<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UploadBlobError<'a> {
     #[serde(rename = "InvalidContentType")]
-    InvalidContentType(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidContentType(Option<CowStr<'a>>),
     #[serde(rename = "BlobTooLarge")]
-    BlobTooLarge(core::option::Option<jacquard_common::CowStr<'a>>),
+    BlobTooLarge(Option<CowStr<'a>>),
     #[serde(rename = "UploadFailed")]
-    UploadFailed(core::option::Option<jacquard_common::CowStr<'a>>),
+    UploadFailed(Option<CowStr<'a>>),
     #[serde(rename = "NoActiveSession")]
-    NoActiveSession(core::option::Option<jacquard_common::CowStr<'a>>),
+    NoActiveSession(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for UploadBlobError<'_> {
@@ -98,8 +93,7 @@ impl core::fmt::Display for UploadBlobError<'_> {
     }
 }
 
-/// Response type for
-///app.chronosky.media.uploadBlob
+/// Response type for app.chronosky.media.uploadBlob
 pub struct UploadBlobResponse;
 impl jacquard_common::xrpc::XrpcResp for UploadBlobResponse {
     const NSID: &'static str = "app.chronosky.media.uploadBlob";
@@ -131,8 +125,7 @@ impl jacquard_common::xrpc::XrpcRequest for UploadBlob {
     }
 }
 
-/// Endpoint type for
-///app.chronosky.media.uploadBlob
+/// Endpoint type for app.chronosky.media.uploadBlob
 pub struct UploadBlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UploadBlobRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.media.uploadBlob";

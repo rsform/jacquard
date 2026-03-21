@@ -5,62 +5,56 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::collab::CollaborationStateView;
+use crate::sh_weaver::notebook::PublishedVersionView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveVersionConflict<'a> {
     #[serde(borrow)]
-    pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
+    pub uris: Vec<AtUri<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveVersionConflictOutput<'a> {
     #[serde(borrow)]
-    pub canonical: crate::sh_weaver::notebook::PublishedVersionView<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub canonical: PublishedVersionView<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub collaboration_state: core::option::Option<
-        crate::sh_weaver::collab::CollaborationStateView<'a>,
-    >,
+    pub collaboration_state: Option<CollaborationStateView<'a>>,
     #[serde(borrow)]
-    pub related: Vec<crate::sh_weaver::notebook::PublishedVersionView<'a>>,
+    pub related: Vec<PublishedVersionView<'a>>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ResolveVersionConflictError<'a> {
     /// The URIs don't appear to be related versions
     #[serde(rename = "NoRelatedVersions")]
-    NoRelatedVersions(core::option::Option<jacquard_common::CowStr<'a>>),
+    NoRelatedVersions(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for ResolveVersionConflictError<'_> {
@@ -78,8 +72,7 @@ impl core::fmt::Display for ResolveVersionConflictError<'_> {
     }
 }
 
-/// Response type for
-///sh.weaver.notebook.resolveVersionConflict
+/// Response type for sh.weaver.notebook.resolveVersionConflict
 pub struct ResolveVersionConflictResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveVersionConflictResponse {
     const NSID: &'static str = "sh.weaver.notebook.resolveVersionConflict";
@@ -94,8 +87,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveVersionConflict<'a> {
     type Response = ResolveVersionConflictResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notebook.resolveVersionConflict
+/// Endpoint type for sh.weaver.notebook.resolveVersionConflict
 pub struct ResolveVersionConflictRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveVersionConflictRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.resolveVersionConflict";
@@ -138,11 +130,9 @@ pub mod resolve_version_conflict_state {
 
 /// Builder for constructing an instance of this type
 pub struct ResolveVersionConflictBuilder<'a, S: resolve_version_conflict_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<AtUri<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ResolveVersionConflict<'a> {
@@ -159,9 +149,9 @@ impl<'a> ResolveVersionConflictBuilder<'a, resolve_version_conflict_state::Empty
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ResolveVersionConflictBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -174,13 +164,13 @@ where
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<'a>>>,
     ) -> ResolveVersionConflictBuilder<'a, resolve_version_conflict_state::SetUris<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ResolveVersionConflictBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

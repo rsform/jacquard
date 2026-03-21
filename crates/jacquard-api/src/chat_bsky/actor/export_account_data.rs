@@ -5,34 +5,22 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ExportAccountDataOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct ExportAccountData;
-/// Response type for
-///chat.bsky.actor.exportAccountData
+/// Response type for chat.bsky.actor.exportAccountData
 pub struct ExportAccountDataResponse;
 impl jacquard_common::xrpc::XrpcResp for ExportAccountDataResponse {
     const NSID: &'static str = "chat.bsky.actor.exportAccountData";
@@ -62,8 +50,7 @@ impl jacquard_common::xrpc::XrpcRequest for ExportAccountData {
     type Response = ExportAccountDataResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.actor.exportAccountData
+/// Endpoint type for chat.bsky.actor.exportAccountData
 pub struct ExportAccountDataRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ExportAccountDataRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.actor.exportAccountData";

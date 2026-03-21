@@ -5,50 +5,40 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::{RecordKey, Rkey};
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteTarget<'a> {
     ///The Record Key of the target to delete.
     #[serde(borrow)]
-    pub rkey: jacquard_common::types::string::RecordKey<
-        jacquard_common::types::string::Rkey<'a>,
-    >,
+    pub rkey: RecordKey<Rkey<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteTargetOutput<'a> {}
+
 #[jacquard_derive::open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteTargetError<'a> {}
@@ -60,8 +50,7 @@ impl core::fmt::Display for DeleteTargetError<'_> {
     }
 }
 
-/// Response type for
-///place.stream.multistream.deleteTarget
+/// Response type for place.stream.multistream.deleteTarget
 pub struct DeleteTargetResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteTargetResponse {
     const NSID: &'static str = "place.stream.multistream.deleteTarget";
@@ -78,8 +67,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteTarget<'a> {
     type Response = DeleteTargetResponse;
 }
 
-/// Endpoint type for
-///place.stream.multistream.deleteTarget
+/// Endpoint type for place.stream.multistream.deleteTarget
 pub struct DeleteTargetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteTargetRequest {
     const PATH: &'static str = "/xrpc/place.stream.multistream.deleteTarget";
@@ -124,15 +112,9 @@ pub mod delete_target_state {
 
 /// Builder for constructing an instance of this type
 pub struct DeleteTargetBuilder<'a, S: delete_target_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<RecordKey<Rkey<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> DeleteTarget<'a> {
@@ -146,9 +128,9 @@ impl<'a> DeleteTargetBuilder<'a, delete_target_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeleteTargetBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -161,17 +143,13 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<
-            jacquard_common::types::string::RecordKey<
-                jacquard_common::types::string::Rkey<'a>,
-            >,
-        >,
+        value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> DeleteTargetBuilder<'a, delete_target_state::SetRkey<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         DeleteTargetBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -191,7 +169,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

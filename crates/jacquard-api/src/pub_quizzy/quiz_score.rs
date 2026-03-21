@@ -5,89 +5,83 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::pub_quizzy::quiz_score;
 /// Final rankings for a completed quiz
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct QuizScore<'a> {
     ///Reference to the quizBegin record
     #[serde(borrow)]
-    pub quiz_begin: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    pub quiz_begin: StrongRef<'a>,
     ///Ordered list of team results (by ranking)
     #[serde(borrow)]
-    pub results: Vec<crate::pub_quizzy::quiz_score::TeamResult<'a>>,
+    pub results: Vec<quiz_score::TeamResult<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct QuizScoreGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: QuizScore<'a>,
 }
 
 /// A team's final result
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct TeamResult<'a> {
     ///Reference to the team's detailed score record
     #[serde(borrow)]
-    pub team_score: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    pub team_score: StrongRef<'a>,
     ///Team's total score
     pub total_score: i64,
 }
 
 impl<'a> QuizScore<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, QuizScoreRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, QuizScoreRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct QuizScoreRecord;
-impl jacquard_common::xrpc::XrpcResp for QuizScoreRecord {
+impl XrpcResp for QuizScoreRecord {
     const NSID: &'static str = "pub.quizzy.quizScore";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = QuizScoreGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<QuizScoreGetRecordOutput<'_>> for QuizScore<'_> {
@@ -97,37 +91,33 @@ impl From<QuizScoreGetRecordOutput<'_>> for QuizScore<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for QuizScore<'_> {
+impl Collection for QuizScore<'_> {
     const NSID: &'static str = "pub.quizzy.quizScore";
     type Record = QuizScoreRecord;
 }
 
-impl jacquard_common::types::collection::Collection for QuizScoreRecord {
+impl Collection for QuizScoreRecord {
     const NSID: &'static str = "pub.quizzy.quizScore";
     type Record = QuizScoreRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for QuizScore<'a> {
+impl<'a> LexiconSchema for QuizScore<'a> {
     fn nsid() -> &'static str {
         "pub.quizzy.quizScore"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_pub_quizzy_quizScore()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.results;
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "results",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("results"),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -137,10 +127,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for QuizScore<'a> {
             let value = &self.results;
             #[allow(unused_comparisons)]
             if value.len() < 1usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "results",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("results"),
                     min: 1usize,
                     actual: value.len(),
                 });
@@ -150,26 +138,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for QuizScore<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for TeamResult<'a> {
+impl<'a> LexiconSchema for TeamResult<'a> {
     fn nsid() -> &'static str {
         "pub.quizzy.quizScore"
     }
     fn def_name() -> &'static str {
         "teamResult"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_pub_quizzy_quizScore()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.total_score;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "total_score",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("total_score"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -189,48 +173,48 @@ pub mod quiz_score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Results;
         type QuizBegin;
+        type Results;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Results = Unset;
         type QuizBegin = Unset;
-    }
-    ///State transition - sets the `results` field to Set
-    pub struct SetResults<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResults<S> {}
-    impl<S: State> State for SetResults<S> {
-        type Results = Set<members::results>;
-        type QuizBegin = S::QuizBegin;
+        type Results = Unset;
     }
     ///State transition - sets the `quiz_begin` field to Set
     pub struct SetQuizBegin<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuizBegin<S> {}
     impl<S: State> State for SetQuizBegin<S> {
-        type Results = S::Results;
         type QuizBegin = Set<members::quiz_begin>;
+        type Results = S::Results;
+    }
+    ///State transition - sets the `results` field to Set
+    pub struct SetResults<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResults<S> {}
+    impl<S: State> State for SetResults<S> {
+        type QuizBegin = S::QuizBegin;
+        type Results = Set<members::results>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `results` field
-        pub struct results(());
         ///Marker type for the `quiz_begin` field
         pub struct quiz_begin(());
+        ///Marker type for the `results` field
+        pub struct results(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct QuizScoreBuilder<'a, S: quiz_score_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<Vec<crate::pub_quizzy::quiz_score::TeamResult<'a>>>,
+        Option<StrongRef<'a>>,
+        Option<Vec<quiz_score::TeamResult<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> QuizScore<'a> {
@@ -244,9 +228,9 @@ impl<'a> QuizScoreBuilder<'a, quiz_score_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         QuizScoreBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -259,13 +243,13 @@ where
     /// Set the `quizBegin` field (required)
     pub fn quiz_begin(
         mut self,
-        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        value: impl Into<StrongRef<'a>>,
     ) -> QuizScoreBuilder<'a, quiz_score_state::SetQuizBegin<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         QuizScoreBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -278,13 +262,13 @@ where
     /// Set the `results` field (required)
     pub fn results(
         mut self,
-        value: impl Into<Vec<crate::pub_quizzy::quiz_score::TeamResult<'a>>>,
+        value: impl Into<Vec<quiz_score::TeamResult<'a>>>,
     ) -> QuizScoreBuilder<'a, quiz_score_state::SetResults<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         QuizScoreBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -292,8 +276,8 @@ where
 impl<'a, S> QuizScoreBuilder<'a, S>
 where
     S: quiz_score_state::State,
-    S::Results: quiz_score_state::IsSet,
     S::QuizBegin: quiz_score_state::IsSet,
+    S::Results: quiz_score_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> QuizScore<'a> {
@@ -306,7 +290,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -319,115 +303,99 @@ where
     }
 }
 
-fn lexicon_doc_pub_quizzy_quizScore() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("pub.quizzy.quizScore"),
-        revision: None,
-        description: None,
+fn lexicon_doc_pub_quizzy_quizScore() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("pub.quizzy.quizScore"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Final rankings for a completed quiz",
-                        ),
+                        CowStr::new_static("Final rankings for a completed quiz"),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("quizBegin"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("results")
+                                SmolStr::new_static("quizBegin"),
+                                SmolStr::new_static("results")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "quizBegin",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "com.atproto.repo.strongRef",
-                                    ),
+                                SmolStr::new_static("quizBegin"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "results",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("results"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Ordered list of team results (by ranking)",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static("#teamResult"),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#teamResult"),
+                                        ..Default::default()
                                     }),
                                     min_length: Some(1usize),
                                     max_length: Some(100usize),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("teamResult"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("A team's final result"),
-                    ),
+                SmolStr::new_static("teamResult"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("A team's final result")),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("teamScore"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("totalScore")
+                            SmolStr::new_static("teamScore"),
+                            SmolStr::new_static("totalScore")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "teamScore",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "com.atproto.repo.strongRef",
-                                ),
+                            SmolStr::new_static("teamScore"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "totalScore",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("totalScore"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -441,48 +409,45 @@ pub mod team_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TeamScore;
         type TotalScore;
+        type TeamScore;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TeamScore = Unset;
         type TotalScore = Unset;
-    }
-    ///State transition - sets the `team_score` field to Set
-    pub struct SetTeamScore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTeamScore<S> {}
-    impl<S: State> State for SetTeamScore<S> {
-        type TeamScore = Set<members::team_score>;
-        type TotalScore = S::TotalScore;
+        type TeamScore = Unset;
     }
     ///State transition - sets the `total_score` field to Set
     pub struct SetTotalScore<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotalScore<S> {}
     impl<S: State> State for SetTotalScore<S> {
-        type TeamScore = S::TeamScore;
         type TotalScore = Set<members::total_score>;
+        type TeamScore = S::TeamScore;
+    }
+    ///State transition - sets the `team_score` field to Set
+    pub struct SetTeamScore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTeamScore<S> {}
+    impl<S: State> State for SetTeamScore<S> {
+        type TotalScore = S::TotalScore;
+        type TeamScore = Set<members::team_score>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `team_score` field
-        pub struct team_score(());
         ///Marker type for the `total_score` field
         pub struct total_score(());
+        ///Marker type for the `team_score` field
+        pub struct team_score(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TeamResultBuilder<'a, S: team_result_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<i64>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<StrongRef<'a>>, Option<i64>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> TeamResult<'a> {
@@ -496,9 +461,9 @@ impl<'a> TeamResultBuilder<'a, team_result_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TeamResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -511,13 +476,13 @@ where
     /// Set the `teamScore` field (required)
     pub fn team_score(
         mut self,
-        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        value: impl Into<StrongRef<'a>>,
     ) -> TeamResultBuilder<'a, team_result_state::SetTeamScore<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         TeamResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -532,11 +497,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> TeamResultBuilder<'a, team_result_state::SetTotalScore<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         TeamResultBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -544,8 +509,8 @@ where
 impl<'a, S> TeamResultBuilder<'a, S>
 where
     S: team_result_state::State,
-    S::TeamScore: team_result_state::IsSet,
     S::TotalScore: team_result_state::IsSet,
+    S::TeamScore: team_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TeamResult<'a> {
@@ -558,7 +523,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

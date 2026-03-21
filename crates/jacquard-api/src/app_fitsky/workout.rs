@@ -5,160 +5,131 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::app_fitsky::workout;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CardioDetails<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub calories: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub calories: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cardio_zones: core::option::Option<
-        crate::app_fitsky::workout::CardioZoneData<'a>,
-    >,
+    pub cardio_zones: Option<workout::CardioZoneData<'a>>,
     ///Distance in meters
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub distance_meters: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub distance_meters: Option<i64>,
     ///Elevation gain in meters
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub elevation_gain_meters: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub elevation_gain_meters: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub heart_rate: core::option::Option<crate::app_fitsky::workout::HeartRateData<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub heart_rate: Option<workout::HeartRateData<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub heart_rate_samples: core::option::Option<
-        Vec<crate::app_fitsky::workout::HeartRateSample<'a>>,
-    >,
+    pub heart_rate_samples: Option<Vec<workout::HeartRateSample<'a>>>,
     ///Pace in seconds per kilometer
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub pace_seconds_per_km: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pace_seconds_per_km: Option<i64>,
     ///GPS route points recorded during the workout
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub route_points: core::option::Option<
-        Vec<crate::app_fitsky::workout::RoutePoint<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub steps: core::option::Option<i64>,
+    pub route_points: Option<Vec<workout::RoutePoint<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub steps: Option<i64>,
 }
 
 /// Time in seconds spent in each heart rate zone
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CardioZoneData<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub zone1_rest: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub zone2_easy: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub zone3_aerobic: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub zone4_threshold: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub zone5_max: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub zone1_rest: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub zone2_easy: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub zone3_aerobic: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub zone4_threshold: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub zone5_max: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Exercise<'a> {
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     #[serde(borrow)]
-    pub sets: Vec<crate::app_fitsky::workout::ExerciseSet<'a>>,
+    pub sets: Vec<workout::ExerciseSet<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ExerciseSet<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub reps: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reps: Option<i64>,
     ///Weight in grams
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub weight_grams: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weight_grams: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct FlexibilityDetails<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub calories: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub calories: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cardio_zones: core::option::Option<
-        crate::app_fitsky::workout::CardioZoneData<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cardio_zones: Option<workout::CardioZoneData<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub heart_rate: core::option::Option<crate::app_fitsky::workout::HeartRateData<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub heart_rate: Option<workout::HeartRateData<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub heart_rate_samples: core::option::Option<
-        Vec<crate::app_fitsky::workout::HeartRateSample<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub heart_rate_samples: Option<Vec<workout::HeartRateSample<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub intensity: core::option::Option<FlexibilityDetailsIntensity<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub movements: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub steps: core::option::Option<i64>,
+    pub intensity: Option<FlexibilityDetailsIntensity<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub movements: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub steps: Option<i64>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum FlexibilityDetailsIntensity<'a> {
     Light,
     Moderate,
     Intense,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> FlexibilityDetailsIntensity<'a> {
@@ -178,7 +149,7 @@ impl<'a> From<&'a str> for FlexibilityDetailsIntensity<'a> {
             "light" => Self::Light,
             "moderate" => Self::Moderate,
             "intense" => Self::Intense,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -189,7 +160,7 @@ impl<'a> From<String> for FlexibilityDetailsIntensity<'a> {
             "light" => Self::Light,
             "moderate" => Self::Moderate,
             "intense" => Self::Intense,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -250,103 +221,75 @@ impl jacquard_common::IntoStatic for FlexibilityDetailsIntensity<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct HeartRateData<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub avg: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub max: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub min: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub resting: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub avg: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub min: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub resting: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct HeartRateSample<'a> {
     pub bpm: i64,
-    pub timestamp: jacquard_common::types::string::Datetime,
+    pub timestamp: Datetime,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct HiitSportsDetails<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub calories: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub calories: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cardio_zones: core::option::Option<
-        crate::app_fitsky::workout::CardioZoneData<'a>,
-    >,
+    pub cardio_zones: Option<workout::CardioZoneData<'a>>,
     ///Distance in meters
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub distance_meters: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub distance_meters: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub heart_rate: core::option::Option<crate::app_fitsky::workout::HeartRateData<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub heart_rate: Option<workout::HeartRateData<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub heart_rate_samples: core::option::Option<
-        Vec<crate::app_fitsky::workout::HeartRateSample<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub heart_rate_samples: Option<Vec<workout::HeartRateSample<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub intensity: core::option::Option<HiitSportsDetailsIntensity<'a>>,
+    pub intensity: Option<HiitSportsDetailsIntensity<'a>>,
     ///Pace in seconds per kilometer
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub pace_seconds_per_km: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub rounds: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pace_seconds_per_km: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rounds: Option<i64>,
     ///GPS route points recorded during the workout
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub route_points: core::option::Option<
-        Vec<crate::app_fitsky::workout::RoutePoint<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub route_points: Option<Vec<workout::RoutePoint<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sport: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub steps: core::option::Option<i64>,
+    pub sport: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub steps: Option<i64>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum HiitSportsDetailsIntensity<'a> {
     Light,
     Moderate,
     Intense,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> HiitSportsDetailsIntensity<'a> {
@@ -366,7 +309,7 @@ impl<'a> From<&'a str> for HiitSportsDetailsIntensity<'a> {
             "light" => Self::Light,
             "moderate" => Self::Moderate,
             "intense" => Self::Intense,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -377,7 +320,7 @@ impl<'a> From<String> for HiitSportsDetailsIntensity<'a> {
             "light" => Self::Light,
             "moderate" => Self::Moderate,
             "intense" => Self::Intense,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -437,86 +380,71 @@ impl jacquard_common::IntoStatic for HiitSportsDetailsIntensity<'_> {
 }
 
 /// A fitness workout record
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Workout<'a> {
-    pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: Datetime,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub details: core::option::Option<WorkoutDetails<'a>>,
+    pub details: Option<WorkoutDetails<'a>>,
     ///Duration in seconds
     pub duration: i64,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub ended_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ended_at: Option<Datetime>,
     ///Progress milestones for linear workouts
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub milestones: core::option::Option<Vec<crate::app_fitsky::workout::Milestone<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub milestones: Option<Vec<workout::Milestone<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: Option<CowStr<'a>>,
     ///Open Graph preview image for social sharing
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub og_image: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub og_image: Option<BlobRef<'a>>,
     ///Reference to the workoutPlan used, if any
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub plan_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    pub started_at: jacquard_common::types::string::Datetime,
+    pub plan_uri: Option<AtUri<'a>>,
+    pub started_at: Datetime,
     ///Whether the workout is in progress or finished. Omitted for legacy workouts (treat as completed).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: core::option::Option<WorkoutStatus<'a>>,
+    pub status: Option<WorkoutStatus<'a>>,
     #[serde(borrow)]
-    pub title: jacquard_common::CowStr<'a>,
+    pub title: CowStr<'a>,
     #[serde(borrow)]
     pub r#type: WorkoutType<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub visibility: core::option::Option<
-        crate::app_fitsky::workout::VisibilitySettings<'a>,
-    >,
+    pub visibility: Option<workout::VisibilitySettings<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum WorkoutDetails<'a> {
     #[serde(rename = "app.fitsky.workout#cardioDetails")]
-    CardioDetails(Box<crate::app_fitsky::workout::CardioDetails<'a>>),
+    CardioDetails(Box<workout::CardioDetails<'a>>),
     #[serde(rename = "app.fitsky.workout#strengthDetails")]
-    StrengthDetails(Box<crate::app_fitsky::workout::StrengthDetails<'a>>),
+    StrengthDetails(Box<workout::StrengthDetails<'a>>),
     #[serde(rename = "app.fitsky.workout#flexibilityDetails")]
-    FlexibilityDetails(Box<crate::app_fitsky::workout::FlexibilityDetails<'a>>),
+    FlexibilityDetails(Box<workout::FlexibilityDetails<'a>>),
     #[serde(rename = "app.fitsky.workout#hiitSportsDetails")]
-    HiitSportsDetails(Box<crate::app_fitsky::workout::HiitSportsDetails<'a>>),
+    HiitSportsDetails(Box<workout::HiitSportsDetails<'a>>),
 }
 
 /// Whether the workout is in progress or finished. Omitted for legacy workouts (treat as completed).
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum WorkoutStatus<'a> {
     Active,
     Completed,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> WorkoutStatus<'a> {
@@ -534,7 +462,7 @@ impl<'a> From<&'a str> for WorkoutStatus<'a> {
         match s {
             "active" => Self::Active,
             "completed" => Self::Completed,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -544,7 +472,7 @@ impl<'a> From<String> for WorkoutStatus<'a> {
         match s.as_str() {
             "active" => Self::Active,
             "completed" => Self::Completed,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -600,6 +528,7 @@ impl jacquard_common::IntoStatic for WorkoutStatus<'_> {
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum WorkoutType<'a> {
     Running,
@@ -613,7 +542,7 @@ pub enum WorkoutType<'a> {
     Sports,
     Stretching,
     Hiking,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> WorkoutType<'a> {
@@ -649,7 +578,7 @@ impl<'a> From<&'a str> for WorkoutType<'a> {
             "sports" => Self::Sports,
             "stretching" => Self::Stretching,
             "hiking" => Self::Hiking,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -668,7 +597,7 @@ impl<'a> From<String> for WorkoutType<'a> {
             "sports" => Self::Sports,
             "stretching" => Self::Stretching,
             "hiking" => Self::Hiking,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -734,55 +663,42 @@ impl jacquard_common::IntoStatic for WorkoutType<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct WorkoutGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Workout<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Milestone<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub note: core::option::Option<jacquard_common::CowStr<'a>>,
-    pub timestamp: jacquard_common::types::string::Datetime,
+    pub note: Option<CowStr<'a>>,
+    pub timestamp: Datetime,
     #[serde(borrow)]
     pub r#type: MilestoneType<'a>,
     ///Milestone value in meters
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub value_meters: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value_meters: Option<i64>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MilestoneType<'a> {
     Distance,
     Lap,
     Note,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> MilestoneType<'a> {
@@ -802,7 +718,7 @@ impl<'a> From<&'a str> for MilestoneType<'a> {
             "distance" => Self::Distance,
             "lap" => Self::Lap,
             "note" => Self::Note,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -813,7 +729,7 @@ impl<'a> From<String> for MilestoneType<'a> {
             "distance" => Self::Distance,
             "lap" => Self::Lap,
             "note" => Self::Note,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -870,99 +786,73 @@ impl jacquard_common::IntoStatic for MilestoneType<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RoutePoint<'a> {
     ///Latitude in microdegrees (degrees * 1,000,000)
     pub lat_e6: i64,
     ///Longitude in microdegrees (degrees * 1,000,000)
     pub lng_e6: i64,
-    pub timestamp: jacquard_common::types::string::Datetime,
+    pub timestamp: Datetime,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct StrengthDetails<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub calories: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub calories: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cardio_zones: core::option::Option<
-        crate::app_fitsky::workout::CardioZoneData<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cardio_zones: Option<workout::CardioZoneData<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub exercises: core::option::Option<Vec<crate::app_fitsky::workout::Exercise<'a>>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub exercises: Option<Vec<workout::Exercise<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub heart_rate: core::option::Option<crate::app_fitsky::workout::HeartRateData<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub heart_rate: Option<workout::HeartRateData<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub heart_rate_samples: core::option::Option<
-        Vec<crate::app_fitsky::workout::HeartRateSample<'a>>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub steps: core::option::Option<i64>,
+    pub heart_rate_samples: Option<Vec<workout::HeartRateSample<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub steps: Option<i64>,
 }
 
 /// Controls which fields are visible to other users in the Fitsky UI. Note: ATProto repos are public — this is UI-level privacy only.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct VisibilitySettings<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub calories: core::option::Option<VisibilitySettingsCalories<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub calories: Option<VisibilitySettingsCalories<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cardio_zones: core::option::Option<VisibilitySettingsCardioZones<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cardio_zones: Option<VisibilitySettingsCardioZones<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub details: core::option::Option<VisibilitySettingsDetails<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub details: Option<VisibilitySettingsDetails<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub heart_rate: core::option::Option<VisibilitySettingsHeartRate<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub heart_rate: Option<VisibilitySettingsHeartRate<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub notes: core::option::Option<VisibilitySettingsNotes<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub notes: Option<VisibilitySettingsNotes<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub steps: core::option::Option<VisibilitySettingsSteps<'a>>,
+    pub steps: Option<VisibilitySettingsSteps<'a>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsCalories<'a> {
     Public,
     Private,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> VisibilitySettingsCalories<'a> {
@@ -980,7 +870,7 @@ impl<'a> From<&'a str> for VisibilitySettingsCalories<'a> {
         match s {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -990,7 +880,7 @@ impl<'a> From<String> for VisibilitySettingsCalories<'a> {
         match s.as_str() {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -1048,11 +938,12 @@ impl jacquard_common::IntoStatic for VisibilitySettingsCalories<'_> {
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsCardioZones<'a> {
     Public,
     Private,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> VisibilitySettingsCardioZones<'a> {
@@ -1070,7 +961,7 @@ impl<'a> From<&'a str> for VisibilitySettingsCardioZones<'a> {
         match s {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -1080,7 +971,7 @@ impl<'a> From<String> for VisibilitySettingsCardioZones<'a> {
         match s.as_str() {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -1142,11 +1033,12 @@ impl jacquard_common::IntoStatic for VisibilitySettingsCardioZones<'_> {
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsDetails<'a> {
     Public,
     Private,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> VisibilitySettingsDetails<'a> {
@@ -1164,7 +1056,7 @@ impl<'a> From<&'a str> for VisibilitySettingsDetails<'a> {
         match s {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -1174,7 +1066,7 @@ impl<'a> From<String> for VisibilitySettingsDetails<'a> {
         match s.as_str() {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -1232,11 +1124,12 @@ impl jacquard_common::IntoStatic for VisibilitySettingsDetails<'_> {
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsHeartRate<'a> {
     Public,
     Private,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> VisibilitySettingsHeartRate<'a> {
@@ -1254,7 +1147,7 @@ impl<'a> From<&'a str> for VisibilitySettingsHeartRate<'a> {
         match s {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -1264,7 +1157,7 @@ impl<'a> From<String> for VisibilitySettingsHeartRate<'a> {
         match s.as_str() {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -1322,11 +1215,12 @@ impl jacquard_common::IntoStatic for VisibilitySettingsHeartRate<'_> {
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsNotes<'a> {
     Public,
     Private,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> VisibilitySettingsNotes<'a> {
@@ -1344,7 +1238,7 @@ impl<'a> From<&'a str> for VisibilitySettingsNotes<'a> {
         match s {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -1354,7 +1248,7 @@ impl<'a> From<String> for VisibilitySettingsNotes<'a> {
         match s.as_str() {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -1412,11 +1306,12 @@ impl jacquard_common::IntoStatic for VisibilitySettingsNotes<'_> {
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsSteps<'a> {
     Public,
     Private,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> VisibilitySettingsSteps<'a> {
@@ -1434,7 +1329,7 @@ impl<'a> From<&'a str> for VisibilitySettingsSteps<'a> {
         match s {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -1444,7 +1339,7 @@ impl<'a> From<String> for VisibilitySettingsSteps<'a> {
         match s.as_str() {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -1504,36 +1399,27 @@ impl jacquard_common::IntoStatic for VisibilitySettingsSteps<'_> {
 
 impl<'a> Workout<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, WorkoutRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, WorkoutRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CardioDetails<'a> {
+impl<'a> LexiconSchema for CardioDetails<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
     fn def_name() -> &'static str {
         "cardioDetails"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_fitsky_workout()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.distance_meters {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "distance_meters",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("distance_meters"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1541,10 +1427,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CardioDetails<'a> {
         }
         if let Some(ref value) = self.elevation_gain_meters {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "elevation_gain_meters",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("elevation_gain_meters"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1552,10 +1436,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CardioDetails<'a> {
         }
         if let Some(ref value) = self.pace_seconds_per_km {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "pace_seconds_per_km",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("pace_seconds_per_km"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1565,44 +1447,38 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CardioDetails<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CardioZoneData<'a> {
+impl<'a> LexiconSchema for CardioZoneData<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
     fn def_name() -> &'static str {
         "cardioZoneData"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_fitsky_workout()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Exercise<'a> {
+impl<'a> LexiconSchema for Exercise<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
     fn def_name() -> &'static str {
         "exercise"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_fitsky_workout()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1612,25 +1488,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Exercise<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ExerciseSet<'a> {
+impl<'a> LexiconSchema for ExerciseSet<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
     fn def_name() -> &'static str {
         "exerciseSet"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_fitsky_workout()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.weight_grams {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "weight_grams",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("weight_grams"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1640,26 +1512,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ExerciseSet<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for FlexibilityDetails<'a> {
+impl<'a> LexiconSchema for FlexibilityDetails<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
     fn def_name() -> &'static str {
         "flexibilityDetails"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_fitsky_workout()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.intensity {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "intensity",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("intensity"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1669,59 +1537,51 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for FlexibilityDetails<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for HeartRateData<'a> {
+impl<'a> LexiconSchema for HeartRateData<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
     fn def_name() -> &'static str {
         "heartRateData"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_fitsky_workout()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for HeartRateSample<'a> {
+impl<'a> LexiconSchema for HeartRateSample<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
     fn def_name() -> &'static str {
         "heartRateSample"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_fitsky_workout()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for HiitSportsDetails<'a> {
+impl<'a> LexiconSchema for HiitSportsDetails<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
     fn def_name() -> &'static str {
         "hiitSportsDetails"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_fitsky_workout()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.distance_meters {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "distance_meters",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("distance_meters"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1730,10 +1590,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for HiitSportsDetails<'a> {
         if let Some(ref value) = self.intensity {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "intensity",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("intensity"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1741,10 +1599,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for HiitSportsDetails<'a> {
         }
         if let Some(ref value) = self.pace_seconds_per_km {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "pace_seconds_per_km",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("pace_seconds_per_km"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1753,10 +1609,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for HiitSportsDetails<'a> {
         if let Some(ref value) = self.sport {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "sport",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("sport"),
                     max: 128usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1767,13 +1621,14 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for HiitSportsDetails<'a> {
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct WorkoutRecord;
-impl jacquard_common::xrpc::XrpcResp for WorkoutRecord {
+impl XrpcResp for WorkoutRecord {
     const NSID: &'static str = "app.fitsky.workout";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = WorkoutGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<WorkoutGetRecordOutput<'_>> for Workout<'_> {
@@ -1783,36 +1638,32 @@ impl From<WorkoutGetRecordOutput<'_>> for Workout<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Workout<'_> {
+impl Collection for Workout<'_> {
     const NSID: &'static str = "app.fitsky.workout";
     type Record = WorkoutRecord;
 }
 
-impl jacquard_common::types::collection::Collection for WorkoutRecord {
+impl Collection for WorkoutRecord {
     const NSID: &'static str = "app.fitsky.workout";
     type Record = WorkoutRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Workout<'a> {
+impl<'a> LexiconSchema for Workout<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_fitsky_workout()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.duration;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "duration",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("duration"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1821,10 +1672,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Workout<'a> {
         if let Some(ref value) = self.notes {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("notes"),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1834,10 +1683,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Workout<'a> {
             {
                 let size = value.blob().size;
                 if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "og_image",
-                        ),
+                    return Err(ConstraintError::BlobTooLarge {
+                        path: ValidationPath::from_field("og_image"),
                         max: 1000000usize,
                         actual: size,
                     });
@@ -1862,10 +1709,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Workout<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "og_image",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("og_image"),
                         accepted: vec![
                             "image/png".to_string(), "image/jpeg".to_string(),
                             "image/webp".to_string()
@@ -1878,10 +1723,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Workout<'a> {
         if let Some(ref value) = self.status {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "status",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("status"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1891,10 +1734,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Workout<'a> {
             let value = &self.title;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "title",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("title"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1904,10 +1745,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Workout<'a> {
             let value = &self.r#type;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("type"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1917,26 +1756,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Workout<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Milestone<'a> {
+impl<'a> LexiconSchema for Milestone<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
     fn def_name() -> &'static str {
         "milestone"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_fitsky_workout()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.note {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "note",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("note"),
                     max: 512usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1946,10 +1781,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Milestone<'a> {
             let value = &self.r#type;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("type"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1957,10 +1790,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Milestone<'a> {
         }
         if let Some(ref value) = self.value_meters {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "value_meters",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("value_meters"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -1970,60 +1801,52 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Milestone<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for RoutePoint<'a> {
+impl<'a> LexiconSchema for RoutePoint<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
     fn def_name() -> &'static str {
         "routePoint"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_fitsky_workout()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for StrengthDetails<'a> {
+impl<'a> LexiconSchema for StrengthDetails<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
     fn def_name() -> &'static str {
         "strengthDetails"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_fitsky_workout()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for VisibilitySettings<'a> {
+impl<'a> LexiconSchema for VisibilitySettings<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
     fn def_name() -> &'static str {
         "visibilitySettings"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_fitsky_workout()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.calories {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "calories",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("calories"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2032,10 +1855,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for VisibilitySettings<'a> {
         if let Some(ref value) = self.cardio_zones {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "cardio_zones",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("cardio_zones"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2044,10 +1865,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for VisibilitySettings<'a> {
         if let Some(ref value) = self.details {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "details",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("details"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2056,10 +1875,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for VisibilitySettings<'a> {
         if let Some(ref value) = self.heart_rate {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "heart_rate",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("heart_rate"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2068,10 +1885,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for VisibilitySettings<'a> {
         if let Some(ref value) = self.notes {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("notes"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2080,10 +1895,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for VisibilitySettings<'a> {
         if let Some(ref value) = self.steps {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "steps",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("steps"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -2093,1324 +1906,753 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for VisibilitySettings<'a> {
     }
 }
 
-fn lexicon_doc_app_fitsky_workout() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.fitsky.workout"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_fitsky_workout() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.fitsky.workout"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("cardioDetails"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("cardioDetails"),
+                LexUserType::Object(LexObject {
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "calories",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("calories"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cardioZones",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#cardioZoneData",
-                                ),
+                            SmolStr::new_static("cardioZones"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#cardioZoneData"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "distanceMeters",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("distanceMeters"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "elevationGainMeters",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("elevationGainMeters"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "heartRate",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#heartRateData",
-                                ),
+                            SmolStr::new_static("heartRate"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#heartRateData"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "heartRateSamples",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#heartRateSample",
-                                    ),
+                            SmolStr::new_static("heartRateSamples"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#heartRateSample"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "paceSecondsPerKm",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("paceSecondsPerKm"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "routePoints",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("routePoints"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "GPS route points recorded during the workout",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#routePoint"),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#routePoint"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "steps",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("steps"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("cardioZoneData"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("cardioZoneData"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Time in seconds spent in each heart rate zone",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "zone1Rest",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("zone1Rest"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "zone2Easy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("zone2Easy"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "zone3Aerobic",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("zone3Aerobic"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "zone4Threshold",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("zone4Threshold"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "zone5Max",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("zone5Max"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("exercise"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("exercise"),
+                LexUserType::Object(LexObject {
                     required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("sets")
-                        ],
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("sets")],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "name",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(128usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sets",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#exerciseSet"),
+                            SmolStr::new_static("sets"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#exerciseSet"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("exerciseSet"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("exerciseSet"),
+                LexUserType::Object(LexObject {
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "reps",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("reps"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "weightGrams",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("weightGrams"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "flexibilityDetails",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("flexibilityDetails"),
+                LexUserType::Object(LexObject {
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "calories",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("calories"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cardioZones",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#cardioZoneData",
-                                ),
+                            SmolStr::new_static("cardioZones"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#cardioZoneData"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "heartRate",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#heartRateData",
-                                ),
+                            SmolStr::new_static("heartRate"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#heartRateData"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "heartRateSamples",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#heartRateSample",
-                                    ),
+                            SmolStr::new_static("heartRateSamples"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#heartRateSample"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "intensity",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("intensity"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(64usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "movements",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("movements"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "steps",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("steps"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("heartRateData"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("heartRateData"),
+                LexUserType::Object(LexObject {
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "avg",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("avg"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "max",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("max"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "min",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("min"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "resting",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("resting"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "heartRateSample",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("heartRateSample"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("timestamp"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("bpm")
+                            SmolStr::new_static("timestamp"), SmolStr::new_static("bpm")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "bpm",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("bpm"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "timestamp",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("timestamp"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "hiitSportsDetails",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("hiitSportsDetails"),
+                LexUserType::Object(LexObject {
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "calories",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("calories"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cardioZones",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#cardioZoneData",
-                                ),
+                            SmolStr::new_static("cardioZones"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#cardioZoneData"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "distanceMeters",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("distanceMeters"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "heartRate",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#heartRateData",
-                                ),
+                            SmolStr::new_static("heartRate"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#heartRateData"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "heartRateSamples",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#heartRateSample",
-                                    ),
+                            SmolStr::new_static("heartRateSamples"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#heartRateSample"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "intensity",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("intensity"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(64usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "paceSecondsPerKm",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("paceSecondsPerKm"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "rounds",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("rounds"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "routePoints",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            SmolStr::new_static("routePoints"),
+                            LexObjectProperty::Array(LexArray {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "GPS route points recorded during the workout",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#routePoint"),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#routePoint"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "sport",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("sport"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(128usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "steps",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("steps"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("A fitness workout record"),
-                    ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
+                    description: Some(CowStr::new_static("A fitness workout record")),
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("startedAt"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("duration"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("type"), SmolStr::new_static("title"),
+                                SmolStr::new_static("startedAt"),
+                                SmolStr::new_static("duration"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "details",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                SmolStr::new_static("details"),
+                                LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("#cardioDetails"),
-                                        ::jacquard_common::CowStr::new_static("#strengthDetails"),
-                                        ::jacquard_common::CowStr::new_static("#flexibilityDetails"),
-                                        ::jacquard_common::CowStr::new_static("#hiitSportsDetails")
+                                        CowStr::new_static("#cardioDetails"),
+                                        CowStr::new_static("#strengthDetails"),
+                                        CowStr::new_static("#flexibilityDetails"),
+                                        CowStr::new_static("#hiitSportsDetails")
                                     ],
-                                    closed: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "duration",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("duration"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "endedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("endedAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "milestones",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("milestones"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Progress milestones for linear workouts",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static("#milestone"),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#milestone"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
-                                    max_length: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "notes",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("notes"),
+                                LexObjectProperty::String(LexString {
                                     max_length: Some(2048usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "ogImage",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                    description: None,
-                                    accept: None,
-                                    max_size: None,
-                                }),
+                                SmolStr::new_static("ogImage"),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "planUri",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("planUri"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Reference to the workoutPlan used, if any",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "startedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("startedAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "status",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("status"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Whether the workout is in progress or finished. Omitted for legacy workouts (treat as completed).",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(64usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "title",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("title"),
+                                LexObjectProperty::String(LexString {
                                     max_length: Some(256usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "type",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
+                                SmolStr::new_static("type"),
+                                LexObjectProperty::String(LexString {
                                     max_length: Some(64usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "visibility",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#visibilitySettings",
-                                    ),
+                                SmolStr::new_static("visibility"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#visibilitySettings"),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("milestone"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("milestone"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("type"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("timestamp")
+                            SmolStr::new_static("type"), SmolStr::new_static("timestamp")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "note",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("note"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(512usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "timestamp",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("timestamp"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "type",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(64usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "valueMeters",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("valueMeters"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("routePoint"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("routePoint"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("latE6"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("lngE6"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("timestamp")
+                            SmolStr::new_static("latE6"), SmolStr::new_static("lngE6"),
+                            SmolStr::new_static("timestamp")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "latE6",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("latE6"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "lngE6",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("lngE6"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "timestamp",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("timestamp"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "strengthDetails",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("strengthDetails"),
+                LexUserType::Object(LexObject {
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "calories",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("calories"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cardioZones",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#cardioZoneData",
-                                ),
+                            SmolStr::new_static("cardioZones"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#cardioZoneData"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "exercises",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#exercise"),
+                            SmolStr::new_static("exercises"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#exercise"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "heartRate",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#heartRateData",
-                                ),
+                            SmolStr::new_static("heartRate"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#heartRateData"),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "heartRateSamples",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#heartRateSample",
-                                    ),
+                            SmolStr::new_static("heartRateSamples"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#heartRateSample"),
+                                    ..Default::default()
                                 }),
-                                min_length: None,
-                                max_length: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "steps",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
-                                minimum: None,
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                            SmolStr::new_static("steps"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "visibilitySettings",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("visibilitySettings"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Controls which fields are visible to other users in the Fitsky UI. Note: ATProto repos are public — this is UI-level privacy only.",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "calories",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("calories"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(64usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "cardioZones",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("cardioZones"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(64usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "details",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("details"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(64usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "heartRate",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("heartRate"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(64usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "notes",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("notes"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(64usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "steps",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
+                            SmolStr::new_static("steps"),
+                            LexObjectProperty::String(LexString {
                                 max_length: Some(64usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -3460,12 +2702,9 @@ pub mod exercise_state {
 
 /// Builder for constructing an instance of this type
 pub struct ExerciseBuilder<'a, S: exercise_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::app_fitsky::workout::ExerciseSet<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<Vec<workout::ExerciseSet<'a>>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Exercise<'a> {
@@ -3479,9 +2718,9 @@ impl<'a> ExerciseBuilder<'a, exercise_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ExerciseBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3494,13 +2733,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ExerciseBuilder<'a, exercise_state::SetName<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ExerciseBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3513,13 +2752,13 @@ where
     /// Set the `sets` field (required)
     pub fn sets(
         mut self,
-        value: impl Into<Vec<crate::app_fitsky::workout::ExerciseSet<'a>>>,
+        value: impl Into<Vec<workout::ExerciseSet<'a>>>,
     ) -> ExerciseBuilder<'a, exercise_state::SetSets<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ExerciseBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3541,7 +2780,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3600,12 +2839,9 @@ pub mod heart_rate_sample_state {
 
 /// Builder for constructing an instance of this type
 pub struct HeartRateSampleBuilder<'a, S: heart_rate_sample_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<Datetime>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> HeartRateSample<'a> {
@@ -3619,9 +2855,9 @@ impl<'a> HeartRateSampleBuilder<'a, heart_rate_sample_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         HeartRateSampleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3636,11 +2872,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> HeartRateSampleBuilder<'a, heart_rate_sample_state::SetBpm<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         HeartRateSampleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3653,13 +2889,13 @@ where
     /// Set the `timestamp` field (required)
     pub fn timestamp(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> HeartRateSampleBuilder<'a, heart_rate_sample_state::SetTimestamp<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         HeartRateSampleBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3681,7 +2917,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3705,106 +2941,106 @@ pub mod workout_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Type;
-        type StartedAt;
         type Duration;
+        type Type;
         type Title;
+        type StartedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Type = Unset;
-        type StartedAt = Unset;
         type Duration = Unset;
+        type Type = Unset;
         type Title = Unset;
+        type StartedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Duration = S::Duration;
         type Type = S::Type;
+        type Title = S::Title;
         type StartedAt = S::StartedAt;
-        type Duration = S::Duration;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = Set<members::r#type>;
-        type StartedAt = S::StartedAt;
-        type Duration = S::Duration;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
-        type StartedAt = Set<members::started_at>;
-        type Duration = S::Duration;
-        type Title = S::Title;
     }
     ///State transition - sets the `duration` field to Set
     pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDuration<S> {}
     impl<S: State> State for SetDuration<S> {
         type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
-        type StartedAt = S::StartedAt;
         type Duration = Set<members::duration>;
+        type Type = S::Type;
         type Title = S::Title;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type CreatedAt = S::CreatedAt;
+        type Duration = S::Duration;
+        type Type = Set<members::r#type>;
+        type Title = S::Title;
+        type StartedAt = S::StartedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
-        type StartedAt = S::StartedAt;
         type Duration = S::Duration;
+        type Type = S::Type;
         type Title = Set<members::title>;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type CreatedAt = S::CreatedAt;
+        type Duration = S::Duration;
+        type Type = S::Type;
+        type Title = S::Title;
+        type StartedAt = Set<members::started_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
         ///Marker type for the `duration` field
         pub struct duration(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct WorkoutBuilder<'a, S: workout_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<WorkoutDetails<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<Vec<crate::app_fitsky::workout::Milestone<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<WorkoutStatus<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<WorkoutType<'a>>,
-        ::core::option::Option<crate::app_fitsky::workout::VisibilitySettings<'a>>,
+        Option<Datetime>,
+        Option<WorkoutDetails<'a>>,
+        Option<i64>,
+        Option<Datetime>,
+        Option<Vec<workout::Milestone<'a>>>,
+        Option<CowStr<'a>>,
+        Option<BlobRef<'a>>,
+        Option<AtUri<'a>>,
+        Option<Datetime>,
+        Option<WorkoutStatus<'a>>,
+        Option<CowStr<'a>>,
+        Option<WorkoutType<'a>>,
+        Option<workout::VisibilitySettings<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Workout<'a> {
@@ -3818,7 +3054,7 @@ impl<'a> WorkoutBuilder<'a, workout_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         WorkoutBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -3834,7 +3070,7 @@ impl<'a> WorkoutBuilder<'a, workout_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3847,13 +3083,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> WorkoutBuilder<'a, workout_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         WorkoutBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -3881,29 +3117,23 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> WorkoutBuilder<'a, workout_state::SetDuration<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         WorkoutBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `endedAt` field (optional)
-    pub fn ended_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn ended_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `endedAt` field to an Option value (optional)
-    pub fn maybe_ended_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_ended_at(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -3913,7 +3143,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `milestones` field (optional)
     pub fn milestones(
         mut self,
-        value: impl Into<Option<Vec<crate::app_fitsky::workout::Milestone<'a>>>>,
+        value: impl Into<Option<Vec<workout::Milestone<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
@@ -3921,7 +3151,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `milestones` field to an Option value (optional)
     pub fn maybe_milestones(
         mut self,
-        value: Option<Vec<crate::app_fitsky::workout::Milestone<'a>>>,
+        value: Option<Vec<workout::Milestone<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
@@ -3930,15 +3160,12 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
 
 impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
-    pub fn maybe_notes(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -3946,18 +3173,12 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
 
 impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `ogImage` field (optional)
-    pub fn og_image(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
-    ) -> Self {
+    pub fn og_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `ogImage` field to an Option value (optional)
-    pub fn maybe_og_image(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_og_image(mut self, value: Option<BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -3965,18 +3186,12 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
 
 impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `planUri` field (optional)
-    pub fn plan_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn plan_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `planUri` field to an Option value (optional)
-    pub fn maybe_plan_uri(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_plan_uri(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -3990,13 +3205,13 @@ where
     /// Set the `startedAt` field (required)
     pub fn started_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> WorkoutBuilder<'a, workout_state::SetStartedAt<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         WorkoutBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -4022,13 +3237,13 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> WorkoutBuilder<'a, workout_state::SetTitle<S>> {
-        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.10 = Option::Some(value.into());
         WorkoutBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -4043,11 +3258,11 @@ where
         mut self,
         value: impl Into<WorkoutType<'a>>,
     ) -> WorkoutBuilder<'a, workout_state::SetType<S>> {
-        self.__unsafe_private_named.11 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.11 = Option::Some(value.into());
         WorkoutBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -4056,7 +3271,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `visibility` field (optional)
     pub fn visibility(
         mut self,
-        value: impl Into<Option<crate::app_fitsky::workout::VisibilitySettings<'a>>>,
+        value: impl Into<Option<workout::VisibilitySettings<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.12 = value.into();
         self
@@ -4064,7 +3279,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `visibility` field to an Option value (optional)
     pub fn maybe_visibility(
         mut self,
-        value: Option<crate::app_fitsky::workout::VisibilitySettings<'a>>,
+        value: Option<workout::VisibilitySettings<'a>>,
     ) -> Self {
         self.__unsafe_private_named.12 = value;
         self
@@ -4075,10 +3290,10 @@ impl<'a, S> WorkoutBuilder<'a, S>
 where
     S: workout_state::State,
     S::CreatedAt: workout_state::IsSet,
-    S::Type: workout_state::IsSet,
-    S::StartedAt: workout_state::IsSet,
     S::Duration: workout_state::IsSet,
+    S::Type: workout_state::IsSet,
     S::Title: workout_state::IsSet,
+    S::StartedAt: workout_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Workout<'a> {
@@ -4102,7 +3317,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4136,50 +3351,50 @@ pub mod milestone_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type Timestamp;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Timestamp = S::Timestamp;
+        type Type = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
-        type Type = S::Type;
         type Timestamp = Set<members::timestamp>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Timestamp = S::Timestamp;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MilestoneBuilder<'a, S: milestone_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<MilestoneType<'a>>,
-        ::core::option::Option<i64>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<MilestoneType<'a>>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Milestone<'a> {
@@ -4193,24 +3408,21 @@ impl<'a> MilestoneBuilder<'a, milestone_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MilestoneBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: milestone_state::State> MilestoneBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
-    pub fn maybe_note(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -4224,13 +3436,13 @@ where
     /// Set the `timestamp` field (required)
     pub fn timestamp(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> MilestoneBuilder<'a, milestone_state::SetTimestamp<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         MilestoneBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -4245,11 +3457,11 @@ where
         mut self,
         value: impl Into<MilestoneType<'a>>,
     ) -> MilestoneBuilder<'a, milestone_state::SetType<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         MilestoneBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -4270,8 +3482,8 @@ impl<'a, S: milestone_state::State> MilestoneBuilder<'a, S> {
 impl<'a, S> MilestoneBuilder<'a, S>
 where
     S: milestone_state::State,
-    S::Type: milestone_state::IsSet,
     S::Timestamp: milestone_state::IsSet,
+    S::Type: milestone_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Milestone<'a> {
@@ -4286,7 +3498,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4311,63 +3523,59 @@ pub mod route_point_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LngE6;
         type Timestamp;
         type LatE6;
+        type LngE6;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LngE6 = Unset;
         type Timestamp = Unset;
         type LatE6 = Unset;
-    }
-    ///State transition - sets the `lng_e6` field to Set
-    pub struct SetLngE6<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLngE6<S> {}
-    impl<S: State> State for SetLngE6<S> {
-        type LngE6 = Set<members::lng_e6>;
-        type Timestamp = S::Timestamp;
-        type LatE6 = S::LatE6;
+        type LngE6 = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
-        type LngE6 = S::LngE6;
         type Timestamp = Set<members::timestamp>;
         type LatE6 = S::LatE6;
+        type LngE6 = S::LngE6;
     }
     ///State transition - sets the `lat_e6` field to Set
     pub struct SetLatE6<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLatE6<S> {}
     impl<S: State> State for SetLatE6<S> {
-        type LngE6 = S::LngE6;
         type Timestamp = S::Timestamp;
         type LatE6 = Set<members::lat_e6>;
+        type LngE6 = S::LngE6;
+    }
+    ///State transition - sets the `lng_e6` field to Set
+    pub struct SetLngE6<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLngE6<S> {}
+    impl<S: State> State for SetLngE6<S> {
+        type Timestamp = S::Timestamp;
+        type LatE6 = S::LatE6;
+        type LngE6 = Set<members::lng_e6>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lng_e6` field
-        pub struct lng_e6(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
         ///Marker type for the `lat_e6` field
         pub struct lat_e6(());
+        ///Marker type for the `lng_e6` field
+        pub struct lng_e6(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RoutePointBuilder<'a, S: route_point_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<i64>, Option<Datetime>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> RoutePoint<'a> {
@@ -4381,9 +3589,9 @@ impl<'a> RoutePointBuilder<'a, route_point_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RoutePointBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -4398,11 +3606,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> RoutePointBuilder<'a, route_point_state::SetLatE6<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         RoutePointBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -4417,11 +3625,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> RoutePointBuilder<'a, route_point_state::SetLngE6<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         RoutePointBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -4434,13 +3642,13 @@ where
     /// Set the `timestamp` field (required)
     pub fn timestamp(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> RoutePointBuilder<'a, route_point_state::SetTimestamp<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         RoutePointBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -4448,9 +3656,9 @@ where
 impl<'a, S> RoutePointBuilder<'a, S>
 where
     S: route_point_state::State,
-    S::LngE6: route_point_state::IsSet,
     S::Timestamp: route_point_state::IsSet,
     S::LatE6: route_point_state::IsSet,
+    S::LngE6: route_point_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RoutePoint<'a> {
@@ -4464,7 +3672,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

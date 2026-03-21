@@ -5,62 +5,57 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetEntryMetadataByName<'a> {
     #[serde(borrow)]
-    pub author: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub author: AtIdentifier<'a>,
     #[serde(borrow)]
-    pub entry_title: jacquard_common::CowStr<'a>,
+    pub entry_title: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetEntryMetadataByNameOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub entry_uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub last_update: core::option::Option<jacquard_common::types::string::Datetime>,
+    pub entry_uri: AtUri<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_update: Option<Datetime>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetEntryMetadataByNameError<'a> {
     /// If the associated name isn't registered in the author's repo, this error is returned
     #[serde(rename = "NotFound")]
-    NotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    NotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetEntryMetadataByNameError<'_> {
@@ -78,8 +73,7 @@ impl core::fmt::Display for GetEntryMetadataByNameError<'_> {
     }
 }
 
-/// Response type for
-///com.whtwnd.blog.getEntryMetadataByName
+/// Response type for com.whtwnd.blog.getEntryMetadataByName
 pub struct GetEntryMetadataByNameResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryMetadataByNameResponse {
     const NSID: &'static str = "com.whtwnd.blog.getEntryMetadataByName";
@@ -94,8 +88,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntryMetadataByName<'a> {
     type Response = GetEntryMetadataByNameResponse;
 }
 
-/// Endpoint type for
-///com.whtwnd.blog.getEntryMetadataByName
+/// Endpoint type for com.whtwnd.blog.getEntryMetadataByName
 pub struct GetEntryMetadataByNameRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryMetadataByNameRequest {
     const PATH: &'static str = "/xrpc/com.whtwnd.blog.getEntryMetadataByName";
@@ -114,37 +107,37 @@ pub mod get_entry_metadata_by_name_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Author;
         type EntryTitle;
+        type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Author = Unset;
         type EntryTitle = Unset;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Author = Set<members::author>;
-        type EntryTitle = S::EntryTitle;
+        type Author = Unset;
     }
     ///State transition - sets the `entry_title` field to Set
     pub struct SetEntryTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEntryTitle<S> {}
     impl<S: State> State for SetEntryTitle<S> {
-        type Author = S::Author;
         type EntryTitle = Set<members::entry_title>;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type EntryTitle = S::EntryTitle;
+        type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `entry_title` field
         pub struct entry_title(());
+        ///Marker type for the `author` field
+        pub struct author(());
     }
 }
 
@@ -153,12 +146,9 @@ pub struct GetEntryMetadataByNameBuilder<
     'a,
     S: get_entry_metadata_by_name_state::State,
 > {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetEntryMetadataByName<'a> {
@@ -175,9 +165,9 @@ impl<'a> GetEntryMetadataByNameBuilder<'a, get_entry_metadata_by_name_state::Emp
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetEntryMetadataByNameBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -190,16 +180,16 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> GetEntryMetadataByNameBuilder<
         'a,
         get_entry_metadata_by_name_state::SetAuthor<S>,
     > {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetEntryMetadataByNameBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -212,16 +202,16 @@ where
     /// Set the `entryTitle` field (required)
     pub fn entry_title(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetEntryMetadataByNameBuilder<
         'a,
         get_entry_metadata_by_name_state::SetEntryTitle<S>,
     > {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetEntryMetadataByNameBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -229,8 +219,8 @@ where
 impl<'a, S> GetEntryMetadataByNameBuilder<'a, S>
 where
     S: get_entry_metadata_by_name_state::State,
-    S::Author: get_entry_metadata_by_name_state::IsSet,
     S::EntryTitle: get_entry_metadata_by_name_state::IsSet,
+    S::Author: get_entry_metadata_by_name_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetEntryMetadataByName<'a> {

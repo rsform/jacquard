@@ -5,64 +5,57 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::MessageView;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveReaction<'a> {
     #[serde(borrow)]
-    pub convo_id: jacquard_common::CowStr<'a>,
+    pub convo_id: CowStr<'a>,
     #[serde(borrow)]
-    pub message_id: jacquard_common::CowStr<'a>,
+    pub message_id: CowStr<'a>,
     #[serde(borrow)]
-    pub value: jacquard_common::CowStr<'a>,
+    pub value: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RemoveReactionOutput<'a> {
     #[serde(borrow)]
-    pub message: crate::chat_bsky::convo::MessageView<'a>,
+    pub message: MessageView<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RemoveReactionError<'a> {
     /// Indicates that the message has been deleted and reactions can no longer be added/removed.
     #[serde(rename = "ReactionMessageDeleted")]
-    ReactionMessageDeleted(core::option::Option<jacquard_common::CowStr<'a>>),
+    ReactionMessageDeleted(Option<CowStr<'a>>),
     /// Indicates the value for the reaction is not acceptable. In general, this means it is not an emoji.
     #[serde(rename = "ReactionInvalidValue")]
-    ReactionInvalidValue(core::option::Option<jacquard_common::CowStr<'a>>),
+    ReactionInvalidValue(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for RemoveReactionError<'_> {
@@ -87,8 +80,7 @@ impl core::fmt::Display for RemoveReactionError<'_> {
     }
 }
 
-/// Response type for
-///chat.bsky.convo.removeReaction
+/// Response type for chat.bsky.convo.removeReaction
 pub struct RemoveReactionResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveReactionResponse {
     const NSID: &'static str = "chat.bsky.convo.removeReaction";
@@ -105,8 +97,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveReaction<'a> {
     type Response = RemoveReactionResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.convo.removeReaction
+/// Endpoint type for chat.bsky.convo.removeReaction
 pub struct RemoveReactionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveReactionRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.removeReaction";

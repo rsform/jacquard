@@ -5,38 +5,26 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LoginOutput<'a> {
     ///The code used to login on the InstantDB website
     #[serde(borrow)]
-    pub code: jacquard_common::CowStr<'a>,
+    pub code: CowStr<'a>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct Login;
-/// Response type for
-///app.ocho.state.login
+/// Response type for app.ocho.state.login
 pub struct LoginResponse;
 impl jacquard_common::xrpc::XrpcResp for LoginResponse {
     const NSID: &'static str = "app.ocho.state.login";
@@ -51,8 +39,7 @@ impl jacquard_common::xrpc::XrpcRequest for Login {
     type Response = LoginResponse;
 }
 
-/// Endpoint type for
-///app.ocho.state.login
+/// Endpoint type for app.ocho.state.login
 pub struct LoginRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LoginRequest {
     const PATH: &'static str = "/xrpc/app.ocho.state.login";

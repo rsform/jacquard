@@ -5,56 +5,51 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::blue_recipes::feed::RecipeView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRecipe<'a> {
     #[serde(borrow)]
-    pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
+    pub uris: Vec<AtUri<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRecipeOutput<'a> {
     #[serde(borrow)]
-    pub recipes: Vec<crate::blue_recipes::feed::RecipeView<'a>>,
+    pub recipes: Vec<RecipeView<'a>>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetRecipeError<'a> {
     #[serde(rename = "NotFound")]
-    NotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    NotFound(Option<CowStr<'a>>),
     #[serde(rename = "InvalidUri")]
-    InvalidUri(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidUri(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetRecipeError<'_> {
@@ -79,8 +74,7 @@ impl core::fmt::Display for GetRecipeError<'_> {
     }
 }
 
-/// Response type for
-///blue.recipes.feed.getRecipe
+/// Response type for blue.recipes.feed.getRecipe
 pub struct GetRecipeResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecipeResponse {
     const NSID: &'static str = "blue.recipes.feed.getRecipe";
@@ -95,8 +89,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecipe<'a> {
     type Response = GetRecipeResponse;
 }
 
-/// Endpoint type for
-///blue.recipes.feed.getRecipe
+/// Endpoint type for blue.recipes.feed.getRecipe
 pub struct GetRecipeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecipeRequest {
     const PATH: &'static str = "/xrpc/blue.recipes.feed.getRecipe";
@@ -139,11 +132,9 @@ pub mod get_recipe_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetRecipeBuilder<'a, S: get_recipe_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<AtUri<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetRecipe<'a> {
@@ -157,9 +148,9 @@ impl<'a> GetRecipeBuilder<'a, get_recipe_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetRecipeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -172,13 +163,13 @@ where
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<'a>>>,
     ) -> GetRecipeBuilder<'a, get_recipe_state::SetUris<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetRecipeBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

@@ -5,39 +5,51 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::app_certified::badge::award::Award;
 /// Recipient response to a badge award.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Response<'a> {
     ///Reference to the badge award.
     #[serde(borrow)]
-    pub badge_award: crate::app_certified::badge::award::Award<'a>,
+    pub badge_award: Award<'a>,
     ///Client-declared timestamp when this record was originally created
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///The recipient’s response for the badge (accepted or rejected).
     #[serde(borrow)]
     pub response: ResponseResponse<'a>,
     ///Optional relative weight for accepted badges, assigned by the recipient.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub weight: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub weight: Option<CowStr<'a>>,
 }
 
 /// The recipient’s response for the badge (accepted or rejected).
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ResponseResponse<'a> {
     Accepted,
     Rejected,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> ResponseResponse<'a> {
@@ -55,7 +67,7 @@ impl<'a> From<&'a str> for ResponseResponse<'a> {
         match s {
             "accepted" => Self::Accepted,
             "rejected" => Self::Rejected,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -65,7 +77,7 @@ impl<'a> From<String> for ResponseResponse<'a> {
         match s.as_str() {
             "accepted" => Self::Accepted,
             "rejected" => Self::Rejected,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -122,47 +134,36 @@ impl jacquard_common::IntoStatic for ResponseResponse<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ResponseGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Response<'a>,
 }
 
 impl<'a> Response<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, ResponseRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, ResponseRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ResponseRecord;
-impl jacquard_common::xrpc::XrpcResp for ResponseRecord {
+impl XrpcResp for ResponseRecord {
     const NSID: &'static str = "app.certified.badge.response";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ResponseGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<ResponseGetRecordOutput<'_>> for Response<'_> {
@@ -172,36 +173,32 @@ impl From<ResponseGetRecordOutput<'_>> for Response<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Response<'_> {
+impl Collection for Response<'_> {
     const NSID: &'static str = "app.certified.badge.response";
     type Record = ResponseRecord;
 }
 
-impl jacquard_common::types::collection::Collection for ResponseRecord {
+impl Collection for ResponseRecord {
     const NSID: &'static str = "app.certified.badge.response";
     type Record = ResponseRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Response<'a> {
+impl<'a> LexiconSchema for Response<'a> {
     fn nsid() -> &'static str {
         "app.certified.badge.response"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_certified_badge_response()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.weight {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "weight",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("weight"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -221,64 +218,64 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Response;
         type BadgeAward;
+        type Response;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Response = Unset;
         type BadgeAward = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Response = S::Response;
-        type BadgeAward = S::BadgeAward;
-    }
-    ///State transition - sets the `response` field to Set
-    pub struct SetResponse<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResponse<S> {}
-    impl<S: State> State for SetResponse<S> {
-        type CreatedAt = S::CreatedAt;
-        type Response = Set<members::response>;
-        type BadgeAward = S::BadgeAward;
+        type Response = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `badge_award` field to Set
     pub struct SetBadgeAward<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBadgeAward<S> {}
     impl<S: State> State for SetBadgeAward<S> {
-        type CreatedAt = S::CreatedAt;
-        type Response = S::Response;
         type BadgeAward = Set<members::badge_award>;
+        type Response = S::Response;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `response` field to Set
+    pub struct SetResponse<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResponse<S> {}
+    impl<S: State> State for SetResponse<S> {
+        type BadgeAward = S::BadgeAward;
+        type Response = Set<members::response>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type BadgeAward = S::BadgeAward;
+        type Response = S::Response;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `response` field
-        pub struct response(());
         ///Marker type for the `badge_award` field
         pub struct badge_award(());
+        ///Marker type for the `response` field
+        pub struct response(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ResponseBuilder<'a, S: response_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::app_certified::badge::award::Award<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<ResponseResponse<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<Award<'a>>,
+        Option<Datetime>,
+        Option<ResponseResponse<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Response<'a> {
@@ -292,9 +289,9 @@ impl<'a> ResponseBuilder<'a, response_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ResponseBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -307,13 +304,13 @@ where
     /// Set the `badgeAward` field (required)
     pub fn badge_award(
         mut self,
-        value: impl Into<crate::app_certified::badge::award::Award<'a>>,
+        value: impl Into<Award<'a>>,
     ) -> ResponseBuilder<'a, response_state::SetBadgeAward<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ResponseBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -326,13 +323,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> ResponseBuilder<'a, response_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ResponseBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -347,26 +344,23 @@ where
         mut self,
         value: impl Into<ResponseResponse<'a>>,
     ) -> ResponseBuilder<'a, response_state::SetResponse<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         ResponseBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
     /// Set the `weight` field (optional)
-    pub fn weight(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn weight(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `weight` field to an Option value (optional)
-    pub fn maybe_weight(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_weight(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -375,9 +369,9 @@ impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
 impl<'a, S> ResponseBuilder<'a, S>
 where
     S: response_state::State,
-    S::CreatedAt: response_state::IsSet,
-    S::Response: response_state::IsSet,
     S::BadgeAward: response_state::IsSet,
+    S::Response: response_state::IsSet,
+    S::CreatedAt: response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Response<'a> {
@@ -392,7 +386,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -407,120 +401,85 @@ where
     }
 }
 
-fn lexicon_doc_app_certified_badge_response() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.certified.badge.response"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_certified_badge_response() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.certified.badge.response"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Recipient response to a badge award.",
-                        ),
+                        CowStr::new_static("Recipient response to a badge award."),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("badgeAward"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("response"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("badgeAward"),
+                                SmolStr::new_static("response"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "badgeAward",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "app.certified.badge.award",
-                                    ),
+                                SmolStr::new_static("badgeAward"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("app.certified.badge.award"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Client-declared timestamp when this record was originally created",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "response",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("response"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The recipient’s response for the badge (accepted or rejected).",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "weight",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("weight"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Optional relative weight for accepted badges, assigned by the recipient.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(50usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

@@ -5,68 +5,63 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::science_alt::dataset::label::Label;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveLabel<'a> {
     #[serde(borrow)]
-    pub handle: jacquard_common::CowStr<'a>,
+    pub handle: CowStr<'a>,
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///(max length: 50)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub version: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub version: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveLabelOutput<'a> {
     ///CID of the resolved dataset entry
     #[serde(borrow)]
-    pub cid: jacquard_common::CowStr<'a>,
+    pub cid: CowStr<'a>,
     ///The label record that was resolved
     #[serde(borrow)]
-    pub label: crate::science_alt::dataset::label::Label<'a>,
+    pub label: Label<'a>,
     ///AT-URI of the resolved dataset entry
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ResolveLabelError<'a> {
     /// No label found with the given name
     #[serde(rename = "LabelNotFound")]
-    LabelNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    LabelNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for ResolveLabelError<'_> {
@@ -84,8 +79,7 @@ impl core::fmt::Display for ResolveLabelError<'_> {
     }
 }
 
-/// Response type for
-///science.alt.dataset.resolveLabel
+/// Response type for science.alt.dataset.resolveLabel
 pub struct ResolveLabelResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveLabelResponse {
     const NSID: &'static str = "science.alt.dataset.resolveLabel";
@@ -100,8 +94,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveLabel<'a> {
     type Response = ResolveLabelResponse;
 }
 
-/// Endpoint type for
-///science.alt.dataset.resolveLabel
+/// Endpoint type for science.alt.dataset.resolveLabel
 pub struct ResolveLabelRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveLabelRequest {
     const PATH: &'static str = "/xrpc/science.alt.dataset.resolveLabel";
@@ -156,13 +149,9 @@ pub mod resolve_label_state {
 
 /// Builder for constructing an instance of this type
 pub struct ResolveLabelBuilder<'a, S: resolve_label_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ResolveLabel<'a> {
@@ -176,9 +165,9 @@ impl<'a> ResolveLabelBuilder<'a, resolve_label_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ResolveLabelBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -191,13 +180,13 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ResolveLabelBuilder<'a, resolve_label_state::SetHandle<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ResolveLabelBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -210,28 +199,25 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ResolveLabelBuilder<'a, resolve_label_state::SetName<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ResolveLabelBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: resolve_label_state::State> ResolveLabelBuilder<'a, S> {
     /// Set the `version` field (optional)
-    pub fn version(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn version(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `version` field to an Option value (optional)
-    pub fn maybe_version(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_version(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }

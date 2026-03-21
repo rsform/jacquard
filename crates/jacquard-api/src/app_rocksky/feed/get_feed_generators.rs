@@ -5,41 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::feed::FeedGeneratorsView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedGenerators {
     ///(min: 1)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub size: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size: Option<i64>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedGeneratorsOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::feed::FeedGeneratorsView<'a>,
+    pub value: FeedGeneratorsView<'a>,
 }
 
-/// Response type for
-///app.rocksky.feed.getFeedGenerators
+/// Response type for app.rocksky.feed.getFeedGenerators
 pub struct GetFeedGeneratorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFeedGeneratorsResponse {
     const NSID: &'static str = "app.rocksky.feed.getFeedGenerators";
@@ -54,8 +43,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetFeedGenerators {
     type Response = GetFeedGeneratorsResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.feed.getFeedGenerators
+/// Endpoint type for app.rocksky.feed.getFeedGenerators
 pub struct GetFeedGeneratorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFeedGeneratorsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.feed.getFeedGenerators";
@@ -85,8 +73,8 @@ pub mod get_feed_generators_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetFeedGeneratorsBuilder<S: get_feed_generators_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>,),
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>,),
 }
 
 impl GetFeedGenerators {
@@ -100,7 +88,7 @@ impl GetFeedGeneratorsBuilder<get_feed_generators_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetFeedGeneratorsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
         }
     }

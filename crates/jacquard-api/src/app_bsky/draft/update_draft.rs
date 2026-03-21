@@ -5,24 +5,21 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::draft::DraftWithId;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateDraft<'a> {
     #[serde(borrow)]
-    pub draft: crate::app_bsky::draft::DraftWithId<'a>,
+    pub draft: DraftWithId<'a>,
 }
 
-/// Response type for
-///app.bsky.draft.updateDraft
+/// Response type for app.bsky.draft.updateDraft
 pub struct UpdateDraftResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateDraftResponse {
     const NSID: &'static str = "app.bsky.draft.updateDraft";
@@ -39,8 +36,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateDraft<'a> {
     type Response = UpdateDraftResponse;
 }
 
-/// Endpoint type for
-///app.bsky.draft.updateDraft
+/// Endpoint type for app.bsky.draft.updateDraft
 pub struct UpdateDraftRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateDraftRequest {
     const PATH: &'static str = "/xrpc/app.bsky.draft.updateDraft";
@@ -85,11 +81,9 @@ pub mod update_draft_state {
 
 /// Builder for constructing an instance of this type
 pub struct UpdateDraftBuilder<'a, S: update_draft_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::app_bsky::draft::DraftWithId<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<DraftWithId<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateDraft<'a> {
@@ -103,9 +97,9 @@ impl<'a> UpdateDraftBuilder<'a, update_draft_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateDraftBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -118,13 +112,13 @@ where
     /// Set the `draft` field (required)
     pub fn draft(
         mut self,
-        value: impl Into<crate::app_bsky::draft::DraftWithId<'a>>,
+        value: impl Into<DraftWithId<'a>>,
     ) -> UpdateDraftBuilder<'a, update_draft_state::SetDraft<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         UpdateDraftBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -144,7 +138,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -5,69 +5,63 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::git::temp::Blob;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetEntity<'a> {
     #[serde(borrow)]
-    pub path: jacquard_common::CowStr<'a>,
+    pub path: CowStr<'a>,
     ///Defaults to `"HEAD"`.
     #[serde(default = "_default_ref")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#ref: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#ref: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub repo: jacquard_common::types::string::AtUri<'a>,
+    pub repo: AtUri<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetEntityOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::sh_tangled::git::temp::Blob<'a>,
+    pub value: Blob<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetEntityError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(Option<CowStr<'a>>),
     /// Blob not found
     #[serde(rename = "BlobNotFound")]
-    BlobNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    BlobNotFound(Option<CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRequest(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetEntityError<'_> {
@@ -99,8 +93,7 @@ impl core::fmt::Display for GetEntityError<'_> {
     }
 }
 
-/// Response type for
-///sh.tangled.git.temp.getEntity
+/// Response type for sh.tangled.git.temp.getEntity
 pub struct GetEntityResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntityResponse {
     const NSID: &'static str = "sh.tangled.git.temp.getEntity";
@@ -115,8 +108,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntity<'a> {
     type Response = GetEntityResponse;
 }
 
-/// Endpoint type for
-///sh.tangled.git.temp.getEntity
+/// Endpoint type for sh.tangled.git.temp.getEntity
 pub struct GetEntityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntityRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.getEntity";
@@ -125,8 +117,8 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetEntityRequest {
     type Response = GetEntityResponse;
 }
 
-fn _default_ref() -> core::option::Option<jacquard_common::CowStr<'static>> {
-    Some(jacquard_common::CowStr::from("HEAD"))
+fn _default_ref() -> Option<CowStr<'static>> {
+    Some(CowStr::from("HEAD"))
 }
 
 pub mod get_entity_state {
@@ -139,49 +131,45 @@ pub mod get_entity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Path;
         type Repo;
+        type Path;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Path = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
-        type Path = Set<members::path>;
-        type Repo = S::Repo;
+        type Path = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Path = S::Path;
         type Repo = Set<members::repo>;
+        type Path = S::Path;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPath<S> {}
+    impl<S: State> State for SetPath<S> {
+        type Repo = S::Repo;
+        type Path = Set<members::path>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `path` field
-        pub struct path(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `path` field
+        pub struct path(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetEntityBuilder<'a, S: get_entity_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetEntity<'a> {
@@ -195,9 +183,9 @@ impl<'a> GetEntityBuilder<'a, get_entity_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetEntityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -210,28 +198,25 @@ where
     /// Set the `path` field (required)
     pub fn path(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetEntityBuilder<'a, get_entity_state::SetPath<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetEntityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_entity_state::State> GetEntityBuilder<'a, S> {
     /// Set the `ref` field (optional)
-    pub fn r#ref(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn r#ref(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `ref` field to an Option value (optional)
-    pub fn maybe_ref(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_ref(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -245,13 +230,13 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetEntityBuilder<'a, get_entity_state::SetRepo<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         GetEntityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -259,8 +244,8 @@ where
 impl<'a, S> GetEntityBuilder<'a, S>
 where
     S: get_entity_state::State,
-    S::Path: get_entity_state::IsSet,
     S::Repo: get_entity_state::IsSet,
+    S::Path: get_entity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetEntity<'a> {

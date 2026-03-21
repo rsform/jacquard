@@ -9,7 +9,19 @@ pub mod event;
 pub mod measurement;
 pub mod occurrence;
 
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// The specific nature of the data record. Controlled vocabulary per Darwin Core.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BasisOfRecordEnum<'a> {
     HumanObservation,
@@ -20,7 +32,7 @@ pub enum BasisOfRecordEnum<'a> {
     MaterialSample,
     MaterialEntity,
     MaterialCitation,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> BasisOfRecordEnum<'a> {
@@ -50,7 +62,7 @@ impl<'a> From<&'a str> for BasisOfRecordEnum<'a> {
             "MaterialSample" => Self::MaterialSample,
             "MaterialEntity" => Self::MaterialEntity,
             "MaterialCitation" => Self::MaterialCitation,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -66,7 +78,7 @@ impl<'a> From<String> for BasisOfRecordEnum<'a> {
             "MaterialSample" => Self::MaterialSample,
             "MaterialEntity" => Self::MaterialEntity,
             "MaterialCitation" => Self::MaterialCitation,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -125,6 +137,7 @@ impl jacquard_common::IntoStatic for BasisOfRecordEnum<'_> {
 }
 
 /// Dublin Core type vocabulary for the nature of the resource.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DublinCoreTypeEnum<'a> {
     PhysicalObject,
@@ -134,7 +147,7 @@ pub enum DublinCoreTypeEnum<'a> {
     Text,
     Event,
     Dataset,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> DublinCoreTypeEnum<'a> {
@@ -162,7 +175,7 @@ impl<'a> From<&'a str> for DublinCoreTypeEnum<'a> {
             "Text" => Self::Text,
             "Event" => Self::Event,
             "Dataset" => Self::Dataset,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -177,7 +190,7 @@ impl<'a> From<String> for DublinCoreTypeEnum<'a> {
             "Text" => Self::Text,
             "Event" => Self::Event,
             "Dataset" => Self::Dataset,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -233,35 +246,28 @@ impl jacquard_common::IntoStatic for DublinCoreTypeEnum<'_> {
 }
 
 /// A geographic point with uncertainty, following Darwin Core Location class
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Geolocation<'a> {
     ///Horizontal distance from the coordinates describing the smallest circle containing the whole location. Zero is not valid.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub coordinate_uncertainty_in_meters: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub coordinate_uncertainty_in_meters: Option<i64>,
     ///Geographic latitude in decimal degrees (WGS84). Positive values north of the Equator, negative south. Range: -90 to 90.
     #[serde(borrow)]
-    pub decimal_latitude: jacquard_common::CowStr<'a>,
+    pub decimal_latitude: CowStr<'a>,
     ///Geographic longitude in decimal degrees (WGS84). Positive values east of the Greenwich Meridian, negative west. Range: -180 to 180.
     #[serde(borrow)]
-    pub decimal_longitude: jacquard_common::CowStr<'a>,
+    pub decimal_longitude: CowStr<'a>,
     ///The ellipsoid, geodetic datum, or spatial reference system. Recommended: 'EPSG:4326' (WGS84)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub geodetic_datum: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub geodetic_datum: Option<CowStr<'a>>,
 }
 
 /// The nomenclatural code under which the scientific name is constructed.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum NomenclaturalCodeEnum<'a> {
     Iczn,
@@ -269,7 +275,7 @@ pub enum NomenclaturalCodeEnum<'a> {
     Icnp,
     Ictv,
     BioCode,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> NomenclaturalCodeEnum<'a> {
@@ -293,7 +299,7 @@ impl<'a> From<&'a str> for NomenclaturalCodeEnum<'a> {
             "ICNP" => Self::Icnp,
             "ICTV" => Self::Ictv,
             "BioCode" => Self::BioCode,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -306,7 +312,7 @@ impl<'a> From<String> for NomenclaturalCodeEnum<'a> {
             "ICNP" => Self::Icnp,
             "ICTV" => Self::Ictv,
             "BioCode" => Self::BioCode,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -362,11 +368,12 @@ impl jacquard_common::IntoStatic for NomenclaturalCodeEnum<'_> {
 }
 
 /// Statement about the presence or absence of a taxon at a location.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum OccurrenceStatusEnum<'a> {
     Present,
     Absent,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> OccurrenceStatusEnum<'a> {
@@ -384,7 +391,7 @@ impl<'a> From<&'a str> for OccurrenceStatusEnum<'a> {
         match s {
             "present" => Self::Present,
             "absent" => Self::Absent,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -394,7 +401,7 @@ impl<'a> From<String> for OccurrenceStatusEnum<'a> {
         match s.as_str() {
             "present" => Self::Present,
             "absent" => Self::Absent,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -447,12 +454,13 @@ impl jacquard_common::IntoStatic for OccurrenceStatusEnum<'_> {
 }
 
 /// The sex of the biological individual(s) represented in the occurrence.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SexEnum<'a> {
     Male,
     Female,
     Hermaphrodite,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> SexEnum<'a> {
@@ -472,7 +480,7 @@ impl<'a> From<&'a str> for SexEnum<'a> {
             "male" => Self::Male,
             "female" => Self::Female,
             "hermaphrodite" => Self::Hermaphrodite,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -483,7 +491,7 @@ impl<'a> From<String> for SexEnum<'a> {
             "male" => Self::Male,
             "female" => Self::Female,
             "hermaphrodite" => Self::Hermaphrodite,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -535,49 +543,42 @@ impl jacquard_common::IntoStatic for SexEnum<'_> {
 }
 
 /// A taxonomic identification with provenance metadata
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct TaxonIdentification<'a> {
     ///Date the identification was made (ISO 8601)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub date_identified: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub date_identified: Option<CowStr<'a>>,
     ///GBIF backbone taxonomy key for the identified taxon
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub gbif_taxon_key: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub gbif_taxon_key: Option<CowStr<'a>>,
     ///Uncertainty qualifier applied to the taxon name (e.g., 'cf. agrestis', 'aff. agrestis')
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub identification_qualifier: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub identification_qualifier: Option<CowStr<'a>>,
     ///Notes or comments about the identification
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub identification_remarks: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub identification_remarks: Option<CowStr<'a>>,
     ///Person(s) who made the identification (pipe-delimited for multiple)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub identified_by: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub identified_by: Option<CowStr<'a>>,
     ///ORCID or other persistent identifier for the person(s) who identified (pipe-delimited)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub identified_by_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub identified_by_id: Option<CowStr<'a>>,
     ///The full scientific name including authorship and date
     #[serde(borrow)]
-    pub scientific_name: jacquard_common::CowStr<'a>,
+    pub scientific_name: CowStr<'a>,
 }
 
 /// The taxonomic rank of the most specific name in the scientificName.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TaxonRankEnum<'a> {
     Kingdom,
@@ -592,7 +593,7 @@ pub enum TaxonRankEnum<'a> {
     Subspecies,
     Variety,
     Form,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> TaxonRankEnum<'a> {
@@ -630,7 +631,7 @@ impl<'a> From<&'a str> for TaxonRankEnum<'a> {
             "subspecies" => Self::Subspecies,
             "variety" => Self::Variety,
             "form" => Self::Form,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -650,7 +651,7 @@ impl<'a> From<String> for TaxonRankEnum<'a> {
             "subspecies" => Self::Subspecies,
             "variety" => Self::Variety,
             "form" => Self::Form,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -710,25 +711,21 @@ impl jacquard_common::IntoStatic for TaxonRankEnum<'_> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
+impl<'a> LexiconSchema for Geolocation<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.dwc.defs"
     }
     fn def_name() -> &'static str {
         "geolocation"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_gainforest_dwc_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.coordinate_uncertainty_in_meters {
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "coordinate_uncertainty_in_meters",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("coordinate_uncertainty_in_meters"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -737,16 +734,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
         {
             let value = &self.decimal_latitude;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 32usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "decimal_latitude",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("decimal_latitude"),
                         max: 32usize,
                         actual: count,
                     });
@@ -756,16 +747,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
         {
             let value = &self.decimal_longitude;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 32usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "decimal_longitude",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("decimal_longitude"),
                         max: 32usize,
                         actual: count,
                     });
@@ -774,16 +759,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
         }
         if let Some(ref value) = self.geodetic_datum {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "geodetic_datum",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("geodetic_datum"),
                         max: 64usize,
                         actual: count,
                     });
@@ -794,31 +773,23 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
+impl<'a> LexiconSchema for TaxonIdentification<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.dwc.defs"
     }
     fn def_name() -> &'static str {
         "taxonIdentification"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_gainforest_dwc_defs()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.date_identified {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "date_identified",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("date_identified"),
                         max: 64usize,
                         actual: count,
                     });
@@ -827,16 +798,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
         }
         if let Some(ref value) = self.gbif_taxon_key {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "gbif_taxon_key",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("gbif_taxon_key"),
                         max: 64usize,
                         actual: count,
                     });
@@ -845,16 +810,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
         }
         if let Some(ref value) = self.identification_qualifier {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 256usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identification_qualifier",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("identification_qualifier"),
                         max: 256usize,
                         actual: count,
                     });
@@ -863,16 +822,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
         }
         if let Some(ref value) = self.identification_remarks {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 2048usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identification_remarks",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("identification_remarks"),
                         max: 2048usize,
                         actual: count,
                     });
@@ -881,16 +834,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
         }
         if let Some(ref value) = self.identified_by {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identified_by",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("identified_by"),
                         max: 512usize,
                         actual: count,
                     });
@@ -899,16 +846,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
         }
         if let Some(ref value) = self.identified_by_id {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "identified_by_id",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("identified_by_id"),
                         max: 512usize,
                         actual: count,
                     });
@@ -918,16 +859,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
         {
             let value = &self.scientific_name;
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 512usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "scientific_name",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("scientific_name"),
                         max: 512usize,
                         actual: count,
                     });
@@ -938,407 +873,256 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
     }
 }
 
-fn lexicon_doc_app_gainforest_dwc_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.gainforest.dwc.defs"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_gainforest_dwc_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.gainforest.dwc.defs"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "basisOfRecordEnum",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
+                SmolStr::new_static("basisOfRecordEnum"),
+                LexUserType::String(LexString {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "The specific nature of the data record. Controlled vocabulary per Darwin Core.",
                         ),
                     ),
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
                     max_graphemes: Some(64usize),
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "dublinCoreTypeEnum",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
+                SmolStr::new_static("dublinCoreTypeEnum"),
+                LexUserType::String(LexString {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Dublin Core type vocabulary for the nature of the resource.",
                         ),
                     ),
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
                     max_graphemes: Some(64usize),
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("geolocation"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("geolocation"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A geographic point with uncertainty, following Darwin Core Location class",
                         ),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("decimalLatitude"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("decimalLongitude")
+                            SmolStr::new_static("decimalLatitude"),
+                            SmolStr::new_static("decimalLongitude")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "coordinateUncertaintyInMeters",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("coordinateUncertaintyInMeters"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(1i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "decimalLatitude",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("decimalLatitude"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Geographic latitude in decimal degrees (WGS84). Positive values north of the Equator, negative south. Range: -90 to 90.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
                                 max_graphemes: Some(32usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "decimalLongitude",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("decimalLongitude"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Geographic longitude in decimal degrees (WGS84). Positive values east of the Greenwich Meridian, negative west. Range: -180 to 180.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
                                 max_graphemes: Some(32usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "geodeticDatum",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("geodeticDatum"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The ellipsoid, geodetic datum, or spatial reference system. Recommended: 'EPSG:4326' (WGS84)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
                                 max_graphemes: Some(64usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "nomenclaturalCodeEnum",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
+                SmolStr::new_static("nomenclaturalCodeEnum"),
+                LexUserType::String(LexString {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "The nomenclatural code under which the scientific name is constructed.",
                         ),
                     ),
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
                     max_graphemes: Some(64usize),
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "occurrenceStatusEnum",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
+                SmolStr::new_static("occurrenceStatusEnum"),
+                LexUserType::String(LexString {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Statement about the presence or absence of a taxon at a location.",
                         ),
                     ),
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
                     max_graphemes: Some(64usize),
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("sexEnum"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
+                SmolStr::new_static("sexEnum"),
+                LexUserType::String(LexString {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "The sex of the biological individual(s) represented in the occurrence.",
                         ),
                     ),
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
                     max_graphemes: Some(64usize),
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "taxonIdentification",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("taxonIdentification"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "A taxonomic identification with provenance metadata",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("scientificName")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("scientificName")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "dateIdentified",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("dateIdentified"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Date the identification was made (ISO 8601)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
                                 max_graphemes: Some(64usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "gbifTaxonKey",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("gbifTaxonKey"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "GBIF backbone taxonomy key for the identified taxon",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
                                 max_graphemes: Some(64usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "identificationQualifier",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("identificationQualifier"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Uncertainty qualifier applied to the taxon name (e.g., 'cf. agrestis', 'aff. agrestis')",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
                                 max_graphemes: Some(256usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "identificationRemarks",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("identificationRemarks"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Notes or comments about the identification",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
                                 max_graphemes: Some(2048usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "identifiedBy",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("identifiedBy"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Person(s) who made the identification (pipe-delimited for multiple)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
                                 max_graphemes: Some(512usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "identifiedByID",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("identifiedByID"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "ORCID or other persistent identifier for the person(s) who identified (pipe-delimited)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
                                 max_graphemes: Some(512usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "scientificName",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("scientificName"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The full scientific name including authorship and date",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
                                 max_graphemes: Some(512usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("taxonRankEnum"),
-                ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
+                SmolStr::new_static("taxonRankEnum"),
+                LexUserType::String(LexString {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "The taxonomic rank of the most specific name in the scientificName.",
                         ),
                     ),
-                    format: None,
-                    default: None,
-                    min_length: None,
-                    max_length: None,
-                    min_graphemes: None,
                     max_graphemes: Some(64usize),
-                    r#enum: None,
-                    r#const: None,
-                    known_values: None,
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

@@ -5,54 +5,55 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Stack<'a> {
     ///Cross-axis alignment of children.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub align: core::option::Option<StackAlign<'a>>,
+    pub align: Option<StackAlign<'a>>,
     #[serde(borrow)]
-    pub children: jacquard_common::types::value::Data<'a>,
+    pub children: Data<'a>,
     ///Space between children.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub gap: core::option::Option<StackGap<'a>>,
+    pub gap: Option<StackGap<'a>>,
     ///Whether this container has inset padding. The theme controls the amount.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub inset: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inset: Option<bool>,
     ///Main-axis distribution of children.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub justify: core::option::Option<StackJustify<'a>>,
+    pub justify: Option<StackJustify<'a>>,
     ///Whether the container has an opaque background.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub opaque: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub opaque: Option<bool>,
     ///Whether to show a visual separator between children.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub separator: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub separator: Option<bool>,
     ///Whether the container sticks to the top of the scroll area.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub sticky: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sticky: Option<bool>,
 }
 
 /// Cross-axis alignment of children.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum StackAlign<'a> {
     Start,
     Center,
     End,
     Stretch,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> StackAlign<'a> {
@@ -74,7 +75,7 @@ impl<'a> From<&'a str> for StackAlign<'a> {
             "center" => Self::Center,
             "end" => Self::End,
             "stretch" => Self::Stretch,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -86,7 +87,7 @@ impl<'a> From<String> for StackAlign<'a> {
             "center" => Self::Center,
             "end" => Self::End,
             "stretch" => Self::Stretch,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -145,13 +146,14 @@ impl jacquard_common::IntoStatic for StackAlign<'_> {
 }
 
 /// Space between children.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum StackGap<'a> {
     None,
     Small,
     Medium,
     Large,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> StackGap<'a> {
@@ -173,7 +175,7 @@ impl<'a> From<&'a str> for StackGap<'a> {
             "small" => Self::Small,
             "medium" => Self::Medium,
             "large" => Self::Large,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -185,7 +187,7 @@ impl<'a> From<String> for StackGap<'a> {
             "small" => Self::Small,
             "medium" => Self::Medium,
             "large" => Self::Large,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -244,13 +246,14 @@ impl jacquard_common::IntoStatic for StackGap<'_> {
 }
 
 /// Main-axis distribution of children.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum StackJustify<'a> {
     Start,
     Center,
     End,
     Between,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> StackJustify<'a> {
@@ -272,7 +275,7 @@ impl<'a> From<&'a str> for StackJustify<'a> {
             "center" => Self::Center,
             "end" => Self::End,
             "between" => Self::Between,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -284,7 +287,7 @@ impl<'a> From<String> for StackJustify<'a> {
             "center" => Self::Center,
             "end" => Self::End,
             "between" => Self::Between,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -342,25 +345,17 @@ impl jacquard_common::IntoStatic for StackJustify<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct StackOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
+    pub value: Response<'a>,
 }
 
-/// Response type for
-///org.atsui.Stack
+/// Response type for org.atsui.Stack
 pub struct StackResponse;
 impl jacquard_common::xrpc::XrpcResp for StackResponse {
     const NSID: &'static str = "org.atsui.Stack";
@@ -377,8 +372,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Stack<'a> {
     type Response = StackResponse;
 }
 
-/// Endpoint type for
-///org.atsui.Stack
+/// Endpoint type for org.atsui.Stack
 pub struct StackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StackRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Stack";
@@ -423,18 +417,18 @@ pub mod stack_state {
 
 /// Builder for constructing an instance of this type
 pub struct StackBuilder<'a, S: stack_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<StackAlign<'a>>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<StackGap<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<StackJustify<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<bool>,
+        Option<StackAlign<'a>>,
+        Option<Data<'a>>,
+        Option<StackGap<'a>>,
+        Option<bool>,
+        Option<StackJustify<'a>>,
+        Option<bool>,
+        Option<bool>,
+        Option<bool>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Stack<'a> {
@@ -448,9 +442,9 @@ impl<'a> StackBuilder<'a, stack_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StackBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -476,13 +470,13 @@ where
     /// Set the `children` field (required)
     pub fn children(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> StackBuilder<'a, stack_state::SetChildren<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         StackBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -587,10 +581,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Stack<'a> {
         Stack {
             align: self.__unsafe_private_named.0,

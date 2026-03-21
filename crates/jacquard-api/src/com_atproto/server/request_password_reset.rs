@@ -5,25 +5,21 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RequestPasswordReset<'a> {
     #[serde(borrow)]
-    pub email: jacquard_common::CowStr<'a>,
+    pub email: CowStr<'a>,
 }
 
-/// Response type for
-///com.atproto.server.requestPasswordReset
+/// Response type for com.atproto.server.requestPasswordReset
 pub struct RequestPasswordResetResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestPasswordResetResponse {
     const NSID: &'static str = "com.atproto.server.requestPasswordReset";
@@ -40,8 +36,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RequestPasswordReset<'a> {
     type Response = RequestPasswordResetResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.requestPasswordReset
+/// Endpoint type for com.atproto.server.requestPasswordReset
 pub struct RequestPasswordResetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestPasswordResetRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.requestPasswordReset";

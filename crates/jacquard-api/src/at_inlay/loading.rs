@@ -5,43 +5,35 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Element;
+use crate::at_inlay::Response;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Loading<'a> {
     #[serde(borrow)]
-    pub children: jacquard_common::types::value::Data<'a>,
+    pub children: Data<'a>,
     #[serde(borrow)]
-    pub fallback: crate::at_inlay::Element<'a>,
+    pub fallback: Element<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct LoadingOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
+    pub value: Response<'a>,
 }
 
-/// Response type for
-///at.inlay.Loading
+/// Response type for at.inlay.Loading
 pub struct LoadingResponse;
 impl jacquard_common::xrpc::XrpcResp for LoadingResponse {
     const NSID: &'static str = "at.inlay.Loading";
@@ -58,8 +50,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Loading<'a> {
     type Response = LoadingResponse;
 }
 
-/// Endpoint type for
-///at.inlay.Loading
+/// Endpoint type for at.inlay.Loading
 pub struct LoadingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LoadingRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Loading";
@@ -80,48 +71,45 @@ pub mod loading_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Fallback;
         type Children;
+        type Fallback;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Fallback = Unset;
         type Children = Unset;
-    }
-    ///State transition - sets the `fallback` field to Set
-    pub struct SetFallback<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFallback<S> {}
-    impl<S: State> State for SetFallback<S> {
-        type Fallback = Set<members::fallback>;
-        type Children = S::Children;
+        type Fallback = Unset;
     }
     ///State transition - sets the `children` field to Set
     pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetChildren<S> {}
     impl<S: State> State for SetChildren<S> {
-        type Fallback = S::Fallback;
         type Children = Set<members::children>;
+        type Fallback = S::Fallback;
+    }
+    ///State transition - sets the `fallback` field to Set
+    pub struct SetFallback<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFallback<S> {}
+    impl<S: State> State for SetFallback<S> {
+        type Children = S::Children;
+        type Fallback = Set<members::fallback>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `fallback` field
-        pub struct fallback(());
         ///Marker type for the `children` field
         pub struct children(());
+        ///Marker type for the `fallback` field
+        pub struct fallback(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LoadingBuilder<'a, S: loading_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<crate::at_inlay::Element<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Data<'a>>, Option<Element<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Loading<'a> {
@@ -135,9 +123,9 @@ impl<'a> LoadingBuilder<'a, loading_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LoadingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -150,13 +138,13 @@ where
     /// Set the `children` field (required)
     pub fn children(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> LoadingBuilder<'a, loading_state::SetChildren<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         LoadingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -169,13 +157,13 @@ where
     /// Set the `fallback` field (required)
     pub fn fallback(
         mut self,
-        value: impl Into<crate::at_inlay::Element<'a>>,
+        value: impl Into<Element<'a>>,
     ) -> LoadingBuilder<'a, loading_state::SetFallback<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         LoadingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -183,8 +171,8 @@ where
 impl<'a, S> LoadingBuilder<'a, S>
 where
     S: loading_state::State,
-    S::Fallback: loading_state::IsSet,
     S::Children: loading_state::IsSet,
+    S::Fallback: loading_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Loading<'a> {
@@ -197,10 +185,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Loading<'a> {
         Loading {
             children: self.__unsafe_private_named.0.unwrap(),

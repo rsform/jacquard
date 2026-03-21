@@ -5,73 +5,62 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::UriValue;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::slice::get_o_auth_clients::OauthClientDetails;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateOAuthClient<'a> {
     ///OAuth client ID to update
     #[serde(borrow)]
-    pub client_id: jacquard_common::CowStr<'a>,
+    pub client_id: CowStr<'a>,
     ///New human-readable name of the OAuth client
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub client_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub client_name: Option<CowStr<'a>>,
     ///New URI of the client application
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub client_uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub client_uri: Option<UriValue<'a>>,
     ///New URI of the client logo
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub logo_uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub logo_uri: Option<UriValue<'a>>,
     ///New URI of the privacy policy
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub policy_uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub policy_uri: Option<UriValue<'a>>,
     ///New allowed redirect URIs for OAuth flow
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub redirect_uris: core::option::Option<
-        Vec<jacquard_common::types::string::UriValue<'a>>,
-    >,
+    pub redirect_uris: Option<Vec<UriValue<'a>>>,
     ///New OAuth scope
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub scope: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub scope: Option<CowStr<'a>>,
     ///New URI of the terms of service
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tos_uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub tos_uri: Option<UriValue<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateOAuthClientOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::network_slices::slice::get_o_auth_clients::OauthClientDetails<'a>,
+    pub value: OauthClientDetails<'a>,
 }
 
-/// Response type for
-///network.slices.slice.updateOAuthClient
+/// Response type for network.slices.slice.updateOAuthClient
 pub struct UpdateOAuthClientResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateOAuthClientResponse {
     const NSID: &'static str = "network.slices.slice.updateOAuthClient";
@@ -88,8 +77,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateOAuthClient<'a> {
     type Response = UpdateOAuthClientResponse;
 }
 
-/// Endpoint type for
-///network.slices.slice.updateOAuthClient
+/// Endpoint type for network.slices.slice.updateOAuthClient
 pub struct UpdateOAuthClientRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateOAuthClientRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.updateOAuthClient";

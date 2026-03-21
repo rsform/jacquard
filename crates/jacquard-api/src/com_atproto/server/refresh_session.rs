@@ -5,51 +5,52 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, Handle};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RefreshSessionOutput<'a> {
     #[serde(borrow)]
-    pub access_jwt: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub active: core::option::Option<bool>,
+    pub access_jwt: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub active: Option<bool>,
     #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub did: Did<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did_doc: core::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub did_doc: Option<Data<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub email: core::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub email_auth_factor: core::option::Option<bool>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub email_confirmed: core::option::Option<bool>,
+    pub email: Option<CowStr<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email_auth_factor: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email_confirmed: Option<bool>,
     #[serde(borrow)]
-    pub handle: jacquard_common::types::string::Handle<'a>,
+    pub handle: Handle<'a>,
     #[serde(borrow)]
-    pub refresh_jwt: jacquard_common::CowStr<'a>,
+    pub refresh_jwt: CowStr<'a>,
     ///Hosting status of the account. If not specified, then assume 'active'.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: core::option::Option<RefreshSessionOutputStatus<'a>>,
+    pub status: Option<RefreshSessionOutputStatus<'a>>,
 }
 
 /// Hosting status of the account. If not specified, then assume 'active'.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RefreshSessionOutputStatus<'a> {
     Takendown,
     Suspended,
     Deactivated,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> RefreshSessionOutputStatus<'a> {
@@ -69,7 +70,7 @@ impl<'a> From<&'a str> for RefreshSessionOutputStatus<'a> {
             "takendown" => Self::Takendown,
             "suspended" => Self::Suspended,
             "deactivated" => Self::Deactivated,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -80,7 +81,7 @@ impl<'a> From<String> for RefreshSessionOutputStatus<'a> {
             "takendown" => Self::Takendown,
             "suspended" => Self::Suspended,
             "deactivated" => Self::Deactivated,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -145,27 +146,29 @@ impl jacquard_common::IntoStatic for RefreshSessionOutputStatus<'_> {
     }
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RefreshSessionError<'a> {
     #[serde(rename = "AccountTakedown")]
-    AccountTakedown(core::option::Option<jacquard_common::CowStr<'a>>),
+    AccountTakedown(Option<CowStr<'a>>),
     #[serde(rename = "InvalidToken")]
-    InvalidToken(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidToken(Option<CowStr<'a>>),
     #[serde(rename = "ExpiredToken")]
-    ExpiredToken(core::option::Option<jacquard_common::CowStr<'a>>),
+    ExpiredToken(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for RefreshSessionError<'_> {
@@ -198,19 +201,10 @@ impl core::fmt::Display for RefreshSessionError<'_> {
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct RefreshSession;
-/// Response type for
-///com.atproto.server.refreshSession
+/// Response type for com.atproto.server.refreshSession
 pub struct RefreshSessionResponse;
 impl jacquard_common::xrpc::XrpcResp for RefreshSessionResponse {
     const NSID: &'static str = "com.atproto.server.refreshSession";
@@ -227,8 +221,7 @@ impl jacquard_common::xrpc::XrpcRequest for RefreshSession {
     type Response = RefreshSessionResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.refreshSession
+/// Endpoint type for com.atproto.server.refreshSession
 pub struct RefreshSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RefreshSessionRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.refreshSession";

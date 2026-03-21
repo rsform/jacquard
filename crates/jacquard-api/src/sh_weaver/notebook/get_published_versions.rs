@@ -5,54 +5,44 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::PublishedVersionView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPublishedVersions<'a> {
     #[serde(borrow)]
-    pub entry: jacquard_common::types::string::AtUri<'a>,
+    pub entry: AtUri<'a>,
     /// Defaults to `false`.
     #[serde(default = "_default_include_content")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub include_content: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_content: Option<bool>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPublishedVersionsOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub canonical: core::option::Option<
-        crate::sh_weaver::notebook::PublishedVersionView<'a>,
-    >,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub has_divergence: core::option::Option<bool>,
+    pub canonical: Option<PublishedVersionView<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_divergence: Option<bool>,
     ///Full entry records if includeContent=true
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub records: core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub records: Option<Vec<Data<'a>>>,
     #[serde(borrow)]
-    pub versions: Vec<crate::sh_weaver::notebook::PublishedVersionView<'a>>,
+    pub versions: Vec<PublishedVersionView<'a>>,
 }
 
-/// Response type for
-///sh.weaver.notebook.getPublishedVersions
+/// Response type for sh.weaver.notebook.getPublishedVersions
 pub struct GetPublishedVersionsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPublishedVersionsResponse {
     const NSID: &'static str = "sh.weaver.notebook.getPublishedVersions";
@@ -67,8 +57,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPublishedVersions<'a> {
     type Response = GetPublishedVersionsResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notebook.getPublishedVersions
+/// Endpoint type for sh.weaver.notebook.getPublishedVersions
 pub struct GetPublishedVersionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPublishedVersionsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getPublishedVersions";
@@ -77,7 +66,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPublishedVersionsRequest {
     type Response = GetPublishedVersionsResponse;
 }
 
-fn _default_include_content() -> core::option::Option<bool> {
+fn _default_include_content() -> Option<bool> {
     Some(false)
 }
 
@@ -115,12 +104,9 @@ pub mod get_published_versions_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetPublishedVersionsBuilder<'a, S: get_published_versions_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<bool>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>, Option<bool>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetPublishedVersions<'a> {
@@ -137,9 +123,9 @@ impl<'a> GetPublishedVersionsBuilder<'a, get_published_versions_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetPublishedVersionsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -152,13 +138,13 @@ where
     /// Set the `entry` field (required)
     pub fn entry(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetPublishedVersionsBuilder<'a, get_published_versions_state::SetEntry<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetPublishedVersionsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

@@ -5,41 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetContinueReading {
     ///Defaults to `10`. Min: 1. Max: 20.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetContinueReadingOutput<'a> {
     #[serde(borrow)]
-    pub items: Vec<jacquard_common::types::value::Data<'a>>,
+    pub items: Vec<Data<'a>>,
 }
 
-/// Response type for
-///sh.weaver.notebook.getContinueReading
+/// Response type for sh.weaver.notebook.getContinueReading
 pub struct GetContinueReadingResponse;
 impl jacquard_common::xrpc::XrpcResp for GetContinueReadingResponse {
     const NSID: &'static str = "sh.weaver.notebook.getContinueReading";
@@ -54,8 +44,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetContinueReading {
     type Response = GetContinueReadingResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notebook.getContinueReading
+/// Endpoint type for sh.weaver.notebook.getContinueReading
 pub struct GetContinueReadingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetContinueReadingRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getContinueReading";
@@ -64,7 +53,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetContinueReadingRequest {
     type Response = GetContinueReadingResponse;
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(10i64)
 }
 
@@ -89,8 +78,8 @@ pub mod get_continue_reading_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetContinueReadingBuilder<S: get_continue_reading_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>,),
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>,),
 }
 
 impl GetContinueReading {
@@ -104,7 +93,7 @@ impl GetContinueReadingBuilder<get_continue_reading_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetContinueReadingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
         }
     }

@@ -5,68 +5,64 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::BookEntryView;
+use crate::sh_weaver::notebook::NotebookView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveNotebook<'a> {
     #[serde(borrow)]
-    pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub actor: AtIdentifier<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub entry_cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub entry_cursor: Option<CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_entry_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub entry_limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entry_limit: Option<i64>,
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveNotebookOutput<'a> {
     #[serde(borrow)]
-    pub entries: Vec<crate::sh_weaver::notebook::BookEntryView<'a>>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub entries: Vec<BookEntryView<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub entry_cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub entry_cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
+    pub notebook: NotebookView<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ResolveNotebookError<'a> {
     #[serde(rename = "NotebookNotFound")]
-    NotebookNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    NotebookNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for ResolveNotebookError<'_> {
@@ -84,8 +80,7 @@ impl core::fmt::Display for ResolveNotebookError<'_> {
     }
 }
 
-/// Response type for
-///sh.weaver.notebook.resolveNotebook
+/// Response type for sh.weaver.notebook.resolveNotebook
 pub struct ResolveNotebookResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveNotebookResponse {
     const NSID: &'static str = "sh.weaver.notebook.resolveNotebook";
@@ -100,8 +95,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveNotebook<'a> {
     type Response = ResolveNotebookResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notebook.resolveNotebook
+/// Endpoint type for sh.weaver.notebook.resolveNotebook
 pub struct ResolveNotebookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveNotebookRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.resolveNotebook";
@@ -110,7 +104,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ResolveNotebookRequest {
     type Response = ResolveNotebookResponse;
 }
 
-fn _default_entry_limit() -> core::option::Option<i64> {
+fn _default_entry_limit() -> Option<i64> {
     Some(50i64)
 }
 
@@ -124,50 +118,50 @@ pub mod resolve_notebook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Actor;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Actor = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Actor = S::Actor;
+        type Name = Unset;
     }
     ///State transition - sets the `actor` field to Set
     pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActor<S> {}
     impl<S: State> State for SetActor<S> {
-        type Name = S::Name;
         type Actor = Set<members::actor>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Actor = S::Actor;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `actor` field
         pub struct actor(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ResolveNotebookBuilder<'a, S: resolve_notebook_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<AtIdentifier<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ResolveNotebook<'a> {
@@ -181,9 +175,9 @@ impl<'a> ResolveNotebookBuilder<'a, resolve_notebook_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ResolveNotebookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -196,31 +190,25 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> ResolveNotebookBuilder<'a, resolve_notebook_state::SetActor<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ResolveNotebookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: resolve_notebook_state::State> ResolveNotebookBuilder<'a, S> {
     /// Set the `entryCursor` field (optional)
-    pub fn entry_cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn entry_cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `entryCursor` field to an Option value (optional)
-    pub fn maybe_entry_cursor(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_entry_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -247,13 +235,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ResolveNotebookBuilder<'a, resolve_notebook_state::SetName<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         ResolveNotebookBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -261,8 +249,8 @@ where
 impl<'a, S> ResolveNotebookBuilder<'a, S>
 where
     S: resolve_notebook_state::State,
-    S::Name: resolve_notebook_state::IsSet,
     S::Actor: resolve_notebook_state::IsSet,
+    S::Name: resolve_notebook_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ResolveNotebook<'a> {

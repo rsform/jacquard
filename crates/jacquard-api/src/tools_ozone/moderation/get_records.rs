@@ -5,58 +5,43 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::moderation::RecordViewDetail;
+use crate::tools_ozone::moderation::RecordViewNotFound;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRecords<'a> {
     #[serde(borrow)]
-    pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
+    pub uris: Vec<AtUri<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRecordsOutput<'a> {
     #[serde(borrow)]
     pub records: Vec<GetRecordsOutputRecordsItem<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetRecordsOutputRecordsItem<'a> {
     #[serde(rename = "tools.ozone.moderation.defs#recordViewDetail")]
-    RecordViewDetail(Box<crate::tools_ozone::moderation::RecordViewDetail<'a>>),
+    RecordViewDetail(Box<RecordViewDetail<'a>>),
     #[serde(rename = "tools.ozone.moderation.defs#recordViewNotFound")]
-    RecordViewNotFound(Box<crate::tools_ozone::moderation::RecordViewNotFound<'a>>),
+    RecordViewNotFound(Box<RecordViewNotFound<'a>>),
 }
 
-/// Response type for
-///tools.ozone.moderation.getRecords
+/// Response type for tools.ozone.moderation.getRecords
 pub struct GetRecordsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecordsResponse {
     const NSID: &'static str = "tools.ozone.moderation.getRecords";
@@ -71,8 +56,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecords<'a> {
     type Response = GetRecordsResponse;
 }
 
-/// Endpoint type for
-///tools.ozone.moderation.getRecords
+/// Endpoint type for tools.ozone.moderation.getRecords
 pub struct GetRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecordsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.getRecords";
@@ -115,11 +99,9 @@ pub mod get_records_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetRecordsBuilder<'a, S: get_records_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<AtUri<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetRecords<'a> {
@@ -133,9 +115,9 @@ impl<'a> GetRecordsBuilder<'a, get_records_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetRecordsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -148,13 +130,13 @@ where
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<'a>>>,
     ) -> GetRecordsBuilder<'a, get_records_state::SetUris<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetRecordsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

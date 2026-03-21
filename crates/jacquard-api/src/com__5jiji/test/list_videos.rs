@@ -5,34 +5,23 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListVideos;
 /// The list of videos
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListVideosOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-/// Response type for
-///com.5jiji.test.listVideos
+/// Response type for com.5jiji.test.listVideos
 pub struct ListVideosResponse;
 impl jacquard_common::xrpc::XrpcResp for ListVideosResponse {
     const NSID: &'static str = "com.5jiji.test.listVideos";
@@ -47,8 +36,7 @@ impl jacquard_common::xrpc::XrpcRequest for ListVideos {
     type Response = ListVideosResponse;
 }
 
-/// Endpoint type for
-///com.5jiji.test.listVideos
+/// Endpoint type for com.5jiji.test.listVideos
 pub struct ListVideosRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListVideosRequest {
     const PATH: &'static str = "/xrpc/com.5jiji.test.listVideos";

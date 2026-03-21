@@ -5,39 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::feed::GeneratorView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedGenerators<'a> {
     #[serde(borrow)]
-    pub feeds: Vec<jacquard_common::types::string::AtUri<'a>>,
+    pub feeds: Vec<AtUri<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedGeneratorsOutput<'a> {
     #[serde(borrow)]
-    pub feeds: Vec<crate::app_bsky::feed::GeneratorView<'a>>,
+    pub feeds: Vec<GeneratorView<'a>>,
 }
 
-/// Response type for
-///app.bsky.feed.getFeedGenerators
+/// Response type for app.bsky.feed.getFeedGenerators
 pub struct GetFeedGeneratorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFeedGeneratorsResponse {
     const NSID: &'static str = "app.bsky.feed.getFeedGenerators";
@@ -52,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetFeedGenerators<'a> {
     type Response = GetFeedGeneratorsResponse;
 }
 
-/// Endpoint type for
-///app.bsky.feed.getFeedGenerators
+/// Endpoint type for app.bsky.feed.getFeedGenerators
 pub struct GetFeedGeneratorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFeedGeneratorsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.feed.getFeedGenerators";
@@ -96,11 +86,9 @@ pub mod get_feed_generators_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetFeedGeneratorsBuilder<'a, S: get_feed_generators_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<AtUri<'a>>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetFeedGenerators<'a> {
@@ -114,9 +102,9 @@ impl<'a> GetFeedGeneratorsBuilder<'a, get_feed_generators_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetFeedGeneratorsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -129,13 +117,13 @@ where
     /// Set the `feeds` field (required)
     pub fn feeds(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<'a>>>,
     ) -> GetFeedGeneratorsBuilder<'a, get_feed_generators_state::SetFeeds<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetFeedGeneratorsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

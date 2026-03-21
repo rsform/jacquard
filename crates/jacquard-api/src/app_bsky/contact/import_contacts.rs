@@ -5,70 +5,62 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::contact::MatchAndContactIndex;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ImportContacts<'a> {
     ///List of phone numbers in global E.164 format (e.g., '+12125550123'). Phone numbers that cannot be normalized into a valid phone number will be discarded. Should not repeat the 'phone' input used in `app.bsky.contact.verifyPhone`.
     #[serde(borrow)]
-    pub contacts: Vec<jacquard_common::CowStr<'a>>,
+    pub contacts: Vec<CowStr<'a>>,
     ///JWT to authenticate the call. Use the JWT received as a response to the call to `app.bsky.contact.verifyPhone`.
     #[serde(borrow)]
-    pub token: jacquard_common::CowStr<'a>,
+    pub token: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ImportContactsOutput<'a> {
     ///The users that matched during import and their indexes on the input contacts, so the client can correlate with its local list.
     #[serde(borrow)]
-    pub matches_and_contact_indexes: Vec<
-        crate::app_bsky::contact::MatchAndContactIndex<'a>,
-    >,
+    pub matches_and_contact_indexes: Vec<MatchAndContactIndex<'a>>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ImportContactsError<'a> {
     #[serde(rename = "InvalidDid")]
-    InvalidDid(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidDid(Option<CowStr<'a>>),
     #[serde(rename = "InvalidContacts")]
-    InvalidContacts(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidContacts(Option<CowStr<'a>>),
     #[serde(rename = "TooManyContacts")]
-    TooManyContacts(core::option::Option<jacquard_common::CowStr<'a>>),
+    TooManyContacts(Option<CowStr<'a>>),
     #[serde(rename = "InvalidToken")]
-    InvalidToken(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidToken(Option<CowStr<'a>>),
     #[serde(rename = "InternalError")]
-    InternalError(core::option::Option<jacquard_common::CowStr<'a>>),
+    InternalError(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for ImportContactsError<'_> {
@@ -114,8 +106,7 @@ impl core::fmt::Display for ImportContactsError<'_> {
     }
 }
 
-/// Response type for
-///app.bsky.contact.importContacts
+/// Response type for app.bsky.contact.importContacts
 pub struct ImportContactsResponse;
 impl jacquard_common::xrpc::XrpcResp for ImportContactsResponse {
     const NSID: &'static str = "app.bsky.contact.importContacts";
@@ -132,8 +123,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for ImportContacts<'a> {
     type Response = ImportContactsResponse;
 }
 
-/// Endpoint type for
-///app.bsky.contact.importContacts
+/// Endpoint type for app.bsky.contact.importContacts
 pub struct ImportContactsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ImportContactsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.importContacts";
@@ -154,48 +144,45 @@ pub mod import_contacts_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Token;
         type Contacts;
+        type Token;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Token = Unset;
         type Contacts = Unset;
-    }
-    ///State transition - sets the `token` field to Set
-    pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetToken<S> {}
-    impl<S: State> State for SetToken<S> {
-        type Token = Set<members::token>;
-        type Contacts = S::Contacts;
+        type Token = Unset;
     }
     ///State transition - sets the `contacts` field to Set
     pub struct SetContacts<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContacts<S> {}
     impl<S: State> State for SetContacts<S> {
-        type Token = S::Token;
         type Contacts = Set<members::contacts>;
+        type Token = S::Token;
+    }
+    ///State transition - sets the `token` field to Set
+    pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetToken<S> {}
+    impl<S: State> State for SetToken<S> {
+        type Contacts = S::Contacts;
+        type Token = Set<members::token>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `token` field
-        pub struct token(());
         ///Marker type for the `contacts` field
         pub struct contacts(());
+        ///Marker type for the `token` field
+        pub struct token(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ImportContactsBuilder<'a, S: import_contacts_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Vec<CowStr<'a>>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ImportContacts<'a> {
@@ -209,9 +196,9 @@ impl<'a> ImportContactsBuilder<'a, import_contacts_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImportContactsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -224,13 +211,13 @@ where
     /// Set the `contacts` field (required)
     pub fn contacts(
         mut self,
-        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Vec<CowStr<'a>>>,
     ) -> ImportContactsBuilder<'a, import_contacts_state::SetContacts<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ImportContactsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -243,13 +230,13 @@ where
     /// Set the `token` field (required)
     pub fn token(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> ImportContactsBuilder<'a, import_contacts_state::SetToken<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         ImportContactsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -257,8 +244,8 @@ where
 impl<'a, S> ImportContactsBuilder<'a, S>
 where
     S: import_contacts_state::State,
-    S::Token: import_contacts_state::IsSet,
     S::Contacts: import_contacts_state::IsSet,
+    S::Token: import_contacts_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ImportContacts<'a> {
@@ -271,7 +258,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

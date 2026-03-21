@@ -5,38 +5,39 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Grid<'a> {
     #[serde(borrow)]
-    pub children: jacquard_common::types::value::Data<'a>,
-    ///Number of equal columns. Defaults to `3`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub children: Data<'a>,
+    ///Number of equal columns.  Defaults to `3`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_grid_columns")]
-    pub columns: core::option::Option<i64>,
+    pub columns: Option<i64>,
     ///Space between children.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub gap: core::option::Option<GridGap<'a>>,
+    pub gap: Option<GridGap<'a>>,
 }
 
 /// Space between children.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GridGap<'a> {
     None,
     Small,
     Medium,
     Large,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> GridGap<'a> {
@@ -58,7 +59,7 @@ impl<'a> From<&'a str> for GridGap<'a> {
             "small" => Self::Small,
             "medium" => Self::Medium,
             "large" => Self::Large,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -70,7 +71,7 @@ impl<'a> From<String> for GridGap<'a> {
             "small" => Self::Small,
             "medium" => Self::Medium,
             "large" => Self::Large,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -128,25 +129,17 @@ impl jacquard_common::IntoStatic for GridGap<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GridOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::at_inlay::Response<'a>,
+    pub value: Response<'a>,
 }
 
-/// Response type for
-///org.atsui.Grid
+/// Response type for org.atsui.Grid
 pub struct GridResponse;
 impl jacquard_common::xrpc::XrpcResp for GridResponse {
     const NSID: &'static str = "org.atsui.Grid";
@@ -163,8 +156,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Grid<'a> {
     type Response = GridResponse;
 }
 
-/// Endpoint type for
-///org.atsui.Grid
+/// Endpoint type for org.atsui.Grid
 pub struct GridRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GridRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Grid";
@@ -175,7 +167,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GridRequest {
     type Response = GridResponse;
 }
 
-fn _default_grid_columns() -> core::option::Option<i64> {
+fn _default_grid_columns() -> Option<i64> {
     Some(3i64)
 }
 
@@ -213,13 +205,9 @@ pub mod grid_state {
 
 /// Builder for constructing an instance of this type
 pub struct GridBuilder<'a, S: grid_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<GridGap<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Data<'a>>, Option<i64>, Option<GridGap<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Grid<'a> {
@@ -233,9 +221,9 @@ impl<'a> GridBuilder<'a, grid_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GridBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -248,13 +236,13 @@ where
     /// Set the `children` field (required)
     pub fn children(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> GridBuilder<'a, grid_state::SetChildren<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GridBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -302,10 +290,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Grid<'a> {
         Grid {
             children: self.__unsafe_private_named.0.unwrap(),

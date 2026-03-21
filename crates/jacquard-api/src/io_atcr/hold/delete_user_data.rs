@@ -5,29 +5,19 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteUserData<'a> {}
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteUserDataOutput<'a> {
     ///Whether the user's crew record was deleted (false if user is captain)
@@ -40,25 +30,27 @@ pub struct DeleteUserDataOutput<'a> {
     pub success: bool,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteUserDataError<'a> {
     #[serde(rename = "AuthRequired")]
-    AuthRequired(core::option::Option<jacquard_common::CowStr<'a>>),
+    AuthRequired(Option<CowStr<'a>>),
     #[serde(rename = "DeletionFailed")]
-    DeletionFailed(core::option::Option<jacquard_common::CowStr<'a>>),
+    DeletionFailed(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteUserDataError<'_> {
@@ -83,8 +75,7 @@ impl core::fmt::Display for DeleteUserDataError<'_> {
     }
 }
 
-/// Response type for
-///io.atcr.hold.deleteUserData
+/// Response type for io.atcr.hold.deleteUserData
 pub struct DeleteUserDataResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteUserDataResponse {
     const NSID: &'static str = "io.atcr.hold.deleteUserData";
@@ -101,8 +92,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteUserData<'a> {
     type Response = DeleteUserDataResponse;
 }
 
-/// Endpoint type for
-///io.atcr.hold.deleteUserData
+/// Endpoint type for io.atcr.hold.deleteUserData
 pub struct DeleteUserDataRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteUserDataRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.deleteUserData";

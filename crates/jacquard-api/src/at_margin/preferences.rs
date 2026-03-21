@@ -5,37 +5,48 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::at_margin::preferences;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LabelPreference<'a> {
     ///The label identifier (e.g. sexual, violence, spam).
     #[serde(borrow)]
-    pub label: jacquard_common::CowStr<'a>,
+    pub label: CowStr<'a>,
     ///DID of the labeler service.
     #[serde(borrow)]
-    pub labeler_did: jacquard_common::CowStr<'a>,
+    pub labeler_did: CowStr<'a>,
     ///How to handle content with this label: hide, warn, or ignore.
     #[serde(borrow)]
     pub visibility: LabelPreferenceVisibility<'a>,
 }
 
 /// How to handle content with this label: hide, warn, or ignore.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum LabelPreferenceVisibility<'a> {
     Hide,
     Warn,
     Ignore,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> LabelPreferenceVisibility<'a> {
@@ -55,7 +66,7 @@ impl<'a> From<&'a str> for LabelPreferenceVisibility<'a> {
             "hide" => Self::Hide,
             "warn" => Self::Warn,
             "ignore" => Self::Ignore,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -66,7 +77,7 @@ impl<'a> From<String> for LabelPreferenceVisibility<'a> {
             "hide" => Self::Hide,
             "warn" => Self::Warn,
             "ignore" => Self::Ignore,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -125,137 +136,101 @@ impl jacquard_common::IntoStatic for LabelPreferenceVisibility<'_> {
     }
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerSubscription<'a> {
     ///DID of the labeler service.
     #[serde(borrow)]
-    pub did: jacquard_common::CowStr<'a>,
+    pub did: CowStr<'a>,
 }
 
 /// User preferences for the Margin application.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Preferences<'a> {
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///If true, do not show the confirmation modal when opening external links.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub disable_external_link_warning: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub disable_external_link_warning: Option<bool>,
     ///List of hostnames to skip the external link warning modal for.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub external_link_skipped_hostnames: core::option::Option<
-        Vec<jacquard_common::CowStr<'a>>,
-    >,
+    pub external_link_skipped_hostnames: Option<Vec<CowStr<'a>>>,
     ///Per-label visibility preferences for subscribed labelers.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub label_preferences: core::option::Option<
-        Vec<crate::at_margin::preferences::LabelPreference<'a>>,
-    >,
+    pub label_preferences: Option<Vec<preferences::LabelPreference<'a>>>,
     ///List of labeler services the user subscribes to for content moderation.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subscribed_labelers: core::option::Option<
-        Vec<crate::at_margin::preferences::LabelerSubscription<'a>>,
-    >,
+    pub subscribed_labelers: Option<Vec<preferences::LabelerSubscription<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PreferencesGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Preferences<'a>,
 }
 
 impl<'a> Preferences<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PreferencesRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, PreferencesRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for LabelPreference<'a> {
+impl<'a> LexiconSchema for LabelPreference<'a> {
     fn nsid() -> &'static str {
         "at.margin.preferences"
     }
     fn def_name() -> &'static str {
         "labelPreference"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_at_margin_preferences()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for LabelerSubscription<'a> {
+impl<'a> LexiconSchema for LabelerSubscription<'a> {
     fn nsid() -> &'static str {
         "at.margin.preferences"
     }
     fn def_name() -> &'static str {
         "labelerSubscription"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_at_margin_preferences()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PreferencesRecord;
-impl jacquard_common::xrpc::XrpcResp for PreferencesRecord {
+impl XrpcResp for PreferencesRecord {
     const NSID: &'static str = "at.margin.preferences";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = PreferencesGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<PreferencesGetRecordOutput<'_>> for Preferences<'_> {
@@ -265,36 +240,32 @@ impl From<PreferencesGetRecordOutput<'_>> for Preferences<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Preferences<'_> {
+impl Collection for Preferences<'_> {
     const NSID: &'static str = "at.margin.preferences";
     type Record = PreferencesRecord;
 }
 
-impl jacquard_common::types::collection::Collection for PreferencesRecord {
+impl Collection for PreferencesRecord {
     const NSID: &'static str = "at.margin.preferences";
     type Record = PreferencesRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
+impl<'a> LexiconSchema for Preferences<'a> {
     fn nsid() -> &'static str {
         "at.margin.preferences"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_at_margin_preferences()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.external_link_skipped_hostnames {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "external_link_skipped_hostnames",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("external_link_skipped_hostnames"),
                     max: 100usize,
                     actual: value.len(),
                 });
@@ -303,10 +274,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
         if let Some(ref value) = self.label_preferences {
             #[allow(unused_comparisons)]
             if value.len() > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "label_preferences",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("label_preferences"),
                     max: 500usize,
                     actual: value.len(),
                 });
@@ -315,10 +284,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
         if let Some(ref value) = self.subscribed_labelers {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "subscribed_labelers",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("subscribed_labelers"),
                     max: 50usize,
                     actual: value.len(),
                 });
@@ -328,262 +295,171 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
     }
 }
 
-fn lexicon_doc_at_margin_preferences() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("at.margin.preferences"),
-        revision: None,
-        description: None,
+fn lexicon_doc_at_margin_preferences() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("at.margin.preferences"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "labelPreference",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("labelPreference"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("labelerDid"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("label"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("visibility")
+                            SmolStr::new_static("labelerDid"),
+                            SmolStr::new_static("label"),
+                            SmolStr::new_static("visibility")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "label",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("label"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The label identifier (e.g. sexual, violence, spam).",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "labelerDid",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("labelerDid"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "DID of the labeler service.",
-                                    ),
+                                    CowStr::new_static("DID of the labeler service."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "visibility",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("visibility"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "How to handle content with this label: hide, warn, or ignore.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "labelerSubscription",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did")
-                        ],
-                    ),
-                    nullable: None,
+                SmolStr::new_static("labelerSubscription"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "did",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("did"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "DID of the labeler service.",
-                                    ),
+                                    CowStr::new_static("DID of the labeler service."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "User preferences for the Margin application.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
-                            ],
-                        ),
-                        nullable: None,
+                    key: Some(CowStr::new_static("literal:self")),
+                    record: LexRecordRecord::Object(LexObject {
+                        required: Some(vec![SmolStr::new_static("createdAt")]),
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "disableExternalLinkWarning",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                    description: None,
-                                    default: None,
-                                    r#const: None,
+                                SmolStr::new_static("disableExternalLinkWarning"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "externalLinkSkippedHostnames",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("externalLinkSkippedHostnames"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "List of hostnames to skip the external link warning modal for.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
+                                    items: LexArrayItem::String(LexString {
                                         max_length: Some(255usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(100usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "labelPreferences",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("labelPreferences"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Per-label visibility preferences for subscribed labelers.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "#labelPreference",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#labelPreference"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(500usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "subscribedLabelers",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("subscribedLabelers"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "List of labeler services the user subscribes to for content moderation.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "#labelerSubscription",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#labelerSubscription"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(50usize),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -621,17 +497,15 @@ pub mod preferences_state {
 
 /// Builder for constructing an instance of this type
 pub struct PreferencesBuilder<'a, S: preferences_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<Vec<crate::at_margin::preferences::LabelPreference<'a>>>,
-        ::core::option::Option<
-            Vec<crate::at_margin::preferences::LabelerSubscription<'a>>,
-        >,
+        Option<Datetime>,
+        Option<bool>,
+        Option<Vec<CowStr<'a>>>,
+        Option<Vec<preferences::LabelPreference<'a>>>,
+        Option<Vec<preferences::LabelerSubscription<'a>>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Preferences<'a> {
@@ -645,9 +519,9 @@ impl<'a> PreferencesBuilder<'a, preferences_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -660,13 +534,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> PreferencesBuilder<'a, preferences_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -691,7 +565,7 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     /// Set the `externalLinkSkippedHostnames` field (optional)
     pub fn external_link_skipped_hostnames(
         mut self,
-        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+        value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -699,7 +573,7 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     /// Set the `externalLinkSkippedHostnames` field to an Option value (optional)
     pub fn maybe_external_link_skipped_hostnames(
         mut self,
-        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+        value: Option<Vec<CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
@@ -710,7 +584,7 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     /// Set the `labelPreferences` field (optional)
     pub fn label_preferences(
         mut self,
-        value: impl Into<Option<Vec<crate::at_margin::preferences::LabelPreference<'a>>>>,
+        value: impl Into<Option<Vec<preferences::LabelPreference<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
@@ -718,7 +592,7 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     /// Set the `labelPreferences` field to an Option value (optional)
     pub fn maybe_label_preferences(
         mut self,
-        value: Option<Vec<crate::at_margin::preferences::LabelPreference<'a>>>,
+        value: Option<Vec<preferences::LabelPreference<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
@@ -729,9 +603,7 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     /// Set the `subscribedLabelers` field (optional)
     pub fn subscribed_labelers(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::at_margin::preferences::LabelerSubscription<'a>>>,
-        >,
+        value: impl Into<Option<Vec<preferences::LabelerSubscription<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
@@ -739,7 +611,7 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     /// Set the `subscribedLabelers` field to an Option value (optional)
     pub fn maybe_subscribed_labelers(
         mut self,
-        value: Option<Vec<crate::at_margin::preferences::LabelerSubscription<'a>>>,
+        value: Option<Vec<preferences::LabelerSubscription<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value;
         self
@@ -765,7 +637,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

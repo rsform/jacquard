@@ -5,37 +5,25 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use core::marker::PhantomData;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::unspecced::AgeAssuranceState;
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAgeAssuranceStateOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_bsky::unspecced::AgeAssuranceState<'a>,
+    pub value: AgeAssuranceState<'a>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct GetAgeAssuranceState;
-/// Response type for
-///app.bsky.unspecced.getAgeAssuranceState
+/// Response type for app.bsky.unspecced.getAgeAssuranceState
 pub struct GetAgeAssuranceStateResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAgeAssuranceStateResponse {
     const NSID: &'static str = "app.bsky.unspecced.getAgeAssuranceState";
@@ -50,8 +38,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetAgeAssuranceState {
     type Response = GetAgeAssuranceStateResponse;
 }
 
-/// Endpoint type for
-///app.bsky.unspecced.getAgeAssuranceState
+/// Endpoint type for app.bsky.unspecced.getAgeAssuranceState
 pub struct GetAgeAssuranceStateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAgeAssuranceStateRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getAgeAssuranceState";

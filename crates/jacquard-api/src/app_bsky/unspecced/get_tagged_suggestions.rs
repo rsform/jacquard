@@ -5,60 +5,53 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::string::UriValue;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::unspecced::get_tagged_suggestions;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTaggedSuggestions;
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTaggedSuggestionsOutput<'a> {
     #[serde(borrow)]
-    pub suggestions: Vec<
-        crate::app_bsky::unspecced::get_tagged_suggestions::Suggestion<'a>,
-    >,
+    pub suggestions: Vec<get_tagged_suggestions::Suggestion<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Suggestion<'a> {
     #[serde(borrow)]
-    pub subject: jacquard_common::types::string::UriValue<'a>,
+    pub subject: UriValue<'a>,
     #[serde(borrow)]
     pub subject_type: SuggestionSubjectType<'a>,
     #[serde(borrow)]
-    pub tag: jacquard_common::CowStr<'a>,
+    pub tag: CowStr<'a>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SuggestionSubjectType<'a> {
     Actor,
     Feed,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> SuggestionSubjectType<'a> {
@@ -76,7 +69,7 @@ impl<'a> From<&'a str> for SuggestionSubjectType<'a> {
         match s {
             "actor" => Self::Actor,
             "feed" => Self::Feed,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -86,7 +79,7 @@ impl<'a> From<String> for SuggestionSubjectType<'a> {
         match s.as_str() {
             "actor" => Self::Actor,
             "feed" => Self::Feed,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -144,8 +137,7 @@ impl jacquard_common::IntoStatic for SuggestionSubjectType<'_> {
     }
 }
 
-/// Response type for
-///app.bsky.unspecced.getTaggedSuggestions
+/// Response type for app.bsky.unspecced.getTaggedSuggestions
 pub struct GetTaggedSuggestionsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTaggedSuggestionsResponse {
     const NSID: &'static str = "app.bsky.unspecced.getTaggedSuggestions";
@@ -160,8 +152,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetTaggedSuggestions {
     type Response = GetTaggedSuggestionsResponse;
 }
 
-/// Endpoint type for
-///app.bsky.unspecced.getTaggedSuggestions
+/// Endpoint type for app.bsky.unspecced.getTaggedSuggestions
 pub struct GetTaggedSuggestionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedSuggestionsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getTaggedSuggestions";
@@ -170,19 +161,17 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedSuggestionsRequest {
     type Response = GetTaggedSuggestionsResponse;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Suggestion<'a> {
+impl<'a> LexiconSchema for Suggestion<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.getTaggedSuggestions"
     }
     fn def_name() -> &'static str {
         "suggestion"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_getTaggedSuggestions()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -197,63 +186,63 @@ pub mod suggestion_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SubjectType;
-        type Subject;
         type Tag;
+        type Subject;
+        type SubjectType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SubjectType = Unset;
-        type Subject = Unset;
         type Tag = Unset;
-    }
-    ///State transition - sets the `subject_type` field to Set
-    pub struct SetSubjectType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubjectType<S> {}
-    impl<S: State> State for SetSubjectType<S> {
-        type SubjectType = Set<members::subject_type>;
-        type Subject = S::Subject;
-        type Tag = S::Tag;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type SubjectType = S::SubjectType;
-        type Subject = Set<members::subject>;
-        type Tag = S::Tag;
+        type Subject = Unset;
+        type SubjectType = Unset;
     }
     ///State transition - sets the `tag` field to Set
     pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTag<S> {}
     impl<S: State> State for SetTag<S> {
-        type SubjectType = S::SubjectType;
-        type Subject = S::Subject;
         type Tag = Set<members::tag>;
+        type Subject = S::Subject;
+        type SubjectType = S::SubjectType;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Tag = S::Tag;
+        type Subject = Set<members::subject>;
+        type SubjectType = S::SubjectType;
+    }
+    ///State transition - sets the `subject_type` field to Set
+    pub struct SetSubjectType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubjectType<S> {}
+    impl<S: State> State for SetSubjectType<S> {
+        type Tag = S::Tag;
+        type Subject = S::Subject;
+        type SubjectType = Set<members::subject_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject_type` field
-        pub struct subject_type(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `tag` field
         pub struct tag(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `subject_type` field
+        pub struct subject_type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SuggestionBuilder<'a, S: suggestion_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<SuggestionSubjectType<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<UriValue<'a>>,
+        Option<SuggestionSubjectType<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Suggestion<'a> {
@@ -267,9 +256,9 @@ impl<'a> SuggestionBuilder<'a, suggestion_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SuggestionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -282,13 +271,13 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<jacquard_common::types::string::UriValue<'a>>,
+        value: impl Into<UriValue<'a>>,
     ) -> SuggestionBuilder<'a, suggestion_state::SetSubject<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SuggestionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -303,11 +292,11 @@ where
         mut self,
         value: impl Into<SuggestionSubjectType<'a>>,
     ) -> SuggestionBuilder<'a, suggestion_state::SetSubjectType<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         SuggestionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -320,13 +309,13 @@ where
     /// Set the `tag` field (required)
     pub fn tag(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SuggestionBuilder<'a, suggestion_state::SetTag<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         SuggestionBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -334,9 +323,9 @@ where
 impl<'a, S> SuggestionBuilder<'a, S>
 where
     S: suggestion_state::State,
-    S::SubjectType: suggestion_state::IsSet,
-    S::Subject: suggestion_state::IsSet,
     S::Tag: suggestion_state::IsSet,
+    S::Subject: suggestion_state::IsSet,
+    S::SubjectType: suggestion_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Suggestion<'a> {
@@ -350,7 +339,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -364,110 +353,67 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_unspecced_getTaggedSuggestions() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static(
-            "app.bsky.unspecced.getTaggedSuggestions",
-        ),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_bsky_unspecced_getTaggedSuggestions() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.bsky.unspecced.getTaggedSuggestions"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
-                    description: None,
+                SmolStr::new_static("main"),
+                LexUserType::XrpcQuery(LexXrpcQuery {
                     parameters: Some(
-                        ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
-                            description: None,
-                            required: None,
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::alloc::collections::BTreeMap::new();
+                                let mut map = BTreeMap::new();
                                 map
                             },
+                            ..Default::default()
                         }),
                     ),
-                    output: None,
-                    errors: None,
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("suggestion"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                SmolStr::new_static("suggestion"),
+                LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("tag"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("subjectType"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("subject")
+                            SmolStr::new_static("tag"),
+                            SmolStr::new_static("subjectType"),
+                            SmolStr::new_static("subject")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "subject",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                            SmolStr::new_static("subject"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Uri),
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "subjectType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("subjectType"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "tag",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
+                            SmolStr::new_static("tag"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

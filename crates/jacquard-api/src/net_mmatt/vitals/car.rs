@@ -5,85 +5,84 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Car<'a> {
     ///The car fuel amount remaining value (floating point string)
     #[serde(borrow)]
-    pub amount_remaining: jacquard_common::CowStr<'a>,
+    pub amount_remaining: CowStr<'a>,
     ///The car fuel range value in miles
     pub car_fuel_range: i64,
     ///The car make value
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub car_make: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub car_make: Option<CowStr<'a>>,
     ///The car model value
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub car_model: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub car_model: Option<CowStr<'a>>,
     ///The car fuel level value in percentage (floating point string)
     #[serde(borrow)]
-    pub car_percent_fuel_remaining: jacquard_common::CowStr<'a>,
+    pub car_percent_fuel_remaining: CowStr<'a>,
     ///The car traveled distance value
     pub car_traveled_distance: i64,
     ///The car year value
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub car_year: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub car_year: Option<i64>,
     ///The unix timestamp of when the vital was recorded
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CarGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Car<'a>,
 }
 
 impl<'a> Car<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CarRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, CarRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct CarRecord;
-impl jacquard_common::xrpc::XrpcResp for CarRecord {
+impl XrpcResp for CarRecord {
     const NSID: &'static str = "net.mmatt.vitals.car";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = CarGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<CarGetRecordOutput<'_>> for Car<'_> {
@@ -93,29 +92,27 @@ impl From<CarGetRecordOutput<'_>> for Car<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Car<'_> {
+impl Collection for Car<'_> {
     const NSID: &'static str = "net.mmatt.vitals.car";
     type Record = CarRecord;
 }
 
-impl jacquard_common::types::collection::Collection for CarRecord {
+impl Collection for CarRecord {
     const NSID: &'static str = "net.mmatt.vitals.car";
     type Record = CarRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Car<'a> {
+impl<'a> LexiconSchema for Car<'a> {
     fn nsid() -> &'static str {
         "net.mmatt.vitals.car"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_net_mmatt_vitals_car()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -130,102 +127,102 @@ pub mod car_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CarTraveledDistance;
+        type CreatedAt;
         type CarPercentFuelRemaining;
         type AmountRemaining;
         type CarFuelRange;
-        type CreatedAt;
-        type CarTraveledDistance;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CarTraveledDistance = Unset;
+        type CreatedAt = Unset;
         type CarPercentFuelRemaining = Unset;
         type AmountRemaining = Unset;
         type CarFuelRange = Unset;
-        type CreatedAt = Unset;
-        type CarTraveledDistance = Unset;
-    }
-    ///State transition - sets the `car_percent_fuel_remaining` field to Set
-    pub struct SetCarPercentFuelRemaining<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCarPercentFuelRemaining<S> {}
-    impl<S: State> State for SetCarPercentFuelRemaining<S> {
-        type CarPercentFuelRemaining = Set<members::car_percent_fuel_remaining>;
-        type AmountRemaining = S::AmountRemaining;
-        type CarFuelRange = S::CarFuelRange;
-        type CreatedAt = S::CreatedAt;
-        type CarTraveledDistance = S::CarTraveledDistance;
-    }
-    ///State transition - sets the `amount_remaining` field to Set
-    pub struct SetAmountRemaining<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAmountRemaining<S> {}
-    impl<S: State> State for SetAmountRemaining<S> {
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
-        type AmountRemaining = Set<members::amount_remaining>;
-        type CarFuelRange = S::CarFuelRange;
-        type CreatedAt = S::CreatedAt;
-        type CarTraveledDistance = S::CarTraveledDistance;
-    }
-    ///State transition - sets the `car_fuel_range` field to Set
-    pub struct SetCarFuelRange<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCarFuelRange<S> {}
-    impl<S: State> State for SetCarFuelRange<S> {
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
-        type AmountRemaining = S::AmountRemaining;
-        type CarFuelRange = Set<members::car_fuel_range>;
-        type CreatedAt = S::CreatedAt;
-        type CarTraveledDistance = S::CarTraveledDistance;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
-        type AmountRemaining = S::AmountRemaining;
-        type CarFuelRange = S::CarFuelRange;
-        type CreatedAt = Set<members::created_at>;
-        type CarTraveledDistance = S::CarTraveledDistance;
     }
     ///State transition - sets the `car_traveled_distance` field to Set
     pub struct SetCarTraveledDistance<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCarTraveledDistance<S> {}
     impl<S: State> State for SetCarTraveledDistance<S> {
+        type CarTraveledDistance = Set<members::car_traveled_distance>;
+        type CreatedAt = S::CreatedAt;
         type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
         type AmountRemaining = S::AmountRemaining;
         type CarFuelRange = S::CarFuelRange;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CarTraveledDistance = S::CarTraveledDistance;
+        type CreatedAt = Set<members::created_at>;
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = S::AmountRemaining;
+        type CarFuelRange = S::CarFuelRange;
+    }
+    ///State transition - sets the `car_percent_fuel_remaining` field to Set
+    pub struct SetCarPercentFuelRemaining<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCarPercentFuelRemaining<S> {}
+    impl<S: State> State for SetCarPercentFuelRemaining<S> {
+        type CarTraveledDistance = S::CarTraveledDistance;
         type CreatedAt = S::CreatedAt;
-        type CarTraveledDistance = Set<members::car_traveled_distance>;
+        type CarPercentFuelRemaining = Set<members::car_percent_fuel_remaining>;
+        type AmountRemaining = S::AmountRemaining;
+        type CarFuelRange = S::CarFuelRange;
+    }
+    ///State transition - sets the `amount_remaining` field to Set
+    pub struct SetAmountRemaining<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAmountRemaining<S> {}
+    impl<S: State> State for SetAmountRemaining<S> {
+        type CarTraveledDistance = S::CarTraveledDistance;
+        type CreatedAt = S::CreatedAt;
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = Set<members::amount_remaining>;
+        type CarFuelRange = S::CarFuelRange;
+    }
+    ///State transition - sets the `car_fuel_range` field to Set
+    pub struct SetCarFuelRange<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCarFuelRange<S> {}
+    impl<S: State> State for SetCarFuelRange<S> {
+        type CarTraveledDistance = S::CarTraveledDistance;
+        type CreatedAt = S::CreatedAt;
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = S::AmountRemaining;
+        type CarFuelRange = Set<members::car_fuel_range>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `car_traveled_distance` field
+        pub struct car_traveled_distance(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `car_percent_fuel_remaining` field
         pub struct car_percent_fuel_remaining(());
         ///Marker type for the `amount_remaining` field
         pub struct amount_remaining(());
         ///Marker type for the `car_fuel_range` field
         pub struct car_fuel_range(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `car_traveled_distance` field
-        pub struct car_traveled_distance(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CarBuilder<'a, S: car_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<i64>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Car<'a> {
@@ -239,9 +236,9 @@ impl<'a> CarBuilder<'a, car_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CarBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -254,13 +251,13 @@ where
     /// Set the `amountRemaining` field (required)
     pub fn amount_remaining(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CarBuilder<'a, car_state::SetAmountRemaining<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CarBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -275,26 +272,23 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CarBuilder<'a, car_state::SetCarFuelRange<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CarBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: car_state::State> CarBuilder<'a, S> {
     /// Set the `carMake` field (optional)
-    pub fn car_make(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn car_make(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `carMake` field to an Option value (optional)
-    pub fn maybe_car_make(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_car_make(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -302,18 +296,12 @@ impl<'a, S: car_state::State> CarBuilder<'a, S> {
 
 impl<'a, S: car_state::State> CarBuilder<'a, S> {
     /// Set the `carModel` field (optional)
-    pub fn car_model(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn car_model(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `carModel` field to an Option value (optional)
-    pub fn maybe_car_model(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_car_model(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -327,13 +315,13 @@ where
     /// Set the `carPercentFuelRemaining` field (required)
     pub fn car_percent_fuel_remaining(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CarBuilder<'a, car_state::SetCarPercentFuelRemaining<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         CarBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -348,11 +336,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CarBuilder<'a, car_state::SetCarTraveledDistance<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         CarBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -378,13 +366,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> CarBuilder<'a, car_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         CarBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -392,11 +380,11 @@ where
 impl<'a, S> CarBuilder<'a, S>
 where
     S: car_state::State,
+    S::CarTraveledDistance: car_state::IsSet,
+    S::CreatedAt: car_state::IsSet,
     S::CarPercentFuelRemaining: car_state::IsSet,
     S::AmountRemaining: car_state::IsSet,
     S::CarFuelRange: car_state::IsSet,
-    S::CreatedAt: car_state::IsSet,
-    S::CarTraveledDistance: car_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Car<'a> {
@@ -415,7 +403,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -434,182 +422,110 @@ where
     }
 }
 
-fn lexicon_doc_net_mmatt_vitals_car() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("net.mmatt.vitals.car"),
-        revision: None,
-        description: None,
+fn lexicon_doc_net_mmatt_vitals_car() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("net.mmatt.vitals.car"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("carFuelRange"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("carPercentFuelRemaining"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("amountRemaining"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("carTraveledDistance")
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("carFuelRange"),
+                                SmolStr::new_static("carPercentFuelRemaining"),
+                                SmolStr::new_static("amountRemaining"),
+                                SmolStr::new_static("carTraveledDistance")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "amountRemaining",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("amountRemaining"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The car fuel amount remaining value (floating point string)",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "carFuelRange",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("carFuelRange"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "carMake",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("carMake"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(CowStr::new_static("The car make value")),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("carModel"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static("The car make value"),
+                                        CowStr::new_static("The car model value"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "carModel",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("carPercentFuelRemaining"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static("The car model value"),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "carPercentFuelRemaining",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The car fuel level value in percentage (floating point string)",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "carTraveledDistance",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("carTraveledDistance"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "carYear",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("carYear"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The unix timestamp of when the vital was recorded",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

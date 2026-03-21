@@ -5,53 +5,63 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::app_protoimsg::chat::room;
 /// Declares a chat room. Created by whoever starts the room.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Room<'a> {
     ///Broad category for room discovery (e.g., music, tech, gaming). Lowercased.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub category: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub category: Option<CowStr<'a>>,
     ///Timestamp of room creation.
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///What the room is about.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: Option<CowStr<'a>>,
     ///Display name for the room.
     #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
+    pub name: CowStr<'a>,
     ///Room purpose categorization.
     #[serde(borrow)]
     pub purpose: RoomPurpose<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub settings: core::option::Option<
-        crate::app_protoimsg::chat::room::RoomSettings<'a>,
-    >,
+    pub settings: Option<room::RoomSettings<'a>>,
     ///Room topic for sorting, filtering, and discovery.
     #[serde(borrow)]
-    pub topic: jacquard_common::CowStr<'a>,
+    pub topic: CowStr<'a>,
 }
 
 /// Room purpose categorization.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RoomPurpose<'a> {
     Discussion,
     Event,
     Community,
     Support,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> RoomPurpose<'a> {
@@ -73,7 +83,7 @@ impl<'a> From<&'a str> for RoomPurpose<'a> {
             "event" => Self::Event,
             "community" => Self::Community,
             "support" => Self::Support,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -85,7 +95,7 @@ impl<'a> From<String> for RoomPurpose<'a> {
             "event" => Self::Event,
             "community" => Self::Community,
             "support" => Self::Support,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -144,64 +154,51 @@ impl jacquard_common::IntoStatic for RoomPurpose<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RoomGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Room<'a>,
 }
 
 /// Configurable room settings.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RoomSettings<'a> {
-    ///When true, only users on the room allowlist can send messages. Defaults to `false`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    ///When true, only users on the room allowlist can send messages.  Defaults to `false`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_room_settings_allowlist_enabled")]
-    pub allowlist_enabled: core::option::Option<bool>,
-    ///Minimum atproto account age in days to participate. Defaults to `0`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub allowlist_enabled: Option<bool>,
+    ///Minimum atproto account age in days to participate.  Defaults to `0`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_room_settings_min_account_age_days")]
-    pub min_account_age_days: core::option::Option<i64>,
-    ///Minimum seconds between messages per user. 0 = disabled. Defaults to `0`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub min_account_age_days: Option<i64>,
+    ///Minimum seconds between messages per user. 0 = disabled.  Defaults to `0`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_room_settings_slow_mode_seconds")]
-    pub slow_mode_seconds: core::option::Option<i64>,
+    pub slow_mode_seconds: Option<i64>,
     ///Room discoverability. public = listed in directory, unlisted = link only, private = invite only.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub visibility: core::option::Option<RoomSettingsVisibility<'a>>,
+    pub visibility: Option<RoomSettingsVisibility<'a>>,
 }
 
 /// Room discoverability. public = listed in directory, unlisted = link only, private = invite only.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RoomSettingsVisibility<'a> {
     Public,
     Unlisted,
     Private,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> RoomSettingsVisibility<'a> {
@@ -221,7 +218,7 @@ impl<'a> From<&'a str> for RoomSettingsVisibility<'a> {
             "public" => Self::Public,
             "unlisted" => Self::Unlisted,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -232,7 +229,7 @@ impl<'a> From<String> for RoomSettingsVisibility<'a> {
             "public" => Self::Public,
             "unlisted" => Self::Unlisted,
             "private" => Self::Private,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -293,25 +290,21 @@ impl jacquard_common::IntoStatic for RoomSettingsVisibility<'_> {
 
 impl<'a> Room<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, RoomRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, RoomRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RoomRecord;
-impl jacquard_common::xrpc::XrpcResp for RoomRecord {
+impl XrpcResp for RoomRecord {
     const NSID: &'static str = "app.protoimsg.chat.room";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = RoomGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<RoomGetRecordOutput<'_>> for Room<'_> {
@@ -321,36 +314,32 @@ impl From<RoomGetRecordOutput<'_>> for Room<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Room<'_> {
+impl Collection for Room<'_> {
     const NSID: &'static str = "app.protoimsg.chat.room";
     type Record = RoomRecord;
 }
 
-impl jacquard_common::types::collection::Collection for RoomRecord {
+impl Collection for RoomRecord {
     const NSID: &'static str = "app.protoimsg.chat.room";
     type Record = RoomRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Room<'a> {
+impl<'a> LexiconSchema for Room<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.room"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_room()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.category {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "category",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("category"),
                     max: 50usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -359,10 +348,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Room<'a> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("description"),
                     max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -372,10 +359,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Room<'a> {
             let value = &self.name;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
                     max: 100usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -385,10 +370,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Room<'a> {
             let value = &self.topic;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "topic",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("topic"),
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -398,25 +381,21 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Room<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for RoomSettings<'a> {
+impl<'a> LexiconSchema for RoomSettings<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.room"
     }
     fn def_name() -> &'static str {
         "roomSettings"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_room()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.min_account_age_days {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "min_account_age_days",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("min_account_age_days"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -424,10 +403,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for RoomSettings<'a> {
         }
         if let Some(ref value) = self.slow_mode_seconds {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "slow_mode_seconds",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("slow_mode_seconds"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -447,83 +424,83 @@ pub mod room_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type CreatedAt;
-        type Topic;
         type Purpose;
+        type CreatedAt;
+        type Name;
+        type Topic;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type CreatedAt = Unset;
-        type Topic = Unset;
         type Purpose = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
-        type Topic = S::Topic;
-        type Purpose = S::Purpose;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type CreatedAt = Set<members::created_at>;
-        type Topic = S::Topic;
-        type Purpose = S::Purpose;
-    }
-    ///State transition - sets the `topic` field to Set
-    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTopic<S> {}
-    impl<S: State> State for SetTopic<S> {
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-        type Topic = Set<members::topic>;
-        type Purpose = S::Purpose;
+        type CreatedAt = Unset;
+        type Name = Unset;
+        type Topic = Unset;
     }
     ///State transition - sets the `purpose` field to Set
     pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPurpose<S> {}
     impl<S: State> State for SetPurpose<S> {
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-        type Topic = S::Topic;
         type Purpose = Set<members::purpose>;
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Topic = S::Topic;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Purpose = S::Purpose;
+        type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+        type Topic = S::Topic;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Purpose = S::Purpose;
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
+        type Topic = S::Topic;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTopic<S> {}
+    impl<S: State> State for SetTopic<S> {
+        type Purpose = S::Purpose;
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Topic = Set<members::topic>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `topic` field
-        pub struct topic(());
         ///Marker type for the `purpose` field
         pub struct purpose(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RoomBuilder<'a, S: room_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<RoomPurpose<'a>>,
-        ::core::option::Option<crate::app_protoimsg::chat::room::RoomSettings<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<RoomPurpose<'a>>,
+        Option<room::RoomSettings<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Room<'a> {
@@ -537,24 +514,21 @@ impl<'a> RoomBuilder<'a, room_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RoomBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
-    pub fn maybe_category(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -568,31 +542,25 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> RoomBuilder<'a, room_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         RoomBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -606,13 +574,13 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RoomBuilder<'a, room_state::SetName<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         RoomBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -627,29 +595,23 @@ where
         mut self,
         value: impl Into<RoomPurpose<'a>>,
     ) -> RoomBuilder<'a, room_state::SetPurpose<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         RoomBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `settings` field (optional)
-    pub fn settings(
-        mut self,
-        value: impl Into<Option<crate::app_protoimsg::chat::room::RoomSettings<'a>>>,
-    ) -> Self {
+    pub fn settings(mut self, value: impl Into<Option<room::RoomSettings<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `settings` field to an Option value (optional)
-    pub fn maybe_settings(
-        mut self,
-        value: Option<crate::app_protoimsg::chat::room::RoomSettings<'a>>,
-    ) -> Self {
+    pub fn maybe_settings(mut self, value: Option<room::RoomSettings<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -663,13 +625,13 @@ where
     /// Set the `topic` field (required)
     pub fn topic(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> RoomBuilder<'a, room_state::SetTopic<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         RoomBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -677,10 +639,10 @@ where
 impl<'a, S> RoomBuilder<'a, S>
 where
     S: room_state::State,
-    S::Name: room_state::IsSet,
-    S::CreatedAt: room_state::IsSet,
-    S::Topic: room_state::IsSet,
     S::Purpose: room_state::IsSet,
+    S::CreatedAt: room_state::IsSet,
+    S::Name: room_state::IsSet,
+    S::Topic: room_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Room<'a> {
@@ -698,7 +660,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -716,271 +678,171 @@ where
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_room() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("app.protoimsg.chat.room"),
-        revision: None,
-        description: None,
+fn lexicon_doc_app_protoimsg_chat_room() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("app.protoimsg.chat.room"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Declares a chat room. Created by whoever starts the room.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("topic"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("purpose"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("name"), SmolStr::new_static("topic"),
+                                SmolStr::new_static("purpose"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "category",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("category"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Broad category for room discovery (e.g., music, tech, gaming). Lowercased.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(50usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Timestamp of room creation.",
-                                        ),
+                                        CowStr::new_static("Timestamp of room creation."),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "description",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("description"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "What the room is about.",
-                                        ),
+                                        CowStr::new_static("What the room is about."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(500usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "name",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("name"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Display name for the room.",
-                                        ),
+                                        CowStr::new_static("Display name for the room."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "purpose",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("purpose"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Room purpose categorization.",
-                                        ),
+                                        CowStr::new_static("Room purpose categorization."),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "settings",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#roomSettings",
-                                    ),
+                                SmolStr::new_static("settings"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#roomSettings"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "topic",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("topic"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Room topic for sorting, filtering, and discovery.",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(200usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("roomSettings"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Configurable room settings.",
-                        ),
-                    ),
-                    required: None,
-                    nullable: None,
+                SmolStr::new_static("roomSettings"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static("Configurable room settings.")),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "allowlistEnabled",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("allowlistEnabled"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "minAccountAgeDays",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("minAccountAgeDays"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "slowModeSeconds",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("slowModeSeconds"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
-                                maximum: None,
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "visibility",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("visibility"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Room discoverability. public = listed in directory, unlisted = link only, private = invite only.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
-fn _default_room_settings_allowlist_enabled() -> core::option::Option<bool> {
+fn _default_room_settings_allowlist_enabled() -> Option<bool> {
     Some(false)
 }
 
-fn _default_room_settings_min_account_age_days() -> core::option::Option<i64> {
+fn _default_room_settings_min_account_age_days() -> Option<i64> {
     Some(0i64)
 }
 
-fn _default_room_settings_slow_mode_seconds() -> core::option::Option<i64> {
+fn _default_room_settings_slow_mode_seconds() -> Option<i64> {
     Some(0i64)
 }
 

@@ -5,56 +5,52 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::EntryView;
+use crate::sh_weaver::notebook::PageView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPage<'a> {
     #[serde(borrow)]
-    pub page: jacquard_common::types::string::AtUri<'a>,
+    pub page: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPageOutput<'a> {
     #[serde(borrow)]
-    pub entries: Vec<crate::sh_weaver::notebook::EntryView<'a>>,
+    pub entries: Vec<EntryView<'a>>,
     #[serde(borrow)]
-    pub page: crate::sh_weaver::notebook::PageView<'a>,
+    pub page: PageView<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetPageError<'a> {
     #[serde(rename = "PageNotFound")]
-    PageNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    PageNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetPageError<'_> {
@@ -72,8 +68,7 @@ impl core::fmt::Display for GetPageError<'_> {
     }
 }
 
-/// Response type for
-///sh.weaver.notebook.getPage
+/// Response type for sh.weaver.notebook.getPage
 pub struct GetPageResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPageResponse {
     const NSID: &'static str = "sh.weaver.notebook.getPage";
@@ -88,8 +83,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetPage<'a> {
     type Response = GetPageResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.notebook.getPage
+/// Endpoint type for sh.weaver.notebook.getPage
 pub struct GetPageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPageRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getPage";
@@ -132,11 +126,9 @@ pub mod get_page_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetPageBuilder<'a, S: get_page_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetPage<'a> {
@@ -150,9 +142,9 @@ impl<'a> GetPageBuilder<'a, get_page_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetPageBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -165,13 +157,13 @@ where
     /// Set the `page` field (required)
     pub fn page(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetPageBuilder<'a, get_page_state::SetPage<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetPageBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

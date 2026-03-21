@@ -5,42 +5,31 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Register<'a> {
     ///The expo push token
     #[serde(borrow)]
-    pub push_token: jacquard_common::CowStr<'a>,
+    pub push_token: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RegisterOutput<'a> {
     ///Whether the token was successfully registered.
     pub success: bool,
 }
 
-/// Response type for
-///app.ocho.push.register
+/// Response type for app.ocho.push.register
 pub struct RegisterResponse;
 impl jacquard_common::xrpc::XrpcResp for RegisterResponse {
     const NSID: &'static str = "app.ocho.push.register";
@@ -57,8 +46,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for Register<'a> {
     type Response = RegisterResponse;
 }
 
-/// Endpoint type for
-///app.ocho.push.register
+/// Endpoint type for app.ocho.push.register
 pub struct RegisterRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RegisterRequest {
     const PATH: &'static str = "/xrpc/app.ocho.push.register";

@@ -5,61 +5,54 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::{Did, Nsid};
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetServiceAuth<'a> {
     #[serde(borrow)]
-    pub aud: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub exp: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub aud: Did<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exp: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub lxm: core::option::Option<jacquard_common::types::string::Nsid<'a>>,
+    pub lxm: Option<Nsid<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct GetServiceAuthOutput<'a> {
     #[serde(borrow)]
-    pub token: jacquard_common::CowStr<'a>,
+    pub token: CowStr<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetServiceAuthError<'a> {
     /// Indicates that the requested expiration date is not a valid. May be in the past or may be reliant on the requested scopes.
     #[serde(rename = "BadExpiration")]
-    BadExpiration(core::option::Option<jacquard_common::CowStr<'a>>),
+    BadExpiration(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetServiceAuthError<'_> {
@@ -77,8 +70,7 @@ impl core::fmt::Display for GetServiceAuthError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.server.getServiceAuth
+/// Response type for com.atproto.server.getServiceAuth
 pub struct GetServiceAuthResponse;
 impl jacquard_common::xrpc::XrpcResp for GetServiceAuthResponse {
     const NSID: &'static str = "com.atproto.server.getServiceAuth";
@@ -93,8 +85,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetServiceAuth<'a> {
     type Response = GetServiceAuthResponse;
 }
 
-/// Endpoint type for
-///com.atproto.server.getServiceAuth
+/// Endpoint type for com.atproto.server.getServiceAuth
 pub struct GetServiceAuthRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetServiceAuthRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.getServiceAuth";
@@ -137,13 +128,9 @@ pub mod get_service_auth_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetServiceAuthBuilder<'a, S: get_service_auth_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Did<'a>>, Option<i64>, Option<Nsid<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetServiceAuth<'a> {
@@ -157,9 +144,9 @@ impl<'a> GetServiceAuthBuilder<'a, get_service_auth_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetServiceAuthBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -172,13 +159,13 @@ where
     /// Set the `aud` field (required)
     pub fn aud(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> GetServiceAuthBuilder<'a, get_service_auth_state::SetAud<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetServiceAuthBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -198,18 +185,12 @@ impl<'a, S: get_service_auth_state::State> GetServiceAuthBuilder<'a, S> {
 
 impl<'a, S: get_service_auth_state::State> GetServiceAuthBuilder<'a, S> {
     /// Set the `lxm` field (optional)
-    pub fn lxm(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Nsid<'a>>>,
-    ) -> Self {
+    pub fn lxm(mut self, value: impl Into<Option<Nsid<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `lxm` field to an Option value (optional)
-    pub fn maybe_lxm(
-        mut self,
-        value: Option<jacquard_common::types::string::Nsid<'a>>,
-    ) -> Self {
+    pub fn maybe_lxm(mut self, value: Option<Nsid<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }

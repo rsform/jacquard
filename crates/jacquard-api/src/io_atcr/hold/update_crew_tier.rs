@@ -5,64 +5,57 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateCrewTier<'a> {
     ///Tier rank index (0-based, maps to hold tier list by position).
     pub tier_rank: i64,
     ///DID of the crew member whose tier is being updated.
     #[serde(borrow)]
-    pub user_did: jacquard_common::types::string::Did<'a>,
+    pub user_did: Did<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateCrewTierOutput<'a> {
     ///Resolved tier name on this hold.
     #[serde(borrow)]
-    pub tier_name: jacquard_common::CowStr<'a>,
+    pub tier_name: CowStr<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UpdateCrewTierError<'a> {
     /// Valid appview token required.
     #[serde(rename = "AuthRequired")]
-    AuthRequired(core::option::Option<jacquard_common::CowStr<'a>>),
+    AuthRequired(Option<CowStr<'a>>),
     /// User is not a crew member on this hold.
     #[serde(rename = "UserNotFound")]
-    UserNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    UserNotFound(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for UpdateCrewTierError<'_> {
@@ -87,8 +80,7 @@ impl core::fmt::Display for UpdateCrewTierError<'_> {
     }
 }
 
-/// Response type for
-///io.atcr.hold.updateCrewTier
+/// Response type for io.atcr.hold.updateCrewTier
 pub struct UpdateCrewTierResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateCrewTierResponse {
     const NSID: &'static str = "io.atcr.hold.updateCrewTier";
@@ -105,8 +97,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateCrewTier<'a> {
     type Response = UpdateCrewTierResponse;
 }
 
-/// Endpoint type for
-///io.atcr.hold.updateCrewTier
+/// Endpoint type for io.atcr.hold.updateCrewTier
 pub struct UpdateCrewTierRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateCrewTierRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.updateCrewTier";
@@ -127,48 +118,45 @@ pub mod update_crew_tier_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TierRank;
         type UserDid;
+        type TierRank;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TierRank = Unset;
         type UserDid = Unset;
-    }
-    ///State transition - sets the `tier_rank` field to Set
-    pub struct SetTierRank<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTierRank<S> {}
-    impl<S: State> State for SetTierRank<S> {
-        type TierRank = Set<members::tier_rank>;
-        type UserDid = S::UserDid;
+        type TierRank = Unset;
     }
     ///State transition - sets the `user_did` field to Set
     pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUserDid<S> {}
     impl<S: State> State for SetUserDid<S> {
-        type TierRank = S::TierRank;
         type UserDid = Set<members::user_did>;
+        type TierRank = S::TierRank;
+    }
+    ///State transition - sets the `tier_rank` field to Set
+    pub struct SetTierRank<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTierRank<S> {}
+    impl<S: State> State for SetTierRank<S> {
+        type UserDid = S::UserDid;
+        type TierRank = Set<members::tier_rank>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tier_rank` field
-        pub struct tier_rank(());
         ///Marker type for the `user_did` field
         pub struct user_did(());
+        ///Marker type for the `tier_rank` field
+        pub struct tier_rank(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct UpdateCrewTierBuilder<'a, S: update_crew_tier_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>, Option<Did<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateCrewTier<'a> {
@@ -182,9 +170,9 @@ impl<'a> UpdateCrewTierBuilder<'a, update_crew_tier_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateCrewTierBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -199,11 +187,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> UpdateCrewTierBuilder<'a, update_crew_tier_state::SetTierRank<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         UpdateCrewTierBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -216,13 +204,13 @@ where
     /// Set the `userDid` field (required)
     pub fn user_did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> UpdateCrewTierBuilder<'a, update_crew_tier_state::SetUserDid<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         UpdateCrewTierBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -230,8 +218,8 @@ where
 impl<'a, S> UpdateCrewTierBuilder<'a, S>
 where
     S: update_crew_tier_state::State,
-    S::TierRank: update_crew_tier_state::IsSet,
     S::UserDid: update_crew_tier_state::IsSet,
+    S::TierRank: update_crew_tier_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateCrewTier<'a> {
@@ -244,7 +232,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

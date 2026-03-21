@@ -5,43 +5,35 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::MessageInput;
+use crate::chat_bsky::convo::MessageView;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SendMessage<'a> {
     #[serde(borrow)]
-    pub convo_id: jacquard_common::CowStr<'a>,
+    pub convo_id: CowStr<'a>,
     #[serde(borrow)]
-    pub message: crate::chat_bsky::convo::MessageInput<'a>,
+    pub message: MessageInput<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SendMessageOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::chat_bsky::convo::MessageView<'a>,
+    pub value: MessageView<'a>,
 }
 
-/// Response type for
-///chat.bsky.convo.sendMessage
+/// Response type for chat.bsky.convo.sendMessage
 pub struct SendMessageResponse;
 impl jacquard_common::xrpc::XrpcResp for SendMessageResponse {
     const NSID: &'static str = "chat.bsky.convo.sendMessage";
@@ -58,8 +50,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SendMessage<'a> {
     type Response = SendMessageResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.convo.sendMessage
+/// Endpoint type for chat.bsky.convo.sendMessage
 pub struct SendMessageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SendMessageRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.sendMessage";
@@ -116,12 +107,9 @@ pub mod send_message_state {
 
 /// Builder for constructing an instance of this type
 pub struct SendMessageBuilder<'a, S: send_message_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::chat_bsky::convo::MessageInput<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<MessageInput<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SendMessage<'a> {
@@ -135,9 +123,9 @@ impl<'a> SendMessageBuilder<'a, send_message_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SendMessageBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -150,13 +138,13 @@ where
     /// Set the `convoId` field (required)
     pub fn convo_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> SendMessageBuilder<'a, send_message_state::SetConvoId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SendMessageBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -169,13 +157,13 @@ where
     /// Set the `message` field (required)
     pub fn message(
         mut self,
-        value: impl Into<crate::chat_bsky::convo::MessageInput<'a>>,
+        value: impl Into<MessageInput<'a>>,
     ) -> SendMessageBuilder<'a, send_message_state::SetMessage<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         SendMessageBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -197,7 +185,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

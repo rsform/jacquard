@@ -5,81 +5,80 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// Repository statistics stored in the hold's embedded PDS. Tracks pull/push counts per owner+repository combination. Record key is deterministic: base32(sha256(ownerDID + "/" + repository)[:16]).
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Stats<'a> {
     ///RFC3339 timestamp of last pull
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub last_pull: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_pull: Option<Datetime>,
     ///RFC3339 timestamp of last push
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub last_push: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_push: Option<Datetime>,
     ///DID of the image owner (e.g., did:plc:xyz123)
     #[serde(borrow)]
-    pub owner_did: jacquard_common::types::string::Did<'a>,
+    pub owner_did: Did<'a>,
     ///Number of manifest downloads
     pub pull_count: i64,
     ///Number of manifest uploads
     pub push_count: i64,
     ///Repository name (e.g., myapp)
     #[serde(borrow)]
-    pub repository: jacquard_common::CowStr<'a>,
+    pub repository: CowStr<'a>,
     ///RFC3339 timestamp of when this record was last updated
-    pub updated_at: jacquard_common::types::string::Datetime,
+    pub updated_at: Datetime,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct StatsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Stats<'a>,
 }
 
 impl<'a> Stats<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, StatsRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, StatsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct StatsRecord;
-impl jacquard_common::xrpc::XrpcResp for StatsRecord {
+impl XrpcResp for StatsRecord {
     const NSID: &'static str = "io.atcr.hold.stats";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = StatsGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
@@ -89,36 +88,32 @@ impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Stats<'_> {
+impl Collection for Stats<'_> {
     const NSID: &'static str = "io.atcr.hold.stats";
     type Record = StatsRecord;
 }
 
-impl jacquard_common::types::collection::Collection for StatsRecord {
+impl Collection for StatsRecord {
     const NSID: &'static str = "io.atcr.hold.stats";
     type Record = StatsRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
+impl<'a> LexiconSchema for Stats<'a> {
     fn nsid() -> &'static str {
         "io.atcr.hold.stats"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_io_atcr_hold_stats()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.pull_count;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "pull_count",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("pull_count"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -127,10 +122,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
         {
             let value = &self.push_count;
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "push_count",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("push_count"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -140,10 +133,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
             let value = &self.repository;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "repository",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("repository"),
                     max: 256usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -163,101 +154,101 @@ pub mod stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type UpdatedAt;
+        type Repository;
         type PullCount;
         type PushCount;
-        type Repository;
         type OwnerDid;
-        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type UpdatedAt = Unset;
+        type Repository = Unset;
         type PullCount = Unset;
         type PushCount = Unset;
-        type Repository = Unset;
         type OwnerDid = Unset;
-        type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `pull_count` field to Set
-    pub struct SetPullCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPullCount<S> {}
-    impl<S: State> State for SetPullCount<S> {
-        type PullCount = Set<members::pull_count>;
-        type PushCount = S::PushCount;
-        type Repository = S::Repository;
-        type OwnerDid = S::OwnerDid;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `push_count` field to Set
-    pub struct SetPushCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPushCount<S> {}
-    impl<S: State> State for SetPushCount<S> {
-        type PullCount = S::PullCount;
-        type PushCount = Set<members::push_count>;
-        type Repository = S::Repository;
-        type OwnerDid = S::OwnerDid;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type PullCount = S::PullCount;
-        type PushCount = S::PushCount;
-        type Repository = Set<members::repository>;
-        type OwnerDid = S::OwnerDid;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `owner_did` field to Set
-    pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
-    impl<S: State> State for SetOwnerDid<S> {
-        type PullCount = S::PullCount;
-        type PushCount = S::PushCount;
-        type Repository = S::Repository;
-        type OwnerDid = Set<members::owner_did>;
-        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
+        type UpdatedAt = Set<members::updated_at>;
+        type Repository = S::Repository;
         type PullCount = S::PullCount;
         type PushCount = S::PushCount;
-        type Repository = S::Repository;
         type OwnerDid = S::OwnerDid;
-        type UpdatedAt = Set<members::updated_at>;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Repository = Set<members::repository>;
+        type PullCount = S::PullCount;
+        type PushCount = S::PushCount;
+        type OwnerDid = S::OwnerDid;
+    }
+    ///State transition - sets the `pull_count` field to Set
+    pub struct SetPullCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPullCount<S> {}
+    impl<S: State> State for SetPullCount<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Repository = S::Repository;
+        type PullCount = Set<members::pull_count>;
+        type PushCount = S::PushCount;
+        type OwnerDid = S::OwnerDid;
+    }
+    ///State transition - sets the `push_count` field to Set
+    pub struct SetPushCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPushCount<S> {}
+    impl<S: State> State for SetPushCount<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Repository = S::Repository;
+        type PullCount = S::PullCount;
+        type PushCount = Set<members::push_count>;
+        type OwnerDid = S::OwnerDid;
+    }
+    ///State transition - sets the `owner_did` field to Set
+    pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
+    impl<S: State> State for SetOwnerDid<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Repository = S::Repository;
+        type PullCount = S::PullCount;
+        type PushCount = S::PushCount;
+        type OwnerDid = Set<members::owner_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
         ///Marker type for the `pull_count` field
         pub struct pull_count(());
         ///Marker type for the `push_count` field
         pub struct push_count(());
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `owner_did` field
         pub struct owner_did(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct StatsBuilder<'a, S: stats_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<Did<'a>>,
+        Option<i64>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<Datetime>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Stats<'a> {
@@ -271,27 +262,21 @@ impl<'a> StatsBuilder<'a, stats_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `lastPull` field (optional)
-    pub fn last_pull(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn last_pull(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `lastPull` field to an Option value (optional)
-    pub fn maybe_last_pull(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_last_pull(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -299,18 +284,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `lastPush` field (optional)
-    pub fn last_push(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
+    pub fn last_push(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `lastPush` field to an Option value (optional)
-    pub fn maybe_last_push(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
+    pub fn maybe_last_push(mut self, value: Option<Datetime>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -324,13 +303,13 @@ where
     /// Set the `ownerDid` field (required)
     pub fn owner_did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<Did<'a>>,
     ) -> StatsBuilder<'a, stats_state::SetOwnerDid<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -345,11 +324,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> StatsBuilder<'a, stats_state::SetPullCount<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -364,11 +343,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> StatsBuilder<'a, stats_state::SetPushCount<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -381,13 +360,13 @@ where
     /// Set the `repository` field (required)
     pub fn repository(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> StatsBuilder<'a, stats_state::SetRepository<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -400,13 +379,13 @@ where
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> StatsBuilder<'a, stats_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -414,11 +393,11 @@ where
 impl<'a, S> StatsBuilder<'a, S>
 where
     S: stats_state::State,
+    S::UpdatedAt: stats_state::IsSet,
+    S::Repository: stats_state::IsSet,
     S::PullCount: stats_state::IsSet,
     S::PushCount: stats_state::IsSet,
-    S::Repository: stats_state::IsSet,
     S::OwnerDid: stats_state::IsSet,
-    S::UpdatedAt: stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Stats<'a> {
@@ -436,7 +415,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -454,183 +433,115 @@ where
     }
 }
 
-fn lexicon_doc_io_atcr_hold_stats() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("io.atcr.hold.stats"),
-        revision: None,
-        description: None,
+fn lexicon_doc_io_atcr_hold_stats() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("io.atcr.hold.stats"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Repository statistics stored in the hold's embedded PDS. Tracks pull/push counts per owner+repository combination. Record key is deterministic: base32(sha256(ownerDID + \"/\" + repository)[:16]).",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("any")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("any")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("ownerDid"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("repository"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("pullCount"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("pushCount"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
+                                SmolStr::new_static("ownerDid"),
+                                SmolStr::new_static("repository"),
+                                SmolStr::new_static("pullCount"),
+                                SmolStr::new_static("pushCount"),
+                                SmolStr::new_static("updatedAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "lastPull",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("lastPull"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "RFC3339 timestamp of last pull",
-                                        ),
+                                        CowStr::new_static("RFC3339 timestamp of last pull"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "lastPush",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("lastPush"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "RFC3339 timestamp of last push",
-                                        ),
+                                        CowStr::new_static("RFC3339 timestamp of last push"),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "ownerDid",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("ownerDid"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "DID of the image owner (e.g., did:plc:xyz123)",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "pullCount",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("pullCount"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "pushCount",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("pushCount"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "repository",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("repository"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Repository name (e.g., myapp)",
-                                        ),
+                                        CowStr::new_static("Repository name (e.g., myapp)"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(256usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "updatedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("updatedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "RFC3339 timestamp of when this record was last updated",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

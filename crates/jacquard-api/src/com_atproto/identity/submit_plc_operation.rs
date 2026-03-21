@@ -5,24 +5,21 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SubmitPlcOperation<'a> {
     #[serde(borrow)]
-    pub operation: jacquard_common::types::value::Data<'a>,
+    pub operation: Data<'a>,
 }
 
-/// Response type for
-///com.atproto.identity.submitPlcOperation
+/// Response type for com.atproto.identity.submitPlcOperation
 pub struct SubmitPlcOperationResponse;
 impl jacquard_common::xrpc::XrpcResp for SubmitPlcOperationResponse {
     const NSID: &'static str = "com.atproto.identity.submitPlcOperation";
@@ -39,8 +36,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for SubmitPlcOperation<'a> {
     type Response = SubmitPlcOperationResponse;
 }
 
-/// Endpoint type for
-///com.atproto.identity.submitPlcOperation
+/// Endpoint type for com.atproto.identity.submitPlcOperation
 pub struct SubmitPlcOperationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SubmitPlcOperationRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.submitPlcOperation";
@@ -85,11 +81,9 @@ pub mod submit_plc_operation_state {
 
 /// Builder for constructing an instance of this type
 pub struct SubmitPlcOperationBuilder<'a, S: submit_plc_operation_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Data<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> SubmitPlcOperation<'a> {
@@ -103,9 +97,9 @@ impl<'a> SubmitPlcOperationBuilder<'a, submit_plc_operation_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SubmitPlcOperationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -118,13 +112,13 @@ where
     /// Set the `operation` field (required)
     pub fn operation(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<Data<'a>>,
     ) -> SubmitPlcOperationBuilder<'a, submit_plc_operation_state::SetOperation<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SubmitPlcOperationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -144,10 +138,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> SubmitPlcOperation<'a> {
         SubmitPlcOperation {
             operation: self.__unsafe_private_named.0.unwrap(),

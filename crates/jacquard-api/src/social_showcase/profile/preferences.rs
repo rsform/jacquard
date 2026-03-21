@@ -5,79 +5,83 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::social_showcase::ActivitySettings;
+use crate::social_showcase::DisplaySettings;
+use crate::social_showcase::NotificationSettings;
+use crate::social_showcase::PrivacySettings;
+use crate::social_showcase::VisibilitySettings;
 /// User preferences and settings
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Preferences<'a> {
     #[serde(borrow)]
-    pub activity: crate::social_showcase::ActivitySettings<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub activity: ActivitySettings<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub display: core::option::Option<crate::social_showcase::DisplaySettings<'a>>,
+    pub display: Option<DisplaySettings<'a>>,
     #[serde(borrow)]
-    pub notifications: crate::social_showcase::NotificationSettings<'a>,
+    pub notifications: NotificationSettings<'a>,
     #[serde(borrow)]
-    pub privacy: crate::social_showcase::PrivacySettings<'a>,
-    ///Schema version for migrations (defaults to 1 if missing) Defaults to `1`.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub privacy: PrivacySettings<'a>,
+    ///Schema version for migrations (defaults to 1 if missing)  Defaults to `1`.
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_preferences_schema_version")]
-    pub schema_version: core::option::Option<i64>,
-    pub updated_at: jacquard_common::types::string::Datetime,
+    pub schema_version: Option<i64>,
+    pub updated_at: Datetime,
     #[serde(borrow)]
-    pub visibility: crate::social_showcase::VisibilitySettings<'a>,
+    pub visibility: VisibilitySettings<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct PreferencesGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Preferences<'a>,
 }
 
 impl<'a> Preferences<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, PreferencesRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, PreferencesRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PreferencesRecord;
-impl jacquard_common::xrpc::XrpcResp for PreferencesRecord {
+impl XrpcResp for PreferencesRecord {
     const NSID: &'static str = "social.showcase.profile.preferences";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = PreferencesGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<PreferencesGetRecordOutput<'_>> for Preferences<'_> {
@@ -87,34 +91,32 @@ impl From<PreferencesGetRecordOutput<'_>> for Preferences<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Preferences<'_> {
+impl Collection for Preferences<'_> {
     const NSID: &'static str = "social.showcase.profile.preferences";
     type Record = PreferencesRecord;
 }
 
-impl jacquard_common::types::collection::Collection for PreferencesRecord {
+impl Collection for PreferencesRecord {
     const NSID: &'static str = "social.showcase.profile.preferences";
     type Record = PreferencesRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
+impl<'a> LexiconSchema for Preferences<'a> {
     fn nsid() -> &'static str {
         "social.showcase.profile.preferences"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_social_showcase_profile_preferences()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_preferences_schema_version() -> core::option::Option<i64> {
+fn _default_preferences_schema_version() -> Option<i64> {
     Some(1i64)
 }
 
@@ -128,101 +130,101 @@ pub mod preferences_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Visibility;
         type Notifications;
-        type Privacy;
-        type Activity;
         type UpdatedAt;
+        type Visibility;
+        type Activity;
+        type Privacy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Visibility = Unset;
         type Notifications = Unset;
-        type Privacy = Unset;
-        type Activity = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type Visibility = Set<members::visibility>;
-        type Notifications = S::Notifications;
-        type Privacy = S::Privacy;
-        type Activity = S::Activity;
-        type UpdatedAt = S::UpdatedAt;
+        type Visibility = Unset;
+        type Activity = Unset;
+        type Privacy = Unset;
     }
     ///State transition - sets the `notifications` field to Set
     pub struct SetNotifications<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotifications<S> {}
     impl<S: State> State for SetNotifications<S> {
-        type Visibility = S::Visibility;
         type Notifications = Set<members::notifications>;
-        type Privacy = S::Privacy;
-        type Activity = S::Activity;
         type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `privacy` field to Set
-    pub struct SetPrivacy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPrivacy<S> {}
-    impl<S: State> State for SetPrivacy<S> {
         type Visibility = S::Visibility;
-        type Notifications = S::Notifications;
-        type Privacy = Set<members::privacy>;
         type Activity = S::Activity;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `activity` field to Set
-    pub struct SetActivity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActivity<S> {}
-    impl<S: State> State for SetActivity<S> {
-        type Visibility = S::Visibility;
-        type Notifications = S::Notifications;
         type Privacy = S::Privacy;
-        type Activity = Set<members::activity>;
-        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type Visibility = S::Visibility;
         type Notifications = S::Notifications;
-        type Privacy = S::Privacy;
-        type Activity = S::Activity;
         type UpdatedAt = Set<members::updated_at>;
+        type Visibility = S::Visibility;
+        type Activity = S::Activity;
+        type Privacy = S::Privacy;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVisibility<S> {}
+    impl<S: State> State for SetVisibility<S> {
+        type Notifications = S::Notifications;
+        type UpdatedAt = S::UpdatedAt;
+        type Visibility = Set<members::visibility>;
+        type Activity = S::Activity;
+        type Privacy = S::Privacy;
+    }
+    ///State transition - sets the `activity` field to Set
+    pub struct SetActivity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActivity<S> {}
+    impl<S: State> State for SetActivity<S> {
+        type Notifications = S::Notifications;
+        type UpdatedAt = S::UpdatedAt;
+        type Visibility = S::Visibility;
+        type Activity = Set<members::activity>;
+        type Privacy = S::Privacy;
+    }
+    ///State transition - sets the `privacy` field to Set
+    pub struct SetPrivacy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPrivacy<S> {}
+    impl<S: State> State for SetPrivacy<S> {
+        type Notifications = S::Notifications;
+        type UpdatedAt = S::UpdatedAt;
+        type Visibility = S::Visibility;
+        type Activity = S::Activity;
+        type Privacy = Set<members::privacy>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
         ///Marker type for the `notifications` field
         pub struct notifications(());
-        ///Marker type for the `privacy` field
-        pub struct privacy(());
-        ///Marker type for the `activity` field
-        pub struct activity(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
+        ///Marker type for the `activity` field
+        pub struct activity(());
+        ///Marker type for the `privacy` field
+        pub struct privacy(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PreferencesBuilder<'a, S: preferences_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::social_showcase::ActivitySettings<'a>>,
-        ::core::option::Option<crate::social_showcase::DisplaySettings<'a>>,
-        ::core::option::Option<crate::social_showcase::NotificationSettings<'a>>,
-        ::core::option::Option<crate::social_showcase::PrivacySettings<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::social_showcase::VisibilitySettings<'a>>,
+        Option<ActivitySettings<'a>>,
+        Option<DisplaySettings<'a>>,
+        Option<NotificationSettings<'a>>,
+        Option<PrivacySettings<'a>>,
+        Option<i64>,
+        Option<Datetime>,
+        Option<VisibilitySettings<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Preferences<'a> {
@@ -236,9 +238,9 @@ impl<'a> PreferencesBuilder<'a, preferences_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -251,31 +253,25 @@ where
     /// Set the `activity` field (required)
     pub fn activity(
         mut self,
-        value: impl Into<crate::social_showcase::ActivitySettings<'a>>,
+        value: impl Into<ActivitySettings<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetActivity<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     /// Set the `display` field (optional)
-    pub fn display(
-        mut self,
-        value: impl Into<Option<crate::social_showcase::DisplaySettings<'a>>>,
-    ) -> Self {
+    pub fn display(mut self, value: impl Into<Option<DisplaySettings<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `display` field to an Option value (optional)
-    pub fn maybe_display(
-        mut self,
-        value: Option<crate::social_showcase::DisplaySettings<'a>>,
-    ) -> Self {
+    pub fn maybe_display(mut self, value: Option<DisplaySettings<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -289,13 +285,13 @@ where
     /// Set the `notifications` field (required)
     pub fn notifications(
         mut self,
-        value: impl Into<crate::social_showcase::NotificationSettings<'a>>,
+        value: impl Into<NotificationSettings<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetNotifications<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -308,13 +304,13 @@ where
     /// Set the `privacy` field (required)
     pub fn privacy(
         mut self,
-        value: impl Into<crate::social_showcase::PrivacySettings<'a>>,
+        value: impl Into<PrivacySettings<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetPrivacy<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -340,13 +336,13 @@ where
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> PreferencesBuilder<'a, preferences_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -359,13 +355,13 @@ where
     /// Set the `visibility` field (required)
     pub fn visibility(
         mut self,
-        value: impl Into<crate::social_showcase::VisibilitySettings<'a>>,
+        value: impl Into<VisibilitySettings<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetVisibility<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -373,11 +369,11 @@ where
 impl<'a, S> PreferencesBuilder<'a, S>
 where
     S: preferences_state::State,
-    S::Visibility: preferences_state::IsSet,
     S::Notifications: preferences_state::IsSet,
-    S::Privacy: preferences_state::IsSet,
-    S::Activity: preferences_state::IsSet,
     S::UpdatedAt: preferences_state::IsSet,
+    S::Visibility: preferences_state::IsSet,
+    S::Activity: preferences_state::IsSet,
+    S::Privacy: preferences_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Preferences<'a> {
@@ -395,7 +391,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -413,133 +409,103 @@ where
     }
 }
 
-fn lexicon_doc_social_showcase_profile_preferences() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("social.showcase.profile.preferences"),
-        revision: None,
-        description: None,
+fn lexicon_doc_social_showcase_profile_preferences() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("social.showcase.profile.preferences"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "User preferences and settings",
-                        ),
+                        CowStr::new_static("User preferences and settings"),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("literal:self")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("visibility"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("activity"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("notifications"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("privacy"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
+                                SmolStr::new_static("visibility"),
+                                SmolStr::new_static("activity"),
+                                SmolStr::new_static("notifications"),
+                                SmolStr::new_static("privacy"),
+                                SmolStr::new_static("updatedAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "activity",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("activity"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "social.showcase.defs#activitySettings",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "display",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("display"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "social.showcase.defs#displaySettings",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "notifications",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("notifications"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "social.showcase.defs#notificationSettings",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "privacy",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("privacy"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "social.showcase.defs#privacySettings",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "schemaVersion",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
-                                    minimum: None,
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                SmolStr::new_static("schemaVersion"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "updatedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                SmolStr::new_static("updatedAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "visibility",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                SmolStr::new_static("visibility"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static(
                                         "social.showcase.defs#visibilitySettings",
                                     ),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

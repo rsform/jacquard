@@ -5,68 +5,82 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::org_hypercerts::SmallImage;
+use crate::org_hypercerts::SmallVideo;
+use crate::org_hypercerts::Uri;
+use crate::org_hypercerts::claim::activity::ContributorIdentity;
+use crate::org_hyperboards::board;
 /// Visual configuration for a hyperboard's background, colors, and layout.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct BoardConfig<'a> {
     ///Display aspect ratio of the board.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: core::option::Option<BoardConfigAspectRatio<'a>>,
+    pub aspect_ratio: Option<BoardConfigAspectRatio<'a>>,
     ///Background color as a hex string (e.g. '#ffffff').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub background_color: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub background_color: Option<CowStr<'a>>,
     ///Whether the background is rendered in grayscale. Default: true.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub background_grayscale: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub background_grayscale: Option<bool>,
     ///URI of the background iframe.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub background_iframe_url: core::option::Option<
-        jacquard_common::types::string::UriValue<'a>,
-    >,
+    pub background_iframe_url: Option<UriValue<'a>>,
     ///Background image as a URI or image blob.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub background_image: core::option::Option<BoardConfigBackgroundImage<'a>>,
+    pub background_image: Option<BoardConfigBackgroundImage<'a>>,
     ///Background opacity as a percentage (0–100).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub background_opacity: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub background_opacity: Option<i64>,
     ///Type of background content.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub background_type: core::option::Option<BoardConfigBackgroundType<'a>>,
+    pub background_type: Option<BoardConfigBackgroundType<'a>>,
     ///Border color as a hex string (e.g. '#000000').
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub border_color: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub border_color: Option<CowStr<'a>>,
     ///Whether contributor images are rendered in grayscale. Default: false.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub grayscale_images: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub grayscale_images: Option<bool>,
     ///Shape used to crop contributor images on this board.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub image_shape: core::option::Option<BoardConfigImageShape<'a>>,
+    pub image_shape: Option<BoardConfigImageShape<'a>>,
 }
 
 /// Display aspect ratio of the board.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BoardConfigAspectRatio<'a> {
     _169,
     _43,
     _11,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> BoardConfigAspectRatio<'a> {
@@ -86,7 +100,7 @@ impl<'a> From<&'a str> for BoardConfigAspectRatio<'a> {
             "16:9" => Self::_169,
             "4:3" => Self::_43,
             "1:1" => Self::_11,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -97,7 +111,7 @@ impl<'a> From<String> for BoardConfigAspectRatio<'a> {
             "16:9" => Self::_169,
             "4:3" => Self::_43,
             "1:1" => Self::_11,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -156,31 +170,25 @@ impl jacquard_common::IntoStatic for BoardConfigAspectRatio<'_> {
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum BoardConfigBackgroundImage<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<crate::org_hypercerts::Uri<'a>>),
+    Uri(Box<Uri<'a>>),
     #[serde(rename = "org.hypercerts.defs#smallImage")]
-    SmallImage(Box<crate::org_hypercerts::SmallImage<'a>>),
+    SmallImage(Box<SmallImage<'a>>),
 }
 
 /// Type of background content.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BoardConfigBackgroundType<'a> {
     Image,
     Iframe,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> BoardConfigBackgroundType<'a> {
@@ -198,7 +206,7 @@ impl<'a> From<&'a str> for BoardConfigBackgroundType<'a> {
         match s {
             "image" => Self::Image,
             "iframe" => Self::Iframe,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -208,7 +216,7 @@ impl<'a> From<String> for BoardConfigBackgroundType<'a> {
         match s.as_str() {
             "image" => Self::Image,
             "iframe" => Self::Iframe,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -267,11 +275,12 @@ impl jacquard_common::IntoStatic for BoardConfigBackgroundType<'_> {
 }
 
 /// Shape used to crop contributor images on this board.
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BoardConfigImageShape<'a> {
     Circular,
     Square,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> BoardConfigImageShape<'a> {
@@ -289,7 +298,7 @@ impl<'a> From<&'a str> for BoardConfigImageShape<'a> {
         match s {
             "circular" => Self::Circular,
             "square" => Self::Square,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -299,7 +308,7 @@ impl<'a> From<String> for BoardConfigImageShape<'a> {
         match s.as_str() {
             "circular" => Self::Circular,
             "square" => Self::Square,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -358,214 +367,150 @@ impl jacquard_common::IntoStatic for BoardConfigImageShape<'_> {
 }
 
 /// Configuration for a specific contributor within a board. Values serve as fallbacks when the contributor has not defined them on their profile. It can also be used to override contributor settings on this board without changing their global profile.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ContributorConfig<'a> {
     ///Identifies the contributor being styled. A strong reference to an org.hypercerts.claim.contributorInformation record, or a contributorIdentity (DID or identifier string) for contributors without a dedicated record.
     #[serde(borrow)]
     pub contributor: ContributorConfigContributor<'a>,
     ///Display name for this contributor on this board.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: Option<CowStr<'a>>,
     ///Iframe overlay shown when hovering over this contributor.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub hover_iframe_url: core::option::Option<
-        jacquard_common::types::string::UriValue<'a>,
-    >,
+    pub hover_iframe_url: Option<UriValue<'a>>,
     ///Image overlay shown when hovering over this contributor, as a URI or image blob.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub hover_image: core::option::Option<ContributorConfigHoverImage<'a>>,
+    pub hover_image: Option<ContributorConfigHoverImage<'a>>,
     ///Avatar or face image for this contributor on this board, as a URI or image blob.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub image: core::option::Option<ContributorConfigImage<'a>>,
+    pub image: Option<ContributorConfigImage<'a>>,
     ///When true, these values take precedence over the contributor's own profile and display settings. When false or omitted, they are only used as fallbacks if the contributor has not set their own settings.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub r#override: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub r#override: Option<bool>,
     ///Click-through link URL for this contributor.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub url: Option<UriValue<'a>>,
     ///Video for this contributor, as a URI (embed/direct link) or uploaded video blob.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub video: core::option::Option<ContributorConfigVideo<'a>>,
+    pub video: Option<ContributorConfigVideo<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ContributorConfigContributor<'a> {
     #[serde(rename = "com.atproto.repo.strongRef")]
-    StrongRef(Box<crate::com_atproto::repo::strong_ref::StrongRef<'a>>),
+    StrongRef(Box<StrongRef<'a>>),
     #[serde(rename = "org.hypercerts.claim.activity#contributorIdentity")]
-    ActivityContributorIdentity(
-        Box<crate::org_hypercerts::claim::activity::ContributorIdentity<'a>>,
-    ),
+    ActivityContributorIdentity(Box<ContributorIdentity<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ContributorConfigHoverImage<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<crate::org_hypercerts::Uri<'a>>),
+    Uri(Box<Uri<'a>>),
     #[serde(rename = "org.hypercerts.defs#smallImage")]
-    SmallImage(Box<crate::org_hypercerts::SmallImage<'a>>),
+    SmallImage(Box<SmallImage<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ContributorConfigImage<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<crate::org_hypercerts::Uri<'a>>),
+    Uri(Box<Uri<'a>>),
     #[serde(rename = "org.hypercerts.defs#smallImage")]
-    SmallImage(Box<crate::org_hypercerts::SmallImage<'a>>),
+    SmallImage(Box<SmallImage<'a>>),
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ContributorConfigVideo<'a> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<crate::org_hypercerts::Uri<'a>>),
+    Uri(Box<Uri<'a>>),
     #[serde(rename = "org.hypercerts.defs#smallVideo")]
-    SmallVideo(Box<crate::org_hypercerts::SmallVideo<'a>>),
+    SmallVideo(Box<SmallVideo<'a>>),
 }
 
 /// Configuration record for a hyperboard, wrapping an underlying activity or collection with visual presentation settings. Stored in the creator's PDS.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Board<'a> {
     ///Board-level visual configuration (background, colors, aspect ratio).
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub config: core::option::Option<crate::org_hyperboards::board::BoardConfig<'a>>,
+    pub config: Option<board::BoardConfig<'a>>,
     ///Per-contributor configuration entries for this board.
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub contributor_configs: core::option::Option<
-        Vec<crate::org_hyperboards::board::ContributorConfig<'a>>,
-    >,
+    pub contributor_configs: Option<Vec<board::ContributorConfig<'a>>>,
     ///Client-declared timestamp when this record was originally created.
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///Reference to the org.hypercerts.claim.activity or org.hypercerts.claim.collection this board visualizes.
     #[serde(borrow)]
-    pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    pub subject: StrongRef<'a>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct BoardGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Board<'a>,
 }
 
 impl<'a> Board<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, BoardRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, BoardRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for BoardConfig<'a> {
+impl<'a> LexiconSchema for BoardConfig<'a> {
     fn nsid() -> &'static str {
         "org.hyperboards.board"
     }
     fn def_name() -> &'static str {
         "boardConfig"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_hyperboards_board()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.aspect_ratio {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "aspect_ratio",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("aspect_ratio"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -574,10 +519,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for BoardConfig<'a> {
         if let Some(ref value) = self.background_color {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "background_color",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("background_color"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -586,10 +529,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for BoardConfig<'a> {
         if let Some(ref value) = self.background_iframe_url {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "background_iframe_url",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("background_iframe_url"),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -597,10 +538,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for BoardConfig<'a> {
         }
         if let Some(ref value) = self.background_opacity {
             if *value > 100i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "background_opacity",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("background_opacity"),
                     max: 100i64,
                     actual: *value,
                 });
@@ -608,10 +547,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for BoardConfig<'a> {
         }
         if let Some(ref value) = self.background_opacity {
             if *value < 0i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "background_opacity",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("background_opacity"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -620,10 +557,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for BoardConfig<'a> {
         if let Some(ref value) = self.background_type {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "background_type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("background_type"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -632,10 +567,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for BoardConfig<'a> {
         if let Some(ref value) = self.border_color {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "border_color",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("border_color"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -644,10 +577,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for BoardConfig<'a> {
         if let Some(ref value) = self.image_shape {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "image_shape",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("image_shape"),
                     max: 20usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -657,26 +588,22 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for BoardConfig<'a> {
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for ContributorConfig<'a> {
+impl<'a> LexiconSchema for ContributorConfig<'a> {
     fn nsid() -> &'static str {
         "org.hyperboards.board"
     }
     fn def_name() -> &'static str {
         "contributorConfig"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_hyperboards_board()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.display_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("display_name"),
                     max: 640usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -684,16 +611,10 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ContributorConfig<'a> {
         }
         if let Some(ref value) = self.display_name {
             {
-                let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
                 if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "display_name",
-                        ),
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("display_name"),
                         max: 64usize,
                         actual: count,
                     });
@@ -703,10 +624,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ContributorConfig<'a> {
         if let Some(ref value) = self.hover_iframe_url {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "hover_iframe_url",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("hover_iframe_url"),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -715,10 +634,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ContributorConfig<'a> {
         if let Some(ref value) = self.url {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "url",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("url"),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -729,13 +646,14 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for ContributorConfig<'a> {
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct BoardRecord;
-impl jacquard_common::xrpc::XrpcResp for BoardRecord {
+impl XrpcResp for BoardRecord {
     const NSID: &'static str = "org.hyperboards.board";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = BoardGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<BoardGetRecordOutput<'_>> for Board<'_> {
@@ -745,36 +663,32 @@ impl From<BoardGetRecordOutput<'_>> for Board<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Board<'_> {
+impl Collection for Board<'_> {
     const NSID: &'static str = "org.hyperboards.board";
     type Record = BoardRecord;
 }
 
-impl jacquard_common::types::collection::Collection for BoardRecord {
+impl Collection for BoardRecord {
     const NSID: &'static str = "org.hyperboards.board";
     type Record = BoardRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Board<'a> {
+impl<'a> LexiconSchema for Board<'a> {
     fn nsid() -> &'static str {
         "org.hyperboards.board"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_hyperboards_board()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.contributor_configs {
             #[allow(unused_comparisons)]
             if value.len() > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "contributor_configs",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("contributor_configs"),
                     max: 1000usize,
                     actual: value.len(),
                 });
@@ -784,470 +698,327 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Board<'a> {
     }
 }
 
-fn lexicon_doc_org_hyperboards_board() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.hyperboards.board"),
-        revision: None,
-        description: None,
+fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("org.hyperboards.board"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("boardConfig"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("boardConfig"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Visual configuration for a hyperboard's background, colors, and layout.",
                         ),
                     ),
-                    required: None,
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "aspectRatio",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("aspectRatio"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Display aspect ratio of the board.",
-                                    ),
+                                    CowStr::new_static("Display aspect ratio of the board."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(10usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "backgroundColor",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("backgroundColor"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Background color as a hex string (e.g. '#ffffff').",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(20usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "backgroundGrayscale",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("backgroundGrayscale"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "backgroundIframeUrl",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("backgroundIframeUrl"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "URI of the background iframe.",
-                                    ),
+                                    CowStr::new_static("URI of the background iframe."),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
+                                format: Some(LexStringFormat::Uri),
                                 max_length: Some(2048usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "backgroundImage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                            SmolStr::new_static("backgroundImage"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Background image as a URI or image blob.",
                                     ),
                                 ),
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("org.hypercerts.defs#uri"),
-                                    ::jacquard_common::CowStr::new_static("org.hypercerts.defs#smallImage")
+                                    CowStr::new_static("org.hypercerts.defs#uri"),
+                                    CowStr::new_static("org.hypercerts.defs#smallImage")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "backgroundOpacity",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                description: None,
-                                default: None,
+                            SmolStr::new_static("backgroundOpacity"),
+                            LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
                                 maximum: Some(100i64),
-                                r#enum: None,
-                                r#const: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "backgroundType",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("backgroundType"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Type of background content.",
-                                    ),
+                                    CowStr::new_static("Type of background content."),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(10usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "borderColor",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("borderColor"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Border color as a hex string (e.g. '#000000').",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(20usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "grayscaleImages",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("grayscaleImages"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "imageShape",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("imageShape"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Shape used to crop contributor images on this board.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(20usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                    "contributorConfig",
-                ),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("contributorConfig"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Configuration for a specific contributor within a board. Values serve as fallbacks when the contributor has not defined them on their profile. It can also be used to override contributor settings on this board without changing their global profile.",
                         ),
                     ),
-                    required: Some(
-                        vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("contributor")
-                        ],
-                    ),
-                    nullable: None,
+                    required: Some(vec![SmolStr::new_static("contributor")]),
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "contributor",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                            SmolStr::new_static("contributor"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Identifies the contributor being styled. A strong reference to an org.hypercerts.claim.contributorInformation record, or a contributorIdentity (DID or identifier string) for contributors without a dedicated record.",
                                     ),
                                 ),
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("com.atproto.repo.strongRef"),
-                                    ::jacquard_common::CowStr::new_static("org.hypercerts.claim.activity#contributorIdentity")
+                                    CowStr::new_static("com.atproto.repo.strongRef"),
+                                    CowStr::new_static("org.hypercerts.claim.activity#contributorIdentity")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "displayName",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("displayName"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Display name for this contributor on this board.",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(640usize),
-                                min_graphemes: None,
                                 max_graphemes: Some(64usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hoverIframeUrl",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("hoverIframeUrl"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Iframe overlay shown when hovering over this contributor.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
+                                format: Some(LexStringFormat::Uri),
                                 max_length: Some(2048usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "hoverImage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                            SmolStr::new_static("hoverImage"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Image overlay shown when hovering over this contributor, as a URI or image blob.",
                                     ),
                                 ),
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("org.hypercerts.defs#uri"),
-                                    ::jacquard_common::CowStr::new_static("org.hypercerts.defs#smallImage")
+                                    CowStr::new_static("org.hypercerts.defs#uri"),
+                                    CowStr::new_static("org.hypercerts.defs#smallImage")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "image",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                            SmolStr::new_static("image"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Avatar or face image for this contributor on this board, as a URI or image blob.",
                                     ),
                                 ),
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("org.hypercerts.defs#uri"),
-                                    ::jacquard_common::CowStr::new_static("org.hypercerts.defs#smallImage")
+                                    CowStr::new_static("org.hypercerts.defs#uri"),
+                                    CowStr::new_static("org.hypercerts.defs#smallImage")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "override",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
+                            SmolStr::new_static("override"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "url",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("url"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Click-through link URL for this contributor.",
                                     ),
                                 ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
+                                format: Some(LexStringFormat::Uri),
                                 max_length: Some(2048usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "video",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                            SmolStr::new_static("video"),
+                            LexObjectProperty::Union(LexRefUnion {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Video for this contributor, as a URI (embed/direct link) or uploaded video blob.",
                                     ),
                                 ),
                                 refs: vec![
-                                    ::jacquard_common::CowStr::new_static("org.hypercerts.defs#uri"),
-                                    ::jacquard_common::CowStr::new_static("org.hypercerts.defs#smallVideo")
+                                    CowStr::new_static("org.hypercerts.defs#uri"),
+                                    CowStr::new_static("org.hypercerts.defs#smallVideo")
                                 ],
-                                closed: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Configuration record for a hyperboard, wrapping an underlying activity or collection with visual presentation settings. Stored in the creator's PDS.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("subject"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("subject"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "config",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#boardConfig"),
+                                SmolStr::new_static("config"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#boardConfig"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "contributorConfigs",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                SmolStr::new_static("contributorConfigs"),
+                                LexObjectProperty::Array(LexArray {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Per-contributor configuration entries for this board.",
                                         ),
                                     ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static(
-                                            "#contributorConfig",
-                                        ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#contributorConfig"),
+                                        ..Default::default()
                                     }),
-                                    min_length: None,
                                     max_length: Some(1000usize),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Client-declared timestamp when this record was originally created.",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "subject",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "com.atproto.repo.strongRef",
-                                    ),
+                                SmolStr::new_static("subject"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -1285,18 +1056,18 @@ pub mod contributor_config_state {
 
 /// Builder for constructing an instance of this type
 pub struct ContributorConfigBuilder<'a, S: contributor_config_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<ContributorConfigContributor<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<ContributorConfigHoverImage<'a>>,
-        ::core::option::Option<ContributorConfigImage<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
-        ::core::option::Option<ContributorConfigVideo<'a>>,
+        Option<ContributorConfigContributor<'a>>,
+        Option<CowStr<'a>>,
+        Option<UriValue<'a>>,
+        Option<ContributorConfigHoverImage<'a>>,
+        Option<ContributorConfigImage<'a>>,
+        Option<bool>,
+        Option<UriValue<'a>>,
+        Option<ContributorConfigVideo<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> ContributorConfig<'a> {
@@ -1310,9 +1081,9 @@ impl<'a> ContributorConfigBuilder<'a, contributor_config_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ContributorConfigBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1327,29 +1098,23 @@ where
         mut self,
         value: impl Into<ContributorConfigContributor<'a>>,
     ) -> ContributorConfigBuilder<'a, contributor_config_state::SetContributor<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         ContributorConfigBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }
@@ -1357,18 +1122,12 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
 
 impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `hoverIframeUrl` field (optional)
-    pub fn hover_iframe_url(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn hover_iframe_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `hoverIframeUrl` field to an Option value (optional)
-    pub fn maybe_hover_iframe_url(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_hover_iframe_url(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -1424,18 +1183,12 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
 
 impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
-    ) -> Self {
+    pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(
-        mut self,
-        value: Option<jacquard_common::types::string::UriValue<'a>>,
-    ) -> Self {
+    pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -1479,7 +1232,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1544,16 +1297,14 @@ pub mod board_state {
 
 /// Builder for constructing an instance of this type
 pub struct BoardBuilder<'a, S: board_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::org_hyperboards::board::BoardConfig<'a>>,
-        ::core::option::Option<
-            Vec<crate::org_hyperboards::board::ContributorConfig<'a>>,
-        >,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        Option<board::BoardConfig<'a>>,
+        Option<Vec<board::ContributorConfig<'a>>>,
+        Option<Datetime>,
+        Option<StrongRef<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Board<'a> {
@@ -1567,27 +1318,21 @@ impl<'a> BoardBuilder<'a, board_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BoardBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: board_state::State> BoardBuilder<'a, S> {
     /// Set the `config` field (optional)
-    pub fn config(
-        mut self,
-        value: impl Into<Option<crate::org_hyperboards::board::BoardConfig<'a>>>,
-    ) -> Self {
+    pub fn config(mut self, value: impl Into<Option<board::BoardConfig<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `config` field to an Option value (optional)
-    pub fn maybe_config(
-        mut self,
-        value: Option<crate::org_hyperboards::board::BoardConfig<'a>>,
-    ) -> Self {
+    pub fn maybe_config(mut self, value: Option<board::BoardConfig<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
@@ -1597,9 +1342,7 @@ impl<'a, S: board_state::State> BoardBuilder<'a, S> {
     /// Set the `contributorConfigs` field (optional)
     pub fn contributor_configs(
         mut self,
-        value: impl Into<
-            Option<Vec<crate::org_hyperboards::board::ContributorConfig<'a>>>,
-        >,
+        value: impl Into<Option<Vec<board::ContributorConfig<'a>>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
@@ -1607,7 +1350,7 @@ impl<'a, S: board_state::State> BoardBuilder<'a, S> {
     /// Set the `contributorConfigs` field to an Option value (optional)
     pub fn maybe_contributor_configs(
         mut self,
-        value: Option<Vec<crate::org_hyperboards::board::ContributorConfig<'a>>>,
+        value: Option<Vec<board::ContributorConfig<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.1 = value;
         self
@@ -1622,13 +1365,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> BoardBuilder<'a, board_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         BoardBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1641,13 +1384,13 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        value: impl Into<StrongRef<'a>>,
     ) -> BoardBuilder<'a, board_state::SetSubject<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         BoardBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -1671,7 +1414,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -5,69 +5,54 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::DeletedMessageView;
+use crate::chat_bsky::convo::MessageView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetMessageContext<'a> {
     ///Defaults to `5`.
     #[serde(default = "_default_after")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub after: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub after: Option<i64>,
     ///Defaults to `5`.
     #[serde(default = "_default_before")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub before: core::option::Option<i64>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub before: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub convo_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub convo_id: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub message_id: jacquard_common::CowStr<'a>,
+    pub message_id: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetMessageContextOutput<'a> {
     #[serde(borrow)]
     pub messages: Vec<GetMessageContextOutputMessagesItem<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetMessageContextOutputMessagesItem<'a> {
     #[serde(rename = "chat.bsky.convo.defs#messageView")]
-    MessageView(Box<crate::chat_bsky::convo::MessageView<'a>>),
+    MessageView(Box<MessageView<'a>>),
     #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
-    DeletedMessageView(Box<crate::chat_bsky::convo::DeletedMessageView<'a>>),
+    DeletedMessageView(Box<DeletedMessageView<'a>>),
 }
 
-/// Response type for
-///chat.bsky.moderation.getMessageContext
+/// Response type for chat.bsky.moderation.getMessageContext
 pub struct GetMessageContextResponse;
 impl jacquard_common::xrpc::XrpcResp for GetMessageContextResponse {
     const NSID: &'static str = "chat.bsky.moderation.getMessageContext";
@@ -82,8 +67,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetMessageContext<'a> {
     type Response = GetMessageContextResponse;
 }
 
-/// Endpoint type for
-///chat.bsky.moderation.getMessageContext
+/// Endpoint type for chat.bsky.moderation.getMessageContext
 pub struct GetMessageContextRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetMessageContextRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.moderation.getMessageContext";
@@ -92,11 +76,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetMessageContextRequest {
     type Response = GetMessageContextResponse;
 }
 
-fn _default_after() -> core::option::Option<i64> {
+fn _default_after() -> Option<i64> {
     Some(5i64)
 }
 
-fn _default_before() -> core::option::Option<i64> {
+fn _default_before() -> Option<i64> {
     Some(5i64)
 }
 
@@ -134,14 +118,14 @@ pub mod get_message_context_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetMessageContextBuilder<'a, S: get_message_context_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        Option<i64>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetMessageContext<'a> {
@@ -155,9 +139,9 @@ impl<'a> GetMessageContextBuilder<'a, get_message_context_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetMessageContextBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -190,15 +174,12 @@ impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
 
 impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
     /// Set the `convoId` field (optional)
-    pub fn convo_id(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn convo_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `convoId` field to an Option value (optional)
-    pub fn maybe_convo_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_convo_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -212,13 +193,13 @@ where
     /// Set the `messageId` field (required)
     pub fn message_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetMessageContextBuilder<'a, get_message_context_state::SetMessageId<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         GetMessageContextBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

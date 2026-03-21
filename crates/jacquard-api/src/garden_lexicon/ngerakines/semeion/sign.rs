@@ -5,36 +5,25 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Sign {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SignOutput {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-/// Response type for
-///garden.lexicon.ngerakines.semeion.Sign
+/// Response type for garden.lexicon.ngerakines.semeion.Sign
 pub struct SignResponse;
 impl jacquard_common::xrpc::XrpcResp for SignResponse {
     const NSID: &'static str = "garden.lexicon.ngerakines.semeion.Sign";
@@ -81,8 +70,7 @@ impl jacquard_common::xrpc::XrpcRequest for Sign {
     }
 }
 
-/// Endpoint type for
-///garden.lexicon.ngerakines.semeion.Sign
+/// Endpoint type for garden.lexicon.ngerakines.semeion.Sign
 pub struct SignRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SignRequest {
     const PATH: &'static str = "/xrpc/garden.lexicon.ngerakines.semeion.Sign";

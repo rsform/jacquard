@@ -5,75 +5,79 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
+use crate::org_impactindexer::link::attestation;
 /// The EIP-712 typed data message structure
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct Eip712Message<'a> {
     ///The chain ID as a string (for bigint compatibility, max uint256)
     #[serde(borrow)]
-    pub chain_id: jacquard_common::CowStr<'a>,
+    pub chain_id: CowStr<'a>,
     ///The ATProto DID being linked
     #[serde(borrow)]
-    pub did: jacquard_common::CowStr<'a>,
+    pub did: CowStr<'a>,
     ///The EVM address being linked (0x-prefixed)
     #[serde(borrow)]
-    pub evm_address: jacquard_common::CowStr<'a>,
+    pub evm_address: CowStr<'a>,
     ///Replay protection nonce as a string (for bigint compatibility)
     #[serde(borrow)]
-    pub nonce: jacquard_common::CowStr<'a>,
+    pub nonce: CowStr<'a>,
     ///Unix timestamp as a string (for bigint compatibility)
     #[serde(borrow)]
-    pub timestamp: jacquard_common::CowStr<'a>,
+    pub timestamp: CowStr<'a>,
 }
 
 /// An attestation linking an ATProto DID to an EVM wallet address, signed with EIP-712.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Attestation<'a> {
     ///The EVM wallet address (checksummed or lowercase, 0x-prefixed)
     #[serde(borrow)]
-    pub address: jacquard_common::CowStr<'a>,
+    pub address: CowStr<'a>,
     ///The EVM chain ID where the signature was created
     pub chain_id: i64,
     ///Timestamp when the attestation was created
-    pub created_at: jacquard_common::types::string::Datetime,
+    pub created_at: Datetime,
     ///The EIP-712 typed data message that was signed
     #[serde(borrow)]
-    pub message: crate::org_impactindexer::link::attestation::Eip712Message<'a>,
+    pub message: attestation::Eip712Message<'a>,
     ///The EIP-712 signature in hex format (0x-prefixed, 65 bytes for ECDSA, longer for smart contract sigs)
     #[serde(borrow)]
-    pub signature: jacquard_common::CowStr<'a>,
+    pub signature: CowStr<'a>,
     ///The type of signature: eoa (EOA/ECDSA), erc1271 (smart contract), erc6492 (counterfactual)
     #[serde(borrow)]
     pub signature_type: AttestationSignatureType<'a>,
 }
 
 /// The type of signature: eoa (EOA/ECDSA), erc1271 (smart contract), erc6492 (counterfactual)
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AttestationSignatureType<'a> {
     Eoa,
     Erc1271,
     Erc6492,
-    Other(jacquard_common::CowStr<'a>),
+    Other(CowStr<'a>),
 }
 
 impl<'a> AttestationSignatureType<'a> {
@@ -93,7 +97,7 @@ impl<'a> From<&'a str> for AttestationSignatureType<'a> {
             "eoa" => Self::Eoa,
             "erc1271" => Self::Erc1271,
             "erc6492" => Self::Erc6492,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -104,7 +108,7 @@ impl<'a> From<String> for AttestationSignatureType<'a> {
             "eoa" => Self::Eoa,
             "erc1271" => Self::Erc1271,
             "erc6492" => Self::Erc6492,
-            _ => Self::Other(jacquard_common::CowStr::from(s)),
+            _ => Self::Other(CowStr::from(s)),
         }
     }
 }
@@ -164,60 +168,44 @@ impl jacquard_common::IntoStatic for AttestationSignatureType<'_> {
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct AttestationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Attestation<'a>,
 }
 
 impl<'a> Attestation<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, AttestationRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, AttestationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Eip712Message<'a> {
+impl<'a> LexiconSchema for Eip712Message<'a> {
     fn nsid() -> &'static str {
         "org.impactindexer.link.attestation"
     }
     fn def_name() -> &'static str {
         "eip712Message"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_impactindexer_link_attestation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.chain_id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 78usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "chain_id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("chain_id"),
                     max: 78usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -227,10 +215,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Eip712Message<'a> {
             let value = &self.did;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "did",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("did"),
                     max: 2048usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -240,10 +226,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Eip712Message<'a> {
             let value = &self.evm_address;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 42usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "evm_address",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("evm_address"),
                     max: 42usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -253,10 +237,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Eip712Message<'a> {
             let value = &self.evm_address;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 42usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "evm_address",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("evm_address"),
                     min: 42usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -266,10 +248,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Eip712Message<'a> {
             let value = &self.nonce;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 78usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "nonce",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("nonce"),
                     max: 78usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -279,10 +259,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Eip712Message<'a> {
             let value = &self.timestamp;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 78usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "timestamp",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("timestamp"),
                     max: 78usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -293,13 +271,14 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Eip712Message<'a> {
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct AttestationRecord;
-impl jacquard_common::xrpc::XrpcResp for AttestationRecord {
+impl XrpcResp for AttestationRecord {
     const NSID: &'static str = "org.impactindexer.link.attestation";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = AttestationGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<AttestationGetRecordOutput<'_>> for Attestation<'_> {
@@ -309,37 +288,33 @@ impl From<AttestationGetRecordOutput<'_>> for Attestation<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for Attestation<'_> {
+impl Collection for Attestation<'_> {
     const NSID: &'static str = "org.impactindexer.link.attestation";
     type Record = AttestationRecord;
 }
 
-impl jacquard_common::types::collection::Collection for AttestationRecord {
+impl Collection for AttestationRecord {
     const NSID: &'static str = "org.impactindexer.link.attestation";
     type Record = AttestationRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for Attestation<'a> {
+impl<'a> LexiconSchema for Attestation<'a> {
     fn nsid() -> &'static str {
         "org.impactindexer.link.attestation"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_org_impactindexer_link_attestation()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.address;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 42usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "address",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("address"),
                     max: 42usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -349,10 +324,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Attestation<'a> {
             let value = &self.address;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 42usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "address",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("address"),
                     min: 42usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -361,10 +334,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Attestation<'a> {
         {
             let value = &self.chain_id;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "chain_id",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("chain_id"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -374,10 +345,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Attestation<'a> {
             let value = &self.signature;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "signature",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("signature"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -387,10 +356,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Attestation<'a> {
             let value = &self.signature;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) < 132usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "signature",
-                    ),
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("signature"),
                     min: 132usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -400,10 +367,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Attestation<'a> {
             let value = &self.signature_type;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "signature_type",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("signature_type"),
                     max: 10usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -413,288 +378,195 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for Attestation<'a> {
     }
 }
 
-fn lexicon_doc_org_impactindexer_link_attestation() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("org.impactindexer.link.attestation"),
-        revision: None,
-        description: None,
+fn lexicon_doc_org_impactindexer_link_attestation() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("org.impactindexer.link.attestation"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("eip712Message"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                SmolStr::new_static("eip712Message"),
+                LexUserType::Object(LexObject {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "The EIP-712 typed data message structure",
-                        ),
+                        CowStr::new_static("The EIP-712 typed data message structure"),
                     ),
                     required: Some(
                         vec![
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("did"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("evmAddress"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("chainId"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("timestamp"),
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static("nonce")
+                            SmolStr::new_static("did"),
+                            SmolStr::new_static("evmAddress"),
+                            SmolStr::new_static("chainId"),
+                            SmolStr::new_static("timestamp"),
+                            SmolStr::new_static("nonce")
                         ],
                     ),
-                    nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::alloc::collections::BTreeMap::new();
+                        let mut map = BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "chainId",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("chainId"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The chain ID as a string (for bigint compatibility, max uint256)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(78usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "did",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("did"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "The ATProto DID being linked",
-                                    ),
+                                    CowStr::new_static("The ATProto DID being linked"),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(2048usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "evmAddress",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("evmAddress"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "The EVM address being linked (0x-prefixed)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
                                 min_length: Some(42usize),
                                 max_length: Some(42usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "nonce",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("nonce"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Replay protection nonce as a string (for bigint compatibility)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(78usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                "timestamp",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            SmolStr::new_static("timestamp"),
+                            LexObjectProperty::String(LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
+                                    CowStr::new_static(
                                         "Unix timestamp as a string (for bigint compatibility)",
                                     ),
                                 ),
-                                format: None,
-                                default: None,
-                                min_length: None,
                                 max_length: Some(78usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                ..Default::default()
                             }),
                         );
                         map
                     },
+                    ..Default::default()
                 }),
             );
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "An attestation linking an ATProto DID to an EVM wallet address, signed with EIP-712.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("address"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("chainId"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("signature"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("message"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("signatureType"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("createdAt")
+                                SmolStr::new_static("address"),
+                                SmolStr::new_static("chainId"),
+                                SmolStr::new_static("signature"),
+                                SmolStr::new_static("message"),
+                                SmolStr::new_static("signatureType"),
+                                SmolStr::new_static("createdAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "address",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("address"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The EVM wallet address (checksummed or lowercase, 0x-prefixed)",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
                                     min_length: Some(42usize),
                                     max_length: Some(42usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "chainId",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("chainId"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp when the attestation was created",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "message",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "#eip712Message",
-                                    ),
+                                SmolStr::new_static("message"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#eip712Message"),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "signature",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("signature"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The EIP-712 signature in hex format (0x-prefixed, 65 bytes for ECDSA, longer for smart contract sigs)",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
                                     min_length: Some(132usize),
                                     max_length: Some(1000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "signatureType",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("signatureType"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "The type of signature: eoa (EOA/ECDSA), erc1271 (smart contract), erc6492 (counterfactual)",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(10usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }
 
@@ -709,121 +581,119 @@ pub mod attestation_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ChainId;
-        type Signature;
+        type Message;
         type Address;
         type SignatureType;
-        type Message;
         type CreatedAt;
+        type Signature;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ChainId = Unset;
-        type Signature = Unset;
+        type Message = Unset;
         type Address = Unset;
         type SignatureType = Unset;
-        type Message = Unset;
         type CreatedAt = Unset;
+        type Signature = Unset;
     }
     ///State transition - sets the `chain_id` field to Set
     pub struct SetChainId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetChainId<S> {}
     impl<S: State> State for SetChainId<S> {
         type ChainId = Set<members::chain_id>;
-        type Signature = S::Signature;
+        type Message = S::Message;
         type Address = S::Address;
         type SignatureType = S::SignatureType;
-        type Message = S::Message;
         type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignature<S> {}
-    impl<S: State> State for SetSignature<S> {
-        type ChainId = S::ChainId;
-        type Signature = Set<members::signature>;
-        type Address = S::Address;
-        type SignatureType = S::SignatureType;
-        type Message = S::Message;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `address` field to Set
-    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddress<S> {}
-    impl<S: State> State for SetAddress<S> {
-        type ChainId = S::ChainId;
         type Signature = S::Signature;
-        type Address = Set<members::address>;
-        type SignatureType = S::SignatureType;
-        type Message = S::Message;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `signature_type` field to Set
-    pub struct SetSignatureType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignatureType<S> {}
-    impl<S: State> State for SetSignatureType<S> {
-        type ChainId = S::ChainId;
-        type Signature = S::Signature;
-        type Address = S::Address;
-        type SignatureType = Set<members::signature_type>;
-        type Message = S::Message;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
         type ChainId = S::ChainId;
-        type Signature = S::Signature;
+        type Message = Set<members::message>;
         type Address = S::Address;
         type SignatureType = S::SignatureType;
-        type Message = Set<members::message>;
         type CreatedAt = S::CreatedAt;
+        type Signature = S::Signature;
+    }
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddress<S> {}
+    impl<S: State> State for SetAddress<S> {
+        type ChainId = S::ChainId;
+        type Message = S::Message;
+        type Address = Set<members::address>;
+        type SignatureType = S::SignatureType;
+        type CreatedAt = S::CreatedAt;
+        type Signature = S::Signature;
+    }
+    ///State transition - sets the `signature_type` field to Set
+    pub struct SetSignatureType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignatureType<S> {}
+    impl<S: State> State for SetSignatureType<S> {
+        type ChainId = S::ChainId;
+        type Message = S::Message;
+        type Address = S::Address;
+        type SignatureType = Set<members::signature_type>;
+        type CreatedAt = S::CreatedAt;
+        type Signature = S::Signature;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type ChainId = S::ChainId;
-        type Signature = S::Signature;
+        type Message = S::Message;
         type Address = S::Address;
         type SignatureType = S::SignatureType;
-        type Message = S::Message;
         type CreatedAt = Set<members::created_at>;
+        type Signature = S::Signature;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignature<S> {}
+    impl<S: State> State for SetSignature<S> {
+        type ChainId = S::ChainId;
+        type Message = S::Message;
+        type Address = S::Address;
+        type SignatureType = S::SignatureType;
+        type CreatedAt = S::CreatedAt;
+        type Signature = Set<members::signature>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `chain_id` field
         pub struct chain_id(());
-        ///Marker type for the `signature` field
-        pub struct signature(());
+        ///Marker type for the `message` field
+        pub struct message(());
         ///Marker type for the `address` field
         pub struct address(());
         ///Marker type for the `signature_type` field
         pub struct signature_type(());
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AttestationBuilder<'a, S: attestation_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<
-            crate::org_impactindexer::link::attestation::Eip712Message<'a>,
-        >,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<AttestationSignatureType<'a>>,
+        Option<CowStr<'a>>,
+        Option<i64>,
+        Option<Datetime>,
+        Option<attestation::Eip712Message<'a>>,
+        Option<CowStr<'a>>,
+        Option<AttestationSignatureType<'a>>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Attestation<'a> {
@@ -837,9 +707,9 @@ impl<'a> AttestationBuilder<'a, attestation_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AttestationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -852,13 +722,13 @@ where
     /// Set the `address` field (required)
     pub fn address(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> AttestationBuilder<'a, attestation_state::SetAddress<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         AttestationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -873,11 +743,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AttestationBuilder<'a, attestation_state::SetChainId<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         AttestationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -890,13 +760,13 @@ where
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> AttestationBuilder<'a, attestation_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = Option::Some(value.into());
         AttestationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -909,13 +779,13 @@ where
     /// Set the `message` field (required)
     pub fn message(
         mut self,
-        value: impl Into<crate::org_impactindexer::link::attestation::Eip712Message<'a>>,
+        value: impl Into<attestation::Eip712Message<'a>>,
     ) -> AttestationBuilder<'a, attestation_state::SetMessage<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         AttestationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -928,13 +798,13 @@ where
     /// Set the `signature` field (required)
     pub fn signature(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> AttestationBuilder<'a, attestation_state::SetSignature<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = Option::Some(value.into());
         AttestationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -949,11 +819,11 @@ where
         mut self,
         value: impl Into<AttestationSignatureType<'a>>,
     ) -> AttestationBuilder<'a, attestation_state::SetSignatureType<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = Option::Some(value.into());
         AttestationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -962,11 +832,11 @@ impl<'a, S> AttestationBuilder<'a, S>
 where
     S: attestation_state::State,
     S::ChainId: attestation_state::IsSet,
-    S::Signature: attestation_state::IsSet,
+    S::Message: attestation_state::IsSet,
     S::Address: attestation_state::IsSet,
     S::SignatureType: attestation_state::IsSet,
-    S::Message: attestation_state::IsSet,
     S::CreatedAt: attestation_state::IsSet,
+    S::Signature: attestation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Attestation<'a> {
@@ -983,7 +853,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

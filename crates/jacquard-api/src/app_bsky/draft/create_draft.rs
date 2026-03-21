@@ -5,58 +5,51 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::draft::Draft;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateDraft<'a> {
     #[serde(borrow)]
-    pub draft: crate::app_bsky::draft::Draft<'a>,
+    pub draft: Draft<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateDraftOutput<'a> {
     ///The ID of the created draft.
     #[serde(borrow)]
-    pub id: jacquard_common::CowStr<'a>,
+    pub id: CowStr<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateDraftError<'a> {
     /// Trying to insert a new draft when the limit was already reached.
     #[serde(rename = "DraftLimitReached")]
-    DraftLimitReached(core::option::Option<jacquard_common::CowStr<'a>>),
+    DraftLimitReached(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for CreateDraftError<'_> {
@@ -74,8 +67,7 @@ impl core::fmt::Display for CreateDraftError<'_> {
     }
 }
 
-/// Response type for
-///app.bsky.draft.createDraft
+/// Response type for app.bsky.draft.createDraft
 pub struct CreateDraftResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateDraftResponse {
     const NSID: &'static str = "app.bsky.draft.createDraft";
@@ -92,8 +84,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for CreateDraft<'a> {
     type Response = CreateDraftResponse;
 }
 
-/// Endpoint type for
-///app.bsky.draft.createDraft
+/// Endpoint type for app.bsky.draft.createDraft
 pub struct CreateDraftRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateDraftRequest {
     const PATH: &'static str = "/xrpc/app.bsky.draft.createDraft";
@@ -138,9 +129,9 @@ pub mod create_draft_state {
 
 /// Builder for constructing an instance of this type
 pub struct CreateDraftBuilder<'a, S: create_draft_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<crate::app_bsky::draft::Draft<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<Draft<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CreateDraft<'a> {
@@ -154,9 +145,9 @@ impl<'a> CreateDraftBuilder<'a, create_draft_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateDraftBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -169,13 +160,13 @@ where
     /// Set the `draft` field (required)
     pub fn draft(
         mut self,
-        value: impl Into<crate::app_bsky::draft::Draft<'a>>,
+        value: impl Into<Draft<'a>>,
     ) -> CreateDraftBuilder<'a, create_draft_state::SetDraft<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CreateDraftBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -195,7 +186,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

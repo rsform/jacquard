@@ -5,90 +5,90 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::collection::{Collection, RecordError};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
+use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::xrpc::XrpcResp;
+use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_lexicon::lexicon::LexiconDoc;
+use jacquard_lexicon::schema::LexiconSchema;
+
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 /// Additional details (notes, photo) for a goal completion day.
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CompletionDetails<'a> {
     ///Day of the completion (1-31)
     pub day: i64,
     ///UUID of the goal this details record belongs to
     #[serde(borrow)]
-    pub goal_id: jacquard_common::CowStr<'a>,
+    pub goal_id: CowStr<'a>,
     ///AT Protocol URI reference to the goal record
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub goal_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub goal_uri: Option<AtUri<'a>>,
     ///Month of the completion (1-12)
     pub month: i64,
     ///Optional notes for this day
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: Option<CowStr<'a>>,
     ///Alt text for the photo
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub photo_alt: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub photo_alt: Option<CowStr<'a>>,
     ///Optional photo for this day
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub photo_blob: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub photo_blob: Option<BlobRef<'a>>,
     ///Timestamp when this details record was last updated
-    pub updated_at: jacquard_common::types::string::Datetime,
+    pub updated_at: Datetime,
     ///Year of the completion
     pub year: i64,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct CompletionDetailsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: CompletionDetails<'a>,
 }
 
 impl<'a> CompletionDetails<'a> {
     pub fn uri(
-        uri: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> Result<
-        jacquard_common::types::uri::RecordUri<'a, CompletionDetailsRecord>,
-        jacquard_common::types::uri::UriError,
-    > {
-        jacquard_common::types::uri::RecordUri::try_from_uri(
-            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
-        )
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, CompletionDetailsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
 
 /// Marker type for deserializing records from this collection.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct CompletionDetailsRecord;
-impl jacquard_common::xrpc::XrpcResp for CompletionDetailsRecord {
+impl XrpcResp for CompletionDetailsRecord {
     const NSID: &'static str = "garden.goals.completionDetails";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = CompletionDetailsGetRecordOutput<'de>;
-    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+    type Err<'de> = RecordError<'de>;
 }
 
 impl From<CompletionDetailsGetRecordOutput<'_>> for CompletionDetails<'_> {
@@ -98,36 +98,32 @@ impl From<CompletionDetailsGetRecordOutput<'_>> for CompletionDetails<'_> {
     }
 }
 
-impl jacquard_common::types::collection::Collection for CompletionDetails<'_> {
+impl Collection for CompletionDetails<'_> {
     const NSID: &'static str = "garden.goals.completionDetails";
     type Record = CompletionDetailsRecord;
 }
 
-impl jacquard_common::types::collection::Collection for CompletionDetailsRecord {
+impl Collection for CompletionDetailsRecord {
     const NSID: &'static str = "garden.goals.completionDetails";
     type Record = CompletionDetailsRecord;
 }
 
-impl<'a> jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
+impl<'a> LexiconSchema for CompletionDetails<'a> {
     fn nsid() -> &'static str {
         "garden.goals.completionDetails"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_garden_goals_completionDetails()
     }
-    fn validate(
-        &self,
-    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+    fn validate(&self) -> Result<(), ConstraintError> {
         {
             let value = &self.day;
             if *value > 31i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "day",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("day"),
                     max: 31i64,
                     actual: *value,
                 });
@@ -136,10 +132,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
         {
             let value = &self.day;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "day",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("day"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -149,10 +143,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
             let value = &self.goal_id;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "goal_id",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("goal_id"),
                     max: 64usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -161,10 +153,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
         {
             let value = &self.month;
             if *value > 12i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "month",
-                    ),
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("month"),
                     max: 12i64,
                     actual: *value,
                 });
@@ -173,10 +163,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
         {
             let value = &self.month;
             if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "month",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("month"),
                     min: 1i64,
                     actual: *value,
                 });
@@ -185,10 +173,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
         if let Some(ref value) = self.notes {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 99usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "notes",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("notes"),
                     max: 99usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -197,10 +183,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
         if let Some(ref value) = self.photo_alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "photo_alt",
-                    ),
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("photo_alt"),
                     max: 1000usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -210,10 +194,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
             {
                 let size = value.blob().size;
                 if size > 1000000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "photo_blob",
-                        ),
+                    return Err(ConstraintError::BlobTooLarge {
+                        path: ValidationPath::from_field("photo_blob"),
                         max: 1000000usize,
                         actual: size,
                     });
@@ -238,10 +220,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
                         }
                     });
                 if !matched {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "photo_blob",
-                        ),
+                    return Err(ConstraintError::BlobMimeTypeNotAccepted {
+                        path: ValidationPath::from_field("photo_blob"),
                         accepted: vec!["image/*".to_string()],
                         actual: mime.to_string(),
                     });
@@ -251,10 +231,8 @@ impl<'a> jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
         {
             let value = &self.year;
             if *value < 1970i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "year",
-                    ),
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("year"),
                     min: 1970i64,
                     actual: *value,
                 });
@@ -274,75 +252,77 @@ pub mod completion_details_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Year;
         type UpdatedAt;
         type GoalId;
         type Day;
         type Month;
-        type Year;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Year = Unset;
         type UpdatedAt = Unset;
         type GoalId = Unset;
         type Day = Unset;
         type Month = Unset;
-        type Year = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type GoalId = S::GoalId;
-        type Day = S::Day;
-        type Month = S::Month;
-        type Year = S::Year;
-    }
-    ///State transition - sets the `goal_id` field to Set
-    pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGoalId<S> {}
-    impl<S: State> State for SetGoalId<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type GoalId = Set<members::goal_id>;
-        type Day = S::Day;
-        type Month = S::Month;
-        type Year = S::Year;
-    }
-    ///State transition - sets the `day` field to Set
-    pub struct SetDay<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDay<S> {}
-    impl<S: State> State for SetDay<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type GoalId = S::GoalId;
-        type Day = Set<members::day>;
-        type Month = S::Month;
-        type Year = S::Year;
-    }
-    ///State transition - sets the `month` field to Set
-    pub struct SetMonth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMonth<S> {}
-    impl<S: State> State for SetMonth<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type GoalId = S::GoalId;
-        type Day = S::Day;
-        type Month = Set<members::month>;
-        type Year = S::Year;
     }
     ///State transition - sets the `year` field to Set
     pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetYear<S> {}
     impl<S: State> State for SetYear<S> {
+        type Year = Set<members::year>;
         type UpdatedAt = S::UpdatedAt;
         type GoalId = S::GoalId;
         type Day = S::Day;
         type Month = S::Month;
-        type Year = Set<members::year>;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Year = S::Year;
+        type UpdatedAt = Set<members::updated_at>;
+        type GoalId = S::GoalId;
+        type Day = S::Day;
+        type Month = S::Month;
+    }
+    ///State transition - sets the `goal_id` field to Set
+    pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGoalId<S> {}
+    impl<S: State> State for SetGoalId<S> {
+        type Year = S::Year;
+        type UpdatedAt = S::UpdatedAt;
+        type GoalId = Set<members::goal_id>;
+        type Day = S::Day;
+        type Month = S::Month;
+    }
+    ///State transition - sets the `day` field to Set
+    pub struct SetDay<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDay<S> {}
+    impl<S: State> State for SetDay<S> {
+        type Year = S::Year;
+        type UpdatedAt = S::UpdatedAt;
+        type GoalId = S::GoalId;
+        type Day = Set<members::day>;
+        type Month = S::Month;
+    }
+    ///State transition - sets the `month` field to Set
+    pub struct SetMonth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMonth<S> {}
+    impl<S: State> State for SetMonth<S> {
+        type Year = S::Year;
+        type UpdatedAt = S::UpdatedAt;
+        type GoalId = S::GoalId;
+        type Day = S::Day;
+        type Month = Set<members::month>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `year` field
+        pub struct year(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
         ///Marker type for the `goal_id` field
@@ -351,26 +331,24 @@ pub mod completion_details_state {
         pub struct day(());
         ///Marker type for the `month` field
         pub struct month(());
-        ///Marker type for the `year` field
-        pub struct year(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CompletionDetailsBuilder<'a, S: completion_details_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<i64>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<AtUri<'a>>,
+        Option<i64>,
+        Option<CowStr<'a>>,
+        Option<CowStr<'a>>,
+        Option<BlobRef<'a>>,
+        Option<Datetime>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> CompletionDetails<'a> {
@@ -384,7 +362,7 @@ impl<'a> CompletionDetailsBuilder<'a, completion_details_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CompletionDetailsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (
                 None,
                 None,
@@ -396,7 +374,7 @@ impl<'a> CompletionDetailsBuilder<'a, completion_details_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -411,11 +389,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CompletionDetailsBuilder<'a, completion_details_state::SetDay<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         CompletionDetailsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -428,31 +406,25 @@ where
     /// Set the `goalId` field (required)
     pub fn goal_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> CompletionDetailsBuilder<'a, completion_details_state::SetGoalId<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         CompletionDetailsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: completion_details_state::State> CompletionDetailsBuilder<'a, S> {
     /// Set the `goalUri` field (optional)
-    pub fn goal_uri(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
-    ) -> Self {
+    pub fn goal_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `goalUri` field to an Option value (optional)
-    pub fn maybe_goal_uri(
-        mut self,
-        value: Option<jacquard_common::types::string::AtUri<'a>>,
-    ) -> Self {
+    pub fn maybe_goal_uri(mut self, value: Option<AtUri<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -468,26 +440,23 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CompletionDetailsBuilder<'a, completion_details_state::SetMonth<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = Option::Some(value.into());
         CompletionDetailsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: completion_details_state::State> CompletionDetailsBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
-    pub fn maybe_notes(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -495,18 +464,12 @@ impl<'a, S: completion_details_state::State> CompletionDetailsBuilder<'a, S> {
 
 impl<'a, S: completion_details_state::State> CompletionDetailsBuilder<'a, S> {
     /// Set the `photoAlt` field (optional)
-    pub fn photo_alt(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn photo_alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `photoAlt` field to an Option value (optional)
-    pub fn maybe_photo_alt(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_photo_alt(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -514,18 +477,12 @@ impl<'a, S: completion_details_state::State> CompletionDetailsBuilder<'a, S> {
 
 impl<'a, S: completion_details_state::State> CompletionDetailsBuilder<'a, S> {
     /// Set the `photoBlob` field (optional)
-    pub fn photo_blob(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
-    ) -> Self {
+    pub fn photo_blob(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `photoBlob` field to an Option value (optional)
-    pub fn maybe_photo_blob(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
+    pub fn maybe_photo_blob(mut self, value: Option<BlobRef<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -539,13 +496,13 @@ where
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
+        value: impl Into<Datetime>,
     ) -> CompletionDetailsBuilder<'a, completion_details_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = Option::Some(value.into());
         CompletionDetailsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -560,11 +517,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CompletionDetailsBuilder<'a, completion_details_state::SetYear<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = Option::Some(value.into());
         CompletionDetailsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -572,11 +529,11 @@ where
 impl<'a, S> CompletionDetailsBuilder<'a, S>
 where
     S: completion_details_state::State,
+    S::Year: completion_details_state::IsSet,
     S::UpdatedAt: completion_details_state::IsSet,
     S::GoalId: completion_details_state::IsSet,
     S::Day: completion_details_state::IsSet,
     S::Month: completion_details_state::IsSet,
-    S::Year: completion_details_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CompletionDetails<'a> {
@@ -596,7 +553,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -616,204 +573,128 @@ where
     }
 }
 
-fn lexicon_doc_garden_goals_completionDetails() -> jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("garden.goals.completionDetails"),
-        revision: None,
-        description: None,
+fn lexicon_doc_garden_goals_completionDetails() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("garden.goals.completionDetails"),
         defs: {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = BTreeMap::new();
             map.insert(
-                ::jacquard_common::deps::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                SmolStr::new_static("main"),
+                LexUserType::Record(LexRecord {
                     description: Some(
-                        ::jacquard_common::CowStr::new_static(
+                        CowStr::new_static(
                             "Additional details (notes, photo) for a goal completion day.",
                         ),
                     ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                    key: Some(CowStr::new_static("tid")),
+                    record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("goalId"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("year"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("month"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("day"),
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static("updatedAt")
+                                SmolStr::new_static("goalId"), SmolStr::new_static("year"),
+                                SmolStr::new_static("month"), SmolStr::new_static("day"),
+                                SmolStr::new_static("updatedAt")
                             ],
                         ),
-                        nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::alloc::collections::BTreeMap::new();
+                            let mut map = BTreeMap::new();
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "day",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("day"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
                                     maximum: Some(31i64),
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "goalId",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("goalId"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "UUID of the goal this details record belongs to",
                                         ),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(64usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "goalUri",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("goalUri"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "AT Protocol URI reference to the goal record",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "month",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("month"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
                                     maximum: Some(12i64),
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "notes",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("notes"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Optional notes for this day",
-                                        ),
+                                        CowStr::new_static("Optional notes for this day"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(99usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "photoAlt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("photoAlt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Alt text for the photo",
-                                        ),
+                                        CowStr::new_static("Alt text for the photo"),
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
                                     max_length: Some(1000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "photoBlob",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                    description: None,
-                                    accept: None,
-                                    max_size: None,
-                                }),
+                                SmolStr::new_static("photoBlob"),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "updatedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                SmolStr::new_static("updatedAt"),
+                                LexObjectProperty::String(LexString {
                                     description: Some(
-                                        ::jacquard_common::CowStr::new_static(
+                                        CowStr::new_static(
                                             "Timestamp when this details record was last updated",
                                         ),
                                     ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
                                 }),
                             );
                             map.insert(
-                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
-                                    "year",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
-                                    description: None,
-                                    default: None,
+                                SmolStr::new_static("year"),
+                                LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1970i64),
-                                    maximum: None,
-                                    r#enum: None,
-                                    r#const: None,
+                                    ..Default::default()
                                 }),
                             );
                             map
                         },
+                        ..Default::default()
                     }),
+                    ..Default::default()
                 }),
             );
             map
         },
+        ..Default::default()
     }
 }

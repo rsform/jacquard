@@ -5,17 +5,11 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 /// open pull request
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Hash
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Open;
 impl core::fmt::Display for Open {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {

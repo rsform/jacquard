@@ -8,358 +8,398 @@ use quote::quote;
 use std::collections::BTreeMap;
 use syn;
 
-/// Convert LexiconDoc to TokenStream for compile-time codegen
-/// union_fields maps property names to type paths for runtime union access
-pub fn doc_to_tokens(doc: &LexiconDoc, union_fields: &BTreeMap<String, String>) -> TokenStream {
-    let id = doc.id.as_ref();
-    let defs_tokens = defs_map_to_tokens(&doc.defs, union_fields);
+/// Path prefixes for generated lexicon doc literals.
+///
+/// In derive macro context, all paths are fully qualified (`::jacquard_lexicon::lexicon::LexUserType`).
+/// In codegen pretty mode, paths are bare (`LexUserType`) because the generated function body
+/// includes scoped `use` imports.
+pub(crate) struct DocPaths {
+    /// Prefix for `jacquard_lexicon::lexicon::` types. Empty in short mode.
+    lex: TokenStream,
+    /// Path to `CowStr`. Fully qualified or bare.
+    cow: TokenStream,
+    /// Path to `SmolStr::new_static`. Fully qualified or bare.
+    smol: TokenStream,
+    /// Path to `BTreeMap`. Fully qualified or bare.
+    btree: TokenStream,
+    /// Path to `Vec`. Fully qualified or bare.
+    vec: TokenStream,
+    /// Path to `MimeType(...)`. Fully qualified or bare.
+    mime: TokenStream,
+}
 
-    quote! {
-        ::jacquard_lexicon::lexicon::LexiconDoc {
-            lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-            id: ::jacquard_common::CowStr::new_static(#id),
-            revision: None,
-            description: None,
-            defs: #defs_tokens,
+impl DocPaths {
+    /// Fully qualified paths for derive macro / proc-macro context.
+    pub(crate) fn qualified() -> Self {
+        Self {
+            lex: quote! { ::jacquard_lexicon::lexicon:: },
+            cow: quote! { ::jacquard_common::CowStr },
+            smol: quote! { ::jacquard_common::deps::smol_str::SmolStr },
+            btree: quote! { ::alloc::collections::BTreeMap },
+            vec: quote! { ::alloc::vec::Vec },
+            mime: quote! { jacquard_common::types::blob::MimeType },
+        }
+    }
+
+    /// Short paths for codegen pretty mode. Requires function-scoped imports.
+    pub(crate) fn short() -> Self {
+        Self {
+            lex: TokenStream::new(),
+            cow: quote! { CowStr },
+            smol: quote! { SmolStr },
+            btree: quote! { BTreeMap },
+            vec: quote! { Vec },
+            mime: quote! { MimeType },
+        }
+    }
+
+    /// Generate scoped `use` imports for the top of a generated function body.
+    /// Only meaningful in short mode — returns empty in qualified mode.
+    pub(crate) fn scoped_imports(&self) -> TokenStream {
+        if self.lex.is_empty() {
+            quote! {
+                #[allow(unused_imports)]
+                use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+                use jacquard_lexicon::lexicon::*;
+                use alloc::collections::BTreeMap;
+            }
+        } else {
+            TokenStream::new()
         }
     }
 }
 
-/// Convert defs BTreeMap to tokens
+/// Convert LexiconDoc to TokenStream for compile-time codegen.
+/// union_fields maps property names to type paths for runtime union access.
+pub fn doc_to_tokens(doc: &LexiconDoc, union_fields: &BTreeMap<String, String>) -> TokenStream {
+    doc_to_tokens_with_paths(doc, union_fields, &DocPaths::qualified())
+}
+
+/// Convert LexiconDoc to TokenStream with configurable path style.
+pub(crate) fn doc_to_tokens_with_paths(
+    doc: &LexiconDoc,
+    union_fields: &BTreeMap<String, String>,
+    p: &DocPaths,
+) -> TokenStream {
+    let id = doc.id.as_ref();
+    let defs_tokens = defs_map_to_tokens(&doc.defs, union_fields, p);
+    let lex = &p.lex;
+    let cow = &p.cow;
+
+    quote! {
+        #lex LexiconDoc {
+            lexicon: #lex Lexicon::Lexicon1,
+            id: #cow::new_static(#id),
+            defs: #defs_tokens,
+            ..Default::default()
+        }
+    }
+}
+
+/// Convert defs BTreeMap to tokens.
 fn defs_map_to_tokens(
     defs: &BTreeMap<SmolStr, LexUserType>,
     union_fields: &BTreeMap<String, String>,
+    p: &DocPaths,
 ) -> TokenStream {
+    let smol = &p.smol;
+    let btree = &p.btree;
     let def_entries: Vec<_> = defs
         .iter()
         .map(|(name, def)| {
             let name_str = name.as_str();
-            let def_tokens = user_type_to_tokens(def, union_fields);
-            quote! { map.insert(::jacquard_common::deps::smol_str::SmolStr::new_static(#name_str), #def_tokens) }
+            let def_tokens = user_type_to_tokens(def, union_fields, p);
+            quote! { map.insert(#smol::new_static(#name_str), #def_tokens) }
         })
         .collect();
 
     quote! {
         {
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = #btree::new();
             #(#def_entries;)*
             map
         }
     }
 }
 
-/// Convert LexUserType to tokens
-fn user_type_to_tokens(ut: &LexUserType, union_fields: &BTreeMap<String, String>) -> TokenStream {
+/// Convert LexUserType to tokens.
+fn user_type_to_tokens(
+    ut: &LexUserType,
+    union_fields: &BTreeMap<String, String>,
+    p: &DocPaths,
+) -> TokenStream {
+    let lex = &p.lex;
+    let cow = &p.cow;
     match ut {
         LexUserType::Record(rec) => {
-            let description = option_cow_str_to_tokens(&rec.description);
-            let key = option_cow_str_to_tokens(&rec.key);
+            let description = field_cow_str("description", &rec.description, p);
+            let key = field_cow_str("key", &rec.key, p);
             let record_tokens = match &rec.record {
                 LexRecordRecord::Object(obj) => {
-                    let obj_tokens = object_to_tokens(obj, union_fields);
-                    quote! {
-                        ::jacquard_lexicon::lexicon::LexRecordRecord::Object(#obj_tokens)
-                    }
+                    let obj_tokens = object_to_tokens(obj, union_fields, p);
+                    quote! { #lex LexRecordRecord::Object(#obj_tokens) }
                 }
             };
             quote! {
-                ::jacquard_lexicon::lexicon::LexUserType::Record(
-                    ::jacquard_lexicon::lexicon::LexRecord {
-                        description: #description,
-                        key: #key,
+                #lex LexUserType::Record(
+                    #lex LexRecord {
+                        #description
+                        #key
                         record: #record_tokens,
+                        ..Default::default()
                     }
                 )
             }
         }
         LexUserType::XrpcQuery(query) => {
-            let params = option_to_tokens(&query.parameters, |p| match p {
+            let params = option_to_tokens(&query.parameters, |qp| match qp {
                 LexXrpcQueryParameter::Params(params) => {
-                    let params_tokens = xrpc_parameters_to_tokens(params);
-                    quote! {
-                        ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(#params_tokens)
-                    }
+                    let params_tokens = xrpc_parameters_to_tokens(params, p);
+                    quote! { #lex LexXrpcQueryParameter::Params(#params_tokens) }
                 }
             });
             quote! {
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(
-                    ::jacquard_lexicon::lexicon::LexXrpcQuery {
-                        description: None,
+                #lex LexUserType::XrpcQuery(
+                    #lex LexXrpcQuery {
                         parameters: #params,
-                        output: None,
-                        errors: None,
+                        ..Default::default()
                     }
                 )
             }
         }
         LexUserType::XrpcProcedure(proc) => {
-            let input =
-                option_to_tokens(&proc.input, |body| xrpc_body_to_tokens(body, union_fields));
+            let input = option_to_tokens(&proc.input, |body| {
+                xrpc_body_to_tokens(body, union_fields, p)
+            });
             quote! {
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(
-                    ::jacquard_lexicon::lexicon::LexXrpcProcedure {
-                        description: None,
-                        parameters: None,
+                #lex LexUserType::XrpcProcedure(
+                    #lex LexXrpcProcedure {
                         input: #input,
-                        output: None,
-                        errors: None,
+                        ..Default::default()
                     }
                 )
             }
         }
         LexUserType::XrpcSubscription(sub) => {
-            let params = option_to_tokens(&sub.parameters, |p| match p {
+            let params = option_to_tokens(&sub.parameters, |sp| match sp {
                 LexXrpcSubscriptionParameter::Params(params) => {
-                    let params_tokens = xrpc_parameters_to_tokens(params);
-                    quote! {
-                        ::jacquard_lexicon::lexicon::LexXrpcSubscriptionParameter::Params(#params_tokens)
-                    }
+                    let params_tokens = xrpc_parameters_to_tokens(params, p);
+                    quote! { #lex LexXrpcSubscriptionParameter::Params(#params_tokens) }
                 }
             });
             quote! {
-                ::jacquard_lexicon::lexicon::LexUserType::XrpcSubscription(
-                    ::jacquard_lexicon::lexicon::LexXrpcSubscription {
-                        description: None,
+                #lex LexUserType::XrpcSubscription(
+                    #lex LexXrpcSubscription {
                         parameters: #params,
-                        message: None,
-                        infos: None,
-                        errors: None,
+                        ..Default::default()
                     }
                 )
             }
         }
         LexUserType::Object(obj) => {
-            let obj_tokens = object_to_tokens(obj, union_fields);
-            quote! {
-                ::jacquard_lexicon::lexicon::LexUserType::Object(#obj_tokens)
-            }
+            let obj_tokens = object_to_tokens(obj, union_fields, p);
+            quote! { #lex LexUserType::Object(#obj_tokens) }
         }
         LexUserType::Union(union) => {
             let refs: Vec<_> = union.refs.iter().map(|r| r.as_ref()).collect();
-            let closed = option_to_tokens(&union.closed, |c| quote! { #c });
+            let closed = field_option("closed", &union.closed, |c| quote! { #c });
             quote! {
-                ::jacquard_lexicon::lexicon::LexUserType::Union(
-                    ::jacquard_lexicon::lexicon::LexRefUnion {
-                        description: None,
-                        refs: vec![#(::jacquard_common::CowStr::new_static(#refs)),*],
-                        closed: #closed,
+                #lex LexUserType::Union(
+                    #lex LexRefUnion {
+                        refs: vec![#(#cow::new_static(#refs)),*],
+                        #closed
+                        ..Default::default()
                     }
                 )
             }
         }
         LexUserType::Blob(blob) => {
-            let accept = option_vec_mime_type_to_tokens(&blob.accept);
-            let max_size = option_to_tokens(&blob.max_size, |v| quote! { #v });
+            let accept = field_vec_mime("accept", &blob.accept, p);
+            let max_size = field_option("max_size", &blob.max_size, |v| quote! { #v });
             quote! {
-                ::jacquard_lexicon::lexicon::LexUserType::Blob(
-                    ::jacquard_lexicon::lexicon::LexBlob {
-                        description: None,
-                        accept: #accept,
-                        max_size: #max_size,
+                #lex LexUserType::Blob(
+                    #lex LexBlob {
+                        #accept
+                        #max_size
+                        ..Default::default()
                     }
                 )
             }
         }
         LexUserType::Array(arr) => {
-            let items = array_item_to_tokens(&arr.items);
-            let min = option_to_tokens(&arr.min_length, |v| quote! { #v });
-            let max = option_to_tokens(&arr.max_length, |v| quote! { #v });
+            let items = array_item_to_tokens(&arr.items, p);
+            let min = field_option("min_length", &arr.min_length, |v| quote! { #v });
+            let max = field_option("max_length", &arr.max_length, |v| quote! { #v });
             quote! {
-                ::jacquard_lexicon::lexicon::LexUserType::Array(
-                    ::jacquard_lexicon::lexicon::LexArray {
-                        description: None,
+                #lex LexUserType::Array(
+                    #lex LexArray {
                         items: #items,
-                        min_length: #min,
-                        max_length: #max,
+                        #min
+                        #max
+                        ..Default::default()
                     }
                 )
             }
         }
         LexUserType::Token(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexUserType::Token(
-                ::jacquard_lexicon::lexicon::LexToken { description: None }
-            )
+            #lex LexUserType::Token(#lex LexToken { ..Default::default() })
         },
         LexUserType::Boolean(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexUserType::Boolean(
-                ::jacquard_lexicon::lexicon::LexBoolean {
-                    description: None,
-                    default: None,
-                    r#const: None,
-                }
-            )
+            #lex LexUserType::Boolean(#lex LexBoolean { ..Default::default() })
         },
         LexUserType::Integer(i) => {
-            let min = option_to_tokens(&i.minimum, |v| quote! { #v });
-            let max = option_to_tokens(&i.maximum, |v| quote! { #v });
+            let min = field_option("minimum", &i.minimum, |v| quote! { #v });
+            let max = field_option("maximum", &i.maximum, |v| quote! { #v });
             quote! {
-                ::jacquard_lexicon::lexicon::LexUserType::Integer(
-                    ::jacquard_lexicon::lexicon::LexInteger {
-                        description: None,
-                        default: None,
-                        minimum: #min,
-                        maximum: #max,
-                        r#enum: None,
-                        r#const: None,
+                #lex LexUserType::Integer(
+                    #lex LexInteger {
+                        #min
+                        #max
+                        ..Default::default()
                     }
                 )
             }
         }
         LexUserType::String(s) => {
-            let string_tokens = lex_string_to_tokens(s);
-            quote! {
-                ::jacquard_lexicon::lexicon::LexUserType::String(#string_tokens)
-            }
+            let string_tokens = lex_string_to_tokens(s, p);
+            quote! { #lex LexUserType::String(#string_tokens) }
         }
         LexUserType::Bytes(b) => {
-            let min = option_to_tokens(&b.min_length, |v| quote! { #v });
-            let max = option_to_tokens(&b.max_length, |v| quote! { #v });
+            let min = field_option("min_length", &b.min_length, |v| quote! { #v });
+            let max = field_option("max_length", &b.max_length, |v| quote! { #v });
             quote! {
-                ::jacquard_lexicon::lexicon::LexUserType::Bytes(
-                    ::jacquard_lexicon::lexicon::LexBytes {
-                        description: None,
-                        max_length: #max,
-                        min_length: #min,
+                #lex LexUserType::Bytes(
+                    #lex LexBytes {
+                        #max
+                        #min
+                        ..Default::default()
                     }
                 )
             }
         }
         LexUserType::CidLink(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexUserType::CidLink(
-                ::jacquard_lexicon::lexicon::LexCidLink { description: None }
-            )
+            #lex LexUserType::CidLink(#lex LexCidLink { ..Default::default() })
         },
         LexUserType::Unknown(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexUserType::Unknown(
-                ::jacquard_lexicon::lexicon::LexUnknown { description: None }
-            )
+            #lex LexUserType::Unknown(#lex LexUnknown { ..Default::default() })
         },
     }
 }
 
-/// Convert LexObject to tokens
-fn object_to_tokens(obj: &LexObject, union_fields: &BTreeMap<String, String>) -> TokenStream {
-    let props = properties_to_tokens(&obj.properties, union_fields);
-    let required = option_vec_smol_str_to_tokens(&obj.required);
-    let description = option_cow_str_to_tokens(&obj.description);
+/// Convert LexObject to tokens.
+fn object_to_tokens(
+    obj: &LexObject,
+    union_fields: &BTreeMap<String, String>,
+    p: &DocPaths,
+) -> TokenStream {
+    let lex = &p.lex;
+    let props = properties_to_tokens(&obj.properties, union_fields, p);
+    let required = field_vec_smol("required", &obj.required, p);
+    let description = field_cow_str("description", &obj.description, p);
 
     quote! {
-        ::jacquard_lexicon::lexicon::LexObject {
-            description: #description,
-            required: #required,
-            nullable: None,
+        #lex LexObject {
+            #description
+            #required
             properties: #props,
+            ..Default::default()
         }
     }
 }
 
-/// Convert properties map to tokens
+/// Convert properties map to tokens.
 fn properties_to_tokens(
     props: &BTreeMap<SmolStr, LexObjectProperty>,
     union_fields: &BTreeMap<String, String>,
+    p: &DocPaths,
 ) -> TokenStream {
+    let smol = &p.smol;
+    let btree = &p.btree;
     let prop_entries: Vec<_> = props
         .iter()
         .map(|(name, prop)| {
             let name_str = name.as_str();
             let union_type_path = union_fields.get(name.as_str());
-            let prop_tokens = object_property_to_tokens(prop, union_type_path);
-            quote! { map.insert(::jacquard_common::deps::smol_str::SmolStr::new_static(#name_str), #prop_tokens) }
+            let prop_tokens = object_property_to_tokens(prop, union_type_path, p);
+            quote! { map.insert(#smol::new_static(#name_str), #prop_tokens) }
         })
         .collect();
 
     quote! {
         {
             #[allow(unused_mut)]
-            let mut map = ::alloc::collections::BTreeMap::new();
+            let mut map = #btree::new();
             #(#prop_entries;)*
             map
         }
     }
 }
 
-/// Convert LexObjectProperty to tokens
-/// If union_type_path is Some, this property is a union and should access Type::LEXICON_UNION_REFS at runtime
+/// Convert LexObjectProperty to tokens.
+/// If union_type_path is Some, this property is a union and should access Type::LEXICON_UNION_REFS at runtime.
 fn object_property_to_tokens(
     prop: &LexObjectProperty,
     union_type_path: Option<&String>,
+    p: &DocPaths,
 ) -> TokenStream {
+    let lex = &p.lex;
+    let cow = &p.cow;
     match prop {
         LexObjectProperty::Boolean(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(
-                ::jacquard_lexicon::lexicon::LexBoolean {
-                    description: None,
-                    default: None,
-                    r#const: None,
-                }
-            )
+            #lex LexObjectProperty::Boolean(#lex LexBoolean { ..Default::default() })
         },
         LexObjectProperty::Integer(i) => {
-            let min = option_to_tokens(&i.minimum, |v| quote! { #v });
-            let max = option_to_tokens(&i.maximum, |v| quote! { #v });
+            let min = field_option("minimum", &i.minimum, |v| quote! { #v });
+            let max = field_option("maximum", &i.maximum, |v| quote! { #v });
             quote! {
-                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                    ::jacquard_lexicon::lexicon::LexInteger {
-                        description: None,
-                        default: None,
-                        minimum: #min,
-                        maximum: #max,
-                        r#enum: None,
-                        r#const: None,
+                #lex LexObjectProperty::Integer(
+                    #lex LexInteger {
+                        #min
+                        #max
+                        ..Default::default()
                     }
                 )
             }
         }
         LexObjectProperty::String(s) => {
-            let string_tokens = lex_string_to_tokens(s);
-            quote! {
-                ::jacquard_lexicon::lexicon::LexObjectProperty::String(#string_tokens)
-            }
+            let string_tokens = lex_string_to_tokens(s, p);
+            quote! { #lex LexObjectProperty::String(#string_tokens) }
         }
         LexObjectProperty::Bytes(b) => {
-            let min = option_to_tokens(&b.min_length, |v| quote! { #v });
-            let max = option_to_tokens(&b.max_length, |v| quote! { #v });
+            let min = field_option("min_length", &b.min_length, |v| quote! { #v });
+            let max = field_option("max_length", &b.max_length, |v| quote! { #v });
             quote! {
-                ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(
-                    ::jacquard_lexicon::lexicon::LexBytes {
-                        description: None,
-                        max_length: #max,
-                        min_length: #min,
+                #lex LexObjectProperty::Bytes(
+                    #lex LexBytes {
+                        #max
+                        #min
+                        ..Default::default()
                     }
                 )
             }
         }
         LexObjectProperty::CidLink(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexObjectProperty::CidLink(
-                ::jacquard_lexicon::lexicon::LexCidLink { description: None }
-            )
+            #lex LexObjectProperty::CidLink(#lex LexCidLink { ..Default::default() })
         },
         LexObjectProperty::Blob(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(
-                ::jacquard_lexicon::lexicon::LexBlob {
-                    description: None,
-                    accept: None,
-                    max_size: None,
-                }
-            )
+            #lex LexObjectProperty::Blob(#lex LexBlob { ..Default::default() })
         },
         LexObjectProperty::Unknown(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(
-                ::jacquard_lexicon::lexicon::LexUnknown { description: None }
-            )
+            #lex LexObjectProperty::Unknown(#lex LexUnknown { ..Default::default() })
         },
         LexObjectProperty::Array(arr) => {
-            let description = option_cow_str_to_tokens(&arr.description);
-            let items = array_item_to_tokens(&arr.items);
-            let min = option_to_tokens(&arr.min_length, |v| quote! { #v });
-            let max = option_to_tokens(&arr.max_length, |v| quote! { #v });
+            let description = field_cow_str("description", &arr.description, p);
+            let items = array_item_to_tokens(&arr.items, p);
+            let min = field_option("min_length", &arr.min_length, |v| quote! { #v });
+            let max = field_option("max_length", &arr.max_length, |v| quote! { #v });
             quote! {
-                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
-                    ::jacquard_lexicon::lexicon::LexArray {
-                        description: #description,
+                #lex LexObjectProperty::Array(
+                    #lex LexArray {
+                        #description
                         items: #items,
-                        min_length: #min,
-                        max_length: #max,
+                        #min
+                        #max
+                        ..Default::default()
                     }
                 )
             }
@@ -367,79 +407,71 @@ fn object_property_to_tokens(
         LexObjectProperty::Ref(r) => {
             let ref_str = r.r#ref.as_ref();
             quote! {
-                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
-                    ::jacquard_lexicon::lexicon::LexRef {
-                        description: None,
-                        r#ref: ::jacquard_common::CowStr::new_static(#ref_str),
+                #lex LexObjectProperty::Ref(
+                    #lex LexRef {
+                        r#ref: #cow::new_static(#ref_str),
+                        ..Default::default()
                     }
                 )
             }
         }
         LexObjectProperty::Union(union) => {
-            let description = option_cow_str_to_tokens(&union.description);
+            let description = field_cow_str("description", &union.description, p);
+            let vec_path = &p.vec;
 
-            // Check if this is a runtime union (has union_type_path)
             if let Some(type_path) = union_type_path {
-                // Parse the type path to extract just the type name (handle Option<Type> -> Type)
                 let type_ident_str = extract_type_ident_from_path(type_path);
                 let type_ident = syn::Ident::new(&type_ident_str, proc_macro2::Span::call_site());
+                let closed = field_option("closed", &union.closed, |c| quote! { #c });
 
-                let closed = option_to_tokens(&union.closed, |c| quote! { #c });
-
-                // Generate runtime code that accesses Type::LEXICON_UNION_REFS
                 quote! {
-                    ::jacquard_lexicon::lexicon::LexObjectProperty::Union(
-                        ::jacquard_lexicon::lexicon::LexRefUnion {
-                            description: #description,
+                    #lex LexObjectProperty::Union(
+                        #lex LexRefUnion {
+                            #description
                             refs: {
-                                let mut vec: ::alloc::vec::Vec<::jacquard_common::CowStr<'static>> = ::alloc::vec::Vec::new();
+                                let mut vec: #vec_path<#cow<'static>> = #vec_path::new();
                                 for s in #type_ident::LEXICON_UNION_REFS.iter().copied() {
-                                    vec.push(::jacquard_common::CowStr::new_static(s));
+                                    vec.push(#cow::new_static(s));
                                 }
                                 vec
                             },
-                            closed: #closed,
+                            #closed
+                            ..Default::default()
                         }
                     )
                 }
             } else {
-                // Static union - use hardcoded refs
                 let refs: Vec<_> = union.refs.iter().map(|r| r.as_ref()).collect();
-                let closed = option_to_tokens(&union.closed, |c| quote! { #c });
+                let closed = field_option("closed", &union.closed, |c| quote! { #c });
                 quote! {
-                    ::jacquard_lexicon::lexicon::LexObjectProperty::Union(
-                        ::jacquard_lexicon::lexicon::LexRefUnion {
-                            description: #description,
-                            refs: vec![#(::jacquard_common::CowStr::new_static(#refs)),*],
-                            closed: #closed,
+                    #lex LexObjectProperty::Union(
+                        #lex LexRefUnion {
+                            #description
+                            refs: vec![#(#cow::new_static(#refs)),*],
+                            #closed
+                            ..Default::default()
                         }
                     )
                 }
             }
         }
         LexObjectProperty::Object(obj) => {
-            let obj_tokens = object_to_tokens(obj, &BTreeMap::new()); // Nested objects don't have union fields
-            quote! {
-                ::jacquard_lexicon::lexicon::LexObjectProperty::Object(#obj_tokens)
-            }
+            let obj_tokens = object_to_tokens(obj, &BTreeMap::new(), p);
+            quote! { #lex LexObjectProperty::Object(#obj_tokens) }
         }
     }
 }
 
-/// Extract type identifier from type path string (handle Option<Type<'a>> -> Type)
+/// Extract type identifier from type path string (handle Option<Type<'a>> -> Type).
 fn extract_type_ident_from_path(type_path: &str) -> String {
-    // Parse back into TokenStream and then try to extract the type
-    let tokens: proc_macro2::TokenStream = type_path.parse().unwrap_or_else(|_| {
-        // Fallback to string manipulation if parse fails
-        type_path.replace(" ", "").parse().unwrap()
-    });
+    let tokens: proc_macro2::TokenStream = type_path
+        .parse()
+        .unwrap_or_else(|_| type_path.replace(" ", "").parse().unwrap());
 
-    // Try to parse as a Type
     if let Ok(ty) = syn::parse2::<syn::Type>(tokens.clone()) {
         return extract_base_type_ident(&ty);
     }
 
-    // Fallback: just return the first identifier we find
     tokens
         .into_iter()
         .find_map(|tt| {
@@ -452,13 +484,11 @@ fn extract_type_ident_from_path(type_path: &str) -> String {
         .unwrap_or_else(|| type_path.to_string())
 }
 
-/// Extract the base type identifier from a syn::Type
+/// Extract the base type identifier from a syn::Type.
 fn extract_base_type_ident(ty: &syn::Type) -> String {
     match ty {
         syn::Type::Path(type_path) => {
-            // Get the last segment (the actual type name)
             if let Some(segment) = type_path.path.segments.last() {
-                // Check if it's Option<T>
                 if segment.ident == "Option" {
                     if let syn::PathArguments::AngleBracketed(args) = &segment.arguments {
                         if let Some(syn::GenericArgument::Type(inner_ty)) = args.args.first() {
@@ -466,7 +496,6 @@ fn extract_base_type_ident(ty: &syn::Type) -> String {
                         }
                     }
                 }
-                // Return the type identifier
                 return segment.ident.to_string();
             }
             "Unknown".to_string()
@@ -475,90 +504,57 @@ fn extract_base_type_ident(ty: &syn::Type) -> String {
     }
 }
 
-/// Convert LexArrayItem to tokens
-fn array_item_to_tokens(item: &LexArrayItem) -> TokenStream {
+/// Convert LexArrayItem to tokens.
+fn array_item_to_tokens(item: &LexArrayItem, p: &DocPaths) -> TokenStream {
+    let lex = &p.lex;
+    let cow = &p.cow;
     match item {
         LexArrayItem::Boolean(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexArrayItem::Boolean(
-                ::jacquard_lexicon::lexicon::LexBoolean {
-                    description: None,
-                    default: None,
-                    r#const: None,
-                }
-            )
+            #lex LexArrayItem::Boolean(#lex LexBoolean { ..Default::default() })
         },
         LexArrayItem::Integer(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexArrayItem::Integer(
-                ::jacquard_lexicon::lexicon::LexInteger {
-                    description: None,
-                    default: None,
-                    minimum: None,
-                    maximum: None,
-                    r#enum: None,
-                    r#const: None,
-                }
-            )
+            #lex LexArrayItem::Integer(#lex LexInteger { ..Default::default() })
         },
         LexArrayItem::String(s) => {
-            let string_tokens = lex_string_to_tokens(s);
-            quote! {
-                ::jacquard_lexicon::lexicon::LexArrayItem::String(#string_tokens)
-            }
+            let string_tokens = lex_string_to_tokens(s, p);
+            quote! { #lex LexArrayItem::String(#string_tokens) }
         }
         LexArrayItem::Bytes(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexArrayItem::Bytes(
-                ::jacquard_lexicon::lexicon::LexBytes {
-                    description: None,
-                    max_length: None,
-                    min_length: None,
-                }
-            )
+            #lex LexArrayItem::Bytes(#lex LexBytes { ..Default::default() })
         },
         LexArrayItem::CidLink(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexArrayItem::CidLink(
-                ::jacquard_lexicon::lexicon::LexCidLink { description: None }
-            )
+            #lex LexArrayItem::CidLink(#lex LexCidLink { ..Default::default() })
         },
         LexArrayItem::Blob(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexArrayItem::Blob(
-                ::jacquard_lexicon::lexicon::LexBlob {
-                    description: None,
-                    accept: None,
-                    max_size: None,
-                }
-            )
+            #lex LexArrayItem::Blob(#lex LexBlob { ..Default::default() })
         },
         LexArrayItem::Unknown(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexArrayItem::Unknown(
-                ::jacquard_lexicon::lexicon::LexUnknown { description: None }
-            )
+            #lex LexArrayItem::Unknown(#lex LexUnknown { ..Default::default() })
         },
         LexArrayItem::Ref(r) => {
             let ref_str = r.r#ref.as_ref();
             quote! {
-                ::jacquard_lexicon::lexicon::LexArrayItem::Ref(
-                    ::jacquard_lexicon::lexicon::LexRef {
-                        description: None,
-                        r#ref: ::jacquard_common::CowStr::new_static(#ref_str),
+                #lex LexArrayItem::Ref(
+                    #lex LexRef {
+                        r#ref: #cow::new_static(#ref_str),
+                        ..Default::default()
                     }
                 )
             }
         }
         LexArrayItem::Object(obj) => {
-            let obj_tokens = object_to_tokens(obj, &BTreeMap::new()); // Array items don't have union fields
-            quote! {
-                ::jacquard_lexicon::lexicon::LexArrayItem::Object(#obj_tokens)
-            }
+            let obj_tokens = object_to_tokens(obj, &BTreeMap::new(), p);
+            quote! { #lex LexArrayItem::Object(#obj_tokens) }
         }
         LexArrayItem::Union(union) => {
             let refs: Vec<_> = union.refs.iter().map(|r| r.as_ref()).collect();
-            let closed = option_to_tokens(&union.closed, |c| quote! { #c });
+            let closed = field_option("closed", &union.closed, |c| quote! { #c });
             quote! {
-                ::jacquard_lexicon::lexicon::LexArrayItem::Union(
-                    ::jacquard_lexicon::lexicon::LexRefUnion {
-                        description: None,
-                        refs: vec![#(::jacquard_common::CowStr::new_static(#refs)),*],
-                        closed: #closed,
+                #lex LexArrayItem::Union(
+                    #lex LexRefUnion {
+                        refs: vec![#(#cow::new_static(#refs)),*],
+                        #closed
+                        ..Default::default()
                     }
                 )
             }
@@ -566,157 +562,113 @@ fn array_item_to_tokens(item: &LexArrayItem) -> TokenStream {
     }
 }
 
-/// Convert LexString to tokens
-fn lex_string_to_tokens(s: &LexString) -> TokenStream {
-    let description = option_cow_str_to_tokens(&s.description);
-    let format = option_to_tokens(&s.format, |f| match f {
-        LexStringFormat::Did => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Did },
-        LexStringFormat::Handle => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Handle },
-        LexStringFormat::AtUri => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::AtUri },
-        LexStringFormat::Nsid => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Nsid },
-        LexStringFormat::Cid => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Cid },
-        LexStringFormat::Datetime => {
-            quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Datetime }
-        }
-        LexStringFormat::Language => {
-            quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Language }
-        }
-        LexStringFormat::Tid => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Tid },
-        LexStringFormat::RecordKey => {
-            quote! { ::jacquard_lexicon::lexicon::LexStringFormat::RecordKey }
-        }
-        LexStringFormat::AtIdentifier => {
-            quote! { ::jacquard_lexicon::lexicon::LexStringFormat::AtIdentifier }
-        }
-        LexStringFormat::Uri => quote! { ::jacquard_lexicon::lexicon::LexStringFormat::Uri },
+/// Convert LexString to tokens.
+fn lex_string_to_tokens(s: &LexString, p: &DocPaths) -> TokenStream {
+    let lex = &p.lex;
+    let description = field_cow_str("description", &s.description, p);
+    let format = field_option("format", &s.format, |f| match f {
+        LexStringFormat::Did => quote! { #lex LexStringFormat::Did },
+        LexStringFormat::Handle => quote! { #lex LexStringFormat::Handle },
+        LexStringFormat::AtUri => quote! { #lex LexStringFormat::AtUri },
+        LexStringFormat::Nsid => quote! { #lex LexStringFormat::Nsid },
+        LexStringFormat::Cid => quote! { #lex LexStringFormat::Cid },
+        LexStringFormat::Datetime => quote! { #lex LexStringFormat::Datetime },
+        LexStringFormat::Language => quote! { #lex LexStringFormat::Language },
+        LexStringFormat::Tid => quote! { #lex LexStringFormat::Tid },
+        LexStringFormat::RecordKey => quote! { #lex LexStringFormat::RecordKey },
+        LexStringFormat::AtIdentifier => quote! { #lex LexStringFormat::AtIdentifier },
+        LexStringFormat::Uri => quote! { #lex LexStringFormat::Uri },
     });
-    let min_len = option_to_tokens(&s.min_length, |v| quote! { #v });
-    let max_len = option_to_tokens(&s.max_length, |v| quote! { #v });
-    let min_graph = option_to_tokens(&s.min_graphemes, |v| quote! { #v });
-    let max_graph = option_to_tokens(&s.max_graphemes, |v| quote! { #v });
+    let min_len = field_option("min_length", &s.min_length, |v| quote! { #v });
+    let max_len = field_option("max_length", &s.max_length, |v| quote! { #v });
+    let min_graph = field_option("min_graphemes", &s.min_graphemes, |v| quote! { #v });
+    let max_graph = field_option("max_graphemes", &s.max_graphemes, |v| quote! { #v });
 
     quote! {
-        ::jacquard_lexicon::lexicon::LexString {
-            description: #description,
-            format: #format,
-            default: None,
-            min_length: #min_len,
-            max_length: #max_len,
-            min_graphemes: #min_graph,
-            max_graphemes: #max_graph,
-            r#enum: None,
-            r#const: None,
-            known_values: None,
+        #lex LexString {
+            #description
+            #format
+            #min_len
+            #max_len
+            #min_graph
+            #max_graph
+            ..Default::default()
         }
     }
 }
 
-/// Convert LexXrpcParameters to tokens
-fn xrpc_parameters_to_tokens(params: &LexXrpcParameters) -> TokenStream {
+/// Convert LexXrpcParameters to tokens.
+fn xrpc_parameters_to_tokens(params: &LexXrpcParameters, p: &DocPaths) -> TokenStream {
+    let lex = &p.lex;
+    let smol = &p.smol;
+    let btree = &p.btree;
     let props: Vec<_> = params
         .properties
         .iter()
         .map(|(name, prop)| {
             let name_str = name.as_str();
-            let prop_tokens = xrpc_param_property_to_tokens(prop);
-            quote! { map.insert(::jacquard_common::deps::smol_str::SmolStr::new_static(#name_str), #prop_tokens) }
+            let prop_tokens = xrpc_param_property_to_tokens(prop, p);
+            quote! { map.insert(#smol::new_static(#name_str), #prop_tokens) }
         })
         .collect();
-    let required = option_vec_smol_str_to_tokens(&params.required);
+    let required = field_vec_smol("required", &params.required, p);
 
     quote! {
-        ::jacquard_lexicon::lexicon::LexXrpcParameters {
-            description: None,
-            required: #required,
+        #lex LexXrpcParameters {
+            #required
             properties: {
                 #[allow(unused_mut)]
-                let mut map = ::alloc::collections::BTreeMap::new();
+                let mut map = #btree::new();
                 #(#props;)*
                 map
             },
+            ..Default::default()
         }
     }
 }
 
-/// Convert LexXrpcParametersProperty to tokens
-fn xrpc_param_property_to_tokens(prop: &LexXrpcParametersProperty) -> TokenStream {
+/// Convert LexXrpcParametersProperty to tokens.
+fn xrpc_param_property_to_tokens(prop: &LexXrpcParametersProperty, p: &DocPaths) -> TokenStream {
+    let lex = &p.lex;
     match prop {
         LexXrpcParametersProperty::Boolean(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Boolean(
-                ::jacquard_lexicon::lexicon::LexBoolean {
-                    description: None,
-                    default: None,
-                    r#const: None,
-                }
-            )
+            #lex LexXrpcParametersProperty::Boolean(#lex LexBoolean { ..Default::default() })
         },
         LexXrpcParametersProperty::Integer(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(
-                ::jacquard_lexicon::lexicon::LexInteger {
-                    description: None,
-                    default: None,
-                    minimum: None,
-                    maximum: None,
-                    r#enum: None,
-                    r#const: None,
-                }
-            )
+            #lex LexXrpcParametersProperty::Integer(#lex LexInteger { ..Default::default() })
         },
         LexXrpcParametersProperty::String(s) => {
-            let string_tokens = lex_string_to_tokens(s);
-            quote! {
-                ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(#string_tokens)
-            }
+            let string_tokens = lex_string_to_tokens(s, p);
+            quote! { #lex LexXrpcParametersProperty::String(#string_tokens) }
         }
         LexXrpcParametersProperty::Unknown(_) => quote! {
-            ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Unknown(
-                ::jacquard_lexicon::lexicon::LexUnknown { description: None }
-            )
+            #lex LexXrpcParametersProperty::Unknown(#lex LexUnknown { ..Default::default() })
         },
         LexXrpcParametersProperty::Array(arr) => {
             let items = match &arr.items {
                 LexPrimitiveArrayItem::Boolean(_) => quote! {
-                    ::jacquard_lexicon::lexicon::LexPrimitiveArrayItem::Boolean(
-                        ::jacquard_lexicon::lexicon::LexBoolean {
-                            description: None,
-                            default: None,
-                            r#const: None,
-                        }
-                    )
+                    #lex LexPrimitiveArrayItem::Boolean(#lex LexBoolean { ..Default::default() })
                 },
                 LexPrimitiveArrayItem::Integer(_) => quote! {
-                    ::jacquard_lexicon::lexicon::LexPrimitiveArrayItem::Integer(
-                        ::jacquard_lexicon::lexicon::LexInteger {
-                            description: None,
-                            default: None,
-                            minimum: None,
-                            maximum: None,
-                            r#enum: None,
-                            r#const: None,
-                        }
-                    )
+                    #lex LexPrimitiveArrayItem::Integer(#lex LexInteger { ..Default::default() })
                 },
                 LexPrimitiveArrayItem::String(s) => {
-                    let string_tokens = lex_string_to_tokens(s);
-                    quote! {
-                        ::jacquard_lexicon::lexicon::LexPrimitiveArrayItem::String(#string_tokens)
-                    }
+                    let string_tokens = lex_string_to_tokens(s, p);
+                    quote! { #lex LexPrimitiveArrayItem::String(#string_tokens) }
                 }
                 LexPrimitiveArrayItem::Unknown(_) => quote! {
-                    ::jacquard_lexicon::lexicon::LexPrimitiveArrayItem::Unknown(
-                        ::jacquard_lexicon::lexicon::LexUnknown { description: None }
-                    )
+                    #lex LexPrimitiveArrayItem::Unknown(#lex LexUnknown { ..Default::default() })
                 },
             };
-            let min = option_to_tokens(&arr.min_length, |v| quote! { #v });
-            let max = option_to_tokens(&arr.max_length, |v| quote! { #v });
+            let min = field_option("min_length", &arr.min_length, |v| quote! { #v });
+            let max = field_option("max_length", &arr.max_length, |v| quote! { #v });
             quote! {
-                ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Array(
-                    ::jacquard_lexicon::lexicon::LexPrimitiveArray {
-                        description: None,
+                #lex LexXrpcParametersProperty::Array(
+                    #lex LexPrimitiveArray {
                         items: #items,
-                        min_length: #min,
-                        max_length: #max,
+                        #min
+                        #max
+                        ..Default::default()
                     }
                 )
             }
@@ -724,36 +676,40 @@ fn xrpc_param_property_to_tokens(prop: &LexXrpcParametersProperty) -> TokenStrea
     }
 }
 
-/// Convert LexXrpcBody to tokens
-fn xrpc_body_to_tokens(body: &LexXrpcBody, union_fields: &BTreeMap<String, String>) -> TokenStream {
+/// Convert LexXrpcBody to tokens.
+fn xrpc_body_to_tokens(
+    body: &LexXrpcBody,
+    union_fields: &BTreeMap<String, String>,
+    p: &DocPaths,
+) -> TokenStream {
+    let lex = &p.lex;
+    let cow = &p.cow;
     let encoding = body.encoding.as_ref();
     let schema = option_to_tokens(&body.schema, |s| match s {
         LexXrpcBodySchema::Object(obj) => {
-            let obj_tokens = object_to_tokens(obj, union_fields);
-            quote! {
-                ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(#obj_tokens)
-            }
+            let obj_tokens = object_to_tokens(obj, union_fields, p);
+            quote! { #lex LexXrpcBodySchema::Object(#obj_tokens) }
         }
         LexXrpcBodySchema::Ref(r) => {
             let ref_str = r.r#ref.as_ref();
             quote! {
-                ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Ref(
-                    ::jacquard_lexicon::lexicon::LexRef {
-                        description: None,
-                        r#ref: ::jacquard_common::CowStr::new_static(#ref_str),
+                #lex LexXrpcBodySchema::Ref(
+                    #lex LexRef {
+                        r#ref: #cow::new_static(#ref_str),
+                        ..Default::default()
                     }
                 )
             }
         }
         LexXrpcBodySchema::Union(union) => {
             let refs: Vec<_> = union.refs.iter().map(|r| r.as_ref()).collect();
-            let closed = option_to_tokens(&union.closed, |c| quote! { #c });
+            let closed = field_option("closed", &union.closed, |c| quote! { #c });
             quote! {
-                ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Union(
-                    ::jacquard_lexicon::lexicon::LexRefUnion {
-                        description: None,
-                        refs: vec![#(::jacquard_common::CowStr::new_static(#refs)),*],
-                        closed: #closed,
+                #lex LexXrpcBodySchema::Union(
+                    #lex LexRefUnion {
+                        refs: vec![#(#cow::new_static(#refs)),*],
+                        #closed
+                        ..Default::default()
                     }
                 )
             }
@@ -761,16 +717,44 @@ fn xrpc_body_to_tokens(body: &LexXrpcBody, union_fields: &BTreeMap<String, Strin
     });
 
     quote! {
-        ::jacquard_lexicon::lexicon::LexXrpcBody {
-            description: None,
-            encoding: ::jacquard_common::CowStr::new_static(#encoding),
+        #lex LexXrpcBody {
+            encoding: #cow::new_static(#encoding),
             schema: #schema,
+            ..Default::default()
         }
     }
 }
 
-/// Convert validation checks to tokens
+/// Convert validation checks to tokens using fully-qualified paths.
+/// Used from derive macros where no import context is available.
 pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
+    validations_to_tokens_resolved(checks, None)
+}
+
+/// Convert validation checks to tokens, optionally using short names from
+/// `ResolvedImports`. When `resolved` is `None`, all paths are fully-qualified
+/// (for derive macro context). When `Some`, paths are shortened via the import
+/// system (for codegen Pretty mode).
+pub fn validations_to_tokens_resolved(
+    checks: &[ValidationCheck],
+    resolved: Option<&crate::codegen::prettify::ResolvedImports>,
+) -> TokenStream {
+    use crate::codegen::prettify::ExternalImport;
+
+    let constraint_error = match resolved {
+        Some(r) => r.external_type_tokens(&ExternalImport::ConstraintError),
+        None => quote! { ::jacquard_lexicon::validation::ConstraintError },
+    };
+    let validation_path = match resolved {
+        Some(r) => r.external_type_tokens(&ExternalImport::ValidationPath),
+        None => quote! { ::jacquard_lexicon::validation::ValidationPath },
+    };
+    let unicode_segmentation = match resolved {
+        Some(r) => r.external_type_tokens(&ExternalImport::UnicodeSegmentation),
+        None => {
+            quote! { jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation }
+        }
+    };
     if checks.is_empty() {
         return quote! { Ok(()) };
     }
@@ -778,13 +762,10 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
     let check_tokens: Vec<_> = checks
         .iter()
         .map(|check| {
-            // Use make_ident to handle keywords properly (adds r# prefix if needed)
             let field_ident = crate::codegen::utils::make_ident(&check.field_name);
             let field_name_literal =
                 syn::LitStr::new(&check.field_name, proc_macro2::Span::call_site());
 
-            // Generate the inner validation check
-            // For array types, use .len() directly; for strings/newtypes, use .as_ref().len()
             let len_expr = if check.is_array {
                 quote! { value.len() }
             } else {
@@ -795,8 +776,8 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                 ConstraintCheck::MaxLength { max } => quote! {
                     #[allow(unused_comparisons)]
                     if #len_expr > #max {
-                        return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
+                        return Err(#constraint_error::MaxLength {
+                            path: #validation_path::from_field(#field_name_literal),
                             max: #max,
                             actual: #len_expr,
                         });
@@ -805,8 +786,8 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                 ConstraintCheck::MinLength { min } => quote! {
                     #[allow(unused_comparisons)]
                     if #len_expr < #min {
-                        return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
+                        return Err(#constraint_error::MinLength {
+                            path: #validation_path::from_field(#field_name_literal),
                             min: #min,
                             actual: #len_expr,
                         });
@@ -814,13 +795,13 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                 },
                 ConstraintCheck::MaxGraphemes { max } => quote! {
                     {
-                        let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        let count = #unicode_segmentation::graphemes(
                             value.as_ref(),
                             true
                         ).count();
                         if count > #max {
-                            return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                                path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
+                            return Err(#constraint_error::MaxGraphemes {
+                                path: #validation_path::from_field(#field_name_literal),
                                 max: #max,
                                 actual: count,
                             });
@@ -829,13 +810,13 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                 },
                 ConstraintCheck::MinGraphemes { min } => quote! {
                     {
-                        let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        let count = #unicode_segmentation::graphemes(
                             value.as_ref(),
                             true
                         ).count();
                         if count < #min {
-                            return Err(::jacquard_lexicon::validation::ConstraintError::MinGraphemes {
-                                path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
+                            return Err(#constraint_error::MinGraphemes {
+                                path: #validation_path::from_field(#field_name_literal),
                                 min: #min,
                                 actual: count,
                             });
@@ -844,8 +825,8 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                 },
                 ConstraintCheck::Maximum { max } => quote! {
                     if *value > #max {
-                        return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
+                        return Err(#constraint_error::Maximum {
+                            path: #validation_path::from_field(#field_name_literal),
                             max: #max,
                             actual: *value,
                         });
@@ -853,8 +834,8 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                 },
                 ConstraintCheck::Minimum { min } => quote! {
                     if *value < #min {
-                        return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                            path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
+                        return Err(#constraint_error::Minimum {
+                            path: #validation_path::from_field(#field_name_literal),
                             min: #min,
                             actual: *value,
                         });
@@ -864,8 +845,8 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                     {
                         let size = value.blob().size;
                         if size > #max {
-                            return Err(::jacquard_lexicon::validation::ConstraintError::BlobTooLarge {
-                                path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
+                            return Err(#constraint_error::BlobTooLarge {
+                                path: #validation_path::from_field(#field_name_literal),
                                 max: #max,
                                 actual: size,
                             });
@@ -889,8 +870,8 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                                 }
                             });
                             if !matched {
-                                return Err(::jacquard_lexicon::validation::ConstraintError::BlobMimeTypeNotAccepted {
-                                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(#field_name_literal),
+                                return Err(#constraint_error::BlobMimeTypeNotAccepted {
+                                    path: #validation_path::from_field(#field_name_literal),
                                     accepted: vec![#(#accept_strs.to_string()),*],
                                     actual: mime.to_string(),
                                 });
@@ -900,9 +881,7 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                 },
             };
 
-            // Wrap in Option check if field is optional
             if check.is_required {
-                // Required field: access directly
                 quote! {
                     {
                         let value = &self.#field_ident;
@@ -910,7 +889,6 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
                     }
                 }
             } else {
-                // Optional field: check if Some first
                 quote! {
                     if let Some(ref value) = self.#field_ident {
                         #inner_check
@@ -926,8 +904,10 @@ pub fn validations_to_tokens(checks: &[ValidationCheck]) -> TokenStream {
     }
 }
 
-// Helper functions
+// --- Helper functions ---
 
+/// Emit `Some(value)` or `None` for an option. Used for enum variant wrappers
+/// where the field assignment is handled by the caller.
 fn option_to_tokens<T, F>(opt: &Option<T>, f: F) -> TokenStream
 where
     F: FnOnce(&T) -> TokenStream,
@@ -941,34 +921,62 @@ where
     }
 }
 
-fn option_cow_str_to_tokens(opt: &Option<jacquard_common::CowStr>) -> TokenStream {
+/// Emit `field_name: Some(value),` when present, or nothing when None.
+/// Used for optional struct fields alongside `..Default::default()`.
+fn field_option<T, F>(name: &str, opt: &Option<T>, f: F) -> TokenStream
+where
+    F: FnOnce(&T) -> TokenStream,
+{
+    match opt {
+        Some(v) => {
+            let ident = syn::Ident::new(name, proc_macro2::Span::call_site());
+            let tokens = f(v);
+            quote! { #ident: Some(#tokens), }
+        }
+        None => TokenStream::new(),
+    }
+}
+
+/// Emit `field_name: Some(CowStr::new_static("...")),` when present, or nothing.
+fn field_cow_str(name: &str, opt: &Option<jacquard_common::CowStr>, p: &DocPaths) -> TokenStream {
+    let cow = &p.cow;
     match opt {
         Some(s) => {
+            let ident = syn::Ident::new(name, proc_macro2::Span::call_site());
             let s_str = s.as_ref();
-            quote! { Some(::jacquard_common::CowStr::new_static(#s_str)) }
+            quote! { #ident: Some(#cow::new_static(#s_str)), }
         }
-        None => quote! { None },
+        None => TokenStream::new(),
     }
 }
 
-fn option_vec_smol_str_to_tokens(opt: &Option<Vec<SmolStr>>) -> TokenStream {
+/// Emit `field_name: Some(vec![SmolStr::new_static(...)]),` when present, or nothing.
+fn field_vec_smol(name: &str, opt: &Option<Vec<SmolStr>>, p: &DocPaths) -> TokenStream {
+    let smol = &p.smol;
     match opt {
         Some(v) => {
+            let ident = syn::Ident::new(name, proc_macro2::Span::call_site());
             let strs: Vec<_> = v.iter().map(|s| s.as_str()).collect();
-            quote! { Some(vec![#(::jacquard_common::deps::smol_str::SmolStr::new_static(#strs)),*]) }
+            quote! { #ident: Some(vec![#(#smol::new_static(#strs)),*]), }
         }
-        None => quote! { None },
+        None => TokenStream::new(),
     }
 }
 
-fn option_vec_mime_type_to_tokens(
+/// Emit `field_name: Some(vec![MimeType(CowStr::new_static(...))]),` when present, or nothing.
+fn field_vec_mime(
+    name: &str,
     opt: &Option<Vec<jacquard_common::types::blob::MimeType>>,
+    p: &DocPaths,
 ) -> TokenStream {
+    let cow = &p.cow;
+    let mime = &p.mime;
     match opt {
         Some(v) => {
+            let ident = syn::Ident::new(name, proc_macro2::Span::call_site());
             let mime_strs: Vec<_> = v.iter().map(|m| m.0.as_ref()).collect();
-            quote! { Some(vec![#(jacquard_common::types::blob::MimeType(::jacquard_common::CowStr::new_static(#mime_strs))),*]) }
+            quote! { #ident: Some(vec![#(#mime(#cow::new_static(#mime_strs))),*]), }
         }
-        None => quote! { None },
+        None => TokenStream::new(),
     }
 }

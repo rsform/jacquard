@@ -5,39 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::graph::StarterPackView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStarterPack<'a> {
     #[serde(borrow)]
-    pub starter_pack: jacquard_common::types::string::AtUri<'a>,
+    pub starter_pack: AtUri<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStarterPackOutput<'a> {
     #[serde(borrow)]
-    pub starter_pack: crate::app_bsky::graph::StarterPackView<'a>,
+    pub starter_pack: StarterPackView<'a>,
 }
 
-/// Response type for
-///app.bsky.graph.getStarterPack
+/// Response type for app.bsky.graph.getStarterPack
 pub struct GetStarterPackResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStarterPackResponse {
     const NSID: &'static str = "app.bsky.graph.getStarterPack";
@@ -52,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetStarterPack<'a> {
     type Response = GetStarterPackResponse;
 }
 
-/// Endpoint type for
-///app.bsky.graph.getStarterPack
+/// Endpoint type for app.bsky.graph.getStarterPack
 pub struct GetStarterPackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPackRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.getStarterPack";
@@ -96,11 +86,9 @@ pub mod get_starter_pack_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetStarterPackBuilder<'a, S: get_starter_pack_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetStarterPack<'a> {
@@ -114,9 +102,9 @@ impl<'a> GetStarterPackBuilder<'a, get_starter_pack_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetStarterPackBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -129,13 +117,13 @@ where
     /// Set the `starterPack` field (required)
     pub fn starter_pack(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetStarterPackBuilder<'a, get_starter_pack_state::SetStarterPack<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetStarterPackBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

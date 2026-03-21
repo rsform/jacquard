@@ -5,41 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStories {
     ///(min: 1)
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub size: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size: Option<i64>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStoriesOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
+    pub value: Data<'a>,
 }
 
-/// Response type for
-///app.rocksky.feed.getStories
+/// Response type for app.rocksky.feed.getStories
 pub struct GetStoriesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStoriesResponse {
     const NSID: &'static str = "app.rocksky.feed.getStories";
@@ -54,8 +43,7 @@ impl jacquard_common::xrpc::XrpcRequest for GetStories {
     type Response = GetStoriesResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.feed.getStories
+/// Endpoint type for app.rocksky.feed.getStories
 pub struct GetStoriesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStoriesRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.feed.getStories";
@@ -85,8 +73,8 @@ pub mod get_stories_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetStoriesBuilder<S: get_stories_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>,),
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>,),
 }
 
 impl GetStories {
@@ -100,7 +88,7 @@ impl GetStoriesBuilder<get_stories_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetStoriesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
         }
     }

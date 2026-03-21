@@ -198,72 +198,87 @@ impl<'c> CodeGenerator<'c> {
         }
     }
 
-    /// Convert ref to Rust type path
-    pub(super) fn ref_to_rust_type(&self, ref_str: &str, resolved: &ResolvedImports) -> Result<TokenStream> {
-        use crate::error::CodegenError;
-
-        // Parse ref to get NSID and def
+    /// Convert a ref string to its full crate path and type name.
+    /// Returns `None` if the ref doesn't exist in the corpus.
+    /// E.g. `"app.bsky.richtext.facet#main"` -> `("crate::app_bsky::richtext::facet::Facet", "Facet")`.
+    /// Build the fully-qualified crate path and type name for a lexicon ref.
+    /// Returns `None` if the ref doesn't exist in the corpus.
+    ///
+    /// The returned tuple is `(full_crate_path, type_name)` where:
+    /// - `full_crate_path` is e.g. `"crate::app_bsky::richtext::facet::Facet"`
+    /// - `type_name` is e.g. `"Facet"`
+    fn build_ref_path(&self, ref_str: &str) -> Option<(String, String)> {
         let ref_path = RefPath::parse(ref_str, None);
         let ref_nsid = ref_path.nsid();
         let ref_def = ref_path.def();
 
-        // Check if ref exists
         if !self.corpus.ref_exists(ref_str) {
-            // Fallback to Data
-            return Ok(resolved.type_tokens(&CommonType::Data));
+            return None;
         }
 
-        // Parse NSID into components
         let nsid_path = NsidPath::parse(ref_nsid);
         let parts = nsid_path.segments();
         let last_segment = nsid_path.last_segment();
-
-        // Convert NSID to module path
-        // com.atproto.repo.strongRef -> com_atproto::repo::strong_ref::StrongRef
-        // app.bsky.richtext.facet -> app_bsky::richtext::facet::Facet
-        // app.bsky.actor.defs#nux -> app_bsky::actor::Nux (defs go in parent module)
         let type_name = self.def_to_type_name(ref_nsid, ref_def);
 
+        // defs types go in parent module (e.g. app.bsky.actor.defs#nux -> app_bsky::actor::Nux).
         let path_str = if nsid_path.is_defs() && parts.len() >= 3 {
-            // defs types go in parent module
             let first_two = namespace_prefix(parts[0], parts[1]);
             if parts.len() == 3 {
-                // com.atproto.defs -> com_atproto::TypeName
                 join_path_parts(&[&self.root_module, &first_two, &type_name])
             } else {
-                // app.bsky.actor.defs -> app_bsky::actor::TypeName
                 let middle = &parts[2..parts.len() - 1];
                 let middle_path = join_module_path(middle);
                 join_path_parts(&[&self.root_module, &first_two, &middle_path, &type_name])
             }
         } else {
-            // Regular types go in their own module file
+            // Regular types go in their own module file.
             let (module_path, file_module) = if parts.len() >= 3 {
-                // Join first two segments with underscore
                 let first_two = namespace_prefix(parts[0], parts[1]);
                 let file_name = sanitize_name_cow(last_segment).to_string().to_snake_case();
-
                 if parts.len() > 3 {
-                    // Middle segments form the module path
                     let middle = &parts[2..parts.len() - 1];
                     let middle_path = join_module_path(middle);
                     let base_path = join_path_parts(&[&first_two, &middle_path]);
                     (base_path, file_name)
                 } else {
-                    // Only 3 parts: com.atproto.label -> com_atproto, file: label
                     (first_two, file_name)
                 }
             } else if parts.len() == 2 {
-                // e.g., "com.example" -> "com_example", file: example
                 let first = sanitize_name_cow(parts[0]).to_string();
                 let file_name = sanitize_name_cow(parts[1]).to_string().to_snake_case();
                 (first, file_name)
             } else {
                 (parts[0].to_string(), "main".to_string())
             };
-
             join_path_parts(&[&self.root_module, &module_path, &file_module, &type_name])
         };
+
+        Some((path_str, type_name))
+    }
+
+    /// Get the fully-qualified crate path and type name for a cross-namespace ref.
+    /// Used by the collection pass to feed into `ResolvedImports::resolve()`.
+    pub(super) fn ref_to_crate_path(&self, ref_str: &str) -> Option<(String, String)> {
+        self.build_ref_path(ref_str)
+    }
+
+    /// Convert ref to Rust type path, using short names from resolved imports when available.
+    pub(super) fn ref_to_rust_type(&self, ref_str: &str, resolved: &ResolvedImports) -> Result<TokenStream> {
+        use crate::error::CodegenError;
+
+        let Some((path_str, _type_name)) = self.build_ref_path(ref_str) else {
+            return Ok(resolved.type_tokens(&CommonType::Data));
+        };
+
+        // In Pretty mode, check if this path was imported via a use statement.
+        if let Some(short_tokens) = resolved.lexicon_ref_tokens(&path_str) {
+            return if self.ref_needs_lifetime(ref_str) {
+                Ok(quote! { #short_tokens<'a> })
+            } else {
+                Ok(quote! { #short_tokens })
+            };
+        }
 
         let path: syn::Path =
             syn::parse_str(&path_str).map_err(|e| CodegenError::PathParseError {
@@ -271,7 +286,6 @@ impl<'c> CodeGenerator<'c> {
                 source: e,
             })?;
 
-        // Only add lifetime if the target type needs it
         if self.ref_needs_lifetime(ref_str) {
             Ok(quote! { #path<'a> })
         } else {

@@ -5,36 +5,24 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DeletePageParams<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub id: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub id: Option<CowStr<'a>>,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct DeletePage;
-/// Response type for
-///app.blebbit.authr.page.deletePage
+/// Response type for app.blebbit.authr.page.deletePage
 pub struct DeletePageResponse;
 impl jacquard_common::xrpc::XrpcResp for DeletePageResponse {
     const NSID: &'static str = "app.blebbit.authr.page.deletePage";
@@ -51,8 +39,7 @@ impl jacquard_common::xrpc::XrpcRequest for DeletePage {
     type Response = DeletePageResponse;
 }
 
-/// Endpoint type for
-///app.blebbit.authr.page.deletePage
+/// Endpoint type for app.blebbit.authr.page.deletePage
 pub struct DeletePageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeletePageRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.page.deletePage";
@@ -84,9 +71,9 @@ pub mod delete_page_params_state {
 
 /// Builder for constructing an instance of this type
 pub struct DeletePageParamsBuilder<'a, S: delete_page_params_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> DeletePageParams<'a> {
@@ -100,21 +87,21 @@ impl<'a> DeletePageParamsBuilder<'a, delete_page_params_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeletePageParamsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: delete_page_params_state::State> DeletePageParamsBuilder<'a, S> {
     /// Set the `id` field (optional)
-    pub fn id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
-    pub fn maybe_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }

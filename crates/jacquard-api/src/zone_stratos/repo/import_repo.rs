@@ -5,57 +5,51 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::deps::bytes::Bytes;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ImportRepo {
-    pub body: jacquard_common::deps::bytes::Bytes,
+    pub body: Bytes,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ImportRepoOutput<'a> {
     ///Number of records successfully imported.
     pub imported: i64,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ImportRepoError<'a> {
     /// The CAR file is malformed, has missing blocks, or contains records with mismatched CIDs.
     #[serde(rename = "InvalidCar")]
-    InvalidCar(core::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidCar(Option<CowStr<'a>>),
     /// The destination already has records for this DID. Import is only supported for empty repos.
     #[serde(rename = "RepoAlreadyExists")]
-    RepoAlreadyExists(core::option::Option<jacquard_common::CowStr<'a>>),
+    RepoAlreadyExists(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for ImportRepoError<'_> {
@@ -80,8 +74,7 @@ impl core::fmt::Display for ImportRepoError<'_> {
     }
 }
 
-/// Response type for
-///zone.stratos.repo.importRepo
+/// Response type for zone.stratos.repo.importRepo
 pub struct ImportRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for ImportRepoResponse {
     const NSID: &'static str = "zone.stratos.repo.importRepo";
@@ -113,8 +106,7 @@ impl jacquard_common::xrpc::XrpcRequest for ImportRepo {
     }
 }
 
-/// Endpoint type for
-///zone.stratos.repo.importRepo
+/// Endpoint type for zone.stratos.repo.importRepo
 pub struct ImportRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ImportRepoRequest {
     const PATH: &'static str = "/xrpc/zone.stratos.repo.importRepo";

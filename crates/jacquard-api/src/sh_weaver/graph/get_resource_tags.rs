@@ -5,40 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::types::string::AtUri;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::graph::ResourceTagsView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetResourceTags<'a> {
     #[serde(borrow)]
-    pub resource: jacquard_common::types::string::AtUri<'a>,
+    pub resource: AtUri<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetResourceTagsOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::sh_weaver::graph::ResourceTagsView<'a>,
+    pub value: ResourceTagsView<'a>,
 }
 
-/// Response type for
-///sh.weaver.graph.getResourceTags
+/// Response type for sh.weaver.graph.getResourceTags
 pub struct GetResourceTagsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetResourceTagsResponse {
     const NSID: &'static str = "sh.weaver.graph.getResourceTags";
@@ -53,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetResourceTags<'a> {
     type Response = GetResourceTagsResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.graph.getResourceTags
+/// Endpoint type for sh.weaver.graph.getResourceTags
 pub struct GetResourceTagsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetResourceTagsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.graph.getResourceTags";
@@ -97,11 +86,9 @@ pub mod get_resource_tags_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetResourceTagsBuilder<'a, S: get_resource_tags_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtUri<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetResourceTags<'a> {
@@ -115,9 +102,9 @@ impl<'a> GetResourceTagsBuilder<'a, get_resource_tags_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetResourceTagsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -130,13 +117,13 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+        value: impl Into<AtUri<'a>>,
     ) -> GetResourceTagsBuilder<'a, get_resource_tags_state::SetResource<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetResourceTagsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

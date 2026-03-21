@@ -5,53 +5,45 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::EntryView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorEntries<'a> {
     #[serde(borrow)]
-    pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub actor: AtIdentifier<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     /// Defaults to `false`.
     #[serde(default = "_default_include_collaborations")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub include_collaborations: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_collaborations: Option<bool>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorEntriesOutput<'a> {
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: Option<CowStr<'a>>,
     #[serde(borrow)]
-    pub entries: Vec<crate::sh_weaver::notebook::EntryView<'a>>,
+    pub entries: Vec<EntryView<'a>>,
 }
 
-/// Response type for
-///sh.weaver.actor.getActorEntries
+/// Response type for sh.weaver.actor.getActorEntries
 pub struct GetActorEntriesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorEntriesResponse {
     const NSID: &'static str = "sh.weaver.actor.getActorEntries";
@@ -66,8 +58,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorEntries<'a> {
     type Response = GetActorEntriesResponse;
 }
 
-/// Endpoint type for
-///sh.weaver.actor.getActorEntries
+/// Endpoint type for sh.weaver.actor.getActorEntries
 pub struct GetActorEntriesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorEntriesRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.actor.getActorEntries";
@@ -76,11 +67,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetActorEntriesRequest {
     type Response = GetActorEntriesResponse;
 }
 
-fn _default_include_collaborations() -> core::option::Option<bool> {
+fn _default_include_collaborations() -> Option<bool> {
     Some(false)
 }
 
-fn _default_limit() -> core::option::Option<i64> {
+fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
@@ -118,14 +109,14 @@ pub mod get_actor_entries_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetActorEntriesBuilder<'a, S: get_actor_entries_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    _phantom_state: PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<bool>,
-        ::core::option::Option<i64>,
+        Option<AtIdentifier<'a>>,
+        Option<CowStr<'a>>,
+        Option<bool>,
+        Option<i64>,
     ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetActorEntries<'a> {
@@ -139,9 +130,9 @@ impl<'a> GetActorEntriesBuilder<'a, get_actor_entries_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetActorEntriesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -154,28 +145,25 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> GetActorEntriesBuilder<'a, get_actor_entries_state::SetActor<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetActorEntriesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_actor_entries_state::State> GetActorEntriesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }

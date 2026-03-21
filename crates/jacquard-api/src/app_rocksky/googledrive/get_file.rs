@@ -5,40 +5,30 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::googledrive::FileView;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFile<'a> {
     #[serde(borrow)]
-    pub file_id: jacquard_common::CowStr<'a>,
+    pub file_id: CowStr<'a>,
 }
 
+
 #[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFileOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::app_rocksky::googledrive::FileView<'a>,
+    pub value: FileView<'a>,
 }
 
-/// Response type for
-///app.rocksky.googledrive.getFile
+/// Response type for app.rocksky.googledrive.getFile
 pub struct GetFileResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFileResponse {
     const NSID: &'static str = "app.rocksky.googledrive.getFile";
@@ -53,8 +43,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetFile<'a> {
     type Response = GetFileResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.googledrive.getFile
+/// Endpoint type for app.rocksky.googledrive.getFile
 pub struct GetFileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFileRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.googledrive.getFile";
@@ -97,9 +86,9 @@ pub mod get_file_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetFileBuilder<'a, S: get_file_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetFile<'a> {
@@ -113,9 +102,9 @@ impl<'a> GetFileBuilder<'a, get_file_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetFileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -128,13 +117,13 @@ where
     /// Set the `fileId` field (required)
     pub fn file_id(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetFileBuilder<'a, get_file_state::SetFileId<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetFileBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

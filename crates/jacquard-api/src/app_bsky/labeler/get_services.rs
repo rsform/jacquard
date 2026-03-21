@@ -5,62 +5,47 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::types::string::Did;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::labeler::LabelerView;
+use crate::app_bsky::labeler::LabelerViewDetailed;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetServices<'a> {
     /// Defaults to `false`.
     #[serde(default = "_default_detailed")]
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
-    pub detailed: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub detailed: Option<bool>,
     #[serde(borrow)]
-    pub dids: Vec<jacquard_common::types::string::Did<'a>>,
+    pub dids: Vec<Did<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetServicesOutput<'a> {
     #[serde(borrow)]
     pub views: Vec<GetServicesOutputViewsItem<'a>>,
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[open_union]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetServicesOutputViewsItem<'a> {
     #[serde(rename = "app.bsky.labeler.defs#labelerView")]
-    LabelerView(Box<crate::app_bsky::labeler::LabelerView<'a>>),
+    LabelerView(Box<LabelerView<'a>>),
     #[serde(rename = "app.bsky.labeler.defs#labelerViewDetailed")]
-    LabelerViewDetailed(Box<crate::app_bsky::labeler::LabelerViewDetailed<'a>>),
+    LabelerViewDetailed(Box<LabelerViewDetailed<'a>>),
 }
 
-/// Response type for
-///app.bsky.labeler.getServices
+/// Response type for app.bsky.labeler.getServices
 pub struct GetServicesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetServicesResponse {
     const NSID: &'static str = "app.bsky.labeler.getServices";
@@ -75,8 +60,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetServices<'a> {
     type Response = GetServicesResponse;
 }
 
-/// Endpoint type for
-///app.bsky.labeler.getServices
+/// Endpoint type for app.bsky.labeler.getServices
 pub struct GetServicesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetServicesRequest {
     const PATH: &'static str = "/xrpc/app.bsky.labeler.getServices";
@@ -85,7 +69,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetServicesRequest {
     type Response = GetServicesResponse;
 }
 
-fn _default_detailed() -> core::option::Option<bool> {
+fn _default_detailed() -> Option<bool> {
     Some(false)
 }
 
@@ -123,12 +107,9 @@ pub mod get_services_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetServicesBuilder<'a, S: get_services_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<bool>,
-        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<bool>, Option<Vec<Did<'a>>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetServices<'a> {
@@ -142,9 +123,9 @@ impl<'a> GetServicesBuilder<'a, get_services_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetServicesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -170,13 +151,13 @@ where
     /// Set the `dids` field (required)
     pub fn dids(
         mut self,
-        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+        value: impl Into<Vec<Did<'a>>>,
     ) -> GetServicesBuilder<'a, get_services_state::SetDids<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetServicesBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }

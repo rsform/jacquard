@@ -5,44 +5,36 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_derive::{IntoStatic, lexicon};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::ageassurance::State;
+use crate::app_bsky::ageassurance::StateMetadata;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetState<'a> {
     #[serde(borrow)]
-    pub country_code: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub country_code: CowStr<'a>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub region_code: core::option::Option<jacquard_common::CowStr<'a>>,
+    pub region_code: Option<CowStr<'a>>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStateOutput<'a> {
     #[serde(borrow)]
-    pub metadata: crate::app_bsky::ageassurance::StateMetadata<'a>,
+    pub metadata: StateMetadata<'a>,
     #[serde(borrow)]
-    pub state: crate::app_bsky::ageassurance::State<'a>,
+    pub state: State<'a>,
 }
 
-/// Response type for
-///app.bsky.ageassurance.getState
+/// Response type for app.bsky.ageassurance.getState
 pub struct GetStateResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStateResponse {
     const NSID: &'static str = "app.bsky.ageassurance.getState";
@@ -57,8 +49,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetState<'a> {
     type Response = GetStateResponse;
 }
 
-/// Endpoint type for
-///app.bsky.ageassurance.getState
+/// Endpoint type for app.bsky.ageassurance.getState
 pub struct GetStateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStateRequest {
     const PATH: &'static str = "/xrpc/app.bsky.ageassurance.getState";
@@ -101,12 +92,9 @@ pub mod get_state_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetStateBuilder<'a, S: get_state_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetState<'a> {
@@ -120,9 +108,9 @@ impl<'a> GetStateBuilder<'a, get_state_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetStateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -135,31 +123,25 @@ where
     /// Set the `countryCode` field (required)
     pub fn country_code(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetStateBuilder<'a, get_state_state::SetCountryCode<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetStateBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
 
 impl<'a, S: get_state_state::State> GetStateBuilder<'a, S> {
     /// Set the `regionCode` field (optional)
-    pub fn region_code(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn region_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `regionCode` field to an Option value (optional)
-    pub fn maybe_region_code(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_region_code(mut self, value: Option<CowStr<'a>>) -> Self {
         self.__unsafe_private_named.1 = value;
         self
     }

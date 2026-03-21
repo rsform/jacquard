@@ -5,71 +5,67 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::place_atwork::listing::Listing;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetListing<'a> {
     #[serde(borrow)]
-    pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub repo: AtIdentifier<'a>,
     #[serde(borrow)]
-    pub rkey: jacquard_common::CowStr<'a>,
+    pub rkey: CowStr<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetListingOutput<'a> {
     ///CID of the listing record
-    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: Option<Cid<'a>>,
     ///AT-URI of the listing
     #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
+    pub uri: AtUri<'a>,
     ///The job listing record
     #[serde(borrow)]
-    pub value: crate::place_atwork::listing::Listing<'a>,
+    pub value: Listing<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetListingError<'a> {
     /// The requested listing does not exist
     #[serde(rename = "ListingNotFound")]
-    ListingNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    ListingNotFound(Option<CowStr<'a>>),
     /// Failed to parse the listing data
     #[serde(rename = "ListingParseFailed")]
-    ListingParseFailed(core::option::Option<jacquard_common::CowStr<'a>>),
+    ListingParseFailed(Option<CowStr<'a>>),
     /// Failed to fetch the listing from storage
     #[serde(rename = "ListingFetchFailed")]
-    ListingFetchFailed(core::option::Option<jacquard_common::CowStr<'a>>),
+    ListingFetchFailed(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetListingError<'_> {
@@ -101,8 +97,7 @@ impl core::fmt::Display for GetListingError<'_> {
     }
 }
 
-/// Response type for
-///place.atwork.getListing
+/// Response type for place.atwork.getListing
 pub struct GetListingResponse;
 impl jacquard_common::xrpc::XrpcResp for GetListingResponse {
     const NSID: &'static str = "place.atwork.getListing";
@@ -117,8 +112,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for GetListing<'a> {
     type Response = GetListingResponse;
 }
 
-/// Endpoint type for
-///place.atwork.getListing
+/// Endpoint type for place.atwork.getListing
 pub struct GetListingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetListingRequest {
     const PATH: &'static str = "/xrpc/place.atwork.getListing";
@@ -137,48 +131,45 @@ pub mod get_listing_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rkey;
         type Repo;
+        type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rkey = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRkey<S> {}
-    impl<S: State> State for SetRkey<S> {
-        type Rkey = Set<members::rkey>;
-        type Repo = S::Repo;
+        type Rkey = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Rkey = S::Rkey;
         type Repo = Set<members::repo>;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type Repo = S::Repo;
+        type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetListingBuilder<'a, S: get_listing_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> GetListing<'a> {
@@ -192,9 +183,9 @@ impl<'a> GetListingBuilder<'a, get_listing_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetListingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -207,13 +198,13 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> GetListingBuilder<'a, get_listing_state::SetRepo<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         GetListingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -226,13 +217,13 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CowStr<'a>>,
     ) -> GetListingBuilder<'a, get_listing_state::SetRkey<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = Option::Some(value.into());
         GetListingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -240,8 +231,8 @@ where
 impl<'a, S> GetListingBuilder<'a, S>
 where
     S: get_listing_state::State,
-    S::Rkey: get_listing_state::IsSet,
     S::Repo: get_listing_state::IsSet,
+    S::Rkey: get_listing_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetListing<'a> {

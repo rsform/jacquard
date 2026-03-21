@@ -5,63 +5,58 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use alloc::collections::BTreeMap;
+use core::marker::PhantomData;
+use jacquard_common::CowStr;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_derive::{IntoStatic, lexicon, open_union};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::identity::IdentityInfo;
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RefreshIdentity<'a> {
     #[serde(borrow)]
-    pub identifier: jacquard_common::types::ident::AtIdentifier<'a>,
+    pub identifier: AtIdentifier<'a>,
 }
 
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+
+#[lexicon]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct RefreshIdentityOutput<'a> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: crate::com_atproto::identity::IdentityInfo<'a>,
+    pub value: IdentityInfo<'a>,
 }
 
-#[jacquard_derive::open_union]
+
+#[open_union]
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
+    Serialize,
+    Deserialize,
     Debug,
     Clone,
     PartialEq,
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic
+    IntoStatic
 )]
+
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RefreshIdentityError<'a> {
     /// The resolution process confirmed that the handle does not resolve to any DID.
     #[serde(rename = "HandleNotFound")]
-    HandleNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    HandleNotFound(Option<CowStr<'a>>),
     /// The DID resolution process confirmed that there is no current DID.
     #[serde(rename = "DidNotFound")]
-    DidNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
+    DidNotFound(Option<CowStr<'a>>),
     /// The DID previously existed, but has been deactivated.
     #[serde(rename = "DidDeactivated")]
-    DidDeactivated(core::option::Option<jacquard_common::CowStr<'a>>),
+    DidDeactivated(Option<CowStr<'a>>),
 }
 
 impl core::fmt::Display for RefreshIdentityError<'_> {
@@ -93,8 +88,7 @@ impl core::fmt::Display for RefreshIdentityError<'_> {
     }
 }
 
-/// Response type for
-///com.atproto.identity.refreshIdentity
+/// Response type for com.atproto.identity.refreshIdentity
 pub struct RefreshIdentityResponse;
 impl jacquard_common::xrpc::XrpcResp for RefreshIdentityResponse {
     const NSID: &'static str = "com.atproto.identity.refreshIdentity";
@@ -111,8 +105,7 @@ impl<'a> jacquard_common::xrpc::XrpcRequest for RefreshIdentity<'a> {
     type Response = RefreshIdentityResponse;
 }
 
-/// Endpoint type for
-///com.atproto.identity.refreshIdentity
+/// Endpoint type for com.atproto.identity.refreshIdentity
 pub struct RefreshIdentityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RefreshIdentityRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.refreshIdentity";
@@ -157,11 +150,9 @@ pub mod refresh_identity_state {
 
 /// Builder for constructing an instance of this type
 pub struct RefreshIdentityBuilder<'a, S: refresh_identity_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<AtIdentifier<'a>>,),
+    _phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> RefreshIdentity<'a> {
@@ -175,9 +166,9 @@ impl<'a> RefreshIdentityBuilder<'a, refresh_identity_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RefreshIdentityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -190,13 +181,13 @@ where
     /// Set the `identifier` field (required)
     pub fn identifier(
         mut self,
-        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<'a>>,
     ) -> RefreshIdentityBuilder<'a, refresh_identity_state::SetIdentifier<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         RefreshIdentityBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
+            _phantom: PhantomData,
         }
     }
 }
@@ -216,7 +207,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: alloc::collections::BTreeMap<
+        extra_data: BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

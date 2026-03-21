@@ -5,34 +5,21 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
+use core::marker::PhantomData;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct SeekParams {
     pub position: i64,
 }
 
 /// XRPC request marker type.
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Copy
-)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct Seek;
-/// Response type for
-///app.rocksky.spotify.seek
+/// Response type for app.rocksky.spotify.seek
 pub struct SeekResponse;
 impl jacquard_common::xrpc::XrpcResp for SeekResponse {
     const NSID: &'static str = "app.rocksky.spotify.seek";
@@ -49,8 +36,7 @@ impl jacquard_common::xrpc::XrpcRequest for Seek {
     type Response = SeekResponse;
 }
 
-/// Endpoint type for
-///app.rocksky.spotify.seek
+/// Endpoint type for app.rocksky.spotify.seek
 pub struct SeekRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SeekRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.spotify.seek";
@@ -95,8 +81,8 @@ pub mod seek_params_state {
 
 /// Builder for constructing an instance of this type
 pub struct SeekParamsBuilder<S: seek_params_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>,),
+    _phantom_state: PhantomData<fn() -> S>,
+    __unsafe_private_named: (Option<i64>,),
 }
 
 impl SeekParams {
@@ -110,7 +96,7 @@ impl SeekParamsBuilder<seek_params_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SeekParamsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: (None,),
         }
     }
@@ -126,9 +112,9 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SeekParamsBuilder<seek_params_state::SetPosition<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = Option::Some(value.into());
         SeekParamsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
+            _phantom_state: PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
         }
     }
